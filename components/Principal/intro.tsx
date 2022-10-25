@@ -11,8 +11,12 @@ const Intro = () => {
           <div className='w-full h-full'>A-IMG</div>
         </div>
 
-        <div className='grid grid-cols-2 w-full h-full border-black border-b-2 border-x-2'>
-          <div className='w-full h-auto'>B</div>
+        <div className='grid grid-cols-2 w-full  border-black border-b-2 border-x-2'>
+          <div className='w-full h-auto pt-10 text-center '>
+            <p>USE TAGS, DISCOVER CONTENT,</p>
+            <p>READ ALL THE LINKS</p>
+            <p>THE WEB3 KNOWLEDGE GRAPH</p>
+          </div>
           <div className='w-full h-auto'>B-IMG</div>
         </div>
 
