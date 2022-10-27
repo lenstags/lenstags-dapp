@@ -8,7 +8,8 @@ module.exports = {
     extend: {
       colors:{
         greenLengs: "#dff602",
-        rojoLengs: "#ff3233"
+        rojoLengs: "#ff3233",
+        letrasGrises: "#a4a3a3"
 
       }
     },

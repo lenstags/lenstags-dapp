@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const Nav = () => {
+const Nav = () => {
   return (
     <div className='flex w-full content-center 
     justify-center bg-greenLengs text-black border-black border-2
@@ -12,7 +12,9 @@ export const Nav = () => {
             onClick={()=>{
                 console.log("CONECTANDO")
             }}
-        >CONECT METAMASK</div>  
+        >CONNECT METAMASK</div>  
     </div>
   )
 }
+
+export default Nav
