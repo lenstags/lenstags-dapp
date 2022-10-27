@@ -58,7 +58,7 @@ const Card: React.FC <Props> = ({img}): JSX.Element => {
               <div className='text-center'>
                 <div>
                   <div className='card-Name'>{datosUser.user_Name}</div>
-                  <img src="add" alt="" />
+                  <img src={Vector.src} alt="" className='' />
                 </div>
                 <div className='card-grayLetters'>{datosUser.lens}</div>
               </div>

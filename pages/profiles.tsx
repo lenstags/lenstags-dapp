@@ -7,7 +7,7 @@ const Profiles = () => {
     return (
         <div className='bg-white w-full h-auto'>
             <Nav/>
-            <Card/>
+            <Card img=""/>
         </div>
     ) 
 }
