@@ -20,7 +20,42 @@ a {
     color-scheme: dark;
   }
   body {
-    color: white;
+    color: black;
     background: black;
   }
+}
+
+
+.Card_container {
+  width: 500px;
+  height: 500px;
+  background-color: #FFF;
+  border-radius: 20px;
+  padding: 20px;
+}
+
+.Card_container_collect_bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border: 1px solid red;
+}
+
+.Card_container_tags {
+  display: flex;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.Card_tags {
+  margin-right: 5px;
+  border: solid 1px;
+  padding: 3px;
+  background-color: #DEF702;
+}
+
+.Card_likes {
+  margin-top: 10px;
+  font-weight: 600;
 }
