@@ -10,7 +10,7 @@ import CardOptions from './CardOptions'
 //IMG
 import world from "../../assets/World.png"
 import Cover from './Cover'
-import Vector from '../../assets/Vector.png'
+import vector from '../../assets/Vector.png'
 import Line1 from '../../assets/Line 1.png'
 
 type Props = {
@@ -34,7 +34,7 @@ const Card: React.FC <Props> = ({img}): JSX.Element => {
 
   
   return (
-    <div className='text-black border-black border-x-2 border-b-2 w-1/5  h-auto ml-20'>
+    <div className='text-black border-black border-x border-b w-1/3  h-auto ml-20'>
       
       <div className='flex flex-col w-auto'>
         <div className='z-0'>
@@ -55,10 +55,14 @@ const Card: React.FC <Props> = ({img}): JSX.Element => {
 
             <div className='flex flex-col content-center w-auto'>
                   
-              <div className='text-center'>
-                <div>
-                  <div className='card-Name'>{datosUser.user_Name}</div>
-                  <img src={Vector.src} alt="" className='' />
+              <div className='text-center pt-5 w-auto'>
+                <div className='w-auto flex'>
+                  
+                    <div className='card-Name w-auto mx-auto flex'>
+                        {datosUser.user_Name}
+                        <img src={vector.src} alt="" className='absolute vector' />
+                    </div>
+                    
                 </div>
                 <div className='card-grayLetters'>{datosUser.lens}</div>
               </div>
@@ -81,7 +85,7 @@ const Card: React.FC <Props> = ({img}): JSX.Element => {
 
           </div>
 
-          <div className='border-black border-t-2 w-auto card-optiones'>
+          <div className='border-black border-t w-auto card-optiones'>
         
             <CardOptions line={Line1}/>
 
