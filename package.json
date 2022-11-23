@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@apollo/client": "^3.7.1",
     "@heroicons/react": "^2.0.12",
     "@rainbow-me/rainbowkit": "^0.7.4",
     "daisyui": "^2.41.0",
