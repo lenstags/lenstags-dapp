@@ -1,4 +1,9 @@
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+
 const UnauthorizedScreen = () => {
+
+  const { openConnectModal } = useConnectModal();
+
   return (
     <div
       className="hero min-h-screen"
@@ -11,7 +16,7 @@ const UnauthorizedScreen = () => {
           <p className="mb-5">
             Please sign in with your wallet
           </p>
-          <button className="btn btn-primary">Sign In</button>
+          <button className="btn btn-primary" onClick={openConnectModal}>Sign In</button>
         </div>
       </div>
     </div>
