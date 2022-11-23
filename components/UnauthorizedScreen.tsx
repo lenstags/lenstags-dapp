@@ -1,4 +1,9 @@
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+
 const UnauthorizedScreen = () => {
+
+  const { openConnectModal } = useConnectModal();
+
   return (
     <div
       className="hero min-h-screen bg-black">
