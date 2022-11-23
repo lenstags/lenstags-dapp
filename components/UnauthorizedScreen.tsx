@@ -6,7 +6,7 @@ const UnauthorizedScreen = () => {
       <div className="hero-content text-center text-neutral-content">
         <div className="max-w-md">
           <h1 className="mb-5 text-5xl text-white font-bold">Welcome to</h1>
-          <img src="img/logo-extended-white.svg" className="logo-img"></img>
+          <img src="img/logo-extended-white.svg"></img>
           <p className="mb-5">
             Please sign in with your wallet
           </p>
