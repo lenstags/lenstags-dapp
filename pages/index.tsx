@@ -1,11 +1,13 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useAccount } from "wagmi";
 import Nav from "../components/Nav/Nav";
 import UnauthorizedScreen from "../components/UnauthorizedScreen";
 
-const Home: NextPage = () => {
-  const isLoggedIn = false;
 
+const Home: NextPage = () => {
+  const { isConnected } = useAccount()
+  
   return (
     <div className="bg-white">
       <Head>
@@ -21,13 +23,7 @@ const Home: NextPage = () => {
       </Head>
 
       <main className="h-screen bg-white">
-        {
-          isLoggedIn ? (
-            <Nav />
-          ) : (
-            <UnauthorizedScreen />
-          )
-        }
+        {isConnected ? <Nav /> : <UnauthorizedScreen />}
       </main>
 
       <footer className=""></footer>

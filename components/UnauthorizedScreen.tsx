@@ -15,9 +15,7 @@ const UnauthorizedScreen = () => {
           <p className="mb-5">
             Please sign in with your wallet
           </p>
-          {/* <button className="btn bg-greenLenstags text-black font-semibold hover:bg-greenLenstags hover:font-semibold active:font-semibold focus:font-semibold ">Sign In</button>
-           */}
-          <button className="btn rounded-full gap-1 bg-greenLenstags text-black  border-none hover:bg-greenLenstags">
+          <button  onClick={openConnectModal} className="btn rounded-full gap-1 bg-greenLenstags text-black  border-none hover:bg-greenLenstags">
           <svg xmlns="http://www.w3.org/2000/svg" className="icon icon-tabler icon-tabler-login" width="28" height="28" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000" fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
           <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
@@ -25,6 +23,7 @@ const UnauthorizedScreen = () => {
           </svg>
           Sign In
           </button>
+
         </div>
       </div>
     </div>
