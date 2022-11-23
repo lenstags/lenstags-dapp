@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body {
   padding: 0;
@@ -23,4 +27,65 @@ a {
     color: white;
     background: black;
   }
+}
+.cover{
+  top:150px;
+  left:150px;
+}
+
+.coverImg{
+  width: 160px;
+  height: 180px
+}
+
+// FONTS 
+
+
+.card-Numbers{
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 36px;
+
+    color: #000000;
+}
+
+.font-pizzola{
+    font-family: 'Piazzolla';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 28px;
+}
+
+.card-grayLetters{
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 29px;
+    color: #AAAAAA;
+
+}
+
+.card-Name {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 36px;
+}
+
+.card-optiones{
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 200;
+  font-size: 20px;
+  line-height: 10px;
+}
+
+.vector{
+  right: 600px;
+  bottom: 470px;
 }
