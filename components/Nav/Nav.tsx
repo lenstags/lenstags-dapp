@@ -1,15 +1,16 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import React, { useState } from "react";
 import Image from "next/image";
 import Tabs from "../Tabs/Tabs";
 import Cards from "../Cards/Cards";
-import Pagination from "../Pagination/Pagination";
 import HeaderProfile from "../Profile/Profile";
 import SearchTags from "../TagsSection/TagsSection";
+import { useDisconnect } from "wagmi";
+import Pagination from "../Pagination/pagination";
 
 export default function IndexPage() {
   const [show, setShow] = useState(false);
   const [profile, setProfile] = useState(false);
+  const { disconnect } = useDisconnect();
 
   return (
     <>
@@ -377,7 +378,12 @@ export default function IndexPage() {
                                   <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
                                   <path d="M7 12h14l-3 -3m0 6l3 -3" />
                                 </svg>
-                                <span className="text-sm ml-2">Disconnect</span>
+                                <span
+                                  className="text-sm ml-2"
+                                  onClick={() => disconnect()}
+                                >
+                                  Disconnect
+                                </span>
                               </div>
                             </li>
                           </ul>
