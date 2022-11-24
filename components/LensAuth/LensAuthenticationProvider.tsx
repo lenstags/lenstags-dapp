@@ -42,7 +42,6 @@ export default function LensAuthenticationProvider({
   };
 
   const setAuthenticated = (lensStore: LensLocalStorage) => {
-    console.log("auth");
     setAuthenticationToken(lensStore.accessToken);
     setAuthenticationStatus("authenticated");
     setProfile({
@@ -53,7 +52,6 @@ export default function LensAuthenticationProvider({
   };
 
   useEffect(() => {
-    console.log("use fx");
     const lensStore = getFromLocalStorage();
     if (!lensStore) {
       clearProfile();
