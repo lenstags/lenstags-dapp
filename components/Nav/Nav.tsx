@@ -1,16 +1,27 @@
-import React, { useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import Tabs from "../Tabs/Tabs";
 import Cards from "../Cards/Cards";
 import HeaderProfile from "../Profile/Profile";
-import SearchTags from "../TagsSection/TagsSection";
 import { useDisconnect } from "wagmi";
 import Pagination from "../Pagination/pagination";
+import { TagsFilterContext } from "../TagsFilter/TagsFilterProvider";
+import { explore } from "../../lib/lens/explore-publications";
+import TagsFilter from "../TagsFilter/TagsFilter";
 
 export default function IndexPage() {
   const [show, setShow] = useState(false);
   const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
+
+  const { tags } = useContext(TagsFilterContext);
+
+  useEffect(() => {
+    explore({ tags }).then((data) => {
+      // TODO Integrate with card listing
+      console.log(data);
+    });
+  }, [tags]);
 
   return (
     <>
@@ -470,7 +481,9 @@ export default function IndexPage() {
             <div className="container mx-auto py-10 h-64 md:w-4/5 w-11/12 px-6 ">
               <HeaderProfile />
               <Tabs />
-              <SearchTags />
+              <div className="mb-3">
+                <TagsFilter />
+              </div>
               <div className="w-full h-auto">
                 <Cards />
                 <Pagination />
