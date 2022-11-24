@@ -4,88 +4,9 @@
 
 html,
 body {
+  color: #000000;
   padding: 0;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
-  body {
-    color: white;
-    background: black;
-  }
-}
-.cover{
-  top:150px;
-  left:150px;
-}
-
-.coverImg{
-  width: 160px;
-  height: 180px
-}
-
-// FONTS 
-
-
-.card-Numbers{
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 36px;
-
-    color: #000000;
-}
-
-.font-pizzola{
-    font-family: 'Piazzolla';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
-}
-
-.card-grayLetters{
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 29px;
-    color: #AAAAAA;
-
-}
-
-.card-Name {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-size: 30px;
-  line-height: 36px;
-}
-
-.card-optiones{
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 200;
-  font-size: 20px;
-  line-height: 10px;
-}
-
-.vector{
-  right: 600px;
-  bottom: 470px;
 }

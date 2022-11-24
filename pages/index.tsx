@@ -1,9 +1,12 @@
 import type { NextPage } from "next";
 import Head from "next/head";
+import { Avatar, Flex, Heading, Divider } from '@chakra-ui/react'
 import { useAccount } from "wagmi";
-import Nav from "../components/Nav/Nav";
+import MainLayout from "../components/Layouts/MainLayout";
+import NavBar from "../components/NavBar/Navbar";
 import TagsFilterProvider from "../components/TagsFilter/TagsFilterProvider";
 import UnauthorizedScreen from "../components/UnauthorizedScreen";
+import { Card } from "../components/Card/Card";
 
 const Home: NextPage = () => {
   const { isConnected } = useAccount();
@@ -22,9 +25,20 @@ const Home: NextPage = () => {
           <meta name="theme-color" content="#ffffff"/>
       </Head>
 
-      <main className="h-screen bg-white">
+      <main className="h-screen">
         <TagsFilterProvider>
-          {isConnected ? <Nav /> : <UnauthorizedScreen />}
+          {isConnected ? (
+            <MainLayout
+              header={<NavBar />}
+            >
+              <Flex w='100%' align="center" direction="column">
+                <Avatar size='2xl' name='Segun Adebayo' src='https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9' />
+                <Heading>Profile name</Heading>
+                <Divider />
+                <Card />
+              </Flex>
+            </MainLayout>
+          ): <UnauthorizedScreen />}
         </TagsFilterProvider>
       </main>
 

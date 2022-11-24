@@ -1,1 +1,1 @@
-export const LENSTAGS_SOURCE = "lenstags";
+export const LENSTAGS_SOURCE = "lenstube";
