@@ -1,5 +1,7 @@
+import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useContext } from "react";
 import { useAccount } from "wagmi";
 import Nav from "../components/Nav/Nav";
 import TagsFilterProvider from "../components/TagsFilter/TagsFilterProvider";
@@ -7,6 +9,7 @@ import UnauthorizedScreen from "../components/UnauthorizedScreen";
 
 const Home: NextPage = () => {
   const { isConnected } = useAccount();
+  const profile = useContext(ProfileContext);
 
   return (
     <div className="bg-white">
@@ -25,6 +28,8 @@ const Home: NextPage = () => {
       <main className="h-screen bg-white">
         <TagsFilterProvider>
           {isConnected ? <Nav /> : <UnauthorizedScreen />}
+          {/* Replace this line to ONLY use Lens Login */}
+          {/* {profile ? <Nav /> : <UnauthorizedScreen />} */}
         </TagsFilterProvider>
       </main>
 
