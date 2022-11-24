@@ -4,6 +4,7 @@ import { useAccount } from "wagmi";
 import Nav from "../components/Nav/Nav";
 import TagsFilterProvider from "../components/TagsFilter/TagsFilterProvider";
 import UnauthorizedScreen from "../components/UnauthorizedScreen";
+import Footer from "../components/Footer/Footer"
 
 const Home: NextPage = () => {
   const { isConnected } = useAccount();
@@ -28,7 +29,7 @@ const Home: NextPage = () => {
         </TagsFilterProvider>
       </main>
 
-      <footer className=""></footer>
+      <Footer/>
     </div>
   );
 };
