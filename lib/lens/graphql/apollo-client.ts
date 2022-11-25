@@ -7,6 +7,7 @@ import {
   InMemoryCache,
 } from "@apollo/client/core";
 import { onError } from "@apollo/client/link/error";
+import { getFromLocalStorage } from "../localStorage";
 
 const API_URL = "https://api.lens.dev";
 let authenticationToken: string | null = null;
@@ -27,7 +28,11 @@ export const setAuthenticationToken = (token: string | null) => {
 };
 
 export const getAuthenticationToken = () => {
-  return authenticationToken;
+  if (authenticationToken) {
+    return authenticationToken;
+  }
+  const localStorageProfile = getFromLocalStorage();
+  return localStorageProfile?.accessToken;
 };
 
 const httpLink = new HttpLink({

@@ -29,7 +29,6 @@ export const explore = async (filter?: IExplorePublications) => {
     customFilters: [CustomFiltersTypes.Gardeners],
   };
 
-  console.log(filter?.tags);
   if (filter?.tags) {
     reqQuery.metadata = {
       tags: { oneOf: filter.tags },

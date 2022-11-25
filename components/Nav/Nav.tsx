@@ -8,6 +8,8 @@ import Pagination from "../Pagination/pagination";
 import { TagsFilterContext } from "../TagsFilter/TagsFilterProvider";
 import { explore } from "../../lib/lens/explore-publications";
 import TagsFilter from "../TagsFilter/TagsFilter";
+import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
+import { deleteLensLocalStorage } from "@lib/lens/localStorage";
 
 export default function IndexPage() {
   const [show, setShow] = useState(false);
@@ -15,6 +17,8 @@ export default function IndexPage() {
   const { disconnect } = useDisconnect();
 
   const { tags } = useContext(TagsFilterContext);
+
+  const lensProfile = useContext(ProfileContext);
 
   useEffect(() => {
     explore({ tags }).then((data) => {
@@ -220,11 +224,12 @@ export default function IndexPage() {
                           className=""
                           width="30px"
                           height="30px"
-                          src="/img/user.png"
+                          src={lensProfile?.pictureUrl || "/img/user.png"}
                           alt="avatar"
                         />
                         <p className="md:text-xl  text-gray-800 text-base leading-4 ml-2">
-                          CryptoNahue
+                          {/* FIXME Remove harcoded name */}
+                          {lensProfile?.name || "CryptoNahue"}
                         </p>
                       </div>
                       <ul className="flex">
@@ -391,7 +396,11 @@ export default function IndexPage() {
                                 </svg>
                                 <span
                                   className="text-sm ml-2"
-                                  onClick={() => disconnect()}
+                                  onClick={() => {
+                                    // FIXME should clear whole profile and token everywhere like in clearProfile()
+                                    deleteLensLocalStorage();
+                                    disconnect();
+                                  }}
                                 >
                                   Disconnect
                                 </span>
@@ -406,14 +415,15 @@ export default function IndexPage() {
                             className=""
                             width="60px"
                             height="60px"
-                            src="/img/user.png"
+                            src={lensProfile?.pictureUrl || "/img/user.png"}
                             alt="avatar"
                           />
                           <div className="w-2 h-2 rounded-full bg-green-400 border border-white absolute inset-0 mb-0 mr-0 m-auto" />
                         </div>
                       </div>
                       <p className="text-gray-800 text-sm mx-3 hover:text-black">
-                        CryptoNahue
+                        {/* FIXME Remove harcoded name */}
+                        {lensProfile?.name || "CryptoNahue"}
                       </p>
                       <div className="cursor-pointer text-gray-600">
                         <svg

@@ -1,9 +1,10 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import "../styles/globals.css";
+import type { AppProps } from "next/app";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
+import LensAuthenticationProvider from "components/LensAuth/LensAuthenticationProvider";
 
 const { chains, provider } = configureChains(
   [chain.polygon, chain.polygonMumbai],
@@ -24,12 +25,13 @@ const wagmiClient = createClient({
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains}>
-      <Component {...pageProps} />
-      </RainbowKitProvider>
+      <LensAuthenticationProvider>
+        <RainbowKitProvider chains={chains}>
+          <Component {...pageProps} />
+        </RainbowKitProvider>
+      </LensAuthenticationProvider>
     </WagmiConfig>
   );
 }
 
-export default MyApp
-
+export default MyApp;

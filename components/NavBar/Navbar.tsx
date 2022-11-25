@@ -1,3 +1,4 @@
+import { deleteLensLocalStorage } from "@lib/lens/localStorage";
 import { useDisconnect } from "wagmi";
 
 export default function NavBar() {
@@ -23,7 +24,15 @@ export default function NavBar() {
               className="menu menu-compact dropdown-content mt-3 p-2 shadow bg-base-100 rounded-box w-52"
             >
               <li>
-                <a onClick={() => disconnect()}>Disconnect</a>
+                <a
+                  onClick={() => {
+                    // FIXME should clear whole profile and token everywhere like in clearProfile()
+                    deleteLensLocalStorage();
+                    disconnect();
+                  }}
+                >
+                  Disconnect
+                </a>
               </li>
             </ul>
           </div>
