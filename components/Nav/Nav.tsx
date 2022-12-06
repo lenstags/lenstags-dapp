@@ -1,5 +1,6 @@
+/* eslint-disable jsx-a11y/role-supports-aria-props */
+/* eslint-disable @next/next/no-img-element */
 import React, { useContext, useEffect, useState } from "react";
-import Image from "next/image";
 import Tabs from "../Tabs/Tabs";
 import Cards from "../Cards/Cards";
 import HeaderProfile from "../Profile/Profile";
@@ -33,7 +34,7 @@ export default function IndexPage() {
         <div className="flex flex-no-wrap">
           <div className="absolute lg:relative w-64 h-screen shadow bg-gray-100  hidden lg:block">
             <div className="h-16 w-full flex items-center px-8 bg-greenLengs">
-              <Image
+              <img
                 src="/img/logo-extended.svg"
                 alt="Lenstags Logo"
                 width={100}
@@ -107,7 +108,7 @@ export default function IndexPage() {
                 <div>
                   <div className="flex items-center justify-between px-8">
                     <div className="h-16 w-full flex items-center">
-                      <Image
+                      <img
                         src="/img/logo-extended.svg"
                         alt="Lenstags Logo"
                         width={100}
@@ -220,7 +221,7 @@ export default function IndexPage() {
                   <div className="border-t border-black">
                     <div className="w-full flex items-center justify-between px-6 pt-1">
                       <div className="flex items-center  ">
-                        <Image
+                        <img
                           className=""
                           width="30px"
                           height="30px"
@@ -411,7 +412,7 @@ export default function IndexPage() {
                           ""
                         )}
                         <div className="relative p-0 m-0">
-                          <Image
+                          <img
                             className=""
                             width="60px"
                             height="60px"
@@ -454,7 +455,7 @@ export default function IndexPage() {
                 <div className="flex justify-between w-screen items-center">
                   <div className="ml-3">
                     {" "}
-                    <Image
+                    <img
                       src="/img/logo-extended.svg"
                       alt="Lenstags Logo"
                       width={100}

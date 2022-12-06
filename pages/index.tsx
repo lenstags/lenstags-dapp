@@ -1,7 +1,7 @@
 import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 import Nav from "../components/Nav/Nav";
 import TagsFilterProvider from "../components/TagsFilter/TagsFilterProvider";
@@ -10,6 +10,14 @@ import UnauthorizedScreen from "../components/UnauthorizedScreen";
 const Home: NextPage = () => {
   const { isConnected } = useAccount();
   const profile = useContext(ProfileContext);
+const [hydrationLoading, sethydrationLoading] = useState(true)
+useEffect(() => {
+ sethydrationLoading(false)
+}, [])
+
+if (hydrationLoading) {
+  return <h1>Loading...</h1>
+}
 
   return (
     <div className="bg-white">
