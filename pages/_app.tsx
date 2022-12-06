@@ -5,6 +5,7 @@ import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import LensAuthenticationProvider from "components/LensAuth/LensAuthenticationProvider";
+import TagsFilterProvider from "components/TagsFilter/TagsFilterProvider";
 
 const { chains, provider } = configureChains(
   [chain.polygon, chain.polygonMumbai],
@@ -27,7 +28,9 @@ function MyApp({ Component, pageProps }: AppProps) {
     <WagmiConfig client={wagmiClient}>
       <LensAuthenticationProvider>
         <RainbowKitProvider chains={chains}>
+        <TagsFilterProvider>
           <Component {...pageProps} />
+        </TagsFilterProvider>
         </RainbowKitProvider>
       </LensAuthenticationProvider>
     </WagmiConfig>

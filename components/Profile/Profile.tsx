@@ -2,7 +2,7 @@
 
 import { profileMockData } from "../../__mocks__/profileMockData";
 
-const Header = () => {
+export const Profile = () => {
   return (
     <div className="mb-5">
       <div className="bg-greenLengs py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between px-5 shadow rounded-t">
@@ -82,4 +82,4 @@ const Header = () => {
     </div>
   );
 };
-export default Header;
+

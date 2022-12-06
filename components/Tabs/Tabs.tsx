@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-const Index = () => {
+export const Tabs = () => {
     const [activeStatus, setActiveStatus] = useState(1);
 
     return (
@@ -23,4 +23,3 @@ const Index = () => {
         </div>
     );
 };
-export default Index;

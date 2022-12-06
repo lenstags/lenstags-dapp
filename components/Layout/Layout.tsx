@@ -34,7 +34,7 @@ export const Layout: FC<Props> = ({ children, title, pageDescription }) => {
           <nav>
             <Navbar />
           </nav>
-          <main>{children}</main>
+          <main className="h-screen bg-white">{children}</main>
         </>
       ) : (
         <UnauthorizedScreen />

@@ -6,7 +6,7 @@ import { TagsFilterContext } from "./TagsFilterProvider";
 const selectedtyle = "bg-greenLengs text-black border-black shadow";
 
 // TODO Improve UI when there are too many tags for two lines
-export default function TagsFilter() {
+export const TagsFilter = () => {
   const [selected, setSelected] = useState<boolean[]>([]);
   const { setTags } = useContext(TagsFilterContext);
 

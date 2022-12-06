@@ -1,2 +1,5 @@
 export * from './Layout'
 export * from './Navbar'
+export * from './Profile'
+export * from './TagsFilter'
+export * from './Tabs'
