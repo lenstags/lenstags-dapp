@@ -10,12 +10,12 @@ import UnauthorizedScreen from "../components/UnauthorizedScreen";
 const Home: NextPage = () => {
   const { isConnected } = useAccount();
   const profile = useContext(ProfileContext);
-const [hidratattionLoading, sethidratattionLoading] = useState(true)
+const [hydrationLoading, sethydrationLoading] = useState(true)
 useEffect(() => {
- sethidratattionLoading(false)
+ sethydrationLoading(false)
 }, [])
 
-if (hidratattionLoading) {
+if (hydrationLoading) {
   return <h1>Loading...</h1>
 }
 
