@@ -46,12 +46,15 @@ export const Navbar = () => {
                 <div>
                   <div className="flex items-center justify-between px-8">
                     <div className="h-16 w-full flex items-center">
+                    <Link href={'/'}>
+
                       <img
                         src="/img/logo-extended.svg"
                         alt="Lenstags Logo"
                         width={100}
                         height={60}
                       />
+                    </Link>
                     </div>
                     <div
                       id="closeSideBar"
@@ -192,12 +195,14 @@ export const Navbar = () => {
           <div className="w-full">
             <nav className="h-16 flex items-center lg:items-stretch justify-end lg:justify-between bg-greenLengs  relative z-10">
               <div className="hidden lg:flex w-full pr-6">
+                <Link href={'/'}>
                 <img
                   src="/img/logo-extended.svg"
                   alt="Lenstags Logo"
                   width={100}
                   height={60}
                 />
+                </Link>
                 <div className="w-1/2 h-full hidden lg:flex items-center pl-6 pr-24">
                   {/**ACA va los items del navbar */}
 
