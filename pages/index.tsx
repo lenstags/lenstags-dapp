@@ -1,9 +1,9 @@
+import { Navbar } from "components";
 import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import Nav from "../components/Nav/Nav";
 import TagsFilterProvider from "../components/TagsFilter/TagsFilterProvider";
 import UnauthorizedScreen from "../components/UnauthorizedScreen";
 
@@ -35,7 +35,7 @@ if (hydrationLoading) {
 
       <main className="h-screen bg-white">
         <TagsFilterProvider>
-          {isConnected ? <Nav /> : <UnauthorizedScreen />}
+          {isConnected ? <Navbar /> : <UnauthorizedScreen />}
           {/* Replace this line to ONLY use Lens Login */}
           {/* {profile ? <Nav /> : <UnauthorizedScreen />} */}
         </TagsFilterProvider>
