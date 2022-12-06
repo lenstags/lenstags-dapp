@@ -1,4 +1,5 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
+
 import { profileMockData } from "../../__mocks__/profileMockData";
 
 const Header = () => {
@@ -7,7 +8,7 @@ const Header = () => {
       <div className="bg-greenLengs py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between px-5 shadow rounded-t">
         <div className="flex items-center  sm:mb-0 md:mb-0 lg:mb-0 xl:mb-0">
           <div className="relative w-24 h-24 ">
-            <Image
+            <img
               width="100%"
               height="100%"
               src={profileMockData.profilePic}
