@@ -9,14 +9,14 @@ import { useAccount } from "wagmi";
 const Home: NextPage = () => {
   const { isConnected } = useAccount();
   const profile = useContext(ProfileContext);
-  const [hydrationLoading, sethydrationLoading] = useState(true);
-  useEffect(() => {
-    sethydrationLoading(false);
-  }, []);
+const [hydrationLoading, sethydrationLoading] = useState(true)
+useEffect(() => {
+ sethydrationLoading(false)
+}, [])
 
-  if (hydrationLoading) {
-    return <h1>Loading...</h1>;
-  }
+if (hydrationLoading) {
+  return <h1>Loading...</h1>
+}
 
   return (
     <div className="bg-white">
