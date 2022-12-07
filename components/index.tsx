@@ -1,6 +1,0 @@
-export * from './Layout/Layout'
-export * from './Navbar/Navbar'
-export * from './Profile/Profile'
-export * from './TagsFilter/TagsFilter'
-export * from './Tabs/Tabs'
-export * from './UnauthorizedScreen/UnauthorizedScreen'

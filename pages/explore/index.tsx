@@ -1,4 +1,5 @@
-import { Layout } from "components";
+
+import { Layout } from "components/Layout/Layout";
 import { NextPage } from "next";
 
 const Explore: NextPage = () => {
