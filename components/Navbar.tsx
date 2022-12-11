@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useContext, useEffect, useState } from "react";
 import { useDisconnect } from "wagmi";
-import { TagsFilterContext } from "./TagsFilter/TagsFilterProvider";
+import { TagsFilterContext } from "./TagsFilterProvider";
 import { explore } from "../lib/lens/explore-publications";
 import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
 import { deleteLensLocalStorage } from "@lib/lens/localStorage";

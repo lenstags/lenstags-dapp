@@ -1,8 +1,7 @@
 import Head from "next/head";
 import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { UnauthorizedScreen } from '../UnauthorizedScreen/UnauthorizedScreen';
-import { Navbar } from "components";
+import { Navbar, UnauthorizedScreen } from "components";
 
 interface Props {
   title: string;
