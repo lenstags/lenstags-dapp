@@ -1,5 +1,5 @@
 
-import { Layout } from "components/Layout";
+import { Layout } from "components";
 import { NextPage } from "next";
 
 const Explore: NextPage = () => {
