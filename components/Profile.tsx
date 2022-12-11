@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { profileMockData } from "../../__mocks__/profileMockData";
+import { profileMockData } from "../__mocks__/profileMockData";
 
 export const Profile = () => {
   return (
