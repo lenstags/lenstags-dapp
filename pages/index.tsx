@@ -1,7 +1,7 @@
 import { Layout } from "components/Layout/Layout";
 import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
 import { Profile } from "components/Profile/Profile";
-import { Tabs } from "components/Tabs/Tabs";
+import { Tabs } from "components";
 import { TagsFilter } from "components/TagsFilter";
 import type { NextPage } from "next";
 import Head from "next/head";
