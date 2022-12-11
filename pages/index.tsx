@@ -1,4 +1,4 @@
-import { Layout } from "components/Layout/Layout";
+import { Layout } from "components/Layout";
 import { ProfileContext } from "components/LensAuthenticationProvider";
 import { Profile } from "components/Profile";
 import { Tabs } from "components";
