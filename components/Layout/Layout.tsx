@@ -1,4 +1,4 @@
-import { Navbar } from "components/Navbar/Navbar";
+import { Navbar } from "../Navbar/Navbar";
 import Head from "next/head";
 import React, { FC, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
