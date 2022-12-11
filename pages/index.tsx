@@ -1,5 +1,5 @@
 import { Layout } from "components/Layout/Layout";
-import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
+import { ProfileContext } from "components/LensAuthenticationProvider";
 import { Profile } from "components/Profile";
 import { Tabs } from "components";
 import { TagsFilter } from "components/TagsFilter";

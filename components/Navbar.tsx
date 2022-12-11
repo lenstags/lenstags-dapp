@@ -4,7 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { useDisconnect } from "wagmi";
 import { TagsFilterContext } from "./TagsFilterProvider";
 import { explore } from "../lib/lens/explore-publications";
-import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
+import { ProfileContext } from "components/LensAuthenticationProvider";
 import { deleteLensLocalStorage } from "@lib/lens/localStorage";
 import Link from "next/link";
 
