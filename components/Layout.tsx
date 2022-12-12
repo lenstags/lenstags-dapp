@@ -7,9 +7,10 @@ interface Props {
   title: string;
   pageDescription: string;
   children: React.ReactNode;
+  screen?: boolean
 }
 
-export const Layout: FC<Props> = ({ children, title, pageDescription }) => {
+export const Layout: FC<Props> = ({ children, title, pageDescription, screen }) => {
   const { isConnected } = useAccount();
   const [hydrationLoading, sethydrationLoading] = useState(true);
   useEffect(() => {
@@ -33,7 +34,7 @@ export const Layout: FC<Props> = ({ children, title, pageDescription }) => {
           <nav>
             <Navbar />
           </nav>
-          <main className="h-screen bg-white">{children}</main>
+          <main className={`${ !screen ? 'h-screen' : 'h-full'} bg-white`}>{children}</main>
         </>
       ) : (
         <UnauthorizedScreen />
