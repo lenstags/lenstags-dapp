@@ -1,6 +1,6 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 
-const UnauthorizedScreen = () => {
+export const UnauthorizedScreen = () => {
 
   const { openConnectModal } = useConnectModal();
 
@@ -30,4 +30,3 @@ const UnauthorizedScreen = () => {
   );
 };
 
-export default UnauthorizedScreen;

@@ -1,18 +1,13 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 /* eslint-disable @next/next/no-img-element */
 import React, { useContext, useEffect, useState } from "react";
-import Tabs from "../Tabs/Tabs";
-import Cards from "../Cards/Cards";
-import HeaderProfile from "../Profile/Profile";
 import { useDisconnect } from "wagmi";
-import Pagination from "../Pagination/pagination";
-import { TagsFilterContext } from "../TagsFilter/TagsFilterProvider";
-import { explore } from "../../lib/lens/explore-publications";
-import TagsFilter from "../TagsFilter/TagsFilter";
-import { ProfileContext } from "components/LensAuth/LensAuthenticationProvider";
+import { explore } from "../lib/lens/explore-publications";
+import { ProfileContext, TagsFilterContext } from "components";
 import { deleteLensLocalStorage } from "@lib/lens/localStorage";
+import Link from "next/link";
 
-export default function IndexPage() {
+export const Navbar = () => {
   const [show, setShow] = useState(false);
   const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
@@ -32,64 +27,6 @@ export default function IndexPage() {
     <>
       <div className="w-full h-full bg-gray-100">
         <div className="flex flex-no-wrap">
-          <div className="absolute lg:relative w-64 h-screen shadow bg-gray-100  hidden lg:block">
-            <div className="h-16 w-full flex items-center px-8 bg-greenLengs">
-              <img
-                src="/img/logo-extended.svg"
-                alt="Lenstags Logo"
-                width={100}
-                height={60}
-              />
-            </div>
-            <ul aria-orientation="vertical" className=" py-6">
-              <li className="pl-6 cursor-pointer  text-sm leading-3 tracking-normal pb-4 pt-5 text-black hover:font-semibold focus:font-semibold focus:outline-none">
-                <div className="flex items-center">
-                  <div>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="icon icon-tabler icon-tabler-grid"
-                      width={20}
-                      height={20}
-                      viewBox="0 0 24 24"
-                      strokeWidth="1.5"
-                      stroke="currentColor"
-                      fill="none"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path stroke="none" d="M0 0h24v24H0z" />
-                      <rect x={4} y={4} width={6} height={6} rx={1} />
-                      <rect x={14} y={4} width={6} height={6} rx={1} />
-                      <rect x={4} y={14} width={6} height={6} rx={1} />
-                      <rect x={14} y={14} width={6} height={6} rx={1} />
-                    </svg>
-                  </div>
-                  <span className="ml-2">Dashboard</span>
-                </div>
-              </li>
-              <li className="pl-6 cursor-pointer  text-sm leading-3 tracking-normal pb-4 pt-5 text-black hover:font-semibold focus:font-semibold focus:outline-none">
-                <div className="flex items-center">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-compass"
-                    width={20}
-                    height={20}
-                    viewBox="0 0 24 24"
-                    strokeWidth="1.5"
-                    stroke="currentColor"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" />
-                    <polyline points="8 16 10 10 16 8 14 14 8 16" />
-                    <circle cx={12} cy={12} r={9} />
-                  </svg>
-                  <span className="ml-2">Explorer</span>
-                </div>
-              </li>
-            </ul>
-          </div>
           {/*Mobile responsive sidebar*/}
           <div
             className={
@@ -108,12 +45,15 @@ export default function IndexPage() {
                 <div>
                   <div className="flex items-center justify-between px-8">
                     <div className="h-16 w-full flex items-center">
+                    <Link href={'/'}>
+
                       <img
                         src="/img/logo-extended.svg"
                         alt="Lenstags Logo"
                         width={100}
                         height={60}
                       />
+                    </Link>
                     </div>
                     <div
                       id="closeSideBar"
@@ -160,7 +100,7 @@ export default function IndexPage() {
                           </svg>
                         </div>
                         <span className="ml-2 xl:text-base md:text-2xl text-base">
-                          Dashboard
+                        <Link href={"/organizations"}>Organizations</Link>
                         </span>
                       </div>
                     </li>
@@ -184,40 +124,13 @@ export default function IndexPage() {
                           </svg>
                         </div>
                         <span className="ml-2 xl:text-base md:text-2xl text-base">
-                          Explorer
+                          <Link href={"/explore"}>Explore</Link>
                         </span>
                       </div>
                     </li>
                   </ul>
                 </div>
                 <div className="w-full">
-                  <div className="flex justify-center mb-4 w-full px-6 ">
-                    <div className="relative w-full">
-                      <div className="text-gray-500 absolute ml-4 inset-0 m-auto w-4 h-4">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-search"
-                          width={16}
-                          height={16}
-                          viewBox="0 0 24 24"
-                          strokeWidth={1}
-                          stroke="#A0AEC0"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" />
-                          <circle cx={10} cy={10} r={7} />
-                          <line x1={21} y1={21} x2={15} y2={15} />
-                        </svg>
-                      </div>
-                      <input
-                        className="bg-gray-200 focus:outline-none border hover:border-2 hover:border-black rounded-none w-full text-sm text-gray-500  pl-10 py-2"
-                        type="text"
-                        placeholder="Search"
-                      />
-                    </div>
-                  </div>
                   <div className="border-t border-black">
                     <div className="w-full flex items-center justify-between px-6 pt-1">
                       <div className="flex items-center  ">
@@ -281,32 +194,20 @@ export default function IndexPage() {
           <div className="w-full">
             <nav className="h-16 flex items-center lg:items-stretch justify-end lg:justify-between bg-greenLengs  relative z-10">
               <div className="hidden lg:flex w-full pr-6">
+                <Link href={'/'}>
+                <img
+                  src="/img/logo-extended.svg"
+                  alt="Lenstags Logo"
+                  width={100}
+                  height={60}
+                />
+                </Link>
                 <div className="w-1/2 h-full hidden lg:flex items-center pl-6 pr-24">
-                  <div className="relative w-full">
-                    <div className="text-gray-500 absolute ml-4 inset-0 m-auto w-4 h-4">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-search"
-                        width={16}
-                        height={16}
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path stroke="none" d="M0 0h24v24H0z" />
-                        <circle cx={10} cy={10} r={7} />
-                        <line x1={21} y1={21} x2={15} y2={15} />
-                      </svg>
-                    </div>
-                    <input
-                      className="border border-black focus:outline-none focus:border-black focus:border-2 rounded-none w-full text-sm text-gray-500 bg-greenLengs pl-12 py-2"
-                      type="text"
-                      placeholder="Search"
-                    />
-                  </div>
+                  {/**ACA va los items del navbar */}
+
+                  <Link href={"/explore"}>Explore</Link>
+
+                  <Link href={"/organizations"}>Organizations</Link>
                 </div>
                 <div className="w-1/2 hidden lg:flex">
                   <div className="w-full flex items-center pl-8 justify-end">
@@ -489,20 +390,9 @@ export default function IndexPage() {
                 </div>
               </div>
             </nav>
-            <div className="container mx-auto py-10 h-64 md:w-4/5 w-11/12 px-6 ">
-              <HeaderProfile />
-              <Tabs />
-              <div className="mb-3">
-                <TagsFilter />
-              </div>
-              <div className="w-full h-auto">
-                <Cards />
-                <Pagination />
-              </div>
-            </div>
           </div>
         </div>
       </div>
     </>
   );
-}
+};
