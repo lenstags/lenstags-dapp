@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
-/* eslint-disable @next/next/no-img-element */
 import React, { useContext, useEffect, useState } from "react";
 import { useDisconnect } from "wagmi";
+import Image from "next/image";
 import { explore } from "../lib/lens/explore-publications";
 import { ProfileContext, TagsFilterContext } from "components";
 import { deleteLensLocalStorage } from "@lib/lens/localStorage";
@@ -45,15 +45,14 @@ export const Navbar = () => {
                 <div>
                   <div className="flex items-center justify-between px-8">
                     <div className="h-16 w-full flex items-center">
-                    <Link href={'/'}>
-
-                      <img
-                        src="/img/logo-extended.svg"
-                        alt="Lenstags Logo"
-                        width={100}
-                        height={60}
-                      />
-                    </Link>
+                      <Link href={"/"}>
+                        <Image
+                          src="/img/logo-extended.svg"
+                          alt="Lenstags Logo"
+                          width={100}
+                          height={60}
+                        />
+                      </Link>
                     </div>
                     <div
                       id="closeSideBar"
@@ -100,7 +99,7 @@ export const Navbar = () => {
                           </svg>
                         </div>
                         <span className="ml-2 xl:text-base md:text-2xl text-base">
-                        <Link href={"/organizations"}>Organizations</Link>
+                          <Link href={"/organizations"}>Organizations</Link>
                         </span>
                       </div>
                     </li>
@@ -134,7 +133,7 @@ export const Navbar = () => {
                   <div className="border-t border-black">
                     <div className="w-full flex items-center justify-between px-6 pt-1">
                       <div className="flex items-center  ">
-                        <img
+                        <Image
                           className=""
                           width="30px"
                           height="30px"
@@ -142,8 +141,7 @@ export const Navbar = () => {
                           alt="avatar"
                         />
                         <p className="md:text-xl  text-gray-800 text-base leading-4 ml-2">
-                          {/* FIXME Remove harcoded name */}
-                          {lensProfile?.name || "CryptoNahue"}
+                          {lensProfile?.name || "no-name"}
                         </p>
                       </div>
                       <ul className="flex">
@@ -192,15 +190,15 @@ export const Navbar = () => {
           </div>
 
           <div className="w-full">
-            <nav className="h-16 flex items-center lg:items-stretch justify-end lg:justify-between bg-greenLengs  relative z-10">
+            <nav className="h-16 px-10 flex items-center lg:items-stretch justify-end lg:justify-between bg-greenLengs  relative z-10">
               <div className="hidden lg:flex w-full pr-6">
-                <Link href={'/'}>
-                <img
-                  src="/img/logo-extended.svg"
-                  alt="Lenstags Logo"
-                  width={100}
-                  height={60}
-                />
+                <Link href={"/"}>
+                  <Image
+                    src="/img/logo-extended.svg"
+                    alt="Lenstags Logo"
+                    width={100}
+                    height={60}
+                  />
                 </Link>
                 <div className="w-1/2 h-full hidden lg:flex items-center pl-6 pr-24">
                   {/**ACA va los items del navbar */}
@@ -256,8 +254,19 @@ export const Navbar = () => {
                     >
                       <div className="rounded-full">
                         {profile ? (
-                          <ul className="p-2 w-full border-r bg-white absolute rounded left-0 shadow mt-12 sm:mt-16 ">
-                            <li className="flex w-full justify-between text-gray-600 hover:text-black cursor-pointer items-center">
+                          <ul
+                            className=" font-extralight -left-16 border-r text-black bg-white absolute rounded shadow  "
+                            style={{ marginTop: "4.4rem" }}
+                          >
+                            <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer ">
+                              <div className="fl  first-letter:ex  ">
+                                <p className="text-xs">Connected as</p>
+                                <p className=" font-normal">
+                                  @{lensProfile?.handle}
+                                </p>
+                              </div>
+                            </li>
+                            <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer items-center">
                               <div className="flex items-center">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -275,10 +284,13 @@ export const Navbar = () => {
                                   <circle cx={12} cy={7} r={4} />
                                   <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                 </svg>
-                                <span className="text-sm ml-2">My Profile</span>
+                                <Link href={"/settings"} className="ml-2">
+                                  &nbsp;Settings
+                                </Link>
                               </div>
                             </li>
-                            <li className="flex w-full justify-between text-gray-600 hover:text-black cursor-pointer items-center mt-2">
+
+                            <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer items-center">
                               <div className="flex items-center">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -297,7 +309,7 @@ export const Navbar = () => {
                                   <path d="M7 12h14l-3 -3m0 6l3 -3" />
                                 </svg>
                                 <span
-                                  className="text-sm ml-2"
+                                  className="  ml-2"
                                   onClick={() => {
                                     // FIXME should clear whole profile and token everywhere like in clearProfile()
                                     deleteLensLocalStorage();
@@ -313,20 +325,19 @@ export const Navbar = () => {
                           ""
                         )}
                         <div className="relative p-0 m-0">
-                          <img
-                            className=""
-                            width="60px"
-                            height="60px"
+                          <Image
+                            height={70}
+                            width={70}
+                            objectFit="cover"
                             src={lensProfile?.pictureUrl || "/img/user.png"}
                             alt="avatar"
                           />
-                          <div className="w-2 h-2 rounded-full bg-green-400 border border-white absolute inset-0 mb-0 mr-0 m-auto" />
+                          {/* <div className="w-2 h-2 rounded-full bg-green-400 border border-white absolute inset-0 mb-0 mr-0 m-auto" /> */}
                         </div>
                       </div>
-                      <p className="text-gray-800 text-sm mx-3 hover:text-black">
-                        {/* FIXME Remove harcoded name */}
-                        {lensProfile?.name || "CryptoNahue"}
-                      </p>
+                      {/* <p className="text-gray-800 text-sm mx-3 hover:text-black">
+                        vacio
+                      </p> */}
                       <div className="cursor-pointer text-gray-600">
                         <svg
                           aria-haspopup="true"
@@ -354,9 +365,9 @@ export const Navbar = () => {
                 onClick={() => setShow(!show)}
               >
                 <div className="flex justify-between w-screen items-center">
-                  <div className="ml-3">
+                  <div className="ml-20">
                     {" "}
-                    <img
+                    <Image
                       src="/img/logo-extended.svg"
                       alt="Lenstags Logo"
                       width={100}
