@@ -6,6 +6,8 @@ export type LensLocalStorage = {
   handle: string;
   name: string;
   pictureUrl: string | null;
+  id: string;
+  bio: string;
 };
 
 export const getFromLocalStorage = (): LensLocalStorage | null => {

@@ -22,6 +22,8 @@ type Profile = {
   handle: string;
   name: string;
   pictureUrl: string | null;
+  id: string;
+  bio: string;
 };
 
 export const ProfileContext = createContext<Profile | null>(null);
@@ -48,6 +50,8 @@ export default function LensAuthenticationProvider({
       handle: lensStore.handle,
       pictureUrl: lensStore.pictureUrl,
       name: lensStore.name,
+      id: lensStore.id,
+      bio: lensStore.bio,
     });
   };
 
@@ -134,6 +138,8 @@ export default function LensAuthenticationProvider({
         handle: profile.handle,
         name: profile.name as string,
         pictureUrl,
+        id: profile.id as string,
+        bio: profile.bio as string,
       };
       setLensLocalStorage(lensStore);
       setAuthenticated(lensStore);
