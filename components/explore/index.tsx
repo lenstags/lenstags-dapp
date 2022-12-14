@@ -1,1 +1,1 @@
-export * from './ExploreCard'
+export * from "../ExplorerCard";
