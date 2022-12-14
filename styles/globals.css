@@ -19,73 +19,71 @@ a {
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   html {
-    color-scheme: dark;
+    color-scheme: light;
   }
   body {
-    color: white;
-    background: black;
+    color: black;
+    background: white;
   }
 }
-.cover{
-  top:150px;
-  left:150px;
+.cover {
+  top: 150px;
+  left: 150px;
 }
 
-.coverImg{
+.coverImg {
   width: 160px;
-  height: 180px
+  height: 180px;
 }
 
-// FONTS 
+/* FONTS */
 
+.card-Numbers {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 36px;
 
-.card-Numbers{
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 30px;
-    line-height: 36px;
-
-    color: #000000;
+  color: #000000;
 }
 
-.font-pizzola{
-    font-family: 'Piazzolla';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 28px;
+.font-piazzola {
+  font-family: "Piazzolla";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 28px;
 }
 
-.card-grayLetters{
-    font-family: 'Inter';
-    font-style: normal;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 29px;
-    color: #AAAAAA;
-
+.card-grayLetters {
+  font-family: "Inter";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 29px;
+  color: #aaaaaa;
 }
 
 .card-Name {
-  font-family: 'Inter';
+  font-family: "Inter";
   font-style: normal;
   font-weight: 400;
   font-size: 30px;
   line-height: 36px;
 }
 
-.card-optiones{
-  font-family: 'Inter';
+.card-options {
+  font-family: "Inter";
   font-style: normal;
   font-weight: 200;
   font-size: 20px;
   line-height: 10px;
 }
 
-.vector{
+.vector {
   right: 600px;
   bottom: 470px;
 }

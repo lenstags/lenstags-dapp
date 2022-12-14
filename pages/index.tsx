@@ -1,25 +1,24 @@
 import { Layout } from "components/Layout";
 import { ProfileContext } from "components/LensAuthenticationProvider";
-import { Profile } from "components/Profile";
-import { Tabs } from "components";
+// import { Profile } from "components/Profile";
+// import { Tabs } from "components";
 import { TagsFilter } from "components/TagsFilter";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useContext, useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
-
 const Home: NextPage = () => {
   const { isConnected } = useAccount();
   const profile = useContext(ProfileContext);
-const [hydrationLoading, sethydrationLoading] = useState(true)
-useEffect(() => {
- sethydrationLoading(false)
-}, [])
+  const [hydrationLoading, sethydrationLoading] = useState(true);
+  useEffect(() => {
+    sethydrationLoading(false);
+  }, []);
 
-if (hydrationLoading) {
-  return <h1>Loading...</h1>
-}
+  if (hydrationLoading) {
+    return <h1>Loading...</h1>;
+  }
 
   return (
     <div className="bg-white">
@@ -53,18 +52,13 @@ if (hydrationLoading) {
         pageDescription={"TODO: Descripcion de la pagina"}
       >
         <div className="container mx-auto py-10 h-64 md:w-4/5 w-11/12 px-6 ">
-          <Profile />
-          <Tabs />
+          {/* <Profile /> */}
+          {/* <Tabs /> */}
           <div className="mb-3">
             <TagsFilter />
           </div>
-          {/**
-               
-              <div className="w-full h-auto">
-                <Cards />
-                <Pagination />
-              </div>
-              */}
+
+          <div className="w-full h-auto">{/* <Pagination /> */}</div>
         </div>
       </Layout>
     </div>

@@ -6,16 +6,15 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors:{
+      colors: {
         greenLengs: "#dff602",
         greenLenstags: "#dff602",
         rojoLengs: "#ff3233",
         letrasGrises: "#a4a3a3",
         letterGray: "#AAAAAA",
-        letterGray2: "#666666"
-
-      }
+        letterGray2: "#666666",
+      },
     },
   },
-  plugins: [require("daisyui")],
-}
+  plugins: [require("daisyui"), require("tailwindcss-animate")],
+};

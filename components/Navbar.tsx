@@ -189,8 +189,13 @@ export const Navbar = () => {
             </div>
           </div>
 
-          <div className="w-full">
-            <nav className="h-16 px-10 flex items-center lg:items-stretch justify-end lg:justify-between bg-greenLengs  relative z-10">
+          <div className="w-full fixed top-0 z-50">
+            <nav
+              className="h-16 px-10 flex items-center lg:items-stretch justify-end lg:justify-between
+             bg-greenLengs  relative z-10
+             animate-in  slide-in-from-top duration-500
+             "
+            >
               <div className="hidden lg:flex w-full pr-6">
                 <Link href={"/"}>
                   <Image
@@ -200,12 +205,14 @@ export const Navbar = () => {
                     height={60}
                   />
                 </Link>
-                <div className="w-1/2 h-full hidden lg:flex items-center pl-6 pr-24">
-                  {/**ACA va los items del navbar */}
-
-                  <Link href={"/explore"}>Explore</Link>
-
-                  <Link href={"/organizations"}>Organizations</Link>
+                <div className="w-1/2 h-full text-black font-light lg:flex items-center pl-6 pr-24">
+                  {/**Here comes the Navbar items */}
+                  <div className="mx-2 hover:underline">
+                    <Link href={"/explorer"}>EXPLORER</Link>
+                  </div>
+                  <div className="mx-2 hover:underline">
+                    <Link href={"/organizations"}>ORGANIZATIONS</Link>
+                  </div>
                 </div>
                 <div className="w-1/2 hidden lg:flex">
                   <div className="w-full flex items-center pl-8 justify-end">
