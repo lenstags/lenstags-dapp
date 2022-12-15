@@ -216,6 +216,12 @@ export const Navbar = () => {
                 </div>
                 <div className="w-1/2 hidden lg:flex">
                   <div className="w-full flex items-center pl-8 justify-end">
+                    <div className="h-full flex items-center justify-center border-l border-black  px-8">
+                      <div className="relative cursor-pointer text-gray-600 hover:text-black">
+                        <Link href={"/create"}>+ CREATE</Link>
+                      </div>
+                    </div>
+
                     <div className="h-full w-20 flex items-center justify-center border-r border-l border-black">
                       <div className="relative cursor-pointer text-gray-600 hover:text-black">
                         <svg
@@ -237,6 +243,7 @@ export const Navbar = () => {
                         <div className="w-2 h-2 rounded-full bg-red-400 border border-white absolute inset-0 mt-1 mr-1 m-auto" />
                       </div>
                     </div>
+
                     <div className="h-full w-20 flex items-center justify-center border-r border-black mr-4 cursor-pointer hover:text-black text-gray-600">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
