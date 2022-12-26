@@ -1,9 +1,9 @@
 import { createClient as createUrqlClient } from 'urql'
 import { refreshAuthToken } from './utils'
 
-// const APIURL = 'https://api-mumbai.lens.dev'
+const APIURL = 'https://api-mumbai.lens.dev'
 
-export const APIURL = 'https://api.lens.dev' // TODO: check according to profile used in demo
+// export const APIURL = 'https://api.lens.dev' // TODO: check according to profile used in demo
 export const STORAGE_KEY = 'LH_STORAGE_KEY'
 export const LENS_HUB_CONTRACT_ADDRESS =
   '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d'

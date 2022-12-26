@@ -21,7 +21,7 @@ export const UnauthorizedScreen = () => {
               width="28"
               height="28"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="#000"
               fill="none"
               stroke-linecap="round"

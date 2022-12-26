@@ -8,7 +8,7 @@ import LensAuthenticationProvider from "components/LensAuthenticationProvider";
 import TagsFilterProvider from "components/TagsFilterProvider";
 
 const { chains, provider } = configureChains(
-  [chain.polygon, chain.polygonMumbai],
+  [chain.polygonMumbai],
   [publicProvider()]
 );
 
@@ -28,9 +28,9 @@ function MyApp({ Component, pageProps }: AppProps) {
     <WagmiConfig client={wagmiClient}>
       <LensAuthenticationProvider>
         <RainbowKitProvider chains={chains}>
-        <TagsFilterProvider>
-          <Component {...pageProps} />
-        </TagsFilterProvider>
+          <TagsFilterProvider>
+            <Component {...pageProps} />
+          </TagsFilterProvider>
         </RainbowKitProvider>
       </LensAuthenticationProvider>
     </WagmiConfig>

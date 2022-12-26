@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useState } from "react";
-import { TAGS } from "../lib/tags";
+import { TAGS } from "../lib/lens/tags";
 import { TagsFilterContext } from "./TagsFilterProvider";
 
 const selectedtyle = "bg-greenLengs text-black border-black shadow";
@@ -37,4 +37,4 @@ export const TagsFilter = () => {
       ))}
     </div>
   );
-}
+};
