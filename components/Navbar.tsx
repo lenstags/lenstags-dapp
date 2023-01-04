@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
-import React, { useContext, useEffect, useState } from "react";
-import { useDisconnect } from "wagmi";
-import Image from "next/image";
-import { explore } from "../lib/lens/explore-publications";
-import { ProfileContext, TagsFilterContext } from "components";
-import { deleteLensLocalStorage } from "@lib/lens/localStorage";
-import Link from "next/link";
+import React, { useContext, useEffect, useState } from 'react';
+import { useDisconnect } from 'wagmi';
+import ImageProxied from './ImageProxied';
+import { explore } from '../lib/lens/explore-publications';
+import { ProfileContext, TagsFilterContext } from 'components';
+import { deleteLensLocalStorage } from '@lib/lens/localStorage';
+import Link from 'next/link';
 
 export const Navbar = () => {
   const [show, setShow] = useState(false);
@@ -31,8 +31,8 @@ export const Navbar = () => {
           <div
             className={
               show
-                ? "w-full h-full absolute z-40  transform  translate-x-0 "
-                : "   w-full h-full absolute z-40  transform -translate-x-full"
+                ? 'w-full h-full absolute z-40  transform  translate-x-0 '
+                : '   w-full h-full absolute z-40  transform -translate-x-full'
             }
             id="mobile-nav"
           >
@@ -45,8 +45,9 @@ export const Navbar = () => {
                 <div>
                   <div className="flex items-center justify-between px-8">
                     <div className="h-16 w-full flex items-center">
-                      <Link href={"/"}>
-                        <Image
+                      <Link href={'/'}>
+                        <ImageProxied
+                          category="profile"
                           src="/img/logo-extended.svg"
                           alt="Lenstags Logo"
                           width={100}
@@ -99,7 +100,7 @@ export const Navbar = () => {
                           </svg>
                         </div>
                         <span className="ml-2 xl:text-base md:text-2xl text-base">
-                          <Link href={"/organizations"}>Organizations</Link>
+                          <Link href={'/organizations'}>Organizations</Link>
                         </span>
                       </div>
                     </li>
@@ -123,7 +124,7 @@ export const Navbar = () => {
                           </svg>
                         </div>
                         <span className="ml-2 xl:text-base md:text-2xl text-base">
-                          <Link href={"/explore"}>Explore</Link>
+                          <Link href={'/explore'}>Explore</Link>
                         </span>
                       </div>
                     </li>
@@ -133,15 +134,16 @@ export const Navbar = () => {
                   <div className="border-t border-black">
                     <div className="w-full flex items-center justify-between px-6 pt-1">
                       <div className="flex items-center  ">
-                        <Image
+                        <ImageProxied
+                          category="post"
                           className=""
                           width="30px"
                           height="30px"
-                          src={lensProfile?.pictureUrl || "/img/user.png"}
+                          src={lensProfile?.pictureUrl}
                           alt="avatar"
                         />
                         <p className="md:text-xl  text-gray-800 text-base leading-4 ml-2">
-                          {lensProfile?.name || "no-name"}
+                          {lensProfile?.name || 'no-name'}
                         </p>
                       </div>
                       <ul className="flex">
@@ -197,8 +199,9 @@ export const Navbar = () => {
              "
             >
               <div className="hidden lg:flex w-full pr-6">
-                <Link href={"/"}>
-                  <Image
+                <Link href={'/'}>
+                  <ImageProxied
+                    category="profile"
                     src="/img/logo-extended.svg"
                     alt="Lenstags Logo"
                     width={100}
@@ -208,17 +211,17 @@ export const Navbar = () => {
                 <div className="w-1/2 h-full text-black font-light lg:flex items-center pl-6 pr-24">
                   {/**Here comes the Navbar items */}
                   <div className="mx-2 hover:underline">
-                    <Link href={"/explorer"}>EXPLORER</Link>
+                    <Link href={'/explorer'}>EXPLORER</Link>
                   </div>
                   <div className="mx-2 hover:underline">
-                    <Link href={"/organizations"}>ORGANIZATIONS</Link>
+                    <Link href={'/organizations'}>ORGANIZATIONS</Link>
                   </div>
                 </div>
                 <div className="w-1/2 hidden lg:flex">
                   <div className="w-full flex items-center pl-8 justify-end">
                     <div className="h-full flex items-center justify-center border-l border-black  px-8">
                       <div className="relative cursor-pointer text-gray-600 hover:text-black">
-                        <Link href={"/create"}>+ CREATE</Link>
+                        <Link href={'/create'}>+ CREATE</Link>
                       </div>
                     </div>
 
@@ -270,7 +273,7 @@ export const Navbar = () => {
                         {profile ? (
                           <ul
                             className=" font-extralight -left-16 border-r text-black bg-white absolute rounded shadow  "
-                            style={{ marginTop: "4.4rem" }}
+                            style={{ marginTop: '4.4rem' }}
                           >
                             <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer ">
                               <div className="fl  first-letter:ex  ">
@@ -298,7 +301,7 @@ export const Navbar = () => {
                                   <circle cx={12} cy={7} r={4} />
                                   <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                 </svg>
-                                <Link href={"/settings"} className="ml-2">
+                                <Link href={'/settings'} className="ml-2">
                                   &nbsp;Settings
                                 </Link>
                               </div>
@@ -336,14 +339,15 @@ export const Navbar = () => {
                             </li>
                           </ul>
                         ) : (
-                          ""
+                          ''
                         )}
                         <div className="relative p-0 m-0">
-                          <Image
+                          <ImageProxied
+                            category="profile"
                             height={70}
                             width={70}
                             objectFit="cover"
-                            src={lensProfile?.pictureUrl || "/img/user.png"}
+                            src={lensProfile?.pictureUrl || '/img/user.png'}
                             alt="avatar"
                           />
                           {/* <div className="w-2 h-2 rounded-full bg-green-400 border border-white absolute inset-0 mb-0 mr-0 m-auto" /> */}
@@ -380,8 +384,9 @@ export const Navbar = () => {
               >
                 <div className="flex justify-between w-screen items-center">
                   <div className="ml-20">
-                    {" "}
-                    <Image
+                    {' '}
+                    <ImageProxied
+                      category="profile"
                       src="/img/logo-extended.svg"
                       alt="Lenstags Logo"
                       width={100}
@@ -390,7 +395,7 @@ export const Navbar = () => {
                   </div>
                   <div className="mr-3">
                     {show ? (
-                      " "
+                      ' '
                     ) : (
                       <svg
                         aria-label="Main Menu"
@@ -410,7 +415,7 @@ export const Navbar = () => {
                         <line x1={4} y1={8} x2={20} y2={8} />
                         <line x1={4} y1={16} x2={20} y2={16} />
                       </svg>
-                    )}{" "}
+                    )}{' '}
                   </div>
                 </div>
               </div>

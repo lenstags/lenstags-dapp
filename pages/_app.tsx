@@ -2,13 +2,14 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import "@rainbow-me/rainbowkit/styles.css";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { polygon, polygonMumbai } from "@wagmi/core/chains";
 import { publicProvider } from "wagmi/providers/public";
 import LensAuthenticationProvider from "components/LensAuthenticationProvider";
 import TagsFilterProvider from "components/TagsFilterProvider";
 
 const { chains, provider } = configureChains(
-  [chain.polygonMumbai],
+  [polygonMumbai],
   [publicProvider()]
 );
 

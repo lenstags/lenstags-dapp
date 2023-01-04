@@ -1,21 +1,21 @@
-import { gql } from "@apollo/client/core";
-import { BigNumber, utils } from "ethers";
-import { v4 as uuidv4 } from "uuid";
-import { apolloClient } from "./graphql/apollo-client";
-import { authenticate } from "./login";
+import { gql } from '@apollo/client/core';
+import { BigNumber, utils } from 'ethers';
+import { v4 as uuidv4 } from 'uuid';
+import { apolloClient } from './graphql/apollo-client';
+import { authenticate } from './login';
 import {
   getAddressFromSigner,
   signedTypeData,
-  splitSignature,
-} from "./ethers.service";
-import { pollUntilIndexed } from "./graphql/has-transaction-been-indexed";
-import { Metadata } from "./interfaces/publication";
-import { uploadIpfs } from "./ipfs";
-import { lensHub } from "./lens-hub";
-import { baseMetadata } from "./graphql/utils";
+  splitSignature
+} from './ethers.service';
+import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
+import { Metadata } from './interfaces/publication';
+import { uploadIpfs } from './ipfs';
+import { lensHub } from './lens-hub';
+import { baseMetadata } from './graphql/utils';
 
 const CREATE_POST_TYPED_DATA = `
-  mutation($request: CreatePublicPostRequest!) { 
+  mutation($request: CreatePublicPostRequest!) {
     createPostTypedData(request: $request) {
       id
       expiresAt
@@ -52,63 +52,64 @@ const createPostTypedData = (createPostTypedDataRequest: any) => {
   return apolloClient.mutate({
     mutation: gql(CREATE_POST_TYPED_DATA),
     variables: {
-      request: createPostTypedDataRequest,
-    },
+      request: createPostTypedDataRequest
+    }
   });
 };
 
 export interface postData {
-    title?: string,
-    name?: string,
-    abstract?: string,
-    content: string,
-    link?: string,
-    cover?: string,
-    tags?: string[],
-    // image?: Buffer[]
-  }
+  title?: string;
+  name?: string;
+  abstract?: string;
+  content: string;
+  link?: string;
+  cover?: string;
+  tags?: string[];
+  // image?: Buffer[]
+}
 
-export const createPost = async (profileId:string, post: postData) => {
-    if (!profileId) {
-        throw new Error("Must define profileId");
+export const createPost = async (profileId: string, post: postData) => {
+  if (!profileId) {
+    throw new Error('Must define profileId');
   }
 
   const address = await getAddressFromSigner();
-  console.log("create post: address", address);
+  console.log('create post: address', address);
 
-  // TODO: verify this!
-  // await authenticate(address);
+  //   // TODO: verify this!
+  //   // await authenticate(address);
+  // await authenticate({ address, signature });
 
   const ipfsResult = await uploadIpfs<Metadata>({
-  metadata_id: uuidv4(),
-  // image: post.image,
-  imageMimeType: null,
-  content: post.content,
-  name: post.title,
-  external_url: null,
-  createdOn: new Date().toISOString(),
-  attributes: [
-    {
-      traitType: 'string',
-      value: 'post'
-    }
-  ],
-  animation_url:'',
-  media: [
-    // {
-    //   item: 'https://scx2.b-cdn.net/gfx/news/hires/2018/lion.jpg',
-    //   // item: 'https://assets-global.website-files.com/5c38aa850637d1e7198ea850/5f4e173f16b537984687e39e_AAVE%20ARTICLE%20website%20main%201600x800.png',
-    //   type: 'image/jpeg',
-    // },
-  ],
-  ...baseMetadata
+    metadata_id: uuidv4(),
+    // image: post.image,
+    imageMimeType: null,
+    content: post.content,
+    name: post.title,
+    external_url: null,
+    createdOn: new Date().toISOString(),
+    attributes: [
+      {
+        traitType: 'string',
+        value: 'post'
+      }
+    ],
+    animation_url: '',
+    media: [
+      // {
+      //   item: 'https://scx2.b-cdn.net/gfx/news/hires/2018/lion.jpg',
+      //   // item: 'https://assets-global.website-files.com/5c38aa850637d1e7198ea850/5f4e173f16b537984687e39e_AAVE%20ARTICLE%20website%20main%201600x800.png',
+      //   type: 'image/jpeg',
+      // },
+    ],
+    ...baseMetadata
   });
-  console.log("create post: ipfs result", ipfsResult);
+  console.log('create post: ipfs result', ipfsResult);
 
   // hard coded to make the code example clear
   const createPostRequest = {
     profileId,
-    contentURI: "ipfs://" + ipfsResult.path,
+    contentURI: 'ipfs://' + ipfsResult.path,
     collectModule: {
       // feeCollectModule: {
       //   amount: {
@@ -121,7 +122,7 @@ export const createPost = async (profileId:string, post: postData) => {
       //   referralFee: 10.5,
       // },
       // revertCollectModule: true,
-      freeCollectModule: { followerOnly: true },
+      freeCollectModule: { followerOnly: true }
       // limitedFeeCollectModule: {
       //   amount: {
       //     currency: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
@@ -133,22 +134,26 @@ export const createPost = async (profileId:string, post: postData) => {
       // },
     },
     referenceModule: {
-      followerOnlyReferenceModule: false,
-    },
+      followerOnlyReferenceModule: false
+    }
   };
 
   const result = await createPostTypedData(createPostRequest);
-  console.log("create post: createPostTypedData", result);
+  console.log('create post: createPostTypedData', result);
 
   const typedData = result.data.createPostTypedData.typedData;
-  console.log("create post: typedData", typedData);
+  console.log('create post: typedData', typedData);
 
   const signature = await signedTypeData(
     typedData.domain,
     typedData.types,
     typedData.value
   );
-  console.log("create post: signature", signature);
+  console.log('create post: signature', signature);
+
+  // TODO: verify this!
+  // await authenticate(address);
+  await authenticate({ address, signature });
 
   const { v, r, s } = splitSignature(signature);
 
@@ -163,44 +168,44 @@ export const createPost = async (profileId:string, post: postData) => {
       v,
       r,
       s,
-      deadline: typedData.value.deadline,
-    },
+      deadline: typedData.value.deadline
+    }
   });
-  console.log("create post: tx hash", tx.hash);
+  console.log('create post: tx hash', tx.hash);
 
-  console.log("create post: poll until indexed");
+  console.log('create post: poll until indexed');
   const indexedResult = await pollUntilIndexed(tx.hash);
 
-  console.log("create post: profile has been indexed", result);
+  console.log('create post: profile has been indexed', result);
 
   const logs = indexedResult.txReceipt.logs;
 
-  console.log("create post: logs", logs);
+  console.log('create post: logs', logs);
 
   const topicId = utils.id(
-    "PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)"
+    'PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)'
   );
-  console.log("topicid we care about", topicId);
+  console.log('topicid we care about', topicId);
 
   const profileCreatedLog = logs.find((l: any) => l.topics[0] === topicId);
-  console.log("create post: created log", profileCreatedLog);
+  console.log('create post: created log', profileCreatedLog);
 
   let profileCreatedEventLog = profileCreatedLog.topics;
-  console.log("create post: created event logs", profileCreatedEventLog);
+  console.log('create post: created event logs', profileCreatedEventLog);
 
   const publicationId = utils.defaultAbiCoder.decode(
-    ["uint256"],
+    ['uint256'],
     profileCreatedEventLog[2]
   )[0];
 
   console.log(
-    "create post: contract publication id",
+    'create post: contract publication id',
     BigNumber.from(publicationId).toHexString()
   );
   console.log(
-    "create post: internal publication id",
-    profileId + "-" + BigNumber.from(publicationId).toHexString()
+    'create post: internal publication id',
+    profileId + '-' + BigNumber.from(publicationId).toHexString()
   );
 
-  return profileId + "-" + BigNumber.from(publicationId).toHexString();
+  return profileId + '-' + BigNumber.from(publicationId).toHexString();
 };

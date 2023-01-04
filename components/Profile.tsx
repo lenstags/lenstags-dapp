@@ -1,10 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-
-import { profileMockData } from "../__mocks__/profileMockData";
-
-import React, { useContext, useEffect, useState } from "react";
-
-import { ProfileContext } from "components/LensAuthenticationProvider";
+import ImageProxied from './ImageProxied';
+import React, { useContext, useEffect, useState } from 'react';
+import { profileMockData } from '../__mocks__/profileMockData';
+import { ProfileContext } from 'components/LensAuthenticationProvider';
 
 export const Profile = () => {
   const lensProfile = useContext(ProfileContext);
@@ -15,7 +13,8 @@ export const Profile = () => {
       <div className="bg-greenLengs py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between px-5 shadow rounded-t">
         <div className="flex items-center  sm:mb-0 md:mb-0 lg:mb-0 xl:mb-0">
           <div className="relative w-24 h-24 ">
-            <img
+            <ImageProxied
+              category="profile"
               className=" rounded-full"
               width="100%"
               height="100%"
@@ -76,10 +75,10 @@ export const Profile = () => {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    {" "}
-                    <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                    <rect x="4" y="4" width="16" height="16" rx="2" />{" "}
-                    <line x1="9" y1="12" x2="15" y2="12" />{" "}
+                    {' '}
+                    <path stroke="none" d="M0 0h24v24H0z" />{' '}
+                    <rect x="4" y="4" width="16" height="16" rx="2" />{' '}
+                    <line x1="9" y1="12" x2="15" y2="12" />{' '}
                     <line x1="12" y1="9" x2="12" y2="15" />
                   </svg>
                 </div>

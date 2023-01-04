@@ -16,6 +16,8 @@ export interface MetadataAttribute {
 
 export interface Metadata extends GenericMetadata {
   description?: string;
+  mainContentFocus?: string;
+  locale?: string;
   content: string;
   external_url?: string | null;
   createdOn: string;
@@ -24,5 +26,16 @@ export interface Metadata extends GenericMetadata {
   image?: string | null;
   imageMimeType?: string | null;
   media?: MetadataMedia[];
+  tags?: string[];
   animation_url?: string;
+}
+
+export enum PublicationMainFocus {
+  VIDEO = 'VIDEO',
+  IMAGE = 'IMAGE',
+  ARTICLE = 'ARTICLE',
+  TEXT_ONLY = 'TEXT_ONLY',
+  AUDIO = 'AUDIO',
+  LINK = 'LINK',
+  EMBED = 'EMBED'
 }

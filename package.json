@@ -11,7 +11,7 @@
   "dependencies": {
     "@apollo/client": "^3.7.1",
     "@heroicons/react": "^2.0.12",
-    "@rainbow-me/rainbowkit": "^0.7.4",
+    "@rainbow-me/rainbowkit": "^0.8.1",
     "daisyui": "^2.41.0",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
@@ -28,7 +28,7 @@
     "suneditor-react": "^2.16.5",
     "urql": "^3.0.3",
     "uuid": "^9.0.0",
-    "wagmi": "^0.7.9"
+    "wagmi": "^0.10.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.7",
@@ -40,6 +40,8 @@
     "autoprefixer": "^10.4.12",
     "eslint": "8.26.0",
     "eslint-config-next": "12.3.1",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "postcss": "^8.4.18",
     "tailwindcss": "^3.2.1",
     "tailwindcss-animate": "^1.0.5",
