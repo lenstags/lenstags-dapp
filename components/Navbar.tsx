@@ -11,7 +11,10 @@ export const Navbar = () => {
   const [show, setShow] = useState(false);
   const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
-
+  const handleDisconnect = () => {
+    deleteLensLocalStorage();
+    disconnect();
+  };
   const { tags } = useContext(TagsFilterContext);
 
   const lensProfile = useContext(ProfileContext);
@@ -272,11 +275,11 @@ export const Navbar = () => {
                       <div className="rounded-full">
                         {profile ? (
                           <ul
-                            className=" font-extralight -left-16 border-r text-black bg-white absolute rounded shadow  "
+                            className=" font-extralight -left-16 border-r text-black bg-white absolute rounded shadow"
                             style={{ marginTop: '4.4rem' }}
                           >
                             <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer ">
-                              <div className="fl  first-letter:ex  ">
+                              <div className="fl first-letter:ex">
                                 <p className="text-xs">Connected as</p>
                                 <p className=" font-normal">
                                   @{lensProfile?.handle}
@@ -302,11 +305,10 @@ export const Navbar = () => {
                                   <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                 </svg>
                                 <Link href={'/settings'} className="ml-2">
-                                  &nbsp;Settings
+                                  Settings
                                 </Link>
                               </div>
                             </li>
-
                             <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer items-center">
                               <div className="flex items-center">
                                 <svg
@@ -326,12 +328,9 @@ export const Navbar = () => {
                                   <path d="M7 12h14l-3 -3m0 6l3 -3" />
                                 </svg>
                                 <span
-                                  className="  ml-2"
-                                  onClick={() => {
-                                    // FIXME should clear whole profile and token everywhere like in clearProfile()
-                                    deleteLensLocalStorage();
-                                    disconnect();
-                                  }}
+                                  className="ml-2"
+                                  // FIXME should clear whole profile and token everywhere like in clearProfile()
+                                  onClick={handleDisconnect}
                                 >
                                   Disconnect
                                 </span>
@@ -350,12 +349,9 @@ export const Navbar = () => {
                             src={lensProfile?.pictureUrl || '/img/user.png'}
                             alt="avatar"
                           />
-                          {/* <div className="w-2 h-2 rounded-full bg-green-400 border border-white absolute inset-0 mb-0 mr-0 m-auto" /> */}
                         </div>
                       </div>
-                      {/* <p className="text-gray-800 text-sm mx-3 hover:text-black">
-                        vacio
-                      </p> */}
+
                       <div className="cursor-pointer text-gray-600">
                         <svg
                           aria-haspopup="true"

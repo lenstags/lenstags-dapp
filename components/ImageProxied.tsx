@@ -29,7 +29,7 @@ const ImageProxied: React.FC<imageProxiedProps> = (props) => {
 
   return (
     <>
-      <Image alt={!props.alt ? 'Default text' : props.alt} {...newProps} />;
+      <Image alt={!props.alt ? 'Default text' : props.alt} {...newProps} />
     </>
   );
 };
