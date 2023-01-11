@@ -1,16 +1,16 @@
 import {
   TypedDataDomain,
-  TypedDataField,
-} from "@ethersproject/abstract-signer";
-import { ethers, utils } from "ethers";
-import { omit } from "../helpers";
-import {MUMBAI_RPC_URL} from "../config"
+  TypedDataField
+} from '@ethersproject/abstract-signer';
+import { ethers, utils } from 'ethers';
+import { omit } from '../helpers';
+import { MUMBAI_RPC_URL } from '../config';
 
 // getSigner function from injected web3 provider
 export const getSigner = () => {
-  if (typeof window === "undefined") {
+  if (typeof window === 'undefined') {
     // server side
-    const privateKey: any = "process.env.PRIVATE_KEY";
+    const privateKey: any = 'process.env.PRIVATE_KEY';
     const provider = new ethers.providers.JsonRpcProvider(
       MUMBAI_RPC_URL
       // process.env.POLYGON_RPC
@@ -37,9 +37,9 @@ export const signedTypeData = (
   const signer = getSigner();
   // remove the __typedname from the signature!
   return signer._signTypedData(
-    omit(domain, "__typename"),
-    omit(types, "__typename"),
-    omit(value, "__typename")
+    omit(domain, '__typename'),
+    omit(types, '__typename'),
+    omit(value, '__typename')
   );
 };
 

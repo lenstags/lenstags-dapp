@@ -1,4 +1,5 @@
 import { GenericMetadata, MetadataDisplayType } from './generic';
+import { MediaOutput } from '../graphql/generated';
 
 interface MetadataMedia {
   item: string;
@@ -14,20 +15,26 @@ export interface MetadataAttribute {
   value: string;
 }
 
+export enum PublicationContentWarning {
+  NSFW = 'NSFW',
+  SENSITIVE = 'SENSITIVE',
+  SPOILER = 'SPOILER'
+}
+
 export interface Metadata extends GenericMetadata {
   description?: string;
-  mainContentFocus?: string;
-  locale?: string;
-  content: string;
+  content?: string;
   external_url?: string | null;
-  createdOn: string;
-  name?: string;
-  attributes?: MetadataAttribute[];
+  name: string;
+  attributes: MetadataAttribute[];
   image?: string | null;
   imageMimeType?: string | null;
-  media?: MetadataMedia[];
-  tags?: string[];
+  media?: MediaOutput[];
   animation_url?: string;
+  locale: string;
+  tags?: string[];
+  contentWarning?: PublicationContentWarning;
+  mainContentFocus: PublicationMainFocus;
 }
 
 export enum PublicationMainFocus {

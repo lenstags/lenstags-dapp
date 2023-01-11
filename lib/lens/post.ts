@@ -12,50 +12,9 @@ import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 import { Metadata } from './interfaces/publication';
 import { uploadIpfs } from './ipfs';
 import { lensHub } from './lens-hub';
-import { baseMetadata } from './graphql/utils';
-
-const CREATE_POST_TYPED_DATA = `
-  mutation($request: CreatePublicPostRequest!) {
-    createPostTypedData(request: $request) {
-      id
-      expiresAt
-      typedData {
-        types {
-          PostWithSig {
-            name
-            type
-          }
-        }
-      domain {
-        name
-        chainId
-        version
-        verifyingContract
-      }
-      value {
-        nonce
-        deadline
-        profileId
-        contentURI
-        collectModule
-        collectModuleInitData
-        referenceModule
-        referenceModuleInitData
-      }
-    }
-  }
-}
-`;
-
-//TODO typings
-const createPostTypedData = (createPostTypedDataRequest: any) => {
-  return apolloClient.mutate({
-    mutation: gql(CREATE_POST_TYPED_DATA),
-    variables: {
-      request: createPostTypedDataRequest
-    }
-  });
-};
+import { signCreatePostTypedData } from './publication-post';
+import { PublicationMainFocus } from './interfaces/publication';
+import { broadcastRequest } from './broadcast';
 
 export interface postData {
   title?: string;
@@ -85,15 +44,19 @@ export const createPost = async (profileId: string, post: postData) => {
     // image: post.image,
     imageMimeType: null,
     content: post.content,
-    name: post.title,
+    name: post.title || '',
     external_url: null,
-    createdOn: new Date().toISOString(),
+    // coverPicture: post.cover,
+    tags: post.tags,
+    // createdOn: new Date().toISOString(),
     attributes: [
       {
         traitType: 'string',
         value: 'post'
       }
     ],
+    locale: 'en-us',
+    mainContentFocus: PublicationMainFocus.TEXT_ONLY,
     animation_url: '',
     media: [
       // {
@@ -102,13 +65,15 @@ export const createPost = async (profileId: string, post: postData) => {
       //   type: 'image/jpeg',
       // },
     ],
-    ...baseMetadata
+    version: '2.0.0',
+    appId: 'lenstags'
   });
   console.log('create post: ipfs result', ipfsResult);
 
   // hard coded to make the code example clear
   const createPostRequest = {
     profileId,
+
     contentURI: 'ipfs://' + ipfsResult.path,
     collectModule: {
       // feeCollectModule: {
@@ -138,74 +103,92 @@ export const createPost = async (profileId: string, post: postData) => {
     }
   };
 
-  const result = await createPostTypedData(createPostRequest);
-  console.log('create post: createPostTypedData', result);
+  // const result = await createPostTypedData(createPostRequest);
+  // console.log('create post: createPostTypedData', result);
 
-  const typedData = result.data.createPostTypedData.typedData;
-  console.log('create post: typedData', typedData);
+  // const typedData = result.data.createPostTypedData.typedData;
+  // console.log('create post: typedData', typedData);
 
-  const signature = await signedTypeData(
-    typedData.domain,
-    typedData.types,
-    typedData.value
-  );
-  console.log('create post: signature', signature);
+  // const signature = await signedTypeData(
+  //   typedData.domain,
+  //   typedData.types,
+  //   typedData.value
+  // );
+  // console.log('create post: signature', signature);
 
-  // TODO: verify this!
-  // await authenticate(address);
-  await authenticate({ address, signature });
+  // // TODO: verify this!
+  // // await authenticate(address);
+  // // await authenticate({ address, signature });
 
-  const { v, r, s } = splitSignature(signature);
+  // const { v, r, s } = splitSignature(signature);
 
-  const tx = await lensHub.postWithSig({
-    profileId: typedData.value.profileId,
-    contentURI: typedData.value.contentURI,
-    collectModule: typedData.value.collectModule,
-    collectModuleInitData: typedData.value.collectModuleInitData,
-    referenceModule: typedData.value.referenceModule,
-    referenceModuleInitData: typedData.value.referenceModuleInitData,
-    sig: {
-      v,
-      r,
-      s,
-      deadline: typedData.value.deadline
-    }
+  // const tx = await lensHub.postWithSig({
+  //   profileId: typedData.value.profileId,
+  //   contentURI: typedData.value.contentURI,
+  //   collectModule: typedData.value.collectModule,
+  //   collectModuleInitData: typedData.value.collectModuleInitData,
+  //   referenceModule: typedData.value.referenceModule,
+  //   referenceModuleInitData: typedData.value.referenceModuleInitData,
+  //   sig: {
+  //     v,
+  //     r,
+  //     s,
+  //     deadline: typedData.value.deadline
+  //   }
+  // });
+
+  //  { result, signature }
+  const signedResult = await signCreatePostTypedData(createPostRequest);
+  console.log('create post via broadcast: signedResult', signedResult);
+
+  const broadcastResult = await broadcastRequest({
+    id: signedResult.result.id,
+    signature: signedResult.signature
   });
-  console.log('create post: tx hash', tx.hash);
 
-  console.log('create post: poll until indexed');
-  const indexedResult = await pollUntilIndexed(tx.hash);
+  if (broadcastResult.__typename !== 'RelayerResult') {
+    console.error('create post via broadcast: failed', broadcastResult);
+    throw new Error('create post via broadcast: failed');
+  }
 
-  console.log('create post: profile has been indexed', result);
+  console.log('create post via broadcast: broadcastResult', broadcastResult);
+  return { txHash: broadcastResult.txHash, txId: broadcastResult.txId };
 
-  const logs = indexedResult.txReceipt.logs;
+  // console.log('create post: tx hash', result.);
 
-  console.log('create post: logs', logs);
+  // console.log('create post: poll until indexed');
+  // const indexedResult = await pollUntilIndexed(tx.hash);
 
-  const topicId = utils.id(
-    'PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)'
-  );
-  console.log('topicid we care about', topicId);
+  // console.log('create post: profile has been indexed', result);
 
-  const profileCreatedLog = logs.find((l: any) => l.topics[0] === topicId);
-  console.log('create post: created log', profileCreatedLog);
+  // const logs = indexedResult.txReceipt.logs;
 
-  let profileCreatedEventLog = profileCreatedLog.topics;
-  console.log('create post: created event logs', profileCreatedEventLog);
+  // console.log('create post: logs', logs);
 
-  const publicationId = utils.defaultAbiCoder.decode(
-    ['uint256'],
-    profileCreatedEventLog[2]
-  )[0];
+  // const topicId = utils.id(
+  //   'PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)'
+  // );
+  // console.log('topicid we care about', topicId);
 
-  console.log(
-    'create post: contract publication id',
-    BigNumber.from(publicationId).toHexString()
-  );
-  console.log(
-    'create post: internal publication id',
-    profileId + '-' + BigNumber.from(publicationId).toHexString()
-  );
+  // const profileCreatedLog = logs.find((l: any) => l.topics[0] === topicId);
+  // console.log('create post: created log', profileCreatedLog);
 
-  return profileId + '-' + BigNumber.from(publicationId).toHexString();
+  // let profileCreatedEventLog = profileCreatedLog.topics;
+  // console.log('create post: created event logs', profileCreatedEventLog);
+
+  // const publicationId = utils.defaultAbiCoder.decode(
+  //   ['uint256'],
+  //   profileCreatedEventLog[2]
+  // )[0];
+
+  // console.log(
+  //   'create post: contract publication id',
+  //   BigNumber.from(publicationId).toHexString()
+  // );
+  // console.log(
+  //   'create post: internal publication id',
+  //   profileId + '-' + BigNumber.from(publicationId).toHexString()
+  // );
+
+  // return profileId + '-' + BigNumber.from(publicationId).toHexString();
 };

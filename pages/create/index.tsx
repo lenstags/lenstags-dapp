@@ -1,27 +1,27 @@
-import { Layout } from "components";
-import { ProfileContext } from "components";
-import { NextPage } from "next";
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-import Image from "next/image";
-import Editor from "components/Editor";
-import { createPost, postData } from "@lib/lens/post";
+import { Layout } from 'components';
+import { ProfileContext } from 'components';
+import { NextPage } from 'next';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import Image from 'next/image';
+import Editor from 'components/Editor';
+import { createPost, postData } from '@lib/lens/post';
 
 const Create: NextPage = () => {
-  const [name, setName] = useState("");
-  const [title, setTitle] = useState("");
-  const [abstract, setAbstract] = useState("");
-  const [editorContents, setEditorContents] = useState("");
-  const [link, setLink] = useState("");
-  const [cover, setCover] = useState("");
+  const [name, setName] = useState('');
+  const [title, setTitle] = useState('');
+  const [abstract, setAbstract] = useState('');
+  const [editorContents, setEditorContents] = useState('');
+  const [link, setLink] = useState('');
+  const [cover, setCover] = useState('');
   const [tags, setTags] = useState([]);
   // const [post, setPost] = useState<postData | null>(null);
 
   const lensProfile = useContext(ProfileContext);
-  const initialContent = "Write something nice and styled!";
+  const initialContent = 'Write something nice and styled!';
 
   const handleChangeEditor = (content: string) => {
     setEditorContents(content);
-    console.log("Content>>> ", content);
+    console.log('Content>>> ', content);
   };
 
   const [loading, setLoading] = useState(false);
@@ -33,10 +33,10 @@ const Create: NextPage = () => {
       name: name,
       title: title,
       abstract: abstract,
-      content: editorContents || "",
+      content: editorContents || '',
       link: link,
       cover: cover,
-      tags: tags,
+      tags: ['web3', 'arts', 'cars']
       // image?: Buffer[]
     };
     // setPost({
@@ -50,7 +50,7 @@ const Create: NextPage = () => {
     //   // image?: Buffer[]
     // });
 
-    console.log("Post! ", constructedPost);
+    console.log('Post! ', constructedPost);
     setLoading(true);
     try {
       // collect post
@@ -58,7 +58,7 @@ const Create: NextPage = () => {
         return;
       }
       const pubId = await createPost(lensProfile.id, constructedPost);
-      console.log("pubId", pubId);
+      console.log('pubId', pubId);
     } catch (e: any) {
       console.error(e);
     }
