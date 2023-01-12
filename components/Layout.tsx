@@ -1,7 +1,7 @@
-import Head from "next/head";
-import React, { FC, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
-import { Navbar, UnauthorizedScreen } from "components";
+import Head from 'next/head';
+import React, { FC, useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
+import { Navbar, UnauthorizedScreen } from 'components';
 
 interface Props {
   title: string;
@@ -14,12 +14,12 @@ export const Layout: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen,
+  screen
 }) => {
   const { isConnected } = useAccount();
-  const [hydrationLoading, sethydrationLoading] = useState(true);
+  const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
-    sethydrationLoading(false);
+    setHydrationLoading(false);
   }, []);
 
   if (hydrationLoading) {
@@ -55,11 +55,11 @@ export const Layout: FC<Props> = ({
       </Head>
       {isConnected ? (
         <>
-          {" "}
+          {' '}
           <nav>
             <Navbar />
           </nav>
-          <main className={`${!screen ? "h-screen" : "h-full"} bg-white mt-16`}>
+          <main className={`${!screen ? 'h-screen' : 'h-full'} bg-white mt-16`}>
             {children}
           </main>
         </>
