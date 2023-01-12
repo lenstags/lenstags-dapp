@@ -4,7 +4,7 @@ export const UnauthorizedScreen = () => {
   const { openConnectModal } = useConnectModal();
 
   return (
-    <div className="hero min-h-screen bg-white">
+    <div className="hero min-h-screen bg-black">
       <div className="hero-overlay bg-opacity-60"></div>
       <div className="hero-content text-center text-neutral-content">
         <div className="max-w-md">
