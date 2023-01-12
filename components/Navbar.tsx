@@ -142,7 +142,7 @@ export const Navbar = () => {
                           className=""
                           width="30px"
                           height="30px"
-                          src={lensProfile?.pictureUrl || '/img/user.png'}
+                          src={lensProfile?.pictureUrl || '/img/profilePic.png'}
                           alt="avatar"
                         />
                         <p className="md:text-xl  text-gray-800 text-base leading-4 ml-2">
@@ -214,7 +214,7 @@ export const Navbar = () => {
                 <div className="w-1/2 h-full text-black font-light lg:flex items-center pl-6 pr-24">
                   {/**Here comes the Navbar items */}
                   <div className="mx-2 hover:underline">
-                    <Link href={'/explorer'}>EXPLORER</Link>
+                    <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
                   <div className="mx-2 hover:underline">
                     <Link href={'/organizations'}>ORGANIZATIONS</Link>
@@ -346,7 +346,9 @@ export const Navbar = () => {
                             height={70}
                             width={70}
                             objectFit="cover"
-                            src={lensProfile?.pictureUrl || '/img/user.png'}
+                            src={
+                              lensProfile?.pictureUrl || '/img/profilePic.png'
+                            }
                             alt="avatar"
                           />
                         </div>

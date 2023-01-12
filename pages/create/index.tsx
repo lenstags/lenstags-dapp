@@ -37,18 +37,8 @@ const Create: NextPage = () => {
       link: link,
       cover: cover,
       tags: ['web3', 'arts', 'cars']
-      // image?: Buffer[]
+      // todo: image?: Buffer[]
     };
-    // setPost({
-    //   name: post?.name,
-    //   title: post?.title,
-    //   abstract: post?.abstract,
-    //   content: post?.content || "",
-    //   link: post?.link,
-    //   cover: post?.cover,
-    //   tags: post?.tags,
-    //   // image?: Buffer[]
-    // });
 
     console.log('Post! ', constructedPost);
     setLoading(true);

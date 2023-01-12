@@ -35,20 +35,16 @@ export const createPost = async (profileId: string, post: postData) => {
   const address = await getAddressFromSigner();
   console.log('create post: address', address);
 
-  //   // TODO: verify this!
-  //   // await authenticate(address);
-  // await authenticate({ address, signature });
-
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
-    // image: post.image,
+    // TODO: image: post.image,
     imageMimeType: null,
     content: post.content,
     name: post.title || '',
     external_url: null,
-    // coverPicture: post.cover,
+    // TODO: coverPicture: post.cover,
     tags: post.tags,
-    // createdOn: new Date().toISOString(),
+    // TODO: createdOn: new Date().toISOString(),
     attributes: [
       {
         traitType: 'string',
@@ -65,6 +61,7 @@ export const createPost = async (profileId: string, post: postData) => {
       //   type: 'image/jpeg',
       // },
     ],
+    // TODO: METADATA VERSION UNIFICATION
     version: '2.0.0',
     appId: 'lenstags'
   });
@@ -76,6 +73,7 @@ export const createPost = async (profileId: string, post: postData) => {
 
     contentURI: 'ipfs://' + ipfsResult.path,
     collectModule: {
+      // TODO IN THE MIDDLE FUTURE
       // feeCollectModule: {
       //   amount: {
       //     currency: currencies.enabledModuleCurrencies.map(
@@ -103,41 +101,6 @@ export const createPost = async (profileId: string, post: postData) => {
     }
   };
 
-  // const result = await createPostTypedData(createPostRequest);
-  // console.log('create post: createPostTypedData', result);
-
-  // const typedData = result.data.createPostTypedData.typedData;
-  // console.log('create post: typedData', typedData);
-
-  // const signature = await signedTypeData(
-  //   typedData.domain,
-  //   typedData.types,
-  //   typedData.value
-  // );
-  // console.log('create post: signature', signature);
-
-  // // TODO: verify this!
-  // // await authenticate(address);
-  // // await authenticate({ address, signature });
-
-  // const { v, r, s } = splitSignature(signature);
-
-  // const tx = await lensHub.postWithSig({
-  //   profileId: typedData.value.profileId,
-  //   contentURI: typedData.value.contentURI,
-  //   collectModule: typedData.value.collectModule,
-  //   collectModuleInitData: typedData.value.collectModuleInitData,
-  //   referenceModule: typedData.value.referenceModule,
-  //   referenceModuleInitData: typedData.value.referenceModuleInitData,
-  //   sig: {
-  //     v,
-  //     r,
-  //     s,
-  //     deadline: typedData.value.deadline
-  //   }
-  // });
-
-  //  { result, signature }
   const signedResult = await signCreatePostTypedData(createPostRequest);
   console.log('create post via broadcast: signedResult', signedResult);
 
@@ -154,41 +117,5 @@ export const createPost = async (profileId: string, post: postData) => {
   console.log('create post via broadcast: broadcastResult', broadcastResult);
   return { txHash: broadcastResult.txHash, txId: broadcastResult.txId };
 
-  // console.log('create post: tx hash', result.);
-
-  // console.log('create post: poll until indexed');
-  // const indexedResult = await pollUntilIndexed(tx.hash);
-
-  // console.log('create post: profile has been indexed', result);
-
-  // const logs = indexedResult.txReceipt.logs;
-
-  // console.log('create post: logs', logs);
-
-  // const topicId = utils.id(
-  //   'PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)'
-  // );
-  // console.log('topicid we care about', topicId);
-
-  // const profileCreatedLog = logs.find((l: any) => l.topics[0] === topicId);
-  // console.log('create post: created log', profileCreatedLog);
-
-  // let profileCreatedEventLog = profileCreatedLog.topics;
-  // console.log('create post: created event logs', profileCreatedEventLog);
-
-  // const publicationId = utils.defaultAbiCoder.decode(
-  //   ['uint256'],
-  //   profileCreatedEventLog[2]
-  // )[0];
-
-  // console.log(
-  //   'create post: contract publication id',
-  //   BigNumber.from(publicationId).toHexString()
-  // );
-  // console.log(
-  //   'create post: internal publication id',
-  //   profileId + '-' + BigNumber.from(publicationId).toHexString()
-  // );
-
-  // return profileId + '-' + BigNumber.from(publicationId).toHexString();
+  // TODO: VERIFY THIS return profileId + '-' + BigNumber.from(publicationId).toHexString();
 };

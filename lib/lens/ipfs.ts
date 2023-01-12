@@ -26,7 +26,6 @@ export const uploadIpfs = async <T>(data: T) => {
   console.log(
     `Basic ${Buffer.from(`${projectId}:${secret}`).toString('base64')}`
   );
-  // console.log(secret);
   const result = await client.add(JSON.stringify(data));
 
   console.log('upload result ipfs', result);

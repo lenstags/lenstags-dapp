@@ -4,7 +4,7 @@ export const argsBespokeInit = () => {
 
 export const PK = 'YOUR_PK';
 export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
-export const DEFAULT_IMAGE_PROFILE = '/img/user.jpg';
+export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
 export const DEFAULT_IMAGE_POST = '/img/post.png';
 
 export const MUMBAI_RPC_URL = 'https://rpc-mumbai.matic.today';
@@ -15,11 +15,6 @@ export const LENS_PERIPHERY_CONTRACT =
 export const LENS_PERIPHERY_NAME = 'LensPeriphery';
 export const INFURA_PROJECT_ID = '2FtLXLpfvzpENl2Xm3K0ElHdGDc';
 export const INFURA_SECRET = '2ec4307c38429b097dd373c3b69b890b';
-// 1de1e1f2ce3d4a2b9456f278aee36fcf
-// ba2c09441d1b45ee9590a968cc83b4ae
-
-// export const INFURA_PROJECT_ID = "1de1e1f2ce3d4a2b9456f278aee36fcf";
-// export const INFURA_SECRET =     "ba2c09441d1b45ee9590a968cc83b4ae";
 
 export const LENS_FOLLOW_NFT_ABI = [
   {

@@ -1,14 +1,15 @@
-import { Layout } from "components/Layout";
-import { ProfileContext } from "components/LensAuthenticationProvider";
+import { Layout } from 'components/Layout';
+import { ProfileContext } from 'components/LensAuthenticationProvider';
 // import { Profile } from "components/Profile";
 // import { Tabs } from "components";
-import { TagsFilter } from "components/TagsFilter";
-import type { NextPage } from "next";
-import Head from "next/head";
-import { useContext, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { TagsFilter } from 'components/TagsFilter';
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import { useContext, useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 
 const Home: NextPage = () => {
+  // TODO fix context?
   const { isConnected } = useAccount();
   const profile = useContext(ProfileContext);
   const [hydrationLoading, sethydrationLoading] = useState(true);
@@ -48,8 +49,8 @@ const Home: NextPage = () => {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <Layout
-        title={"Lenstags | Home"}
-        pageDescription={"TODO: Descripcion de la pagina"}
+        title={'Lenstags | Home'}
+        pageDescription={'TODO: Descripcion de la pagina'}
       >
         <div className="container mx-auto py-10 h-64 md:w-4/5 w-11/12 px-6 ">
           {/* <Profile /> */}
