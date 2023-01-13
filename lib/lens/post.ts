@@ -1,17 +1,7 @@
-import { gql } from '@apollo/client/core';
-import { BigNumber, utils } from 'ethers';
 import { v4 as uuidv4 } from 'uuid';
-import { apolloClient } from './graphql/apollo-client';
-import { authenticate } from './login';
-import {
-  getAddressFromSigner,
-  signedTypeData,
-  splitSignature
-} from './ethers.service';
-import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
+import { getAddressFromSigner } from './ethers.service';
 import { Metadata } from './interfaces/publication';
 import { uploadIpfs } from './ipfs';
-import { lensHub } from './lens-hub';
 import { signCreatePostTypedData } from './publication-post';
 import { PublicationMainFocus } from './interfaces/publication';
 import { broadcastRequest } from './broadcast';
@@ -27,7 +17,7 @@ export interface postData {
   // image?: Buffer[]
 }
 
-export const createPost = async (profileId: string, post: postData) => {
+export const createPost = async (profileId: string, builtPost: postData) => {
   if (!profileId) {
     throw new Error('Must define profileId');
   }
@@ -39,11 +29,11 @@ export const createPost = async (profileId: string, post: postData) => {
     metadata_id: uuidv4(),
     // TODO: image: post.image,
     imageMimeType: null,
-    content: post.content,
-    name: post.title || '',
+    content: builtPost.content,
+    name: builtPost.title || '',
     external_url: null,
     // TODO: coverPicture: post.cover,
-    tags: post.tags,
+    tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
     attributes: [
       {

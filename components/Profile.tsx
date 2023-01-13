@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import ImageProxied from './ImageProxied';
 import React, { useContext, useEffect, useState } from 'react';
-import { profileMockData } from '../__mocks__/profileMockData';
 import { ProfileContext } from 'components/LensAuthenticationProvider';
 
 export const Profile = () => {
@@ -18,7 +17,7 @@ export const Profile = () => {
               className=" rounded-full"
               width="100%"
               height="100%"
-              src={lensProfile?.pictureUrl || profileMockData.profilePic}
+              src={lensProfile?.pictureUrl || '/img/profilePic.png'}
               alt="avatar"
             />
           </div>
