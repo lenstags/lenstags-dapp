@@ -26,7 +26,7 @@ export const getSigner = () => {
 };
 
 export const getAddressFromSigner = async () => {
-  return await getSigner().getAddress();
+  return await getSigner()?.getAddress();
 };
 
 export const signedTypeData = (
@@ -36,7 +36,7 @@ export const signedTypeData = (
 ) => {
   const signer = getSigner();
   // remove the __typedname from the signature!
-  return signer._signTypedData(
+  return signer?._signTypedData(
     omit(domain, '__typename'),
     omit(types, '__typename'),
     omit(value, '__typename')
@@ -51,9 +51,9 @@ export const sendTx = (
   transaction: ethers.utils.Deferrable<ethers.providers.TransactionRequest>
 ) => {
   const signer = getSigner();
-  return signer.sendTransaction(transaction);
+  return signer?.sendTransaction(transaction);
 };
 
 export const signText = (text: string) => {
-  return getSigner().signMessage(text);
+  return getSigner()?.signMessage(text);
 };
