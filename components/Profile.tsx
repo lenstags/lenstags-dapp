@@ -1,10 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
-
-import { profileMockData } from "../__mocks__/profileMockData";
-
-import React, { useContext, useEffect, useState } from "react";
-
-import { ProfileContext } from "components/LensAuthenticationProvider";
+import ImageProxied from './ImageProxied';
+import React, { useContext, useEffect, useState } from 'react';
+import { profileMockData } from '../__mocks__/profileMockData';
+import { ProfileContext } from 'components/LensAuthenticationProvider';
 
 export const Profile = () => {
   const lensProfile = useContext(ProfileContext);
@@ -15,7 +13,8 @@ export const Profile = () => {
       <div className="bg-greenLengs py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between px-5 shadow rounded-t">
         <div className="flex items-center  sm:mb-0 md:mb-0 lg:mb-0 xl:mb-0">
           <div className="relative w-24 h-24 ">
-            <img
+            <ImageProxied
+              category="profile"
               className=" rounded-full"
               width="100%"
               height="100%"
@@ -48,9 +47,9 @@ export const Profile = () => {
                     stroke="currentColor"
                   >
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
                       d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
                     />
                   </svg>
@@ -70,16 +69,16 @@ export const Profile = () => {
                     width="24"
                     height="24"
                     viewBox="0 0 24 24"
-                    stroke-width="2"
+                    strokeWidth="2"
                     stroke="currentColor"
                     fill="none"
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    {" "}
-                    <path stroke="none" d="M0 0h24v24H0z" />{" "}
-                    <rect x="4" y="4" width="16" height="16" rx="2" />{" "}
-                    <line x1="9" y1="12" x2="15" y2="12" />{" "}
+                    {' '}
+                    <path stroke="none" d="M0 0h24v24H0z" />{' '}
+                    <rect x="4" y="4" width="16" height="16" rx="2" />{' '}
+                    <line x1="9" y1="12" x2="15" y2="12" />{' '}
                     <line x1="12" y1="9" x2="12" y2="15" />
                   </svg>
                 </div>

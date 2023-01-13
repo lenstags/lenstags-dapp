@@ -1,29 +1,29 @@
-import { createClient as createUrqlClient } from 'urql'
-import { refreshAuthToken } from './utils'
+import { createClient as createUrqlClient } from 'urql';
+import { refreshAuthToken } from './utils';
 
-// const APIURL = 'https://api-mumbai.lens.dev'
+const APIURL = 'https://api-mumbai.lens.dev';
 
-export const APIURL = 'https://api.lens.dev' // TODO: check according to profile used in demo
-export const STORAGE_KEY = 'LH_STORAGE_KEY'
+// TODO: MOVE TO THE CONFIG FILE? export const APIURL = 'https://api.lens.dev' // TODO: check according to profile used in demo
+export const STORAGE_KEY = 'LH_STORAGE_KEY';
 export const LENS_HUB_CONTRACT_ADDRESS =
-  '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d'
+  '0x60Ae865ee4C725cd04353b5AAb364553f56ceF82';
 export const PERIPHERY_CONTRACT_ADDRESS =
-  '0xeff187b4190E551FC25a7fA4dFC6cf7fDeF7194f'
+  '0xD5037d72877808cdE7F669563e9389930AF404E8';
 
-// export const basicClient = createClient({
-//   url: APIURL
-// })
-export const basicClient = createUrqlClient ({
+// TODO: SHOULD WE USE URQL?
+export const basicClient = createUrqlClient({
   url: APIURL
-})
+});
 
 export async function createClient() {
-  const storageData: string = JSON.parse(localStorage.getItem(STORAGE_KEY)as string)
+  const storageData: string = JSON.parse(
+    localStorage.getItem(STORAGE_KEY) as string
+  );
 
   if (storageData) {
     try {
-      const { accessToken }  = await refreshAuthToken() as any
-      console.log('accessToken ', accessToken)
+      const { accessToken } = (await refreshAuthToken()) as any;
+      console.log('URQL (REMOVE?) accessToken ', accessToken);
 
       const urqlClient = createUrqlClient({
         url: APIURL,
@@ -32,16 +32,17 @@ export async function createClient() {
             'x-access-token': `Bearer ${accessToken}`
           }
         }
-      })
-      return urqlClient
+      });
+      return urqlClient;
     } catch (err) {
-      console.log('XXX ', err)
-      return basicClient
+      return basicClient;
     }
   } else {
-    return basicClient
+    return basicClient;
   }
 }
+
+// TODO: IS THIS STORED IN GENERATED GRAPHQL?
 
 export const getProfilesById = `query Profiles 
 (
@@ -134,7 +135,7 @@ export const getProfilesById = `query Profiles
       totalCount
     }
   }
-}`
+}`;
 
 export const recommendProfiles = `
 query RecommendedProfiles {
@@ -219,7 +220,7 @@ query RecommendedProfiles {
         }
     }
   }
-`
+`;
 
 export const getChallenge = `
   query Challenge($address: EthereumAddress!) {
@@ -227,7 +228,7 @@ export const getChallenge = `
       text
     }
   }
-`
+`;
 
 export const authenticate = `
   mutation Authenticate(
@@ -242,7 +243,7 @@ export const authenticate = `
       refreshToken
     }
   }
-`
+`;
 
 export const refresh = `
   mutation Refresh(
@@ -255,7 +256,7 @@ export const refresh = `
       refreshToken
     }
   }
-`
+`;
 
 export const getDefaultProfile = `
 query DefaultProfile($address: EthereumAddress!) {
@@ -342,7 +343,7 @@ query DefaultProfile($address: EthereumAddress!) {
   }
 }
 
-`
+`;
 
 // not COMMENT, MIRROR
 // // also dont forget you can filter these queries on sources as well
@@ -702,4 +703,4 @@ fragment ReferenceModuleFields on ReferenceModule {
     degreesOfSeparation
   }
 }
-`
+`;

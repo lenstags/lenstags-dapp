@@ -1,19 +1,20 @@
-import { Layout } from "components/Layout";
-import { ProfileContext } from "components/LensAuthenticationProvider";
-// import { Profile } from "components/Profile";
-// import { Tabs } from "components";
-import { TagsFilter } from "components/TagsFilter";
-import type { NextPage } from "next";
-import Head from "next/head";
-import { useContext, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { explore } from '@lib/lens/explore-publications';
+import { Layout } from 'components/Layout';
+import { TagsFilter } from 'components/TagsFilter';
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import { useEffect, useState } from 'react';
+import ExplorerCard from 'components/ExplorerCard';
 
 const Home: NextPage = () => {
-  const { isConnected } = useAccount();
-  const profile = useContext(ProfileContext);
+  const [publications, setpublications] = useState<any[]>([]);
   const [hydrationLoading, sethydrationLoading] = useState(true);
   useEffect(() => {
     sethydrationLoading(false);
+  }, []);
+
+  useEffect(() => {
+    explore().then((data) => setpublications(data.items));
   }, []);
 
   if (hydrationLoading) {
@@ -48,8 +49,8 @@ const Home: NextPage = () => {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <Layout
-        title={"Lenstags | Home"}
-        pageDescription={"TODO: Descripcion de la pagina"}
+        title={'Lenstags | Home'}
+        pageDescription={'TODO: Descripcion de la pagina'}
       >
         <div className="container mx-auto py-10 h-64 md:w-4/5 w-11/12 px-6 ">
           {/* <Profile /> */}
@@ -57,7 +58,17 @@ const Home: NextPage = () => {
           <div className="mb-3">
             <TagsFilter />
           </div>
+          <div className="container mx-auto px-4 md:px-12">
+            <div className="flex flex-wrap -mx-1 lg:-mx-4">
+              {publications
+                ? publications.map((post, index) => {
+                    // console.log(post);
 
+                    return <ExplorerCard post={post} key={index} />;
+                  })
+                : null}
+            </div>
+          </div>
           <div className="w-full h-auto">{/* <Pagination /> */}</div>
         </div>
       </Layout>

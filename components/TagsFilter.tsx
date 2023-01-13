@@ -1,9 +1,9 @@
-import { useContext } from "react";
-import { useState } from "react";
-import { TAGS } from "../lib/tags";
-import { TagsFilterContext } from "./TagsFilterProvider";
+import { useContext } from 'react';
+import { useState } from 'react';
+import { TAGS } from '../lib/lens/tags';
+import { TagsFilterContext } from './TagsFilterProvider';
 
-const selectedtyle = "bg-greenLengs text-black border-black shadow";
+const selectedStyle = 'bg-greenLengs text-black border-black shadow';
 
 // TODO Improve UI when there are too many tags for two lines
 export const TagsFilter = () => {
@@ -27,7 +27,7 @@ export const TagsFilter = () => {
       {TAGS.map((tag, index) => (
         <span
           className={`${
-            selected[index] ? selectedtyle : "border-zinc-400"
+            selected[index] ? selectedStyle : 'border-zinc-400'
           } px-2 py-1 whitespace-nowrap flex-1 flex justify-center cursor-pointer select-none border`}
           key={index}
           onClick={() => toggleSelected(index)}
@@ -37,4 +37,4 @@ export const TagsFilter = () => {
       ))}
     </div>
   );
-}
+};

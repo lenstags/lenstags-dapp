@@ -1,10 +1,10 @@
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 
 export const UnauthorizedScreen = () => {
   const { openConnectModal } = useConnectModal();
 
   return (
-    <div className="hero min-h-screen bg-white">
+    <div className="hero min-h-screen bg-black">
       <div className="hero-overlay bg-opacity-60"></div>
       <div className="hero-content text-center text-neutral-content">
         <div className="max-w-md">
@@ -21,7 +21,7 @@ export const UnauthorizedScreen = () => {
               width="28"
               height="28"
               viewBox="0 0 24 24"
-              stroke-width="1.5"
+              strokeWidth="1.5"
               stroke="#000"
               fill="none"
               stroke-linecap="round"
