@@ -1,35 +1,36 @@
-import "@rainbow-me/rainbowkit/styles.css";
+import '@rainbow-me/rainbowkit/styles.css';
 
-import jwt from "jsonwebtoken";
-import { createContext, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import jwt from 'jsonwebtoken';
+import { createContext, useEffect, useState } from 'react';
+import { useAccount } from 'wagmi';
 import {
   createAuthenticationAdapter,
-  RainbowKitAuthenticationProvider,
-} from "@rainbow-me/rainbowkit";
-import { generateChallenge, authenticate } from "@lib/lens/login";
-import { setAuthenticationToken } from "@lib/lens/graphql/apollo-client";
-import { getDefaultProfile } from "@lib/lens/default-profile";
+  RainbowKitAuthenticationProvider
+} from '@rainbow-me/rainbowkit';
+import { generateChallenge, authenticate } from '@lib/lens/login';
+import { setAuthenticationToken } from '@lib/lens/graphql/apollo-client';
+import { getDefaultProfile } from '@lib/lens/default-profile';
 import {
   deleteLensLocalStorage,
   getFromLocalStorage,
   LensLocalStorage,
-  setLensLocalStorage,
-} from "@lib/lens/localStorage";
-import { refresh } from "@lib/lens/refresh";
+  setLensLocalStorage
+} from '@lib/lens/localStorage';
+import { refresh } from '@lib/lens/refresh';
 
 type Profile = {
   handle: string;
   name: string;
   pictureUrl: string | null;
   id: string;
+  canUseRelay: boolean | undefined;
   bio: string;
 };
 
 export const ProfileContext = createContext<Profile | null>(null);
 
 export default function LensAuthenticationProvider({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {
@@ -38,20 +39,23 @@ export default function LensAuthenticationProvider({
 
   const clearProfile = () => {
     setAuthenticationToken(null);
-    setAuthenticationStatus("unauthenticated");
+    setAuthenticationStatus('unauthenticated');
     setProfile(null);
     deleteLensLocalStorage();
   };
 
   const setAuthenticated = (lensStore: LensLocalStorage) => {
     setAuthenticationToken(lensStore.accessToken);
-    setAuthenticationStatus("authenticated");
+    setAuthenticationStatus('authenticated');
+    console.log('lensStore: ', lensStore);
+
     setProfile({
       handle: lensStore.handle,
       pictureUrl: lensStore.pictureUrl,
       name: lensStore.name,
+      canUseRelay: lensStore.canUseRelay,
       id: lensStore.id,
-      bio: lensStore.bio,
+      bio: lensStore.bio
     });
   };
 
@@ -80,7 +84,7 @@ export default function LensAuthenticationProvider({
             const newLensStore = {
               ...lensStore,
               accessToken: newToken.accessToken,
-              refreshToken: newToken.refreshToken,
+              refreshToken: newToken.refreshToken
             };
             setLensLocalStorage(newLensStore);
             setAuthenticated(newLensStore);
@@ -97,13 +101,13 @@ export default function LensAuthenticationProvider({
   }, [address]);
 
   const [authenticationStatus, setAuthenticationStatus] = useState<
-    "loading" | "authenticated" | "unauthenticated"
-  >("unauthenticated");
+    'loading' | 'authenticated' | 'unauthenticated'
+  >('unauthenticated');
 
   const authenticationAdapter = createAuthenticationAdapter({
     getNonce: async () => {
       const challenge = await generateChallenge({
-        address,
+        address
       });
 
       return challenge.text;
@@ -138,19 +142,21 @@ export default function LensAuthenticationProvider({
         handle: profile.handle,
         name: profile.name as string,
         pictureUrl,
+        canUseRelay: profile.dispatcher?.canUseRelay,
         id: profile.id as string,
-        bio: profile.bio as string,
+        bio: profile.bio as string
       };
       setLensLocalStorage(lensStore);
       setAuthenticated(lensStore);
 
+      console.log('PROFILE DISPATCHER SET ', profile.dispatcher?.canUseRelay);
       return Boolean(true);
     },
 
     signOut: async () => {
       deleteLensLocalStorage();
       setAuthenticationToken(null);
-    },
+    }
   });
 
   return (

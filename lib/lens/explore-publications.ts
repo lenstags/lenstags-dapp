@@ -35,8 +35,6 @@ export const explore = async (filter?: IExplorePublications) => {
     };
   }
 
-  console.log('😎 ', reqQuery);
   const result = await explorePublications(reqQuery);
-
   return result.data.explorePublications;
 };

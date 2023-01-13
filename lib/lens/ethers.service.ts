@@ -9,14 +9,14 @@ import { MUMBAI_RPC_URL } from '../config';
 // getSigner function from injected web3 provider
 export const getSigner = () => {
   if (typeof window === 'undefined') {
-    // // TODO: server side
-    const privateKey: any = 'process.env.PRIVATE_KEY';
-    const provider = new ethers.providers.JsonRpcProvider(
-      MUMBAI_RPC_URL
-      // process.env.POLYGON_RPC
-    );
-    const singer = new ethers.Wallet(privateKey, provider);
-    return singer;
+    // // // TODO: server side VERIFY THIS
+    // const privateKey: any = process.env.PRIVATE_KEY;
+    // const provider = new ethers.providers.JsonRpcProvider(
+    //   MUMBAI_RPC_URL
+    //   // process.env.POLYGON_RPC
+    // );
+    // const singer = new ethers.Wallet(privateKey, provider);
+    // return singer;
   } else {
     // client side
     const p: any = window.ethereum;

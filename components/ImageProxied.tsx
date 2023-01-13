@@ -10,14 +10,6 @@ interface imageProxiedProps extends ImageProps {
 }
 
 const ImageProxied: React.FC<imageProxiedProps> = (props) => {
-  console.log(
-    props.src
-      ? getIPFSImage(props.src as string)
-      : props.itemType === 'post'
-      ? DEFAULT_IMAGE_POST
-      : DEFAULT_IMAGE_PROFILE
-  );
-
   const newProps = {
     ...props,
     src: props.src
