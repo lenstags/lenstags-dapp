@@ -52,6 +52,10 @@ export const enable = async (profileId: any) => {
   );
   console.log('set dispatcher: signature', signature);
 
+  if (!signature) {
+    throw new Error('Error splitting signature');
+  }
+
   const { v, r, s } = splitSignature(signature);
 
   const tx = await lensHub.setDispatcherWithSig({
@@ -106,6 +110,10 @@ export const disable = async (profileId: any) => {
   );
   console.log('disable dispatcher: signature', signature);
 
+  if (!signature) {
+    throw new Error('Error splitting signature');
+  }
+
   const { v, r, s } = splitSignature(signature);
 
   const tx = await lensHub.setDispatcherWithSig({
@@ -121,6 +129,7 @@ export const disable = async (profileId: any) => {
   console.log('disable dispatcher: tx hash', tx.hash);
 };
 
+// TODO: move to its own file
 export async function queryProfile(request: SingleProfileQueryRequest) {
   const result = await apolloClient.query({
     query: ProfileDocument,

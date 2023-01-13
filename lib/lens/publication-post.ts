@@ -110,6 +110,10 @@ const createPost = async (profileId: string) => {
 
   const typedData = signedResult.result.typedData;
 
+  if (!signedResult.signature) {
+    throw new Error('Error splitting signature');
+  }
+
   const { v, r, s } = splitSignature(signedResult.signature);
 
   const tx = await lensHub.postWithSig({
