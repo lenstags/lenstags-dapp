@@ -1,4 +1,4 @@
-const LS_LENS_STORE = "lens.store";
+const LS_LENS_STORE = 'lens.store';
 
 export type LensLocalStorage = {
   accessToken: string;
@@ -6,6 +6,9 @@ export type LensLocalStorage = {
   handle: string;
   name: string;
   pictureUrl: string | null;
+  id: string;
+  bio: string;
+  canUseRelay: boolean | undefined;
 };
 
 export const getFromLocalStorage = (): LensLocalStorage | null => {

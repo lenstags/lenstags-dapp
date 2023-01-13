@@ -2,9 +2,16 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  images: {
-    domains: ['media.lenster.xyz', 'lens.infura-ipfs.io'],
-  },
-}
 
-module.exports = nextConfig
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'http',
+        protocol: 'https',
+        hostname: '**'
+      }
+    ]
+  }
+};
+
+module.exports = nextConfig;

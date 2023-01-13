@@ -1,19 +1,19 @@
-import { LENSTAGS_SOURCE } from "./constants";
-import { apolloClient } from "./graphql/apollo-client";
+import { LENSTAGS_SOURCE } from './constants';
+import { apolloClient } from './graphql/apollo-client';
 import {
   CustomFiltersTypes,
   ExplorePublicationRequest,
   ExplorePublicationsDocument,
   PublicationSortCriteria,
-  PublicationTypes,
-} from "./graphql/generated";
+  PublicationTypes
+} from './graphql/generated';
 
 const explorePublications = (request: ExplorePublicationRequest) => {
   return apolloClient.query({
     query: ExplorePublicationsDocument,
     variables: {
-      request,
-    },
+      request
+    }
   });
 };
 
@@ -26,16 +26,15 @@ export const explore = async (filter?: IExplorePublications) => {
     sortCriteria: PublicationSortCriteria.Latest,
     sources: [LENSTAGS_SOURCE],
     publicationTypes: [PublicationTypes.Post],
-    customFilters: [CustomFiltersTypes.Gardeners],
+    customFilters: [CustomFiltersTypes.Gardeners]
   };
 
   if (filter?.tags) {
     reqQuery.metadata = {
-      tags: { oneOf: filter.tags },
+      tags: { oneOf: filter.tags }
     };
   }
 
   const result = await explorePublications(reqQuery);
-
   return result.data.explorePublications;
 };
