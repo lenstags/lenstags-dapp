@@ -47,6 +47,9 @@ export const follow = async (profileId: string = '0x11') => {
   );
   console.log('follow: signature', signature);
 
+  if (!signature) {
+    return;
+  }
   const { v, r, s } = splitSignature(signature);
 
   const tx = await lensHub.followWithSig({
