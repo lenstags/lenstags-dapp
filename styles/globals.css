@@ -40,16 +40,18 @@ button {
   padding: 6px 12px 3px 12px;
   background: var(--button_color);
   color: #121400;
-  transform: translateY(-0.15em);
+  transform: translate(-0.15em, -0.15rem);
   transition: transform 0.1s ease;
 }
 
 button:hover .button_top {
   /* Pull the button upwards when hovered */
-  transform: translateY(-0.3em);
+  transform: translate(-0.3em, -0.3em);
 }
 
 button:active .button_top {
   /* Push the button downwards when pressed */
   transform: translateY(0);
 }
+
+@import url('./inputs/inputs.css');
