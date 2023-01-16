@@ -107,19 +107,43 @@ const Create: NextPage = () => {
             </button>
           </div>
         </div>
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              {' '}
+              <p className="font-semibold">Title</p>
+            </div>
+            <div className="w-full">
+              <input
+                className=" w-full font-semibold px-3 py-2 mx-4 text-lensGray2 bg-white outline-none"
+                type="text"
+                name="title"
+                id="title"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  return;
+                }}
+              />
+            </div>
+          </div>
+        </div>
 
-        <div className="px-6 py-1 my-4 flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <p className=" ">TITLE</p>
-          <input
-            className=" text-sm w-full px-3 py-2 mx-4 text-gray-600 bg-white outline-none"
-            type="text"
-            name="title"
-            id="title"
-            onChange={(e) => {
-              setTitle(e.target.value);
-              return;
-            }}
-          />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              {' '}
+              <p className="font-semibold">Abstract</p>
+            </div>
+            <div className="w-full">
+              <input
+                className=" w-full font-semibold px-3 py-2 mx-4 text-lensGray2 bg-white outline-none"
+                type="text"
+                name="abstract"
+                id="abstract"
+                onChange={(e) => setAbstract(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
         {/* name: post?.name,
@@ -130,47 +154,64 @@ link: post?.link,
 cover: post?.cover,
 tags: post?.tags, */}
 
-        <p className="ml-6 mb-2">Post details</p>
-
-        <div className="px-6 py-1  flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <p className=" ">ABSTRACT</p>
-          <input
-            className=" text-sm w-full px-3 py-2 mx-4 text-gray-600 bg-white outline-none"
-            type="text"
-            name="abstract"
-            id="abstract"
-            onChange={(e) => setAbstract(e.target.value)}
-          />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-2 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div className="w-full">
+              <Editor
+                initialContent={initialContent}
+                onChange={handleChangeEditor}
+              />
+            </div>
+          </div>
         </div>
 
-        <div className="mb-4 border border-gray-100 shadow-md rounded-md font-extralight">
-          <Editor
-            initialContent={initialContent}
-            onChange={handleChangeEditor}
-          />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              {' '}
+              <p className="font-semibold">Link</p>
+            </div>
+            <div className="w-full">
+              <input
+                className=" text-sm w-full py-2 px-2 text-gray-600 bg-white outline-none"
+                type="text"
+                name="link"
+                id="link"
+                placeholder="Insert the link starting with 'https://'"
+                onChange={(e) => setLink(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
-        <p className="ml-6 mb-2">Link</p>
-
-        <div className="px-6 py-1 my-4 flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <input
-            className=" text-sm w-full py-2 text-gray-600 bg-white outline-none"
-            type="text"
-            name="link"
-            id="link"
-            placeholder="Insert the link starting with 'https://'"
-            onChange={(e) => setLink(e.target.value)}
-          />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full pb-1 pt-2 flex justify-between items-center bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              <p className="font-semibold">Cover</p>
+            </div>
+            <div className="">
+             
+            </div>
+            <button className="btnLenstags px-2 pb-2 py-2 rounded-lg">
+                Add photo
+            </button>
+          </div>
         </div>
 
-        <p className="ml-6 mb-2">Cover</p>
-        <button className="bg-gray-100 my-2 mb-4 px-4 py-2 rounded-md shadow-md">
-          Add photo
-        </button>
-
-        <p className="ml-6 mb-2">Tags</p>
-        <div className="px-6 py-1 my-4 mb-6 flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <div className=" text-sm w-full py-2 text-gray-600 bg-white outline-none" />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              <p className="font-semibold">Tags</p>
+            </div>
+            <div className="w-full">
+             <select className="select px-6 bg-white w-full">
+            <option disabled selected>Select tag one</option>
+            <option>Tag 1</option>
+            <option>Tag 2</option>
+            <option>Tag 3</option>
+          </select>
+            </div>
+          </div>
         </div>
 
         <div className="text-right">
