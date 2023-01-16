@@ -1,0 +1,12 @@
+.btnLenstags {
+    display: flex;
+    box-sizing: border-box;
+    border: 2px solid var(--button_outline_color);
+    border-radius: var(--button_radius);
+    padding: 6px 12px 3px 12px;
+    background: var(--button_color);
+    color: #121400;
+    transform: translate(-0.15em, -0.15rem ) ;
+    transition: transform 0.1s ease;
+}
+
