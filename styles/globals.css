@@ -2,88 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-@media (prefers-color-scheme: light) {
+@layer base {
   html {
-    color-scheme: light;
-  }
-  body {
-    color: black;
-    background: white;
+    font-family: Inter, system-ui, sans-serif;
   }
 }
-.cover {
-  top: 150px;
-  left: 150px;
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: "Inter";
+    src: url("/assets/fonts/Inter/Inter-Regular.woff") format("woff");
+  }
 }
 
-.coverImg {
-  width: 160px;
-  height: 180px;
+button {
+  /* Variables */
+ --button_radius: 10px;
+ --button_color: #DEF702;
+ --button_outline_color: #121400;
+ font-size: 14px;
+ font-weight: bold;
+ border: none;
+ border-radius: var(--button_radius);
+ background: var(--button_outline_color);
 }
 
-/* FONTS */
-
-.card-Numbers {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 30px;
-  line-height: 36px;
-
-  color: #000000;
+.button_top {
+ display: flex;
+ box-sizing: border-box;
+ border: 2px solid var(--button_outline_color);
+ border-radius: var(--button_radius);
+ padding: 6px 12px 3px 12px;
+ background: var(--button_color);
+ color: #121400;
+ transform: translateY(-0.15em);
+ transition: transform 0.1s ease;
 }
 
-.font-piazzola {
-  font-family: "Piazzolla";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 28px;
+button:hover .button_top {
+  /* Pull the button upwards when hovered */
+ transform: translateY(-0.3em);
+ 
 }
 
-.card-grayLetters {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 18px;
-  line-height: 29px;
-  color: #aaaaaa;
-}
-
-.card-Name {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 400;
-  font-size: 30px;
-  line-height: 36px;
-}
-
-.card-options {
-  font-family: "Inter";
-  font-style: normal;
-  font-weight: 200;
-  font-size: 20px;
-  line-height: 10px;
-}
-
-.vector {
-  right: 600px;
-  bottom: 470px;
+button:active .button_top {
+  /* Push the button downwards when pressed */
+ transform: translateY(0);
 }

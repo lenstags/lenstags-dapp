@@ -173,7 +173,7 @@ tags: post?.tags, */}
         <div className="text-right">
           <button
             onClick={handlePost}
-            className="font-light bg-greenLenstags my-2 mb-4 px-12 py-4 rounded-md shadow-md"
+            className="font-light bg-lensGreen my-2 mb-4 px-12 py-4 rounded-md shadow-md"
           >
             CREATE POST
             {loading && (
