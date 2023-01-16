@@ -13,7 +13,7 @@ export const UnauthorizedScreen = () => {
           <p className="mb-5">Please sign in with your wallet</p>
           <button
             onClick={openConnectModal}
-            className="btn rounded-full gap-1 bg-greenLenstags text-black  border-none hover:bg-greenLenstags"
+            className="btn rounded-full gap-1 bg-lensGreen text-black  border-none hover:bg-LensGreen"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
