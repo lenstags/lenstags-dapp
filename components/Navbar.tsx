@@ -219,7 +219,9 @@ export const Navbar = () => {
                     <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
                   <div className="mx-2 border-2 p-2 rounded-lg border-lensBlack hover:bg-lensBlack hover:text-lensGray">
-                    <Link href={'#'} ><a title="Soon" >PROJECTS</a></Link>
+                    <Link href={'#'}>
+                      <a title="Soon">PROJECTS</a>
+                    </Link>
                   </div>
                 </div>
                 <div className="w-1/2 hidden lg:flex">
