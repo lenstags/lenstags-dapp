@@ -1003,5 +1003,5 @@ module.exports = {
       50: '50'
     }
   },
-  plugins: [require('daisyui'), require('tailwindcss-animate')]
+  plugins: [require('tailwindcss-animate')]
 };

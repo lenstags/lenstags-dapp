@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 html {
-  background-color: #FFF !important;
+  background-color: #fff !important;
 }
 
 @layer base {
@@ -15,42 +15,41 @@ html {
 @layer base {
   @font-face {
     font-display: swap;
-    font-family: "Inter";
-    src: url("/assets/fonts/Inter/Inter-Regular.woff") format("woff");
+    font-family: 'Inter';
+    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
   }
 }
 
 button {
   /* Variables */
- --button_radius: 10px;
- --button_color: #DEF702;
- --button_outline_color: #121400;
- font-size: 14px;
- font-weight: bold;
- border: none;
- border-radius: var(--button_radius);
- background: var(--button_outline_color);
+  --button_radius: 10px;
+  --button_color: #def702;
+  --button_outline_color: #121400;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  border-radius: var(--button_radius);
+  background: var(--button_outline_color);
 }
 
 .button_top {
- display: flex;
- box-sizing: border-box;
- border: 2px solid var(--button_outline_color);
- border-radius: var(--button_radius);
- padding: 6px 12px 3px 12px;
- background: var(--button_color);
- color: #121400;
- transform: translateY(-0.15em);
- transition: transform 0.1s ease;
+  display: flex;
+  box-sizing: border-box;
+  border: 2px solid var(--button_outline_color);
+  border-radius: var(--button_radius);
+  padding: 6px 12px 3px 12px;
+  background: var(--button_color);
+  color: #121400;
+  transform: translateY(-0.15em);
+  transition: transform 0.1s ease;
 }
 
 button:hover .button_top {
   /* Pull the button upwards when hovered */
- transform: translateY(-0.3em);
- 
+  transform: translateY(-0.3em);
 }
 
 button:active .button_top {
   /* Push the button downwards when pressed */
- transform: translateY(0);
+  transform: translateY(0);
 }

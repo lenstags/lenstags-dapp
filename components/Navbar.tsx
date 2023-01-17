@@ -217,27 +217,29 @@ export const Navbar = () => {
                     <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
                   <div className="mx-2 border-2 p-2 rounded-lg border-lensBlack hover:bg-lensBlack hover:text-lensGrey">
-                     <Link href={'/organizations'}>ORGANIZATIONS</Link>
+                    <Link href={'/organizations'}>ORGANIZATIONS</Link>
                   </div>
                 </div>
                 <div className="w-1/2 hidden lg:flex">
                   <div className="w-full flex items-center pl-8 justify-end">
                     <div className="h-full flex items-center justify-center  border-black  px-8">
-                    <button className="flex align-middle">
-                          <Link href={'/create'}>
-                              <div className="button_top flex">
-                                <div><ImageProxied
-                                  category="profile"
-                                  className="text-lensBlack"
-                                  src="/assets/icons/plus.svg"
-                                  alt="Lenstags Logo"
-                                  width={20}
-                                  height={20}
-                                /></div>
-                                <div>CREATE</div>
-                                  </div>
-                          </Link>
-                        </button>
+                      <button className="flex align-middle">
+                        <Link href={'/create'}>
+                          <div className="button_top flex">
+                            <div>
+                              <ImageProxied
+                                category="profile"
+                                className="text-lensBlack"
+                                src="/assets/icons/plus.svg"
+                                alt="Lenstags Logo"
+                                width={20}
+                                height={20}
+                              />
+                            </div>
+                            <div>CREATE</div>
+                          </div>
+                        </Link>
+                      </button>
                     </div>
 
                     <div className="h-full w-20 flex items-center justify-center  border-black">
@@ -288,7 +290,7 @@ export const Navbar = () => {
                         {profile ? (
                           <ul
                             className=" font-extralight -left-16 border-r text-black bg-white absolute rounded shadow"
-                            style={{ marginTop: '4.4rem' , marginLeft: '-4rem' }}
+                            style={{ marginTop: '4.4rem', marginLeft: '-4rem' }}
                           >
                             <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer ">
                               <div className="fl first-letter:ex">
@@ -316,7 +318,10 @@ export const Navbar = () => {
                                   <circle cx={12} cy={7} r={4} />
                                   <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                 </svg>
-                                <Link href={'/settings'} className="ml-2 hover:font-bold ">
+                                <Link
+                                  href={'/settings'}
+                                  className="ml-2 hover:font-bold "
+                                >
                                   Settings
                                 </Link>
                               </div>
@@ -367,7 +372,7 @@ export const Navbar = () => {
                       </div>
 
                       <div className="cursor-pointer active:rotate-0 visited:rotate-180 ease-linear focus:rotate-0 text-lensGrey2 ">
-                         <svg
+                        <svg
                           aria-haspopup="true"
                           xmlns="http://www.w3.org/2000/svg"
                           className="icon icon-tabler icon-tabler-chevron-down"
@@ -406,12 +411,12 @@ export const Navbar = () => {
                   <div className="mr-3">
                     {show ? (
                       <ImageProxied
-                      category="profile"
-                      src="/assets/icons/x.svg"
-                      alt="Lenstags Logo"
-                      width={20}
-                      height={20}
-                    />
+                        category="profile"
+                        src="/assets/icons/x.svg"
+                        alt="Lenstags Logo"
+                        width={20}
+                        height={20}
+                      />
                     ) : (
                       <svg
                         aria-label="Main Menu"
@@ -431,7 +436,8 @@ export const Navbar = () => {
                         <line x1={4} y1={8} x2={20} y2={8} />
                         <line x1={4} y1={16} x2={20} y2={16} />
                       </svg>
-                    )}{''}
+                    )}
+                    {''}
                   </div>
                 </div>
               </div>
