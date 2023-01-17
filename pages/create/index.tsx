@@ -2,10 +2,12 @@ import { Layout } from 'components';
 import { ProfileContext } from 'components';
 import { NextPage } from 'next';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
 import Editor from 'components/Editor';
 import { createPost, postData } from '@lib/lens/post';
 import { createPostGasless } from '@lib/lens/post-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
+import Toast from '../../components/Toast';
 
 const Create: NextPage = () => {
   const [name, setName] = useState('');
@@ -14,10 +16,12 @@ const Create: NextPage = () => {
     undefined
   );
 
+  const router = useRouter();
   const [abstract, setAbstract] = useState('');
   const [editorContents, setEditorContents] = useState('');
   const [link, setLink] = useState('');
   const [cover, setCover] = useState('');
+  const [isToastVisible, setIsToastVisible] = useState(false);
   const [tags, setTags] = useState([]);
   // const [post, setPost] = useState<postData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -56,7 +60,6 @@ const Create: NextPage = () => {
       // todo: image?: Buffer[]
     };
 
-    console.log('Post! ', constructedPost);
     setLoading(true);
     try {
       // collect post
@@ -67,8 +70,8 @@ const Create: NextPage = () => {
       const pubId = dispatcherStatus
         ? await createPostGasless(lensProfile.id, constructedPost)
         : await createPost(lensProfile.id, constructedPost);
-
-      console.log('pubId', pubId);
+      setIsToastVisible(true);
+      router.push('/');
     } catch (e: any) {
       console.error(e);
     }
@@ -171,9 +174,15 @@ tags: post?.tags, */}
         </div>
 
         <div className="text-right">
+          {isToastVisible ? (
+            <Toast text="Post created successfully!" level="success" />
+          ) : (
+            ''
+          )}
+
           <button
             onClick={handlePost}
-            className="font-light bg-lensGreen my-2 mb-4 px-12 py-4 rounded-md shadow-md"
+            className="font-light bg-lensGree my-2 mb-4 px-12 py-4 rounded-md shadow-md"
           >
             CREATE POST
             {loading && (
