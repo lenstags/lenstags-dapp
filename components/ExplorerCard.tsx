@@ -73,7 +73,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
           <div className="px-3 text-sm font-light">
             <a className=" text-black" href="#">
               <p>{post.metadata.title}</p>
-              <p>{post.metadata.content}</p>
+              <div
+                dangerouslySetInnerHTML={{ __html: post.metadata.content }}
+              ></div>
             </a>
           </div>
         </div>
