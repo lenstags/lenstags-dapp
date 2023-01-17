@@ -1,0 +1,8 @@
+.input-translate {
+ box-sizing: border-box;
+ border-radius: 8px;
+ background: blue;
+ color: #121400;
+ transform: translate(-0.15em, -0.15rem ) ;
+ transition: transform 0.1s ease;
+}

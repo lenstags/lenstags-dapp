@@ -20,6 +20,34 @@ html {
   }
 }
 
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'Inter';
+    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'Inter';
+    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'Inter';
+    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
+  }
+}
+
+@import url('./suneditor/suneditor.css');
+
+@import url('./inputs/inputs.css');
+
 button {
   /* Variables */
   --button_radius: 10px;
@@ -40,16 +68,46 @@ button {
   padding: 6px 12px 3px 12px;
   background: var(--button_color);
   color: #121400;
-  transform: translateY(-0.15em);
+  transform: translate(-0.15em, -0.15rem);
   transition: transform 0.1s ease;
 }
 
 button:hover .button_top {
   /* Pull the button upwards when hovered */
-  transform: translateY(-0.3em);
+  transform: translate(-0.3em, -0.3em);
 }
 
 button:active .button_top {
   /* Push the button downwards when pressed */
   transform: translateY(0);
 }
+
+.button_Nobg {
+  display: flex;
+  box-sizing: border-box;
+  border: 2px solid var(--button_outline_color);
+  border-radius: var(--button_radius);
+  padding: 6px 12px 3px 12px;
+  transform: translate(-0.15em, -0.15rem);
+  transition: transform 0.1s ease;
+}
+
+button:hover .button_Nobg {
+  /* Pull the button upwards when hovered */
+  transform: translate(-0.3em, -0.3em);
+}
+
+button:active .button_Nobg {
+  /* Push the button downwards when pressed */
+  transform: translateY(0);
+}
+
+/* @layer components {
+  .btn_Div {
+    @apply h-full min-w-fit flex items-center justify-center  border-black  px-8;
+  }
+  .btn_Btn { @apply flex align-middle;}
+  .btn_Div2 { @apply flex;}
+} */
+
+@import url('./buttons/buttons.css');

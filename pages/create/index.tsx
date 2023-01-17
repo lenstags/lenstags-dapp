@@ -8,6 +8,15 @@ import { createPost, postData } from '@lib/lens/post';
 import { createPostGasless } from '@lib/lens/post-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import Toast from '../../components/Toast';
+import ImageProxied from 'components/ImageProxied';
+import Link from 'next/link';
+
+const sleep = function () {
+  console.log('Step 1 - Called');
+  setTimeout(function () {
+    console.log('Step 2 - Called');
+  }, 15000);
+};
 
 const Create: NextPage = () => {
   const [name, setName] = useState('');
@@ -71,6 +80,7 @@ const Create: NextPage = () => {
         ? await createPostGasless(lensProfile.id, constructedPost)
         : await createPost(lensProfile.id, constructedPost);
       setIsToastVisible(true);
+      sleep();
       router.push('/');
     } catch (e: any) {
       console.error(e);
@@ -80,11 +90,11 @@ const Create: NextPage = () => {
 
   return (
     <Layout title="Lenstags | Create post" pageDescription="Create post">
-      <div className="container mx-auto py-10 h-64 md:w-1/2 w-11/12 px-6 text-black">
+      <div className="container mx-auto py-6  h-64 md:w-1/2 w-11/12 px-6 text-black">
         <div className="text-xl font-semibold">
           <span className="text-left">Create post</span>
           <div
-            className="tooltip tooltip-bottom float-right"
+            className="tooltip z-10 tooltip-bottom float-right"
             data-tip="By enabling gasless transactions you will able to sign once and post
           for free!"
           >
@@ -107,70 +117,133 @@ const Create: NextPage = () => {
             </button>
           </div>
         </div>
-
-        <div className="px-6 py-1 my-4 flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <p className=" ">TITLE</p>
-          <input
-            className=" text-sm w-full px-3 py-2 mx-4 text-gray-600 bg-white outline-none"
-            type="text"
-            name="title"
-            id="title"
-            onChange={(e) => {
-              setTitle(e.target.value);
-              return;
-            }}
-          />
+        <div className="bg-lensBlack rounded-lg my-6 ">
+          <div className="px-6 w-full py-1 flex  justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              {' '}
+              <p className="font-semibold">Title</p>
+            </div>
+            <div className="w-full">
+              <input
+                className=" w-full font-semibold px-3 py-2 mx-4 text-lensBlack bg-white outline-none"
+                type="text"
+                name="title"
+                id="title"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  return;
+                }}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* name: post?.name,
-title: post?.title,
-abstract: post?.abstract,
-content: post?.content,
-link: post?.link,
-cover: post?.cover,
-tags: post?.tags, */}
-
-        <p className="ml-6 mb-2">Post details</p>
-
-        <div className="px-6 py-1  flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <p className=" ">ABSTRACT</p>
-          <input
-            className=" text-sm w-full px-3 py-2 mx-4 text-gray-600 bg-white outline-none"
-            type="text"
-            name="abstract"
-            id="abstract"
-            onChange={(e) => setAbstract(e.target.value)}
-          />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full  flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              <p className="font-semibold">Tags</p>
+            </div>
+            <div className="w-full">
+              <select className="select px-6 bg-white w-full focus:outline-none">
+                <option disabled selected>
+                  Select tag
+                </option>
+                <option>Tokenomics</option>
+                <option>Food</option>
+                <option>Design</option>
+                <option>Solidity</option>
+                <option>Proof of Stake</option>
+                <option>Communities</option>
+                <option>Art</option>
+                <option>Metaverse</option>
+                <option>Esport</option>
+                <option>Art</option>
+                <option>DAO</option>
+                <option>Comics</option>
+              </select>
+            </div>
+          </div>
         </div>
 
-        <div className="mb-4 border border-gray-100 shadow-md rounded-md font-extralight">
-          <Editor
-            initialContent={initialContent}
-            onChange={handleChangeEditor}
-          />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              {' '}
+              <p className="font-semibold">Link</p>
+            </div>
+            <div className="w-full">
+              <input
+                className="  w-full py-2 px-6 text-lensPurple bg-white outline-none"
+                type="text"
+                name="link"
+                id="link"
+                placeholder="Insert the link starting with 'https://'"
+                onChange={(e) => setLink(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
-        <p className="ml-6 mb-2">Link</p>
-
-        <div className="px-6 py-1 my-4 flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <input
-            className=" text-sm w-full py-2 text-gray-600 bg-white outline-none"
-            type="text"
-            name="link"
-            id="link"
-            placeholder="Insert the link starting with 'https://'"
-            onChange={(e) => setLink(e.target.value)}
-          />
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div>
+              {' '}
+              <p className="font-semibold">Abstract</p>
+            </div>
+            <div className="w-full">
+              <input
+                className=" w-full font-semibold px-3 py-2 mx-4 text-lensBlack bg-white outline-none"
+                type="text"
+                name="abstract"
+                id="abstract"
+                onChange={(e) => setAbstract(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
 
-        <p className="ml-6 mb-2">Cover</p>
-        <button className="bg-gray-100 my-2 mb-4 px-4 py-2 rounded-md shadow-md">
-          Add photo
-        </button>
+        <div className="bg-lensBlack rounded-lg my-6">
+          <div className="px-2 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+            <div className="w-full">
+              <Editor
+                initialContent={initialContent}
+                onChange={handleChangeEditor}
+              />
+            </div>
+          </div>
+        </div>
 
-        <p className="ml-6 mb-2">Tags</p>
-        <div className="px-6 py-1 my-4 mb-6 flex place-items-baseline border rounded border-gray-300 shadow-md ">
-          <div className=" text-sm w-full py-2 text-gray-600 bg-white outline-none" />
+        <div className="flex justify-between items-center rounded-lg  my-6">
+          <div className="bg-lensBlack w-full rounded-lg  ">
+            <div className=" w-12/12 py-3  px-6 flex  items-center bg-white border-2 rounded-lg border-lensBlack input-translate">
+              <div>
+                <p className="font-semibold">Cover</p>
+              </div>
+              <div className="px-6 text-sm text-lensGray2 ">
+                Upload image (Optional)
+              </div>
+            </div>
+          </div>
+
+          <div className="h-full min-w-fit flex items-center justify-center  border-black  pl-8">
+            <button className="flex align-middle">
+              <Link href={'/create'}>
+                <div className="button_top flex">
+                  <div>
+                    <ImageProxied
+                      category="profile"
+                      className="text-lensBlack"
+                      src="/assets/icons/photo.svg"
+                      alt="Lenstags Logo"
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  <div>Add Cover</div>
+                </div>
+              </Link>
+            </button>
+          </div>
         </div>
 
         <div className="text-right">
@@ -179,7 +252,43 @@ tags: post?.tags, */}
           ) : (
             ''
           )}
+          <div className="text-right pb-6">
+            <div className="h-full min-w-fit flex items-center  justify-end border-black   pl-8 ">
+              <button onClick={handlePost} className="flex align-middle">
+                <div className=" bg-lensPurple button_Nobg items-center text-lensGray flex">
+                  <div>
+                    {loading && (
+                      <svg
+                        className="animate-spin h-5 w-5"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    )}
+                  </div>
+                  <div className="text-xl pl-2">Create Post</div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
+      {/* 
           <button
             onClick={handlePost}
             className="font-light bg-lensGree my-2 mb-4 px-12 py-4 rounded-md shadow-md"
@@ -207,9 +316,7 @@ tags: post?.tags, */}
                 ></path>
               </svg>
             )}
-          </button>
-        </div>
-      </div>
+          </button> */}
     </Layout>
   );
 };
