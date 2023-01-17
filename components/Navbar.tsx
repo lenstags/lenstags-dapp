@@ -213,10 +213,10 @@ export const Navbar = () => {
                 </Link>
                 <div className="w-1/2 h-full text-black lg:flex items-center pl-6 pr-24">
                   {/**Here comes the Navbar items */}
-                  <div className="mx-2 p-2 border-2 border-lensBlack rounded-lg bg-lensBlack text-lensGrey ">
+                  <div className="mx-2 p-2 border-2 border-lensBlack rounded-lg bg-lensBlack text-lensGray ">
                     <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
-                  <div className="mx-2 border-2 p-2 rounded-lg border-lensBlack hover:bg-lensBlack hover:text-lensGrey">
+                  <div className="mx-2 border-2 p-2 rounded-lg border-lensBlack hover:bg-lensBlack hover:text-lensGray">
                     <Link href={'/organizations'}>ORGANIZATIONS</Link>
                   </div>
                 </div>
@@ -371,7 +371,7 @@ export const Navbar = () => {
                         </div>
                       </div>
 
-                      <div className="cursor-pointer active:rotate-0 visited:rotate-180 ease-linear focus:rotate-0 text-lensGrey2 ">
+                      <div className="cursor-pointer active:rotate-0 visited:rotate-180 ease-linear focus:rotate-0 text-lensGray2 ">
                         <svg
                           aria-haspopup="true"
                           xmlns="http://www.w3.org/2000/svg"

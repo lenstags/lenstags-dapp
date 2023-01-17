@@ -164,8 +164,9 @@ module.exports = {
     caretColor: ({ theme }) => theme('colors'),
     colors: ({ colors }) => ({
       lensPurple: '#6D1EDC',
-      lensGrey: '#F4EDFD',
-      lensGrey2: '#999999',
+      lensGray: '#F4EDFD',
+      lensGray2: '#999999',
+      lensGray3: '#F5F5F5',
       lensBlack: '#121400',
       lensGreen: '#DEF702',
       lensDanger: '#FF235E',
