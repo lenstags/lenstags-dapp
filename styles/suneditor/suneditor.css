@@ -13,3 +13,17 @@
 .se-toolbar {
     outline: none!important;
 }
+
+.sun-editor-editable p {
+    font-size: 1.1rem;
+}
+
+.sun-editor-editable h1 .sun-editor-editable h2 {
+    font-family: Inter !important;
+}
+
+
+
+.sun-editor .se-wrapper .se-wrapper-wysiwyg p {
+    font-family: Inter ;
+}
