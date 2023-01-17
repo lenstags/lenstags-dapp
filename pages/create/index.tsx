@@ -11,6 +11,13 @@ import Toast from '../../components/Toast';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
 
+const sleep = function () {
+  console.log('Step 1 - Called');
+  setTimeout(function () {
+    console.log('Step 2 - Called');
+  }, 15000);
+};
+
 const Create: NextPage = () => {
   const [name, setName] = useState('');
   const [title, setTitle] = useState('');
@@ -73,6 +80,7 @@ const Create: NextPage = () => {
         ? await createPostGasless(lensProfile.id, constructedPost)
         : await createPost(lensProfile.id, constructedPost);
       setIsToastVisible(true);
+      sleep();
       router.push('/');
     } catch (e: any) {
       console.error(e);
