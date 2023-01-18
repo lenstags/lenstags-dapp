@@ -11,15 +11,14 @@ import Toast from '../../components/Toast';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
 
-const sleep = function () {
-  console.log('Step 1 - Called');
-  setTimeout(function () {
-    console.log('Step 2 - Called');
-  }, 15000);
-};
+const sleep = () =>
+  new Promise((resolve) => {
+    setTimeout(resolve, 2500);
+  });
 
 const Create: NextPage = () => {
   const [name, setName] = useState('');
+
   const [title, setTitle] = useState('');
   const [dispatcherStatus, setDispatcherStatus] = useState<boolean | undefined>(
     undefined
@@ -30,9 +29,11 @@ const Create: NextPage = () => {
   const [editorContents, setEditorContents] = useState('');
   const [link, setLink] = useState('');
   const [cover, setCover] = useState('');
-  const [isToastVisible, setIsToastVisible] = useState(false);
+  const [isSuccessVisible, setIsSuccessVisible] = useState(false);
+  const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
+
   const [tags, setTags] = useState([]);
-  // const [post, setPost] = useState<postData | null>(null);
   const [loading, setLoading] = useState(false);
 
   const lensProfile = useContext(ProfileContext);
@@ -56,8 +57,6 @@ const Create: NextPage = () => {
   };
 
   const handlePost = async () => {
-    console.log({ title, abstract, editorContents, link });
-
     const constructedPost = {
       name: name,
       title: title,
@@ -69,23 +68,48 @@ const Create: NextPage = () => {
       // todo: image?: Buffer[]
     };
 
+    if (!lensProfile) {
+      return;
+    }
+
     setLoading(true);
+
+    // const postPromise = dispatcherStatus
+    //   ? createPostGasless(lensProfile.id, constructedPost)
+    //   : createPost(lensProfile.id, constructedPost);
+
+    // return postPromise
+    //   .then((pubId) => {
+    //     console.log('🇵🇹 ', pubId);
+    //     setIsSuccessVisible(true);
+    //     sleep();
+    //     router.push('/');
+    //   })
+    //   .catch((err) => {
+    //     setIsErrorVisible(true);
+    //     console.error(err);
+    //     setLoading(false);
+    //   });
+
     try {
       // collect post
       if (!lensProfile) {
         return;
       }
 
-      const pubId = dispatcherStatus
+      await (dispatcherStatus
         ? await createPostGasless(lensProfile.id, constructedPost)
-        : await createPost(lensProfile.id, constructedPost);
-      setIsToastVisible(true);
-      sleep();
+        : await createPost(lensProfile.id, constructedPost));
+
+      setIsSuccessVisible(true);
+
+      await sleep();
       router.push('/');
     } catch (e: any) {
+      setIsErrorVisible(true);
       console.error(e);
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -247,76 +271,54 @@ const Create: NextPage = () => {
         </div>
 
         <div className="text-right">
-          {isToastVisible ? (
+          {isSuccessVisible && (
             <Toast text="Post created successfully!" level="success" />
-          ) : (
-            ''
           )}
+          {isErrorVisible && (
+            <Toast text="Something went wrong" level="error" />
+          )}
+
           <div className="text-right pb-6">
             <div className="h-full min-w-fit flex items-center  justify-end border-black   pl-8 ">
-              <button onClick={handlePost} className="flex align-middle">
-                <div className=" bg-lensPurple button_Nobg items-center text-lensGray flex">
-                  <div>
-                    {loading && (
-                      <svg
-                        className="animate-spin h-5 w-5"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                    )}
-                  </div>
-                  <div className="text-xl pl-2">Create Post</div>
+              <button
+                disabled={loading}
+                onClick={() =>
+                  handlePost().then(() => {
+                    // useWaitFiveSeconds();
+                  })
+                }
+                className="flex align-middle"
+              >
+                <div className="bg-lensPurple button_Nobg items-center text-lensGray flex">
+                  {loading && (
+                    <svg
+                      className="animate-spin h-5 w-5 ml-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  )}
+                  <div className="text-xl px-4 py-2">Create Post</div>
                 </div>
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* 
-          <button
-            onClick={handlePost}
-            className="font-light bg-lensGree my-2 mb-4 px-12 py-4 rounded-md shadow-md"
-          >
-            CREATE POST
-            {loading && (
-              <svg
-                className="animate-spin h-5 w-5"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            )}
-          </button> */}
     </Layout>
   );
 };
