@@ -21,10 +21,12 @@ export const Navbar = () => {
 
   const lensProfile = useContext(ProfileContext);
 
+  /// TODO: check this
   useEffect(() => {
     explore({ tags }).then((data) => {
       // TODO Integrate with card listing
-      console.log(data);
+      console.log('EXPLORER-DATA ', data.items);
+      // console.log('tagsss ', tags);
     });
   }, [tags]);
 

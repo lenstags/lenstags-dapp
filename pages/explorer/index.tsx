@@ -1,22 +1,23 @@
-import { explore } from '@lib/lens/explore-publications';
 import { Layout, TagsFilter } from 'components';
+import { useContext, useEffect, useState } from 'react';
+
 import ExplorerCard from 'components/ExplorerCard';
 import { NextPage } from 'next';
-import { useEffect, useState } from 'react';
+import { TagsFilterContext } from 'components';
+import { explore } from '@lib/lens/explore-publications';
 
 const Explorer: NextPage = () => {
-  const [publications, setpublications] = useState<any[]>([]);
-  useEffect(() => {
-    explore().then((data) => setpublications(data.items));
-  }, []);
+  const [publications, setPublications] = useState<any[]>([]);
 
-  explore();
+  const { tags } = useContext(TagsFilterContext);
+
+  useEffect(() => {
+    explore({ tags }).then((data) => setPublications(data.items));
+  }, [tags]);
+
+  explore({ tags });
   return (
-    <Layout
-      title="Lenstags | Explore"
-      pageDescription="TODO: Descripcion de la pagina"
-      screen={true}
-    >
+    <Layout title="Lenstags | Explore" pageDescription="Explore" screen={true}>
       <div className="container mx-auto py-10  md:w-4/5 w-11/12  ">
         <div className="mb-3">
           <TagsFilter />
@@ -27,11 +28,9 @@ const Explorer: NextPage = () => {
       <div className="container mx-auto px-4 md:px-12">
         <div className="flex flex-wrap -mx-1 lg:-mx-4">
           {publications
-            ? publications.map((post, index) => {
-                // console.log(post);
-
-                return <ExplorerCard post={post} key={index} />;
-              })
+            ? publications.map((post, index) => (
+                <ExplorerCard post={post} key={index} />
+              ))
             : null}
         </div>
       </div>

@@ -1,21 +1,25 @@
-import { explore } from '@lib/lens/explore-publications';
-import { Layout } from 'components/Layout';
-import { TagsFilter } from 'components/TagsFilter';
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import { useEffect, useState } from 'react';
+import { ProfileContext, TagsFilterContext } from 'components';
+import { useContext, useEffect, useState } from 'react';
+
 import ExplorerCard from 'components/ExplorerCard';
+import Head from 'next/head';
+import { Layout } from 'components/Layout';
+import type { NextPage } from 'next';
+import { TagsFilter } from 'components/TagsFilter';
+import { explore } from '@lib/lens/explore-publications';
 
 const Home: NextPage = () => {
-  const [publications, setpublications] = useState<any[]>([]);
-  const [hydrationLoading, sethydrationLoading] = useState(true);
+  const [publications, setPublications] = useState<any[]>([]);
+  const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
-    sethydrationLoading(false);
+    setHydrationLoading(false);
   }, []);
 
+  const { tags } = useContext(TagsFilterContext);
+
   useEffect(() => {
-    explore().then((data) => setpublications(data.items));
-  }, []);
+    explore({ tags }).then((data) => setPublications(data.items));
+  }, [tags]);
 
   if (hydrationLoading) {
     return <h1>Loading...</h1>;
@@ -61,11 +65,9 @@ const Home: NextPage = () => {
           <div className="container mx-auto px-4 md:px-12">
             <div className="flex flex-wrap -mx-1 lg:-mx-4">
               {publications
-                ? publications.map((post, index) => {
-                    // console.log(post);
-
-                    return <ExplorerCard post={post} key={index} />;
-                  })
+                ? publications.map((post, index) => (
+                    <ExplorerCard post={post} key={index} />
+                  ))
                 : null}
             </div>
           </div>

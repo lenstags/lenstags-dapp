@@ -28,7 +28,6 @@ export const explore = async (filter?: IExplorePublications) => {
     publicationTypes: [PublicationTypes.Post],
     customFilters: [CustomFiltersTypes.Gardeners]
   };
-
   if (filter?.tags) {
     reqQuery.metadata = {
       tags: { oneOf: filter.tags }
