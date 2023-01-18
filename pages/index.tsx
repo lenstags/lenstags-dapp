@@ -1,21 +1,25 @@
 import { explore } from '@lib/lens/explore-publications';
 import { Layout } from 'components/Layout';
+import { ProfileContext, TagsFilterContext } from 'components';
+
 import { TagsFilter } from 'components/TagsFilter';
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useEffect, useState } from 'react';
-import ExplorerCard from "components/ExplorerCard";
+import { useEffect, useState, useContext } from 'react';
+import ExplorerCard from 'components/ExplorerCard';
 
 const Home: NextPage = () => {
-  const [publications, setpublications] = useState<any[]>([]);
-  const [hydrationLoading, sethydrationLoading] = useState(true);
+  const [publications, setPublications] = useState<any[]>([]);
+  const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
-    sethydrationLoading(false);
+    setHydrationLoading(false);
   }, []);
-  
-    useEffect(() => {
-      explore().then((data) => setpublications(data.items));
-    }, []);
+
+  const { tags } = useContext(TagsFilterContext);
+
+  useEffect(() => {
+    explore({ tags }).then((data) => setPublications(data.items));
+  }, [tags]);
 
   if (hydrationLoading) {
     return <h1>Loading...</h1>;
@@ -59,16 +63,14 @@ const Home: NextPage = () => {
             <TagsFilter />
           </div>
           <div className="container mx-auto px-4 md:px-12">
-        <div className="flex flex-wrap -mx-1 lg:-mx-4">
-          {publications
-            ? publications.map((post, index) => {
-              // console.log(post);
-
-              return <ExplorerCard post={post} key={index} />;
-            })
-            : null}
-        </div>
-      </div>
+            <div className="flex flex-wrap -mx-1 lg:-mx-4">
+              {publications
+                ? publications.map((post, index) => (
+                    <ExplorerCard post={post} key={index} />
+                  ))
+                : null}
+            </div>
+          </div>
           <div className="w-full h-auto">{/* <Pagination /> */}</div>
         </div>
       </Layout>
