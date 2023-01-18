@@ -4,12 +4,14 @@ import { NextPage } from 'next';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import Editor from 'components/Editor';
+import TagsSelector from 'components/TagsSelector';
 import { createPost, postData } from '@lib/lens/post';
 import { createPostGasless } from '@lib/lens/post-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import Toast from '../../components/Toast';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
+import { TAGS } from '@lib/lens/tags';
 
 const sleep = () =>
   new Promise((resolve) => {
@@ -33,8 +35,16 @@ const Create: NextPage = () => {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
 
+  // const [selectedOption, setSelectedOption] = useState(options[0]);
+
   const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [selectedValue, setSelectedValue] = useState('');
+
+  const handleSelect = (value: string) => {
+    setSelectedValue(value);
+  };
 
   const lensProfile = useContext(ProfileContext);
   if (!lensProfile) {
@@ -64,7 +74,8 @@ const Create: NextPage = () => {
       content: editorContents || '',
       link: link,
       cover: cover,
-      tags: ['web3', 'arts', 'cars']
+      // TODO: GET FILTER ARRAY FROM THE UI
+      tags: [selectedValue]
       // todo: image?: Buffer[]
     };
 
@@ -168,23 +179,23 @@ const Create: NextPage = () => {
               <p className="font-semibold">Tags</p>
             </div>
             <div className="w-full">
-              <select className="select px-6 bg-white w-full focus:outline-none">
+              <TagsSelector options={TAGS} onSelect={handleSelect} />
+
+              {/* <select className="select px-6 bg-white w-full focus:outline-none">
                 <option disabled selected>
                   Select tag
                 </option>
-                <option>Tokenomics</option>
-                <option>Food</option>
-                <option>Design</option>
-                <option>Solidity</option>
-                <option>Proof of Stake</option>
-                <option>Communities</option>
-                <option>Art</option>
-                <option>Metaverse</option>
-                <option>Esport</option>
-                <option>Art</option>
-                <option>DAO</option>
-                <option>Comics</option>
-              </select>
+                {TAGS.map((tag) => {
+                  <option> {tags} </option>;
+                })}
+              </select> */}
+
+              {/* <select value={selectedOption}
+              >
+            {options.map((option, index) => (
+                <option key={index} value={option}>{option}</option>
+            ))}
+        </select> */}
             </div>
           </div>
         </div>
