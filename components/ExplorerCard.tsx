@@ -58,7 +58,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                   <ul className="dropdown-menu right-1 z-10 absolute hidden text-lensBlack  rounded-lg border-2 border-lensBlack ">
                     <li className="">
                       <a
-                        className="hover:text-lensGray rounded-t-lg bg-lensGray hover:bg-lensGray2 py-2 px-4 block whitespace-no-wrap"
+                        className="hover:text-lensGray2 rounded-t-lg bg-lensGray hover:bg-lensGray3 py-2 px-6 block whitespace-no-wrap"
                         href="#"
                       >
                         Share
@@ -66,7 +66,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     </li>
                     <li className="">
                       <a
-                        className="hover:text-lensGray rounded-b-lg bg-lensGray hover:bg-lensGray2 py-2 px-4 block whitespace-no-wrap"
+                        className="hover:text-lensGray2 rounded-b-lg bg-lensGray hover:bg-lensGray3 py-2 px-6 block whitespace-no-wrap"
                         href="#"
                       >
                         Report
@@ -91,16 +91,22 @@ const ExploreCard: FC<Props> = ({ post }) => {
           </div>
           <div className="mb-2 flex justify-between">
             <div
-              className="bg-lime-200 text-green-800 text-xs font-light mr-2 
-          px-2 py-0.5 rounded-lg hover:bg-lime-300"
+              className="bg-lensGray3 border-2 border-lensBlack  text-xs font-light mr-2 
+          px-2 py-0.5 rounded-lg"
             >
               12 Collected
             </div>
+            <div
+                className="bg-lensGray border-2 border-lensBlack px-2 text-xs font-light  
+           py-0.5 rounded-lg"
+              >
+                {moment(post.createdAt).format('MMM Do YY')}
+              </div>
           </div>
-          <div className="px-3 text-sm font-light">
-            <a className=" text-black" href="#">
-              <p>{post.metadata.title}</p>
-              <div
+          <div>
+            <a className=" text-xl font-semibold text-lensBlack" href="#">
+              {post.metadata.title} Title post jeje
+              <div className=" text-base font-normal "
                 dangerouslySetInnerHTML={{ __html: post.metadata.content }}
               ></div>
             </a>
@@ -146,8 +152,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
             </span>
 
             <button
-              className="bg-lime-200 text-green-800 text-xs font-light mr-2 
-          px-2.5 py-0.5 rounded-lg hover:bg-lime-300"
+              className="border-2 border-solid border-lensBlack  bg-lensPurple text-lensGray   text-xs font-light mr-2 
+          px-2.5 py-0.5 rounded-lg hover:bg-lensGray2"
             >
               Collect
             </button>
