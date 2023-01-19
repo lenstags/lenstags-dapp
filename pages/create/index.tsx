@@ -246,6 +246,26 @@ const Create: NextPage = () => {
               />
             </div>
           </div>
+
+          <div className="h-full min-w-fit flex items-center justify-center  border-black  pl-8">
+            <button className="flex align-middle">
+              <Link href={'/create'}>
+                <div className="button_top flex">
+                  <div>
+                    <ImageProxied
+                      category="profile"
+                      className="text-lensBlack"
+                      src="/assets/icons/photo.svg"
+                      alt="Lenstags Logo"
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  <div>Add Cover</div>
+                </div>
+              </Link>
+            </button>
+          </div>
         </div>
 
         <div className="flex justify-between items-center rounded-lg  my-6">

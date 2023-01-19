@@ -110,4 +110,6 @@ button:active .button_Nobg {
   .btn_Div2 { @apply flex;}
 } */
 
+@import url('./suneditor/suneditor.css');
 @import url('./buttons/buttons.css');
+@import url('./inputs/inputs.css');

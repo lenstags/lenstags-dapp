@@ -174,6 +174,8 @@ module.exports = {
       lensWarning: '#FFCE71',
       lensinfo: '#5BD5F8',
 
+
+      
       inherit: colors.inherit,
       current: colors.current,
       transparent: colors.transparent,
