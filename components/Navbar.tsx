@@ -105,7 +105,7 @@ export const Navbar = () => {
                           </svg>
                         </div>
                         <span className="ml-2 xl:text-base md:text-2xl text-base">
-                          <Link href={'/organizations'}>Organizations</Link>
+                          <Link href={'#'}>Projects</Link>
                         </span>
                       </div>
                     </li>
@@ -219,7 +219,7 @@ export const Navbar = () => {
                     <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
                   <div className="mx-2 border-2 p-2 rounded-lg border-lensBlack hover:bg-lensBlack hover:text-lensGray">
-                    <Link href={'/organizations'}>ORGANIZATIONS</Link>
+                    <Link href={'#'} ><a title="Soon" >PROJECTS</a></Link>
                   </div>
                 </div>
                 <div className="w-1/2 hidden lg:flex">
