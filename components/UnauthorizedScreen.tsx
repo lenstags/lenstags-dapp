@@ -10,11 +10,11 @@ export const UnauthorizedScreen = () => {
         <div className="max-w-md ">
           <h1 className="mb-5 text-5xl text-white font-bold">Welcome to</h1>
           <img src="img/logo-extended-white.svg"></img>
-          <p className="mb-5">Please sign in with your wallet</p>
+          <p className="mb-5 text-lensGray">Please sign in with your wallet</p>
           <div className="flex justify-center">
           <button
             onClick={openConnectModal}
-            className="btn flex items-center rounded-full gap-1 px-6 py-2 bg-lensGreen text-black  border-none hover:bg-LensGreen"
+            className="btn flex items-center rounded-lg gap-1 px-6 py-2 bg-lensGreen text-black  border-none hover:bg-LensGreen"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
