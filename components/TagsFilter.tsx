@@ -15,7 +15,7 @@ export const TagsFilter = () => {
     newSelected[index] = !selected[index];
     setSelected(newSelected);
 
-    const tags = TAGS.map((tag) => tag.id).filter(
+    const tags = TAGS.map((tag) => tag.value).filter(
       (_, index) => newSelected[index]
     );
 
@@ -32,7 +32,7 @@ export const TagsFilter = () => {
           key={index}
           onClick={() => toggleSelected(index)}
         >
-          {tag.title}
+          {tag.label}
         </span>
       ))}
     </div>
