@@ -1,95 +1,139 @@
 export type Tag = {
-  id: string;
-  title: string;
+  value: string;
+  label: string;
+  color: string;
 };
 
 export const TAGS: Tag[] = [
   {
-    id: 'web3',
-    title: 'Web3'
+    color: '#ddf500',
+    value: 'web3',
+    label: 'Web3'
   },
   {
-    id: 'layer2',
-    title: 'Layer 2'
+    color: '#ddf500',
+
+    value: 'layer2',
+    label: 'Layer 2'
   },
   {
-    id: 'governance',
-    title: 'Governance'
+    color: '#ddf500',
+
+    value: 'governance',
+    label: 'Governance'
   },
   {
-    id: 'product-management',
-    title: 'Product Management'
+    color: '#ddf500',
+
+    value: 'product-management',
+    label: 'Product Management'
   },
   {
-    id: 'ux-ui',
-    title: 'UX/UI'
+    color: '#ddf500',
+
+    value: 'ux-ui',
+    label: 'UX/UI'
   },
   {
-    id: 'food',
-    title: 'Food'
+    color: '#ddf500',
+
+    value: 'food',
+    label: 'Food'
   },
   {
-    id: 'design-systems',
-    title: 'Design Systems'
+    color: '#ddf500',
+
+    value: 'design-systems',
+    label: 'Design Systems'
   },
   {
-    id: 'tokenomics',
-    title: 'Tokenomics'
+    color: '#ddf500',
+
+    value: 'tokenomics',
+    label: 'Tokenomics'
   },
   {
-    id: 'solidity',
-    title: 'Solidity'
+    color: '#ddf500',
+
+    value: 'solidity',
+    label: 'Solidity'
   },
   {
-    id: 'proof-of-stake',
-    title: 'Proof of Stake'
+    color: '#ddf500',
+
+    value: 'proof-of-stake',
+    label: 'Proof of Stake'
   },
   {
-    id: 'movies-series',
-    title: 'Movies & Series'
+    color: '#ddf500',
+
+    value: 'movies-series',
+    label: 'Movies & Series'
   },
   {
-    id: 'play-to-earn',
-    title: 'Play 2 Earn'
+    color: '#ddf500',
+
+    value: 'play-to-earn',
+    label: 'Play 2 Earn'
   },
   {
-    id: 'decentralization',
-    title: 'Decentralization'
+    color: '#ddf500',
+
+    value: 'decentralization',
+    label: 'Decentralization'
   },
   {
-    id: '3d-design',
-    title: '3d Design'
+    color: '#ddf500',
+
+    value: '3d-design',
+    label: '3d Design'
   },
   {
-    id: 'nft',
-    title: 'NFT'
+    color: '#ddf500',
+
+    value: 'nft',
+    label: 'NFT'
   },
   {
-    id: 'lending',
-    title: 'Lending'
+    color: '#ddf500',
+
+    value: 'lending',
+    label: 'Lending'
   },
   {
-    id: 'communities',
-    title: 'Communities'
+    color: '#ddf500',
+
+    value: 'communities',
+    label: 'Communities'
   },
   {
-    id: 'art',
-    title: 'art'
+    color: '#ddf500',
+
+    value: 'art',
+    label: 'art'
   },
   {
-    id: 'metaverse',
-    title: 'Metaverse'
+    color: '#ddf500',
+
+    value: 'metaverse',
+    label: 'Metaverse'
   },
   {
-    id: 'esports',
-    title: 'eSports'
+    color: '#ddf500',
+
+    value: 'esports',
+    label: 'eSports'
   },
   {
-    id: 'dao',
-    title: 'DAO'
+    color: '#ddf500',
+
+    value: 'dao',
+    label: 'DAO'
   },
   {
-    id: 'comics',
-    title: 'Comics'
+    color: '#ddf500',
+
+    value: 'comics',
+    label: 'Comics'
   }
 ];

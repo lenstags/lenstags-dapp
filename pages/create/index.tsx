@@ -1,16 +1,16 @@
 import { Layout } from 'components';
 import { ProfileContext } from 'components';
 import { NextPage } from 'next';
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import Editor from 'components/Editor';
-import TagsSelector from 'components/TagsSelector';
 import { createPost, postData } from '@lib/lens/post';
 import { createPostGasless } from '@lib/lens/post-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import Toast from '../../components/Toast';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
+import CreatableSelect from 'react-select/creatable';
 import { TAGS } from '@lib/lens/tags';
 
 const sleep = () =>
@@ -33,17 +33,11 @@ const Create: NextPage = () => {
   const [cover, setCover] = useState('');
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [isPosting, setIsPosting] = useState(false);
+  const [selectedOption, setSelectedOption] = useState([]);
 
-  // const [selectedOption, setSelectedOption] = useState(options[0]);
-
-  const [tags, setTags] = useState([]);
   const [loading, setLoading] = useState(false);
-
-  const [selectedValue, setSelectedValue] = useState('');
-
-  const handleSelect = (value: string) => {
-    setSelectedValue(value);
+  const handleChange = (selectedOptions: any) => {
+    setSelectedOption(selectedOptions);
   };
 
   const lensProfile = useContext(ProfileContext);
@@ -55,16 +49,12 @@ const Create: NextPage = () => {
     setDispatcherStatus(
       profile?.dispatcher?.canUseRelay ? profile.dispatcher.canUseRelay : false
     );
-
     return;
   });
 
   const initialContent = 'Write something nice and styled!';
 
-  const handleChangeEditor = (content: string) => {
-    setEditorContents(content);
-    console.log('Content>>> ', content);
-  };
+  const handleChangeEditor = (content: string) => setEditorContents(content);
 
   const handlePost = async () => {
     const constructedPost = {
@@ -75,7 +65,7 @@ const Create: NextPage = () => {
       link: link,
       cover: cover,
       // TODO: GET FILTER ARRAY FROM THE UI
-      tags: [selectedValue]
+      tags: selectedOption.map((r) => r['label'])
       // todo: image?: Buffer[]
     };
 
@@ -84,23 +74,6 @@ const Create: NextPage = () => {
     }
 
     setLoading(true);
-
-    // const postPromise = dispatcherStatus
-    //   ? createPostGasless(lensProfile.id, constructedPost)
-    //   : createPost(lensProfile.id, constructedPost);
-
-    // return postPromise
-    //   .then((pubId) => {
-    //     console.log('🇵🇹 ', pubId);
-    //     setIsSuccessVisible(true);
-    //     sleep();
-    //     router.push('/');
-    //   })
-    //   .catch((err) => {
-    //     setIsErrorVisible(true);
-    //     console.error(err);
-    //     setLoading(false);
-    //   });
 
     try {
       // collect post
@@ -173,29 +146,28 @@ const Create: NextPage = () => {
           </div>
         </div>
 
-        <div className="bg-lensBlack rounded-lg my-6">
+        <div className="bg-lensBlack z-20 rounded-lg my-6">
           <div className="px-6 w-full  flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
             <div>
               <p className="font-semibold">Tags</p>
             </div>
-            <div className="w-full">
-              <TagsSelector options={TAGS} onSelect={handleSelect} />
-
-              {/* <select className="select px-6 bg-white w-full focus:outline-none">
-                <option disabled selected>
-                  Select tag
-                </option>
-                {TAGS.map((tag) => {
-                  <option> {tags} </option>;
-                })}
-              </select> */}
-
-              {/* <select value={selectedOption}
-              >
-            {options.map((option, index) => (
-                <option key={index} value={option}>{option}</option>
-            ))}
-        </select> */}
+            <div className="w-full pl-4 border-0 ">
+              <CreatableSelect
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    boxShadow: 'none',
+                    borderColor: 'transparent',
+                    '&:hover': {
+                      borderColor: 'transparent'
+                    }
+                  })
+                }}
+                menuPortalTarget={document.querySelector('body')}
+                isMulti
+                onChange={handleChange}
+                options={TAGS}
+              />
             </div>
           </div>
         </div>
