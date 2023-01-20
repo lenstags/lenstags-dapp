@@ -108,18 +108,14 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
           <div>
             <ul className=" py-2 flex flex-wrap text-xs gap-1">
-              <li className="rounded-lg border-2 bg-lensGreen font-semibold border-lensBlack px-2 ">
-                Web3
-              </li>
-              <li className="rounded-lg border-2  bg-lensGreen font-semibold border-lensBlack px-2 ">
-                DAOS
-              </li>
-              <li className="rounded-lg border-2 bg-lensGreen font-semibold border-lensBlack px-2 ">
-                Layer 2
-              </li>
-              <li className="rounded-lg border-2 bg-lensGreen font-semibold border-lensBlack px-2 ">
-                +3
-              </li>
+              {post.metadata.tags.map((tag: string) => (
+                <li
+                  key={tag}
+                  className="rounded-lg border-2 bg-lensGreen font-semibold border-lensBlack px-2 "
+                >
+                  {tag}
+                </li>
+              ))}
             </ul>
           </div>
 
