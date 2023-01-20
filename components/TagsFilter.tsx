@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { TAGS } from '../lib/lens/tags';
 import { TagsFilterContext } from './TagsFilterProvider';
 
-const selectedStyle = 'bg-greenLengs text-black border-black shadow';
+const selectedStyle = 'bg-lensGreen text-black border-black shadow';
 
 // TODO Improve UI when there are too many tags for two lines
 export const TagsFilter = () => {
@@ -23,18 +23,22 @@ export const TagsFilter = () => {
   };
 
   return (
-    <div className="text-zinc-400 flex gap-2 text-xs flex-wrap max-h-16 overflow-hidden">
-      {TAGS.map((tag, index) => (
-        <span
-          className={`${
-            selected[index] ? selectedStyle : 'border-zinc-400'
-          } px-2 py-1 whitespace-nowrap flex-1 flex justify-center cursor-pointer select-none border`}
-          key={index}
-          onClick={() => toggleSelected(index)}
-        >
-          {tag.label}
-        </span>
-      ))}
+    <div className="flex justify-center">
+      <div className=" flex justify-center gap-2 my-4 max-w-7xl text-xs flex-wrap max-h-16 overflow-hidden">
+        {TAGS.map((tag, index) => (
+          <span
+            className={`${
+              selected[index]
+                ? selectedStyle
+                : 'border-lensBlack hover:bg-lensGreen hover:font-semibold font-normal bg-gray-100 rounded-lg border-2'
+            } px-2 py-1 whitespace-nowrap flex-1  font-semibold rounded-lg flex justify-center cursor-pointer select-none border-2`}
+            key={index}
+            onClick={() => toggleSelected(index)}
+          >
+            {tag.label}
+          </span>
+        ))}
+      </div>
     </div>
   );
 };
