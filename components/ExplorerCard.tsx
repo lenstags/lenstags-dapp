@@ -1,16 +1,19 @@
 import React, { FC } from 'react';
 import ImageProxied from './ImageProxied';
 import moment from 'moment';
-import { profile } from 'console';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 interface Props {
   post: any;
 }
 
 const ExploreCard: FC<Props> = ({ post }) => {
+  const router = useRouter();
   return (
     <div className="my-1 px-1 w-full md:w-1/2 lg:my-4 lg:px-4 lg:w-1/3  ">
       {/* animate-in slide-in-from-bottom duration-1000 */}
+
       <article className="Lens_CardsDiv">
         <div className="bg-white Lens_Cards rounded-lg">
           <header className="w-full items-center p-2 md:p-4">
@@ -28,6 +31,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     src={post.profile.picture?.original?.url}
                   />
                 }
+
                 <div className="col-span-1 pl-2 cursor-pointer">
                   <p className=" ">{post.profile.name || post.profile.id}</p>
                   <p className="text-gray-400">@{post.profile.handle}</p>
@@ -97,19 +101,32 @@ const ExploreCard: FC<Props> = ({ post }) => {
               12 Collected
             </div>
             <div
-                className="bg-lensGray border-2 border-lensBlack px-2 text-xs font-light  
+              className="bg-lensGray border-2 border-lensBlack px-2 text-xs font-light  
            py-0.5 rounded-lg"
-              >
-                {moment(post.createdAt).format('MMM Do YY')}
-              </div>
+            >
+              {moment(post.createdAt).format('MMM Do YY')}
+            </div>
           </div>
           <div>
-            <a className=" text-xl font-semibold text-lensBlack" href="#">
-              {post.metadata.title} Title post jeje
-              <div className=" text-base font-normal "
-                dangerouslySetInnerHTML={{ __html: post.metadata.content }}
-              ></div>
-            </a>
+            <Link href={`/posts/${post.id}`}>
+              <a
+                target="_blank"
+                onClick={() => {
+                  window.localStorage.setItem(
+                    'LENS_POST',
+                    JSON.stringify(post)
+                  );
+                }}
+              >
+                <p className=" text-xl font-semibold text-lensBlack">
+                  {post.metadata.title}
+                  <div
+                    className=" text-base font-normal "
+                    dangerouslySetInnerHTML={{ __html: post.metadata.content }}
+                  ></div>
+                </p>
+              </a>
+            </Link>
           </div>
 
           <div>
