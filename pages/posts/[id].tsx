@@ -6,7 +6,7 @@ import ImageProxied from 'components/ImageProxied';
 export default function PostDetails() {
   const router = useRouter();
   const { id } = router.query;
-  const [post, setPost] = useState();
+  const [post, setPost] = useState<any>();
   useEffect(() => {
     const storedObject = localStorage.getItem('LENS_POST') || '';
     const myObject = JSON.parse(storedObject);
@@ -24,7 +24,7 @@ export default function PostDetails() {
                   {
                     <ImageProxied
                       category="profile"
-                      title={`Loading from ${post.profile.picture?.original?.url}`}
+                      title={`Loading...`}
                       alt="Profile"
                       height={50}
                       width={50}
