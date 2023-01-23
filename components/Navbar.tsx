@@ -6,6 +6,7 @@ import { explore } from '../lib/lens/explore-publications';
 import { ProfileContext, TagsFilterContext } from 'components';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export const Navbar = () => {
   const [show, setShow] = useState(false);
@@ -19,6 +20,8 @@ export const Navbar = () => {
 
   const lensProfile = useContext(ProfileContext);
 
+  const router = useRouter()
+  
   /// TODO: check this
   useEffect(() => {
     explore({ tags }).then((data) => {
@@ -215,10 +218,10 @@ export const Navbar = () => {
                 </Link>
                 <div className="w-1/2 h-full text-black lg:flex items-center pl-6 pr-24">
                   {/**Here comes the Navbar items */}
-                  <div className="mx-2 p-2 border-2 border-lensBlack rounded-lg bg-lensBlack text-lensGray ">
+                  <div className={`mx-2 p-2 border-2 border-lensBlack rounded-lg ${router.asPath === '/explorer' && 'bg-lensBlack text-lensGray'} hover:bg-lensBlack hover:text-lensGray `}>
                     <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
-                  <div className="mx-2 border-2 p-2 rounded-lg border-lensBlack hover:bg-lensBlack hover:text-lensGray">
+                  <div className={`mx-2 p-2 border-2 border-lensBlack rounded-lg ${router.asPath === '/explorer#' && 'bg-lensBlack text-lensGray'} hover:bg-lensBlack hover:text-lensGray`}>
                     <Link href={'#'}>
                       <a title="Soon">PROJECTS</a>
                     </Link>
