@@ -26,6 +26,7 @@ export const enableDispatcherWithTypedData = async (
 };
 
 export const enable = async (profileId: any) => {
+
   if (!profileId) {
     throw new Error('Must define profileId');
   }
@@ -69,6 +70,7 @@ export const enable = async (profileId: any) => {
     }
   });
   console.log('set dispatcher: tx hash', tx.hash);
+
 };
 
 const disableDispatcherWithTypedData = async (
@@ -85,6 +87,7 @@ const disableDispatcherWithTypedData = async (
 };
 
 export const disable = async (profileId: any) => {
+
   if (!profileId) {
     throw new Error('Must define PROFILE_ID in the .env to run this');
   }
@@ -127,6 +130,7 @@ export const disable = async (profileId: any) => {
     }
   });
   console.log('disable dispatcher: tx hash', tx.hash);
+
 };
 
 // TODO: move to its own file
