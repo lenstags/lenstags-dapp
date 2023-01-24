@@ -19,23 +19,37 @@ const ExploreCard: FC<Props> = ({ post }) => {
           <h1 className="w-full items-center p-2 md:p-4">
             <div className="row flex w-full justify-between text-sm font-light text-black">
               {/* profile */}
-              <div className="col-span-3 mr-2 flex justify-between">
-                <ImageProxied
-                  category="profile"
-                  title={`Loading from ${post.profile.picture?.original?.url}`}
-                  alt="Profile"
-                  height={50}
-                  width={50}
-                  objectFit="cover"
-                  className="h-12 w-12 cursor-pointer rounded-full"
-                  src={post.profile.picture?.original?.url}
-                />
+              <Link href={`/profiles/${post.profile.id}`}>
+                <a
+                  target="_blank"
+                  onClick={() => {
+                    window.localStorage.setItem(
+                      'LENS_PROFILE',
+                      JSON.stringify(post.profile)
+                    );
+                  }}
+                >
+                  <div className="col-span-3 mr-2 flex justify-between">
+                    <ImageProxied
+                      category="profile"
+                      title={`Loading from ${post.profile.picture?.original?.url}`}
+                      alt="Profile"
+                      height={50}
+                      width={50}
+                      objectFit="cover"
+                      className="h-12 w-12 cursor-pointer rounded-full"
+                      src={post.profile.picture?.original?.url}
+                    />
 
-                <div className="col-span-1 cursor-pointer pl-2">
-                  <p className=" ">{post.profile.name || post.profile.id}</p>
-                  <p className="text-gray-400">@{post.profile.handle}</p>
-                </div>
-              </div>
+                    <div className="col-span-1 cursor-pointer pl-2">
+                      <p className=" ">
+                        {post.profile.name || post.profile.id}
+                      </p>
+                      <p className="text-gray-400">@{post.profile.handle}</p>
+                    </div>
+                  </div>
+                </a>
+              </Link>
               {/* profile menu */}
               <div className="dropdown relative inline-block cursor-pointer">
                 <div className=" items-center rounded py-2  font-semibold  text-gray-700">
