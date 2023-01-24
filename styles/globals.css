@@ -48,6 +48,7 @@ html {
 
 @import url('./inputs/inputs.css');
 
+
 button {
   /* Variables */
   --button_radius: 10px;
@@ -102,6 +103,31 @@ button:active .button_Nobg {
   transform: translateY(0);
 }
 
+.button_cards {
+  display: flex;
+  box-sizing: border-box;
+  border: 2px solid var(--button_outline_color);
+  border-radius: var(--button_radius);
+  padding: 6px 12px 6px 12px;
+  background: var(--button_color);
+  color: #121400;
+  transform: translate(0.15em, 0.15rem);
+  transition: transform 0.1s ease;
+  }
+  
+  button:hover .button_cards {
+    /* Pull the button upwards when hovered */
+    transform: translate(0.25em, 0.25em);
+  }
+  
+  button:active .button_cards {
+    /* Push the button downwards when pressed */
+    transform: translateY(0);
+  }
+  
+  
+
+
 /* @layer components {
   .btn_Div {
     @apply h-full min-w-fit flex items-center justify-center  border-black  px-8;
@@ -111,6 +137,23 @@ button:active .button_Nobg {
 } */
 
 @import url('./suneditor/suneditor.css');
-@import url('./buttons/buttons.css');
 @import url('./inputs/inputs.css');
 @import url('./Cards/Cards.css');
+
+figure {
+  display: block;
+  position: relative;
+  float: right;
+  overflow: hidden;
+  border-radius: 8px;
+}
+figcaption {
+  position: absolute;
+  padding: 10px 20px;
+}
+
+.cap-right:before {  bottom: 10px; right: 10px; }
+.cap-right figcaption { bottom: 0; right: 0; }
+.cap-right:hover figcaption { right: 0; }
+
+
