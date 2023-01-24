@@ -96,10 +96,12 @@ export const createPostGasless = async (
 
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
+    name: builtPost.name || '', //the title
+    description: builtPost.abstract, //the resume
+    content: builtPost.content, //the details
     // TODO: image: post.image,
     imageMimeType: null,
-    content: builtPost.content,
-    name: builtPost.title || '',
+    // TODO: external urls?
     external_url: null,
     // TODO: coverPicture: post.cover,
     tags: builtPost.tags,
