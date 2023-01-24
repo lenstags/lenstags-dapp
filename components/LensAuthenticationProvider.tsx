@@ -149,7 +149,6 @@ export default function LensAuthenticationProvider({
       setLensLocalStorage(lensStore);
       setAuthenticated(lensStore);
 
-      console.log('PROFILE DISPATCHER SET ', profile.dispatcher?.canUseRelay);
       return Boolean(true);
     },
 

@@ -58,9 +58,9 @@ const Create: NextPage = () => {
 
   const handlePost = async () => {
     const constructedPost = {
-      name: name,
-      title: title,
-      abstract: abstract,
+      name: title,
+      // title: title,
+      abstract: abstract || '',
       content: editorContents || '',
       link: link,
       cover: cover,
@@ -98,11 +98,11 @@ const Create: NextPage = () => {
 
   return (
     <Layout title="Lenstags | Create post" pageDescription="Create post">
-      <div className="container mx-auto py-6  h-64 md:w-1/2 w-11/12 px-6 text-black">
+      <div className="container mx-auto h-64  w-11/12 py-6 px-6 text-black md:w-1/2">
         <div className="text-xl font-semibold">
           <span className="text-left">Create post</span>
           <div
-            className="tooltip z-10 tooltip-bottom float-right"
+            className="tooltip tooltip-bottom z-10 float-right"
             data-tip="By enabling gasless transactions you will able to sign once and post
           for free!"
           >
@@ -110,10 +110,10 @@ const Create: NextPage = () => {
               data-tooltip-target="tooltip-default"
               className={
                 dispatcherStatus === undefined
-                  ? 'bg-stone-200 rounded-lg px-2 py-2 text-xs'
+                  ? 'rounded-lg bg-stone-200 px-2 py-2 text-xs'
                   : dispatcherStatus
-                  ? 'bg-green-300 rounded-lg px-2 py-1 text-xs'
-                  : 'bg-red-300 rounded-lg px-2 py-1  text-xs'
+                  ? 'rounded-lg bg-green-300 px-2 py-1 text-xs'
+                  : 'rounded-lg bg-red-300 px-2 py-1  text-xs'
               }
             >
               Gasless tx are{' '}
@@ -125,15 +125,15 @@ const Create: NextPage = () => {
             </button>
           </div>
         </div>
-        <div className="bg-lensBlack rounded-lg my-6 ">
-          <div className="px-6 w-full py-1 flex  justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+        <div className="my-6 rounded-lg bg-lensBlack ">
+          <div className="input-translate flex w-full place-items-baseline  justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
             <div>
               {' '}
               <p className="font-semibold">Title</p>
             </div>
             <div className="w-full">
               <input
-                className=" w-full font-semibold px-3 py-2 mx-4 text-lensBlack bg-white outline-none"
+                className=" mx-4 w-full bg-white px-3 py-2 font-semibold text-lensBlack outline-none"
                 type="text"
                 name="title"
                 id="title"
@@ -146,12 +146,12 @@ const Create: NextPage = () => {
           </div>
         </div>
 
-        <div className="bg-lensBlack z-20 rounded-lg my-6">
-          <div className="px-6 w-full  flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+        <div className="z-20 my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex  w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6">
             <div>
               <p className="font-semibold">Tags</p>
             </div>
-            <div className="w-full pl-4 border-0 ">
+            <div className="w-full border-0 pl-4 ">
               <CreatableSelect
                 styles={{
                   control: (baseStyles, state) => ({
@@ -172,15 +172,15 @@ const Create: NextPage = () => {
           </div>
         </div>
 
-        <div className="bg-lensBlack rounded-lg my-6">
-          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+        <div className="my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
             <div>
               {' '}
               <p className="font-semibold">Link</p>
             </div>
             <div className="w-full">
               <input
-                className="  w-full py-2 px-6 text-lensPurple bg-white outline-none"
+                className="  w-full bg-white py-2 px-6 text-lensPurple outline-none"
                 type="text"
                 name="link"
                 id="link"
@@ -191,15 +191,15 @@ const Create: NextPage = () => {
           </div>
         </div>
 
-        <div className="bg-lensBlack rounded-lg my-6">
-          <div className="px-6 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+        <div className="my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
             <div>
               {' '}
               <p className="font-semibold">Abstract</p>
             </div>
             <div className="w-full">
               <input
-                className=" w-full font-semibold px-3 py-2 mx-4 text-lensBlack bg-white outline-none"
+                className=" mx-4 w-full bg-white px-3 py-2 font-semibold text-lensBlack outline-none"
                 type="text"
                 name="abstract"
                 id="abstract"
@@ -209,8 +209,8 @@ const Create: NextPage = () => {
           </div>
         </div>
 
-        <div className="bg-lensBlack rounded-lg my-6">
-          <div className="px-2 w-full py-1 flex justify-between place-items-baseline bg-white border-2 rounded-lg border-lensBlack input-translate">
+        <div className="my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-2 py-1">
             <div className="w-full">
               <Editor
                 initialContent={initialContent}
@@ -219,7 +219,7 @@ const Create: NextPage = () => {
             </div>
           </div>
 
-          <div className="h-full min-w-fit flex items-center justify-center  border-black  pl-8">
+          <div className="flex h-full min-w-fit items-center justify-center  border-black  pl-8">
             <button className="flex align-middle">
               <Link href={'/create'}>
                 <div className="button_top flex">
@@ -240,9 +240,9 @@ const Create: NextPage = () => {
           </div>
         </div>
 
-        <div className="flex justify-between items-center rounded-lg  my-6">
-          <div className="bg-lensBlack w-full rounded-lg  ">
-            <div className=" w-12/12 py-3  px-6 flex  items-center bg-white border-2 rounded-lg border-lensBlack input-translate">
+        <div className="my-6 flex items-center justify-between  rounded-lg">
+          <div className="w-full rounded-lg bg-lensBlack  ">
+            <div className=" w-12/12 input-translate  flex items-center  rounded-lg border-2 border-lensBlack bg-white py-3 px-6">
               <div>
                 <p className="font-semibold">Cover</p>
               </div>
@@ -252,7 +252,7 @@ const Create: NextPage = () => {
             </div>
           </div>
 
-          <div className="h-full min-w-fit flex items-center justify-center  border-black  pl-8">
+          <div className="flex h-full min-w-fit items-center justify-center  border-black  pl-8">
             <button className="flex align-middle">
               <Link href={'/create'}>
                 <div className="button_top flex">
@@ -281,8 +281,8 @@ const Create: NextPage = () => {
             <Toast text="Something went wrong" level="error" />
           )}
 
-          <div className="text-right pb-6">
-            <div className="h-full min-w-fit flex items-center  justify-end border-black   pl-8 ">
+          <div className="pb-6 text-right">
+            <div className="flex h-full min-w-fit items-center  justify-end border-black   pl-8 ">
               <button
                 disabled={loading}
                 onClick={() =>
@@ -292,10 +292,10 @@ const Create: NextPage = () => {
                 }
                 className="flex align-middle"
               >
-                <div className="bg-lensPurple button_Nobg items-center text-lensGray flex">
+                <div className="button_Nobg flex items-center bg-lensPurple text-lensGray">
                   {loading && (
                     <svg
-                      className="animate-spin h-5 w-5 ml-2"
+                      className="ml-2 h-5 w-5 animate-spin"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -315,7 +315,7 @@ const Create: NextPage = () => {
                       ></path>
                     </svg>
                   )}
-                  <div className="text-xl px-4 py-2">Create Post</div>
+                  <div className="px-4 py-2 text-xl">Create Post</div>
                 </div>
               </button>
             </div>

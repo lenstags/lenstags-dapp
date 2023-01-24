@@ -75,36 +75,33 @@ const ExploreCard: FC<Props> = ({ post }) => {
             </div>
           </header>
 
-          <div>
-            <Link href={`/posts/${post.id}`}>
-              <a
-                target="_blank"
-                onClick={() => {
-                  window.localStorage.setItem(
-                    'LENS_POST',
-                    JSON.stringify(post)
-                  );
-                }}
-              >
-                <ImageProxied
-                  category="post"
-                  height={400}
-                  width={600}
-                  objectFit="cover"
-                  className="block h-auto w-full"
-                  src={post.metadata.media[0]?.original.url}
-                />
+          <Link href={`/posts/${post.id}`}>
+            <a
+              target="_blank"
+              onClick={() => {
+                console.log('POST ', post);
+                window.localStorage.setItem('LENS_POST', JSON.stringify(post));
+              }}
+            >
+              <ImageProxied
+                category="post"
+                height={400}
+                width={600}
+                objectFit="cover"
+                className="block h-auto w-full"
+                src={post.metadata.media[0]?.original.url}
+              />
 
-                <p className=" text-xl font-semibold text-lensBlack">
-                  {post.metadata.title}
-                  <div
-                    className=" text-base font-normal "
-                    dangerouslySetInnerHTML={{ __html: post.metadata.content }}
-                  ></div>
+              <div>
+                <p className=" font-bold text-lensBlack">
+                  {post.metadata.name || 'untitled'}
                 </p>
-              </a>
-            </Link>
-          </div>
+                <p className="text-sm  font-thin text-gray-500">
+                  {post.metadata.description || 'no-description'}
+                </p>
+              </div>
+            </a>
+          </Link>
           <br></br>
           <div className="mb-2 flex justify-between">
             <div
