@@ -16,64 +16,58 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
       <article className="Lens_CardsDiv">
         <div className="Lens_Cards rounded-lg bg-white">
-          <header className="w-full items-center p-2 md:p-4">
+          <h1 className="w-full items-center p-2 md:p-4">
             <div className="row flex w-full justify-between text-sm font-light text-black">
+              {/* profile */}
               <div className="col-span-3 mr-2 flex justify-between">
-                {
-                  <ImageProxied
-                    category="profile"
-                    title={`Loading from ${post.profile.picture?.original?.url}`}
-                    alt="Profile"
-                    height={50}
-                    width={50}
-                    objectFit="cover"
-                    className="h-12 w-12 cursor-pointer rounded-full"
-                    src={post.profile.picture?.original?.url}
-                  />
-                }
+                <ImageProxied
+                  category="profile"
+                  title={`Loading from ${post.profile.picture?.original?.url}`}
+                  alt="Profile"
+                  height={50}
+                  width={50}
+                  objectFit="cover"
+                  className="h-12 w-12 cursor-pointer rounded-full"
+                  src={post.profile.picture?.original?.url}
+                />
 
                 <div className="col-span-1 cursor-pointer pl-2">
                   <p className=" ">{post.profile.name || post.profile.id}</p>
                   <p className="text-gray-400">@{post.profile.handle}</p>
                 </div>
               </div>
-
-              <div className=" cursor-pointer ">
-                <div className="dropdown relative inline-block">
-                  <div className=" items-center rounded py-2  font-semibold  text-gray-700">
-                    <span className="">
-                      <ImageProxied
-                        category="profile"
-                        src="/assets/icons/dots-vertical.svg"
-                        alt="Lenstags Logo"
-                        width={20}
-                        height={20}
-                      />
-                    </span>
-                  </div>
-                  <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
-                    <li className="">
-                      <a
-                        className="whitespace-no-wrap block rounded-t-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
-                        href="#"
-                      >
-                        Share
-                      </a>
-                    </li>
-                    <li className="">
-                      <a
-                        className="whitespace-no-wrap block rounded-b-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
-                        href="#"
-                      >
-                        Report
-                      </a>
-                    </li>
-                  </ul>
+              {/* profile menu */}
+              <div className="dropdown relative inline-block cursor-pointer">
+                <div className=" items-center rounded py-2  font-semibold  text-gray-700">
+                  <ImageProxied
+                    category="profile"
+                    src="/assets/icons/dots-vertical.svg"
+                    alt="Lenstags Logo"
+                    width={20}
+                    height={20}
+                  />
                 </div>
+                <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
+                  <li className="">
+                    <a
+                      className="whitespace-no-wrap block rounded-t-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
+                      href="#"
+                    >
+                      Share
+                    </a>
+                  </li>
+                  <li className="">
+                    <a
+                      className="whitespace-no-wrap block rounded-b-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
+                      href="#"
+                    >
+                      Report
+                    </a>
+                  </li>
+                </ul>
               </div>
-              {/* <div className="col-span-1 text-right">icons</div> */}
             </div>
-          </header>
+          </h1>
 
           <Link href={`/posts/${post.id}`}>
             <a
@@ -83,56 +77,77 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 window.localStorage.setItem('LENS_POST', JSON.stringify(post));
               }}
             >
-              <ImageProxied
-                category="post"
-                height={400}
-                width={600}
-                objectFit="cover"
-                className="block h-auto w-full"
-                src={post.metadata.media[0]?.original.url}
-              />
+              <figure className="cap-right">
+                <ImageProxied
+                  category="post"
+                  height={400}
+                  width={600}
+                  objectFit="cover"
+                  className="block h-auto w-full"
+                  src={post.metadata.media[0]?.original.url}
+                />
 
-              <div>
-                <p className=" font-bold text-lensBlack">
+                <figcaption className="p-1">
+                  <ul className=" flex flex-wrap gap-1 py-2 text-xs">
+                    {post.metadata.tags.map((tag: string) => (
+                      <li
+                        key={tag}
+                        className="rounded-lg border-2 border-lensBlack bg-lensGreen px-2 font-semibold "
+                      >
+                        {tag}
+                      </li>
+                    ))}
+                  </ul>
+                </figcaption>
+              </figure>
+
+              <div className="mb-3">
+                <p className="font-bold text-lensBlack">
                   {post.metadata.name || 'untitled'}
                 </p>
-                <p className="text-sm  font-thin text-gray-500">
-                  {post.metadata.description || 'no-description'}
+                <p className="text-sm font-thin text-gray-500">
+                  {post.metadata.description || 'no-abstract'}
                 </p>
               </div>
             </a>
           </Link>
-          <br></br>
+
+          {/* date and collected */}
           <div className="mb-2 flex justify-between">
-            <div
+            <span
               className="mr-2 rounded-lg border-2 border-lensBlack bg-lensGray3 px-2 
           py-0.5 text-xs font-light"
             >
               12 Collected
-            </div>
-            <div
+            </span>
+            <span
               className="rounded-lg border-2 border-lensBlack bg-lensGray px-2 py-0.5  
            text-xs font-light"
             >
               {moment(post.createdAt).format('MMM Do YY')}
+            </span>
+          </div>
+
+          <footer className="flex items-center  justify-between  py-2 text-right text-black">
+            <div className="flex h-full items-center justify-center  border-black ">
+              <button className="flex align-middle ">
+                <Link href={'#collect'}>
+                  <div className="button_cards flex">
+                    <div>
+                      <ImageProxied
+                        category="profile"
+                        src="/assets/icons/collect.svg"
+                        alt="Collect"
+                        width={20}
+                        height={20}
+                      />
+                    </div>
+                    <div>Collect</div>
+                  </div>
+                </Link>
+              </button>
             </div>
-          </div>
-
-          <div>
-            <ul className=" flex flex-wrap gap-1 py-2 text-xs">
-              {post.metadata.tags.map((tag: string) => (
-                <li
-                  key={tag}
-                  className="rounded-lg border-2 border-lensBlack bg-lensGreen px-2 font-semibold "
-                >
-                  {tag}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <footer className="flex items-center  justify-between px-4 py-2 text-right text-black">
-            <span className="flex items-center text-xs ">
+            <div className="flex items-center text-xs ">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="icon icon-tabler icon-tabler-messages"
@@ -151,14 +166,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
               </svg>
 
               {post.profile.stats?.totalComments || '0'}
-            </span>
-
-            <button
-              className="mr-2 rounded-lg border-2  border-solid border-lensBlack   bg-lensPurple px-2.5 py-0.5 
-          text-xs font-light text-lensGray hover:bg-lensGray2"
-            >
-              Collect
-            </button>
+            </div>
           </footer>
         </div>
       </article>
