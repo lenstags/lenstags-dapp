@@ -188,9 +188,10 @@ const Home: NextPage = () => {
             alignItems: 'center'
           }}
         >
-          {/* badges */}
+          {/* products */}
           <div
-            className="mx-8 mt-20  flex flex-wrap  justify-center border-4 border-solid border-black bg-white  p-10 text-center 
+            id="products"
+            className="mx-8 flex flex-wrap  justify-center border-4 border-solid border-black bg-white  p-10 text-center 
            shadow-2xl shadow-lensBlack drop-shadow-2xl"
           >
             <div className="m-4 flex rounded-xl border-4 border-solid border-black py-2 px-6">
@@ -359,7 +360,9 @@ const Home: NextPage = () => {
           <hr className="mx-14 my-28  border-2 border-solid border-lensGreen bg-lensGreen  shadow-md shadow-lensBlack" />
 
           {/* team */}
-          <div className="my-10 text-4xl">TEAM</div>
+          <div className="my-10 text-4xl" id="team">
+            TEAM
+          </div>
           <div className="mx-28 flex justify-center gap-8 rounded-lg border-4 border-solid border-lensGreen p-8">
             <div>
               <p className="mb-2 text-8xl">😎</p>
