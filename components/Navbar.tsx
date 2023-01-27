@@ -20,8 +20,8 @@ export const Navbar = () => {
 
   const lensProfile = useContext(ProfileContext);
 
-  const router = useRouter()
-  
+  const router = useRouter();
+
   /// TODO: check this
   useEffect(() => {
     explore({ tags }).then((data) => {
@@ -33,26 +33,26 @@ export const Navbar = () => {
 
   return (
     <>
-      <div className="w-full h-full bg-gray-100">
-        <div className="flex flex-no-wrap">
+      <div className="h-full w-full bg-gray-100">
+        <div className="flex-no-wrap flex">
           {/*Mobile responsive sidebar*/}
           <div
             className={
               show
-                ? 'w-full h-full absolute z-40  transform  translate-x-0 '
-                : '   w-full h-full absolute z-40  transform -translate-x-full'
+                ? 'absolute z-40 h-full w-full  translate-x-0  transform '
+                : '   absolute z-40 h-full w-full  -translate-x-full transform'
             }
             id="mobile-nav"
           >
             <div
-              className="bg-gray-800 opacity-50 absolute h-full w-full lg:hidden"
+              className="absolute h-full w-full bg-gray-800 opacity-50 lg:hidden"
               onClick={() => setShow(!show)}
             />
-            <div className="absolute z-40 sm:relative w-64 md:w-96 shadow pb-4 bg-lensGreen lg:hidden transition duration-150 ease-in-out h-full">
-              <div className="flex flex-col justify-between h-full w-full">
+            <div className="absolute z-40 h-full w-64 bg-lensGreen pb-4 shadow transition duration-150 ease-in-out sm:relative md:w-96 lg:hidden">
+              <div className="flex h-full w-full flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between px-8">
-                    <div className="h-16 w-full flex items-center">
+                    <div className="flex h-16 w-full items-center">
                       <Link href={'/'}>
                         <ImageProxied
                           category="profile"
@@ -65,7 +65,7 @@ export const Navbar = () => {
                     </div>
                     <div
                       id="closeSideBar"
-                      className="flex items-center justify-center h-10 w-10"
+                      className="flex h-10 w-10 items-center justify-center"
                       onClick={() => setShow(!show)}
                     >
                       <svg
@@ -87,9 +87,9 @@ export const Navbar = () => {
                     </div>
                   </div>
                   <ul aria-orientation="vertical" className=" py-6">
-                    <li className="pl-6 cursor-pointer text-black text-sm leading-3 tracking-normal pb-4 pt-5 hover:font-semibold focus:outline-none">
+                    <li className="cursor-pointer pl-6 pb-4 pt-5 text-sm leading-3 tracking-normal text-black hover:font-semibold focus:outline-none">
                       <div className="flex items-center">
-                        <div className="w-6 h-6 md:w-8 md:h-8">
+                        <div className="h-6 w-6 md:h-8 md:w-8">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-grid"
@@ -107,15 +107,15 @@ export const Navbar = () => {
                             <rect x={14} y={14} width={6} height={6} rx={1} />
                           </svg>
                         </div>
-                        <span className="ml-2 xl:text-base md:text-2xl text-base">
+                        <span className="ml-2 text-base md:text-2xl xl:text-base">
                           <Link href={'#'}>Projects</Link>
                         </span>
                       </div>
                     </li>
 
-                    <li className="pl-6 cursor-pointer text-black text-sm leading-3 tracking-normal mb-4 py-2 hover:font-semibold  focus:outline-none">
+                    <li className="mb-4 cursor-pointer py-2 pl-6 text-sm leading-3 tracking-normal text-black hover:font-semibold  focus:outline-none">
                       <div className="flex items-center">
-                        <div className="w-6 h-6 md:w-8 md:h-8">
+                        <div className="h-6 w-6 md:h-8 md:w-8">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-compass"
@@ -131,7 +131,7 @@ export const Navbar = () => {
                             <circle cx={12} cy={12} r={9} />
                           </svg>
                         </div>
-                        <span className="ml-2 xl:text-base md:text-2xl text-base">
+                        <span className="ml-2 text-base md:text-2xl xl:text-base">
                           <Link href={'/explorer'}>Explore</Link>
                         </span>
                       </div>
@@ -140,7 +140,7 @@ export const Navbar = () => {
                 </div>
                 <div className="w-full">
                   <div className="border-t border-black">
-                    <div className="w-full flex items-center justify-between px-6 pt-1">
+                    <div className="flex w-full items-center justify-between px-6 pt-1">
                       <div className="flex items-center  ">
                         <ImageProxied
                           category="post"
@@ -150,12 +150,12 @@ export const Navbar = () => {
                           src={lensProfile?.pictureUrl || '/img/profilePic.png'}
                           alt="avatar"
                         />
-                        <p className="md:text-xl  text-gray-800 text-base leading-4 ml-2">
+                        <p className="ml-2  text-base leading-4 text-gray-800 md:text-xl">
                           {lensProfile?.name || 'no-name'}
                         </p>
                       </div>
                       <ul className="flex">
-                        <li className="cursor-pointer text-white pt-5 pb-3">
+                        <li className="cursor-pointer pt-5 pb-3 text-white">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-messages"
@@ -173,7 +173,7 @@ export const Navbar = () => {
                             <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
                           </svg>
                         </li>
-                        <li className="cursor-pointer text-white pt-5 pb-3 pl-3">
+                        <li className="cursor-pointer pt-5 pb-3 pl-3 text-white">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-bell"
@@ -199,14 +199,14 @@ export const Navbar = () => {
             </div>
           </div>
 
-          <div className="w-full fixed top-0 z-50 border-b-2 border-black">
+          <div className="fixed top-0 z-50 w-full border-b-2 border-black">
             <nav
-              className="h-16 px-10 flex items-center lg:items-stretch justify-end lg:justify-between
-              bg-lensGreen  relative z-10
-              animate-in  slide-in-from-top duration-500
+              className="relative z-10 flex h-16 items-center justify-end bg-lensGreen
+              px-10  animate-in slide-in-from-top
+              duration-500  lg:items-stretch lg:justify-between
               "
             >
-              <div className="hidden lg:flex w-full pr-6">
+              <div className="hidden  w-full pr-6 lg:flex">
                 <Link href={'/'}>
                   <ImageProxied
                     category="profile"
@@ -216,20 +216,31 @@ export const Navbar = () => {
                     height={60}
                   />
                 </Link>
-                <div className="w-1/2 h-full text-black lg:flex items-center pl-6 pr-24">
+
+                <div className="h-full w-1/2 items-center pl-6 pr-24 text-black lg:flex">
                   {/**Here comes the Navbar items */}
-                  <div className={`mx-2 p-2 border-2 border-lensBlack rounded-lg ${router.asPath === '/explorer' && 'bg-lensBlack text-lensGray'} hover:bg-lensBlack hover:text-lensGray `}>
+                  <div
+                    className={`mx-2 rounded-lg border-2 border-lensBlack p-2 ${
+                      router.asPath === '/explorer' &&
+                      'bg-lensBlack text-lensGray'
+                    } hover:bg-lensBlack hover:text-lensGray `}
+                  >
                     <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
-                  <div className={`mx-2 p-2 border-2 border-lensBlack rounded-lg ${router.asPath === '/explorer#' && 'bg-lensBlack text-lensGray'} hover:bg-lensBlack hover:text-lensGray`}>
+                  <div
+                    className={`mx-2 rounded-lg border-2 border-lensBlack p-2 ${
+                      router.asPath === '/explorer#' &&
+                      'bg-lensBlack text-lensGray'
+                    } hover:bg-lensBlack hover:text-lensGray`}
+                  >
                     <Link href={'#'}>
                       <a title="Soon">PROJECTS</a>
                     </Link>
                   </div>
                 </div>
-                <div className="w-1/2 hidden lg:flex">
-                  <div className="w-full flex items-center pl-8 justify-end">
-                    <div className="h-full flex items-center justify-center  border-black  px-8">
+                <div className="hidden w-1/2 lg:flex">
+                  <div className="flex w-full items-center justify-end pl-8">
+                    <div className="flex h-full items-center justify-center  border-black  px-8">
                       <button className="flex align-middle">
                         <Link href={'/create'}>
                           <div className="button_top flex">
@@ -249,7 +260,7 @@ export const Navbar = () => {
                       </button>
                     </div>
 
-                    <div className="h-full w-20 flex items-center justify-center  border-black">
+                    <div className="flex h-full w-20 items-center justify-center  border-black">
                       <div className="relative cursor-pointer text-gray-600 hover:text-black">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -267,11 +278,11 @@ export const Navbar = () => {
                           <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                           <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
                         </svg>
-                        <div className="w-2 h-2 rounded-full bg-red-600 animate-ping border border-white absolute inset-0 mt-1 mr-1 m-auto" />
+                        <div className="absolute inset-0 m-auto mt-1 mr-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
                       </div>
                     </div>
 
-                    <div className="h-full w-20 flex items-center justify-center  border-black mr-4 cursor-pointer hover:text-black text-gray-600">
+                    <div className="mr-4 flex h-full w-20 cursor-pointer  items-center justify-center border-black text-gray-600 hover:text-black">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         className="icon icon-tabler icon-tabler-messages"
@@ -290,16 +301,16 @@ export const Navbar = () => {
                       </svg>
                     </div>
                     <div
-                      className="flex items-center relative cursor-pointer"
+                      className="relative flex cursor-pointer items-center"
                       onClick={() => setProfile(!profile)}
                     >
                       <div className="rounded-full">
                         {profile ? (
                           <ul
-                            className=" font-extralight -left-16 border-r text-black bg-white absolute rounded shadow"
+                            className=" absolute -left-16 rounded border-r bg-white font-extralight text-black shadow"
                             style={{ marginTop: '4.4rem', marginLeft: '-4rem' }}
                           >
-                            <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer ">
+                            <li className="flex w-full cursor-pointer justify-between border-b px-5 py-3 ">
                               <div className="fl first-letter:ex">
                                 <p className="text-xs">Connected as</p>
                                 <p className=" font-normal">
@@ -307,7 +318,7 @@ export const Navbar = () => {
                                 </p>
                               </div>
                             </li>
-                            <li className="px-5 py-3 border-b flex w-full justify-between cursor-pointer items-center">
+                            <li className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-3">
                               <div className="flex items-center">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -333,7 +344,7 @@ export const Navbar = () => {
                                 </Link>
                               </div>
                             </li>
-                            <li className="px-5 hover:text-red-600 py-3 border-b flex w-full justify-between cursor-pointer items-center">
+                            <li className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-3 hover:text-red-600">
                               <div className="flex items-center">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -364,7 +375,7 @@ export const Navbar = () => {
                         ) : (
                           ''
                         )}
-                        <div className="relative p-0 m-0">
+                        <div className="relative m-0 p-0">
                           <ImageProxied
                             category="profile"
                             height={35}
@@ -378,7 +389,7 @@ export const Navbar = () => {
                         </div>
                       </div>
 
-                      <div className="cursor-pointer active:rotate-0 visited:rotate-180 ease-linear focus:rotate-0 text-lensGray2 ">
+                      <div className="cursor-pointer text-lensGray2 ease-linear visited:rotate-180 focus:rotate-0 active:rotate-0 ">
                         <svg
                           aria-haspopup="true"
                           xmlns="http://www.w3.org/2000/svg"
@@ -401,10 +412,10 @@ export const Navbar = () => {
                 </div>
               </div>
               <div
-                className=" text-lensBlack   visible lg:hidden relative"
+                className=" visible   relative text-lensBlack lg:hidden"
                 onClick={() => setShow(!show)}
               >
-                <div className="flex justify-between w-screen items-center">
+                <div className="flex w-screen items-center justify-between">
                   <div className="ml-20">
                     {' '}
                     <ImageProxied

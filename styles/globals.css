@@ -114,6 +114,20 @@ button:active .button_Nobg {
   transition: transform 0.1s ease;
 }
 
+.Lens-slideIn {
+  animation: slideIn 1s forwards;
+  animation-name: 'slideIn';
+  animation-iteration-count: 'infinite';
+}
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
 button:hover .button_cards {
   /* Pull the button upwards when hovered */
   transform: translate(0.25em, 0.25em);
