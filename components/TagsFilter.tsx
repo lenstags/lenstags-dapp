@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import { useState } from 'react';
 import { TAGS } from '../lib/lens/tags';
 import { TagsFilterContext } from './TagsFilterProvider';
+import CreatableSelect from 'react-select/creatable';
 
 const selectedStyle = 'bg-lensGreen text-black border-black shadow';
 
@@ -22,7 +23,41 @@ export const TagsFilter = () => {
     setTags(tags);
   };
 
+  const [selectedOption, setSelectedOption] = useState([]);
+
+  const handleChange = (selectedOptions: any) => {
+    toggleSelected(selectedOptions);
+  };
+
+
+
   return (
+    <div className="z-20 my-6 rounded-lg bg-lensBlack">
+    <div className="input-translate flex  w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6">
+      <div>
+        <p className="font-semibold">Tags</p>
+      </div>
+      <div className="w-full border-0 pl-4 ">
+        <CreatableSelect
+          styles={{
+            control: (baseStyles, state) => ({
+              ...baseStyles,
+              boxShadow: 'none',
+              borderColor: 'transparent',
+              '&:hover': {
+                borderColor: 'transparent'
+              } 
+            })
+          }}
+          menuPortalTarget={document.querySelector('body')}
+          isMulti
+          onChange={handleChange}
+          options={TAGS}
+        />
+      </div>
+    </div>
+  </div>
+    /*
     <div className="flex justify-center">
       <div className=" flex justify-center gap-2 my-4 max-w-7xl text-xs flex-wrap max-h-16 overflow-hidden">
         {TAGS.map((tag, index) => (
@@ -40,5 +75,6 @@ export const TagsFilter = () => {
         ))}
       </div>
     </div>
+    */
   );
 };
