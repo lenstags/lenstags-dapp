@@ -16,7 +16,15 @@ html {
   @font-face {
     font-display: swap;
     font-family: 'Inter';
-    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
+    src: url('/assets/fonts/Inter/Inter-Black.woff') format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'Inter';
+    src: url('/assets/fonts/Inter/Inter-Medium.woff') format('woff');
   }
 }
 
@@ -32,15 +40,7 @@ html {
   @font-face {
     font-display: swap;
     font-family: 'Inter';
-    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
-  }
-}
-
-@layer base {
-  @font-face {
-    font-display: swap;
-    font-family: 'Inter';
-    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
+    src: url('/assets/fonts/Inter/Inter-SemiBold.woff') format('woff');
   }
 }
 
