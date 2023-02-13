@@ -7,6 +7,7 @@ import { polygon, polygonMumbai } from "@wagmi/core/chains";
 import { publicProvider } from "wagmi/providers/public";
 import LensAuthenticationProvider from "components/LensAuthenticationProvider";
 import TagsFilterProvider from "components/TagsFilterProvider";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const { chains, provider } = configureChains(
   [polygonMumbai],
@@ -26,15 +27,17 @@ const wagmiClient = createClient({
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig client={wagmiClient}>
-      <LensAuthenticationProvider>
-        <RainbowKitProvider chains={chains}>
-          <TagsFilterProvider>
-            <Component {...pageProps} />
-          </TagsFilterProvider>
-        </RainbowKitProvider>
-      </LensAuthenticationProvider>
-    </WagmiConfig>
+    <ChakraProvider>
+      <WagmiConfig client={wagmiClient}>
+        <LensAuthenticationProvider>
+          <RainbowKitProvider chains={chains}>
+            <TagsFilterProvider>
+              <Component {...pageProps} />
+            </TagsFilterProvider>
+          </RainbowKitProvider>
+        </LensAuthenticationProvider>
+      </WagmiConfig>
+    </ChakraProvider>
   );
 }
 

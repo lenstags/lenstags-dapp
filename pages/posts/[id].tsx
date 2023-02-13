@@ -2,6 +2,10 @@ import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import moment from 'moment';
 import ImageProxied from 'components/ImageProxied';
+import { Center, HStack, Link, Stack, Tag, Text } from '@chakra-ui/react';
+import { CollectedIcon } from 'components/icons/CollectedIcon';
+import { HeartIcon } from 'components/icons/HeartIcon';
+import { CommentIcon } from 'components/icons/CommentIcon';
 
 export default function PostDetails() {
   const router = useRouter();
@@ -15,13 +19,22 @@ export default function PostDetails() {
 
   return (
     post && (
-      <div className="m-4">
-        <article className=" rounded-lg border-2 border-solid border-black bg-white p-4">
-          <header className="w-full items-center p-2 md:p-4">
-            <div className="row flex w-full justify-between text-sm font-light text-black">
-              <div className="col-span-3 mr-2 flex justify-between">
-                {
-                  <ImageProxied
+      <Stack width={'100%'} height={'100vh'}>
+        {/**Image cover Top de la Publicacion */}
+        <ImageProxied
+          category="post"
+          height={300}
+          width={600}
+          objectFit="cover"
+          className="block h-auto w-full"
+          src={post.metadata.media[0]?.original.url}
+        />
+        <Stack p={'54px'} width={'100%'}>
+          {/**Header de la Publicacion */}
+          <Stack>
+            <HStack justifyContent={'space-between'}>
+              <HStack>
+              <ImageProxied
                     category="profile"
                     title={`Loading...`}
                     alt="Profile"
@@ -31,139 +44,37 @@ export default function PostDetails() {
                     className="h-12 w-12 cursor-pointer rounded-full"
                     src={post.profile.picture?.original?.url}
                   />
-                }
-                <div className="col-span-1 cursor-pointer pl-2">
-                  <p className=" ">{post.profile.name || post.profile.id}</p>
-                  <p className="text-gray-400">@{post.profile.handle}</p>
-                </div>
-              </div>
-
-              <div className=" cursor-pointer ">
-                {/* <ImageProxied
-                      category="profile"
-                      src="/assets/icons/dots-vertical.svg"
-                      alt="Lenstags Logo"
-                      width={20}
-                      height={20}
-                    /> */}
-
-                <div className="dropdown relative inline-block">
-                  <div className=" items-center rounded py-2  font-semibold  text-gray-700">
-                    <span className="">
-                      <ImageProxied
-                        category="profile"
-                        src="/assets/icons/dots-vertical.svg"
-                        alt="Lenstags Logo"
-                        width={20}
-                        height={20}
-                      />
-                    </span>
-                  </div>
-                  <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
-                    <li className="">
-                      <a
-                        className="whitespace-no-wrap block rounded-t-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
-                        href="#"
-                      >
-                        Share
-                      </a>
-                    </li>
-                    <li className="">
-                      <a
-                        className="whitespace-no-wrap block rounded-b-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
-                        href="#"
-                      >
-                        Report
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              {/* <div className="col-span-1 text-right">icons</div> */}
-            </div>
-          </header>
-          <div>
-            <ImageProxied
-              category="post"
-              height={400}
-              width={600}
-              objectFit="cover"
-              className="block h-auto w-full"
-              src={post.metadata.media[0]?.original.url}
-            />
-            <div className="mb-2 flex justify-between">
-              <div
-                className="mr-2 rounded-lg border-2  border-lensBlack bg-lensGray3 px-2 
-          py-0.5 text-xs font-light"
-              >
-                12 Collected
-              </div>
-              <div
-                className="rounded-lg border-2 border-lensBlack bg-lensGray px-2 py-0.5  
-           text-xs font-light"
-              >
-                {moment(post.createdAt).format('MMM Do YY')}
-              </div>
-            </div>
-
-            <div>
-              <p className=" font-bold text-lensBlack">
-                {post.metadata.name || 'untitled'}
-              </p>
-              <p className="text-sm  font-thin text-gray-500">
-                {post.metadata.description || 'no-description'}
-              </p>
-            </div>
-
-            <div
-              dangerouslySetInnerHTML={{ __html: post.metadata.content }}
-            ></div>
-
-            <div>
-              <ul className=" flex flex-wrap gap-1 py-2 text-xs">
-                {post.metadata.tags.map((tag: string) => (
-                  <li
-                    key={tag}
-                    className="rounded-lg border-2 border-lensBlack bg-lensGreen px-2 font-semibold "
-                  >
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-
-          <footer className="flex items-center  justify-between px-4 py-2 text-right text-black">
-            <span className="flex items-center text-xs ">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="icon icon-tabler icon-tabler-messages"
-                width={24}
-                height={24}
-                viewBox="0 0 24 24"
-                strokeWidth={1}
-                stroke="#718096"
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" />
-                <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-              </svg>
-
-              {post.profile.stats?.totalComments || '0'}
-            </span>
-
-            <button
-              className="mr-2 rounded-lg border-2  border-solid border-lensBlack   bg-lensPurple px-2.5 py-0.5 
-          text-xs font-light text-lensGray hover:bg-lensGray2"
-            >
-              Collect
-            </button>
-          </footer>
-        </article>
-      </div>
+                <Stack paddingLeft={'8px'} justify={'center'}>
+                  <Text fontWeight={400} fontSize={'20px'}>{post.profile.name} </Text>
+                  <Text fontWeight={400} fontSize={'20px'}>@{post.profile.handle}</Text>
+                </Stack>
+              </HStack>
+              <Text fontWeight={400} fontSize={'20px'}>Publicado:   {moment(post.createdAt).format('MMM Do YY')}</Text>
+            </HStack>
+            <Text fontWeight={500} fontSize={'31px'} pt={'23px'}>{post.metadata.name || 'untitled'}</Text>
+            <HStack gap={2} pt={'24px'}>
+              <Text display={'flex'} gap={1} alignItems={'center'}><CollectedIcon />15k</Text>
+              <Text display={'flex'} gap={1} alignItems={'center'}><HeartIcon />30k</Text>
+              <Text display={'flex'} gap={1} alignItems={'center'}><CommentIcon />250</Text>
+            </HStack>
+          </Stack>
+          {/**Body de la publicacion */}
+          <Text fontWeight={600} fontSize={'20px'} pt={'32px'}>{post.metadata.description || 'no-description'}</Text>
+          <Text
+            dangerouslySetInnerHTML={{ __html: post.metadata.content }}
+            fontWeight={400}
+            fontSize={'20px'}
+          ></Text>
+          {/**Footer de la publicacion */}
+          <HStack pt={'36px'}>
+            {post.metadata.tags.map((tag: any, index: any) => <Tag key={index} background={'#D9D9D9'} height={'28px'}>{tag}</Tag>)}
+          </HStack>
+          <Center pt={'37px'}>
+            <Text fontWeight={500} fontSize={'20px'} color={'#6D1EDC'}>See mor content from <Link fontWeight={700}>What is LensTags</Link> List</Text>
+          </Center>
+        </Stack>
+      </Stack>
     )
   );
 }
+
