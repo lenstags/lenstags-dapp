@@ -1,7 +1,8 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import moment from 'moment';
+import { useEffect, useState } from 'react';
+
 import ImageProxied from 'components/ImageProxied';
+import moment from 'moment';
+import { useRouter } from 'next/router';
 
 export default function PostDetails() {
   const router = useRouter();
@@ -10,6 +11,7 @@ export default function PostDetails() {
   useEffect(() => {
     const storedObject = localStorage.getItem('LENS_PROFILE') || '';
     const myObject = JSON.parse(storedObject);
+    console.log('no deberia ir aca');
     setProfile(myObject);
   }, [id]);
 

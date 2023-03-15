@@ -1,11 +1,12 @@
-export const argsBespokeInit = () => {
-  return undefined;
-};
-
-export const PK = 'YOUR_PK';
-export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
+export const APP_NAME = 'LensTags';
+export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
 export const DEFAULT_IMAGE_POST = '/img/post.png';
+export const ATTRIBUTES_LIST_KEY = 'list_warehouse_0';
+export const PROFILE_METADATA_VERSION = '1.0.0';
+export const PUBLICATION_METADATA_VERSION = '2.0.0';
+export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
+export const PK = 'YOUR_PK';
 
 export const MUMBAI_RPC_URL = 'https://rpc-mumbai.matic.today';
 export const LENS_API = 'https://api-mumbai.lens.dev/';

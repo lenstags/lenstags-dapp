@@ -1,166 +1,486 @@
-import { Layout } from 'components';
-import { ProfileContext } from 'components';
-import { enable, disable, queryProfile } from '@lib/lens/dispatcher';
-import { NextPage } from 'next';
+import {
+  AttributeData,
+  ProfileMetadata
+} from '@lib/lens/interfaces/profile-metadata';
 import React, { useContext, useEffect, useState } from 'react';
-import ImageProxied from 'components/ImageProxied';
-import { useRouter } from 'next/router';
+// import { ProfileContext } from 'components/ProfileContext';
+import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
 
+import ImageProxied from 'components/ImageProxied';
+import { Layout } from 'components';
+import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
+import { NextPage } from 'next';
+import { ProfileContext } from '../../components/LensAuthenticationProvider';
+import Toast from '../../components/Toast';
+import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
+import { v4 as uuidv4 } from 'uuid';
 
 const Settings: NextPage = () => {
   const lensProfile = useContext(ProfileContext);
-  const [checked, setChecked] = useState(false);
-  const [loading, setloading] = useState(false);
+  const [dispatcherActive, setDispatcherActive] = useState(false);
+  const [isSuccessVisible, setIsSuccessVisible] = useState(false);
+  const [isErrorVisible, setIsErrorVisible] = useState(false);
+  const [pictureUrl, setPictureUrl] = useState('/img/profilePic.png');
+  const [loadingDispatcher, setLoadingDispatcher] = useState(false);
+  const [profileValues, setProfileValues] = useState<any>({});
+  const [hydrationLoading, setHydrationLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-const router = useRouter()
-  queryProfile({ profileId: lensProfile?.id }).then((profile) => {
-    setChecked(
-      profile?.dispatcher?.canUseRelay
-        ? profile?.dispatcher?.canUseRelay
-        : false
-    );
-  });
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!lensProfile) return;
 
-  const handleChange = async () => {
+      const profileResult = await queryProfile({ profileId: lensProfile.id });
+      setDispatcherActive(
+        profileResult?.dispatcher?.canUseRelay
+          ? profileResult?.dispatcher?.canUseRelay
+          : false
+      );
 
-    if (lensProfile) {
-      setloading(true)
-      checked ? await disable(lensProfile.id) : await enable(lensProfile.id)
-      .then(() => console.log('termine'))
+      const pic =
+        lensProfile.picture?.__typename === 'MediaSet'
+          ? lensProfile.picture?.original.url
+          : lensProfile.picture?.__typename === 'NftImage'
+          ? lensProfile.picture.uri
+          : '/img/profilePic.png';
+
+      setPictureUrl(pic);
+      setProfileValues(profileResult);
+      window.localStorage.setItem(
+        'LENS_PROFILE',
+        JSON.stringify(profileResult)
+      );
+      setHydrationLoading(false);
+    };
+    fetchData().catch(console.error);
+  }, [lensProfile]);
+
+  const handleFindDefault = async () => {
+    // if (!lensProfile) {
+    //   throw 'No lens profile found';
+    // }
+    // const profileResult = await queryProfile({
+    //   profileId: lensProfile?.id
+    // });
+
+    const found =
+      profileValues.lists ||
+      profileValues?.attributes?.find(
+        (attribute: AttributeData) => attribute.key === 'lists0'
+      )?.value;
+
+    console.log('list result: ', found);
+
+    if (!found) {
+      // FIXME
+      // create the default and update the list
+      // console.log(not);
     }
-    router.push('/')
+  };
+
+  const handleClickSave = async () => {
+    if (!lensProfile) {
+      throw 'No lens profile found';
+    }
+
+    setSaving(true);
+
+    const attLocation: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      traitType: 'string',
+      value:
+        profileValues.location ||
+        profileValues?.attributes?.find(
+          (attribute: AttributeData) => attribute.key === 'location'
+        )?.value,
+      key: 'location'
+    };
+
+    const attTwitter: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      traitType: 'string',
+      value:
+        profileValues.twitter ||
+        profileValues?.attributes?.find(
+          (attribute: AttributeData) => attribute.key === 'twitter'
+        )?.value,
+      key: 'twitter'
+    };
+
+    const attWebsite: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      traitType: 'string',
+      value:
+        profileValues.website ||
+        profileValues?.attributes?.find(
+          (attribute: AttributeData) => attribute.key === 'website'
+        )?.value,
+      key: 'website'
+    };
+
+    const listsObject = [
+      { name: 'default', key: '0x222' } // set on the first setup
+      // { name: 'anotherlist', key: '0x344' }
+    ];
+    const attLists: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      traitType: 'string',
+      value:
+        // profileValues.lists ||
+        // profileValues?.attributes?.find(
+        //   (attribute: AttributeData) => attribute.key === 'lists0'
+        // )?.value,
+        JSON.stringify(listsObject),
+      key: 'lists0'
+    };
+
+    // {"displayType":"string",
+    // "traitType":"string",
+    // "key":"twitter",
+    // "value":"@lenstags",
+    // "__typename":"Attribute"}
+
+    // default list setup
+
+    const profileMetadata: ProfileMetadata = {
+      version: '1.0.0', // TODO: centralize this!
+      metadata_id: uuidv4(),
+      name: profileValues.name,
+      bio: profileValues.bio || 'empty bio',
+      cover_picture: 'https://picsum.photos/200/333',
+      profile_picture: 'https://picsum.photos/200/444',
+      attributes: [attLocation, attTwitter, attWebsite, attLists]
+    };
+
+    await updateProfileMetadata(lensProfile.id, profileMetadata);
+    setSaving(false);
+    const profileResult = await queryProfile({
+      profileId: lensProfile.id
+    });
+
+    console.log(' MY PROFILE UPDATED 💙💙💙💙 ', profileResult);
+    setIsSuccessVisible(true);
+
+    window.localStorage.setItem('LENS_PROFILE', JSON.stringify(profileResult));
+  };
+
+  const handleClickDispatcher = async () => {
+    if (lensProfile) {
+      setLoadingDispatcher(true);
+      dispatcherActive
+        ? await disable(lensProfile.id)
+        : await enable(lensProfile.id).then(() => console.log('termine'));
+    }
+    // router.push('/');
     return;
   };
 
   return (
     <Layout title="Lenstags | Settings" pageDescription="Settings">
-      <div className="container mx-auto py-10 h-64 md:w-1/2 w-11/12 px-6 text-black">
-        <h1 className=" text-2xl">Settings</h1>
+      {hydrationLoading ? (
+        <div>Loading...</div>
+      ) : (
+        <div className="container mx-auto h-64 w-11/12 py-10 px-6 text-black md:w-1/2">
+          <h1 className=" text-2xl">Settings</h1>
 
-        <p className="px-6 py-4">Dispatcher</p>
-        <div
-          style={{ borderWidth: '0.5px', borderColor: '#949494' }}
-          className="shadow-md rounded-md font-extralight"
-        >
-          <p className="px-6 py-4">
-            Set the dispatcher function to active
-            <label className="inline-flex relative items-center cursor-pointer ml-4">
-              <div className="flex items-center justify-center">
-                {/*<input
-                  type="checkbox"
-                  className="appearance-none w-9 focus:outline-none checked:bg-blue-300 h-5
-                   bg-gray-300 rounded-full before:inline-block before:rounded-full before:bg-blue-500
-                    before:h-4 before:w-4 checked:before:translate-x-full shadow-inner transition-all duration-300 
-                    before:ml-0.5"
-                  checked={checked}
-                  onChange={handleChange}
-  />*/}
-                {loading && <svg
-                  aria-hidden="true"
-                  className="mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-lime-300"
-                  viewBox="0 0 100 101"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                    fill="currentColor"
-                  />
-                  <path
-                    d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                    fill="currentFill"
-                  />
-                </svg>}
-                <button disabled={loading} onClick={handleChange} className={`${checked ? 'bg-red-500 hover:bg-red-700' : 'bg-blue-500 hover:bg-blue-700'} disabled:bg-gray-300 text-white font-bold py-2 px-4 rounded-full `}>{checked ? 'Disable' : 'Enable'}</button>
-
+          <p className="px-6 py-4">Dispatcher</p>
+          <div
+            style={{ borderWidth: '0.5px', borderColor: '#949494' }}
+            className="rounded-md font-extralight shadow-md"
+          >
+            <div className="flex items-center px-6 py-4">
+              <div className="items-center">
+                The transaction Dispatcher is{' '}
+                <span className="  ml-2 rounded-lg   border-amber-200 bg-amber-100 px-3 py-1  text-amber-600">
+                  {dispatcherActive ? 'Active' : 'Inactive'}
+                </span>
               </div>
 
-              {/* <div
-                className="w-11 h-6 bg-gray-200 peer-focus:outline-none 
-             rounded-full peer
-              peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px]
-               after:bg-white
-               after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all
-               peer-checked:bg-greenLengs"
-              ></div> */}
-            </label>
-          </p>
+              <div className="relative ml-4 inline-flex cursor-pointer items-center">
+                <div className="flex items-center justify-center">
+                  <button
+                    disabled={loadingDispatcher}
+                    onClick={handleClickDispatcher}
+                    className={`text-black ${
+                      dispatcherActive
+                        ? 'bg-purple-400 hover:bg-purple-300'
+                        : ' bg-green-100 hover:bg-lensGreen'
+                    } flex rounded-lg border-2 border-solid border-black py-2 px-3  text-white disabled:bg-gray-300 `}
+                  >
+                    {loadingDispatcher && (
+                      <svg
+                        className="mr-2 h-5 w-5 animate-spin"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        ></path>
+                      </svg>
+                    )}
+
+                    {dispatcherActive ? 'Disable' : 'Enable'}
+                  </button>
+                </div>
+
+                <button
+                  onClick={handleFindDefault}
+                  className={`flex rounded-lg border-2 border-solid border-black py-2 px-3
+                   text-white disabled:bg-gray-300 `}
+                >
+                  Find default list
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p className="px-6 py-4">Profile</p>
+          <div
+            style={{ borderWidth: '0.5px', borderColor: '#949494' }}
+            className="rounded-md font-extralight shadow-md"
+          >
+            {/* TODO: row, COMPONENTIZE THIS!*/}
+            {/* <div className="px-6 py-4">
+              <div className="flex items-center">
+                <span className="">Name</span>
+                <input
+                  className=" mx-4 rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 outline-none"
+                  type="text"
+                  name="name"
+                  id="name"
+                  defaultValue={profileValues?.name || ''}
+                  onChange={(e) =>
+                    setProfileValues({ ...profileValues, name: e.target.value })
+                  }
+                />
+
+                <span className="w-full py-2 text-right text-sm text-gray-400 ">
+                  Profile id&nbsp; {lensProfile?.id || 'no-name'}
+                </span>
+              </div>
+            </div> */}
+
+            <div className="mx-6 my-4">
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Handle</div>
+                <div className="col-span-4 rounded-sm bg-gray-100 px-3 py-2 text-center font-mono text-xs text-gray-400">
+                  {profileValues.handle}
+                </div>
+                <div className="col-span-3 rounded-sm bg-gray-100 px-3 py-2 text-center font-mono text-xs text-gray-400">
+                  Id {profileValues.id}
+                </div>
+              </div>
+
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Name</div>
+                <div className="col-span-10">
+                  <input
+                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 outline-none"
+                    type="text"
+                    name="name"
+                    id="name"
+                    defaultValue={profileValues?.name || ''}
+                    onChange={(e) =>
+                      setProfileValues({
+                        ...profileValues,
+                        name: e.target.value
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">
+                  {/* <span className="">Bio</span> */}
+                  Bio
+                </div>
+                <div className="col-span-10">
+                  <input
+                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    type="text"
+                    name="bio"
+                    id="bio"
+                    defaultValue={profileValues?.bio}
+                    onChange={(e) =>
+                      setProfileValues({
+                        ...profileValues,
+                        bio: e.target.value
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">
+                  {/* <span className="">Location</span> */}
+                  Location
+                </div>
+                <div className="col-span-10">
+                  <input
+                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    type="text"
+                    name="location"
+                    id="location"
+                    defaultValue={
+                      profileValues?.attributes?.find(
+                        (attribute: AttributeData) =>
+                          attribute.key === 'location'
+                      )?.value
+                    }
+                    onChange={(e) =>
+                      setProfileValues({
+                        ...profileValues,
+                        location: e.target.value
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">
+                  {/* <span className="">Website</span> */}
+                  Website
+                </div>
+                <div className="col-span-10">
+                  <input
+                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    type="text"
+                    name="website"
+                    defaultValue={
+                      profileValues?.attributes?.find(
+                        (attribute: AttributeData) =>
+                          attribute.key === 'website'
+                      )?.value
+                    }
+                    id="name"
+                    onChange={(e) =>
+                      setProfileValues({
+                        ...profileValues,
+                        website: e.target.value
+                      })
+                    }
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">
+                  {/* <span className="">Twitter</span> */}
+                  Twitter
+                </div>
+                <div className="col-span-10">
+                  <input
+                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    type="text"
+                    name="twitter"
+                    id="twitter"
+                    defaultValue={
+                      profileValues?.attributes?.find(
+                        (attribute: AttributeData) =>
+                          attribute.key === 'twitter'
+                      )?.value
+                    }
+                    onChange={(e) =>
+                      setProfileValues({
+                        ...profileValues,
+                        twitter: e.target.value
+                      })
+                    }
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">
+                  Profile pic
+                  {/* <span className="ml-6">Profile</span> */}
+                </div>
+                <div className="col-span-3">
+                  <div className="px-6 py-4">
+                    <ImageProxied
+                      category="profile"
+                      className="ml-6 rounded-full"
+                      src={pictureUrl}
+                      alt="User profile picture"
+                      width={70}
+                      height={70}
+                      objectFit="cover"
+                    />
+                  </div>
+                </div>
+                <div className="col-span-1">
+                  Cover
+                  {/* <span className="ml-6">Cover</span> */}
+                </div>
+                <div className="col-span-5">
+                  <div className="w-full px-6 py-4">
+                    <ImageProxied
+                      category="profile"
+                      className="w-full rounded-lg"
+                      src={pictureUrl}
+                      alt="User cover picture"
+                      width={100}
+                      height={100}
+                      objectFit="cover"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <p className="px-6 py-4">Actives lists</p>
+          <div
+            style={{ borderWidth: '0.5px', borderColor: '#949494' }}
+            className="rounded-md font-extralight shadow-md"
+          >
+            <div className="mx-6 my-4">
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Attributes</div>
+                <div className="col-span-10">
+                  {
+                    profileValues?.attributes?.find(
+                      (attribute: AttributeData) => attribute.key === 'lists'
+                    )?.value
+
+                    // {"displayType":"string",
+                    // "traitType":"string",
+                    // "key":"twitter",
+                    // "value":"@lenstags",
+                    // "__typename":"Attribute"}
+
+                    // JSON.stringify(profileValues)
+                  }
+                </div>
+              </div>
+
+              <div className="mb-4 grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Website</div>
+                <div className="col-span-10">
+                  {
+                    profileValues?.attributes?.find(
+                      (attribute: AttributeData) => attribute.key === 'website'
+                    )?.value
+                  }
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <p className="px-6 py-4">Profile</p>
-        <div
-          style={{ borderWidth: '0.5px', borderColor: '#949494' }}
-          className="shadow-md rounded-md font-extralight"
-        >
-          {/* TODO: row, COMPONENTIZE THIS!*/}
-          <div className="px-6 py-4">
-            <span className="">Profile Id</span>
-            <input
-              className=" text-sm border-2 px-3 py-2 mx-4 leading-none text-gray-600 bg-white rounded border-gray-300 outline-none"
-              type="text"
-              name="profileId"
-              id="profileId"
-              value={lensProfile?.id || 'no-name'}
-            />
-            <span className="">Name</span>
-            <input
-              className=" text-sm border-2 px-3 py-2 mx-4 leading-none text-gray-600 bg-white rounded border-gray-300 outline-none"
-              type="text"
-              name="name"
-              id="name"
-              value={lensProfile?.name || 'no-name'}
-            />
-          </div>
-
-          <div className="px-6 py-4">
-            <span className="">Location</span>
-            <input
-              className=" text-sm border-2 px-3 py-2 mx-4 leading-none text-gray-600 bg-white rounded border-gray-300 outline-none"
-              type="text"
-              name="profileId"
-              id="profileId"
-            />
-            <span className="">Website</span>
-            <input
-              className=" text-sm border-2 px-3 py-2 mx-4 leading-none text-gray-600 bg-white rounded border-gray-300 outline-none"
-              type="text"
-              name="name"
-              id="name"
-            />
-          </div>
-
-          <div className="px-6 py-4">
-            <span className="">Twitter</span>
-            <input
-              className=" text-sm border-2 px-3 py-2 mx-4 leading-none text-gray-600 bg-white rounded border-gray-300 outline-none"
-              type="text"
-              name="profileId"
-              id="profileId"
-            />
-          </div>
-
-          <div className="px-6 py-4">
-            <span className="">Style</span>
-            <ImageProxied
-              category="profile"
-              className="ml-6 rounded-full"
-              src={lensProfile?.pictureUrl || '/img/logo-extended.svg'}
-              alt="User profile picture"
-              width={70}
-              height={70}
-              objectFit="cover"
-            />
-          </div>
-        </div>
-
-        <p className="px-6 py-4">Account</p>
-        <div
-          style={{ borderWidth: '0.5px', borderColor: '#949494' }}
-          className="shadow-md rounded-md font-extralight"
-        >
-          <p className="px-6 py-4">Further account options</p>
-        </div>
-      </div>
+      )}
     </Layout>
   );
 };

@@ -1,16 +1,28 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import moment from 'moment';
+import { useEffect, useState } from 'react';
+
 import ImageProxied from 'components/ImageProxied';
+import { getPublication } from '@lib/lens/get-publication';
+import moment from 'moment';
+import { useRouter } from 'next/router';
 
 export default function PostDetails() {
   const router = useRouter();
   const { id } = router.query;
   const [post, setPost] = useState<any>();
+  console.log('el id: ', id);
   useEffect(() => {
-    const storedObject = localStorage.getItem('LENS_POST') || '';
-    const myObject = JSON.parse(storedObject);
-    setPost(myObject);
+    const fetchData = async () => {
+      // const storedObject = localStorage.getItem('LENS_POST') || '';
+      // const myObject = JSON.parse(storedObject);
+      // console.log(myObject);
+
+      // get post object
+      const oo = await getPublication(id as string);
+      setPost(oo);
+      console.log('oo post: ', oo);
+    };
+
+    fetchData().catch(console.error);
   }, [id]);
 
   return (
@@ -42,7 +54,7 @@ export default function PostDetails() {
                 {/* <ImageProxied
                       category="profile"
                       src="/assets/icons/dots-vertical.svg"
-                      alt="Lenstags Logo"
+                      alt=""
                       width={20}
                       height={20}
                     /> */}
@@ -53,7 +65,7 @@ export default function PostDetails() {
                       <ImageProxied
                         category="profile"
                         src="/assets/icons/dots-vertical.svg"
-                        alt="Lenstags Logo"
+                        alt=""
                         width={20}
                         height={20}
                       />

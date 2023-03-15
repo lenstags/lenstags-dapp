@@ -1,12 +1,12 @@
-import { explore } from '@lib/lens/explore-publications';
-import { Layout } from 'components/Layout';
 import { ProfileContext, TagsFilterContext } from 'components';
+import { useContext, useEffect, useState } from 'react';
 
-import { TagsFilter } from 'components/TagsFilter';
-import type { NextPage } from 'next';
-import Head from 'next/head';
-import { useEffect, useState, useContext } from 'react';
 import ExplorerCard from 'components/ExplorerCard';
+import Head from 'next/head';
+import { Layout } from 'components/Layout';
+import type { NextPage } from 'next';
+import { TagsFilter } from 'components/TagsFilter';
+import { explore } from '@lib/lens/explore-publications';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);

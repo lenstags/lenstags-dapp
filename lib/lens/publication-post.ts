@@ -1,20 +1,22 @@
 import { BigNumber, utils } from 'ethers';
-import { v4 as uuidv4 } from 'uuid';
-import { apolloClient } from './graphql/apollo-client';
-import { login } from '@lib/lens/login';
+import {
+  CreatePostTypedDataDocument,
+  CreatePublicPostRequest
+} from './graphql/generated';
+import { Metadata, PublicationMainFocus } from './interfaces/publication';
 import {
   getAddressFromSigner,
   signedTypeData,
   splitSignature
 } from './ethers.service';
-import {
-  CreatePostTypedDataDocument,
-  CreatePublicPostRequest
-} from './graphql/generated';
-import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
-import { Metadata, PublicationMainFocus } from './interfaces/publication';
-import { uploadIpfs } from './ipfs';
+
+import { apolloClient } from './graphql/apollo-client';
 import { lensHub } from './lens-hub';
+import { login } from '@lib/lens/login';
+import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
+import { uploadIpfs } from './ipfs';
+import { v4 as uuidv4 } from 'uuid';
+import { PUBLICATION_METADATA_VERSION } from '@lib/config';
 
 export const createPostTypedData = async (request: CreatePublicPostRequest) => {
   const result = await apolloClient.mutate({
@@ -46,6 +48,7 @@ export const signCreatePostTypedData = async (
   return { result, signature };
 };
 
+// DEPRECATED
 const createPost = async (profileId: string) => {
   if (!profileId) {
     throw new Error('Must define PROFILE_ID in the .env to run this');
@@ -57,7 +60,7 @@ const createPost = async (profileId: string) => {
   await login(address);
 
   const ipfsResult = await uploadIpfs<Metadata>({
-    version: '2.0.0',
+    version: PUBLICATION_METADATA_VERSION,
     mainContentFocus: PublicationMainFocus.TEXT_ONLY,
     metadata_id: uuidv4(),
     description: 'Description',
@@ -89,7 +92,9 @@ const createPost = async (profileId: string) => {
       //   referralFee: 10.5,
       // },
       // revertCollectModule: true,
-      freeCollectModule: { followerOnly: true }
+      // freeCollectModule: { followerOnly: true }
+      freeCollectModule: { followerOnly: false }
+
       // limitedFeeCollectModule: {
       //   amount: {
       //     currency: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',

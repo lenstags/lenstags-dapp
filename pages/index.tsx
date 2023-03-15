@@ -4,6 +4,7 @@ import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import { LayoutLanding } from 'components/LayoutLanding';
 import Link from 'next/link';
+import type { NextPage } from 'next';
 
 const Home: NextPage = () => {
   const content = {
@@ -132,7 +133,7 @@ const Home: NextPage = () => {
                 <ImageProxied
                   category="post"
                   src="/img/content.png"
-                  alt="Lenstags Logo"
+                  alt=""
                   width={150}
                   height={150}
                 />
@@ -182,7 +183,7 @@ const Home: NextPage = () => {
           <ImageProxied
             category="post"
             src="/img/logo-extended.svg"
-            alt="Lenstags Logo"
+            alt=""
             width={300}
             height={300}
           />
@@ -197,7 +198,7 @@ const Home: NextPage = () => {
             {/* <ImageProxied
               category="post"
               src="/img/products.svg"
-              alt="Lenstags Logo"
+              alt=""
               width={300}
               height={300}
             /> */}

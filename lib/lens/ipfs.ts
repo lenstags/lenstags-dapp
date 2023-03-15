@@ -1,6 +1,11 @@
+import {
+  INFURA_PROJECT_ID,
+  INFURA_SECRET,
+  PUBLICATION_METADATA_VERSION
+} from '../config';
+
 import { Buffer } from 'buffer';
 import { create } from 'ipfs-http-client';
-import { INFURA_PROJECT_ID, INFURA_SECRET } from '../config';
 
 const projectId = INFURA_PROJECT_ID;
 const secret = INFURA_SECRET;
@@ -32,15 +37,15 @@ export const uploadIpfs = async <T>(data: T) => {
   return result;
 };
 
-export const baseMetadata = {
-  version: '2.0.0',
-  contentWarning: null,
-  attributes: [
-    {
-      traitType: 'string',
-      key: 'type',
-      value: 'post'
-    }
-  ],
-  appId: 'lenstags'
-};
+// export const baseMetadata = {
+//   version: PUBLICATION_METADATA_VERSION,
+//   contentWarning: null,
+//   attributes: [
+//     {
+//       traitType: 'string',
+//       key: 'type',
+//       value: 'post'
+//     }
+//   ],
+//   appId: 'lenstags'
+// };

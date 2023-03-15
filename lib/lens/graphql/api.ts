@@ -357,7 +357,7 @@ query Publications
   publications(request: {
     profileId: $id,
     publicationTypes: [$type],
-    limit: 30
+    limit: 60
   }) {
     items {
       __typename 

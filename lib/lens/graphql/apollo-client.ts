@@ -2,17 +2,18 @@ import {
   ApolloClient,
   ApolloLink,
   DefaultOptions,
-  from,
   HttpLink,
-  InMemoryCache
+  InMemoryCache,
+  from
 } from '@apollo/client/core';
-import { onError } from '@apollo/client/link/error';
+
 import { getFromLocalStorage } from '../localStorage';
+import { onError } from '@apollo/client/link/error';
 
 const API_URL = 'https://api-mumbai.lens.dev';
 let authenticationToken: string | null = null;
 
-const defaultOptions: DefaultOptions = {
+export const defaultOptions: DefaultOptions = {
   watchQuery: {
     fetchPolicy: 'no-cache',
     errorPolicy: 'ignore'

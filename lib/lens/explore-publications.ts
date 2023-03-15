@@ -1,5 +1,3 @@
-import { LENSTAGS_SOURCE } from './constants';
-import { apolloClient } from './graphql/apollo-client';
 import {
   CustomFiltersTypes,
   ExplorePublicationRequest,
@@ -7,6 +5,9 @@ import {
   PublicationSortCriteria,
   PublicationTypes
 } from './graphql/generated';
+
+import { LENSTAGS_SOURCE } from '@lib/config';
+import { apolloClient } from './graphql/apollo-client';
 
 const explorePublications = (request: ExplorePublicationRequest) => {
   return apolloClient.query({
@@ -24,7 +25,8 @@ export interface IExplorePublications {
 export const explore = async (filter?: IExplorePublications) => {
   const reqQuery: ExplorePublicationRequest = {
     sortCriteria: PublicationSortCriteria.Latest,
-   // sources: [LENSTAGS_SOURCE],
+    sources: [LENSTAGS_SOURCE],
+    limit: 50,
     publicationTypes: [PublicationTypes.Post],
     customFilters: [CustomFiltersTypes.Gardeners]
   };

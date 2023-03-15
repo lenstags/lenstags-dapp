@@ -1,9 +1,10 @@
-import Head from 'next/head';
 import React, { FC, useEffect, useState } from 'react';
-import { useAccount } from 'wagmi';
-import { UnauthorizedScreen } from 'components';
+
+import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
+import { UnauthorizedScreen } from 'components';
+import { useAccount } from 'wagmi';
 import { useRouter } from 'next/router';
 
 interface Props {
@@ -56,7 +57,7 @@ export const LayoutLanding: FC<Props> = ({
                           <ImageProxied
                             category="profile"
                             src="/img/logo-extended.svg"
-                            alt="Lenstags Logo"
+                            alt=""
                             width={100}
                             height={60}
                           />
@@ -198,7 +199,7 @@ export const LayoutLanding: FC<Props> = ({
                     <ImageProxied
                       category="profile"
                       src="/img/logo-extended.svg"
-                      alt="Lenstags Logo"
+                      alt=""
                       width={100}
                       height={60}
                     />
@@ -246,7 +247,7 @@ export const LayoutLanding: FC<Props> = ({
                       <ImageProxied
                         category="profile"
                         src="/img/logo-extended.svg"
-                        alt="Lenstags Logo"
+                        alt=""
                         width={100}
                         height={60}
                       />
@@ -256,7 +257,7 @@ export const LayoutLanding: FC<Props> = ({
                         <ImageProxied
                           category="profile"
                           src="/assets/icons/x.svg"
-                          alt="Lenstags Logo"
+                          alt=""
                           width={20}
                           height={20}
                         />

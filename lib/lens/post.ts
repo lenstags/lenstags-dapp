@@ -1,29 +1,34 @@
-import { v4 as uuidv4 } from 'uuid';
-import { getAddressFromSigner } from './ethers.service';
+import { APP_NAME, PUBLICATION_METADATA_VERSION } from '@lib/config';
+import {
+  PublicationMainFocus,
+  IbuiltPost
+} from '@lib/lens/interfaces/publication';
+
 import { Metadata } from './interfaces/publication';
-import { uploadIpfs } from './ipfs';
-import { signCreatePostTypedData } from './publication-post';
-import { PublicationMainFocus } from './interfaces/publication';
 import { broadcastRequest } from './broadcast';
+import { getAddressFromSigner } from './ethers.service';
+import { signCreatePostTypedData } from './publication-post';
+import { uploadIpfs } from './ipfs';
+import { v4 as uuidv4 } from 'uuid';
+import { createPostGasless } from './post-gasless';
+import { freeCollect } from './collect';
 
-export interface postData {
-  title?: string;
-  name?: string;
-  abstract?: string;
-  content: string;
-  link?: string;
-  cover?: string;
-  tags?: string[];
-  // image?: Buffer[]
-}
+export const DEFAULT_METADATA_ATTRIBUTES = [
+  {
+    traitType: 'string',
+    value: 'post',
+    key: 'default_key'
+  }
+];
 
-export const createPost = async (profileId: string, builtPost: postData) => {
+export const createPost = async (profileId: string, builtPost: IbuiltPost) => {
   if (!profileId) {
     throw new Error('Must define profileId');
   }
 
-  const address = await getAddressFromSigner();
-  console.log('create post: address', address);
+  // TODO CHECK THIS
+  // const address = await getAddressFromSigner();
+  // console.log('creating post: address', address);
 
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
@@ -31,16 +36,18 @@ export const createPost = async (profileId: string, builtPost: postData) => {
     imageMimeType: null,
     content: builtPost.content,
     name: builtPost.title || '',
-    external_url: null,
+    external_url: builtPost.external_url, // the list is editabl here
     // TODO: coverPicture: post.cover,
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
-    attributes: [
-      {
-        traitType: 'string',
-        value: 'post'
-      }
-    ],
+    // attributes: [
+    //   {
+    //     traitType: 'string',
+    //     value: 'post'
+    //     // key: 'default'
+    //   }
+    // ],
+    attributes: DEFAULT_METADATA_ATTRIBUTES,
     locale: 'en-us',
     mainContentFocus: PublicationMainFocus.TEXT_ONLY,
     animation_url: '',
@@ -52,15 +59,14 @@ export const createPost = async (profileId: string, builtPost: postData) => {
       // },
     ],
     // TODO: METADATA VERSION UNIFICATION
-    version: '2.0.0',
-    appId: 'lenstags'
+    version: PUBLICATION_METADATA_VERSION,
+    appId: APP_NAME.toLocaleLowerCase()
   });
   console.log('create post: ipfs result', ipfsResult);
 
   // hard coded to make the code example clear
   const createPostRequest = {
     profileId,
-
     contentURI: 'ipfs://' + ipfsResult.path,
     collectModule: {
       // TODO IN THE MIDDLE FUTURE
@@ -75,7 +81,9 @@ export const createPost = async (profileId: string, builtPost: postData) => {
       //   referralFee: 10.5,
       // },
       // revertCollectModule: true,
-      freeCollectModule: { followerOnly: true }
+      // freeCollectModule: { followerOnly: true }
+      freeCollectModule: { followerOnly: false }
+
       // limitedFeeCollectModule: {
       //   amount: {
       //     currency: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
@@ -104,8 +112,53 @@ export const createPost = async (profileId: string, builtPost: postData) => {
     throw new Error('create post via broadcast: failed');
   }
 
-  console.log('create post via broadcast: broadcastResult', broadcastResult);
-  return { txHash: broadcastResult.txHash, txId: broadcastResult.txId };
+  console.log(
+    'ACA 0 create post via broadcast: broadcastResult',
+    broadcastResult
+  );
 
+  // FIXME This won't work because the logs are empty as for now
+
+  // const publicationId = utils.defaultAbiCoder.decode(
+  //   ['uint256'],
+  //   profileCreatedEventLog[2]
+  // )[0];
+
+  // const internalPubId =
+  //   profileId + '-' + BigNumber.from(publicationId).toHexString();
+
+  // const pubId = BigNumber.from(publicationId).toHexString();
+
+  // return { txHash: broadcastResult.txHash, txId: broadcastResult.txId };
+  const postResult = {
+    txHash: broadcastResult.txHash,
+    txId: broadcastResult.txId,
+    internalPubId: '',
+    pubId: ''
+  };
+  return postResult;
   // TODO: VERIFY THIS return profileId + '-' + BigNumber.from(publicationId).toHexString();
+};
+
+export const createPostManager = async (
+  lensProfile: any,
+  builtPost: IbuiltPost,
+  selfCollect: boolean
+) => {
+  // TODO test with no dispatcher
+  const result = lensProfile?.dispatcher?.canUseRelay
+    ? await createPostGasless(lensProfile?.id, builtPost)
+    : await createPost(lensProfile?.id, builtPost);
+
+  if (selfCollect) {
+    console.log(' Collecting post, minting... ');
+    await freeCollect(result.internalPubId);
+    console.log('Collecting post finished.');
+  }
+
+  return result;
+};
+
+export const addPostIdtoListId = async (postId: string, listId: string) => {
+  // get the list id
 };

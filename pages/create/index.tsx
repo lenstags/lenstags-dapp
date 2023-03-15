@@ -1,18 +1,22 @@
-import { Layout } from 'components';
-import { ProfileContext } from 'components';
-import { NextPage } from 'next';
 import React, { useContext, useState } from 'react';
-import { useRouter } from 'next/router';
+
+import CreatableSelect from 'react-select/creatable';
 import Editor from 'components/Editor';
-import { createPost, postData } from '@lib/lens/post';
+import ImageProxied from 'components/ImageProxied';
+import { Layout } from 'components';
+import Link from 'next/link';
+import { NextPage } from 'next';
+import { ProfileContext } from 'components';
+import { TAGS } from '@lib/lens/tags';
+import Toast from '../../components/Toast';
+import { createPost, DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import { createPostGasless } from '@lib/lens/post-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
-import Toast from '../../components/Toast';
-import ImageProxied from 'components/ImageProxied';
-import Link from 'next/link';
-import CreatableSelect from 'react-select/creatable';
-import { TAGS } from '@lib/lens/tags';
+import { useRouter } from 'next/router';
+import { createPostManager } from '@lib/lens/post';
+import { IbuiltPost } from '@lib/lens/interfaces/publication';
 
+const POST_SELF_COLLECT = true;
 const sleep = () =>
   new Promise((resolve) => {
     setTimeout(resolve, 2500);
@@ -57,15 +61,16 @@ const Create: NextPage = () => {
   const handleChangeEditor = (content: string) => setEditorContents(content);
 
   const handlePost = async () => {
-    const constructedPost = {
+    const constructedPost: IbuiltPost = {
+      attributes: DEFAULT_METADATA_ATTRIBUTES,
       name: title,
-      // title: title,
       abstract: abstract || '',
       content: editorContents || '',
       link: link,
       cover: cover,
-      // TODO: GET FILTER ARRAY FROM THE UI
       tags: selectedOption.map((r) => r['label'])
+      // TODO: GET FILTER ARRAY FROM THE UI
+      // title: title,
       // todo: image?: Buffer[]
     };
 
@@ -77,18 +82,27 @@ const Create: NextPage = () => {
 
     try {
       // collect post
-      if (!lensProfile) {
-        return;
-      }
 
-      await (dispatcherStatus
-        ? await createPostGasless(lensProfile.id, constructedPost)
-        : await createPost(lensProfile.id, constructedPost));
+      // await (dispatcherStatus
+      //   ? await createPostGasless(lensProfile.id, constructedPost)
+      //   : await createPost(lensProfile.id, constructedPost));
 
+      const result = await createPostManager(
+        lensProfile,
+        constructedPost,
+        // POST_SELF_COLLECT
+        false
+      );
+      console.log('POST RESULT: ', result);
+      // FIXME
+      // if (result.isOk) {
       setIsSuccessVisible(true);
-
       await sleep();
       router.push('/');
+      // } else {
+      //   setIsErrorVisible(true);
+      //   console.error(e);
+      // }
     } catch (e: any) {
       setIsErrorVisible(true);
       console.error(e);
@@ -228,7 +242,7 @@ const Create: NextPage = () => {
                       category="profile"
                       className="text-lensBlack"
                       src="/assets/icons/photo.svg"
-                      alt="Lenstags Logo"
+                      alt=""
                       width={20}
                       height={20}
                     />
@@ -261,7 +275,7 @@ const Create: NextPage = () => {
                       category="profile"
                       className="text-lensBlack"
                       src="/assets/icons/photo.svg"
-                      alt="Lenstags Logo"
+                      alt=""
                       width={20}
                       height={20}
                     />

@@ -1,19 +1,29 @@
 import { GenericMetadata, MetadataDisplayType } from './generic';
-import { MediaOutput } from '../graphql/generated';
 
-interface MetadataMedia {
-  item: string;
-  /**
-   * This is the mime type of media
-   */
-  type: string;
-}
+// import { AttributeData } from './profile-metadata';
+import { MediaOutput } from '../graphql/generated';
 
 export interface MetadataAttribute {
   displayType?: MetadataDisplayType;
   traitType?: string;
   value: string;
 }
+
+export interface IbuiltPost {
+  title?: string;
+  name?: string;
+  abstract?: string;
+  content: string;
+  link?: string;
+  cover?: string;
+  tags?: string[];
+  external_url?: string;
+  // attributes: AttributeData[];
+  attributes: MetadataAttribute[];
+  // image?: Buffer[]
+}
+
+// contract
 
 export enum PublicationContentWarning {
   NSFW = 'NSFW',

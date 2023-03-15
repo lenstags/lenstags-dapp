@@ -1,23 +1,39 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 
-import { ProfileContext, TagsFilterContext } from 'components';
 import React, { useContext, useEffect, useState } from 'react';
 
+import { AttributeData } from '@lib/lens/interfaces/profile-metadata';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
+import { ProfileContext } from './LensAuthenticationProvider';
+import { TagsFilterContext } from './TagsFilterProvider';
+import { deleteLensLocalStorage } from 'lib/lens/localStorage';
+import { explore } from '../lib/lens/explore-publications';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
+import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 
 export const Navbar = () => {
+  const { openConnectModal } = useConnectModal();
   const [show, setShow] = useState(false);
-  const [profile, setProfile] = useState(false);
+  const [profileView, setProfileView] = useState(false);
+  // const { profile, setProfile } = useContext(ProfileContext);
+  // const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
   const handleDisconnect = () => {
     deleteLensLocalStorage();
     disconnect();
   };
   const { tags } = useContext(TagsFilterContext);
-
   const lensProfile = useContext(ProfileContext);
+  // TODO: TEST THIS FOR NFT URI!!!
+
+  const pictureUrl =
+    lensProfile?.picture?.__typename === 'MediaSet'
+      ? lensProfile?.picture.original.url
+      : lensProfile?.picture?.__typename === 'NftImage'
+      ? lensProfile?.picture.uri
+      : '/img/profilePic.png';
 
   const router = useRouter();
 
@@ -25,10 +41,16 @@ export const Navbar = () => {
   useEffect(() => {
     explore({ tags }).then((data) => {
       // TODO Integrate with card listing
-      console.log('EXPLORER-DATA ', data.items);
+      // console.log(' de lensProfile: ', lensProfile);
+      console.log(
+        'EXPLORER-DATA 🏄🏽‍♂️🏄🏽‍♂️🏄🏽‍♂️',
+        data.items[0],
+        ' of: ',
+        data.items.length
+      );
       // console.log('tagsss ', tags);
     });
-  }, [tags]);
+  }, [tags, lensProfile]);
 
   return (
     <>
@@ -47,7 +69,7 @@ export const Navbar = () => {
               className="absolute h-full w-full bg-gray-800 opacity-50 lg:hidden"
               onClick={() => setShow(!show)}
             />
-            <div className="absolute z-40 h-full w-64 bg-lensGreen pb-4 shadow transition duration-150 ease-in-out sm:relative md:w-96 lg:hidden">
+            <div className="absolute z-40 h-full w-64 bg-lensGreen pb-4 shadow  transition duration-150 ease-in-out sm:relative md:w-96 lg:hidden">
               <div className="flex h-full w-full flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between px-8">
@@ -56,7 +78,7 @@ export const Navbar = () => {
                         <ImageProxied
                           category="profile"
                           src="/img/logo-extended.svg"
-                          alt="Lenstags Logo"
+                          alt=""
                           width={100}
                           height={60}
                         />
@@ -140,13 +162,18 @@ export const Navbar = () => {
                 <div className="w-full">
                   <div className="border-t border-black">
                     <div className="flex w-full items-center justify-between px-6 pt-1">
-                      <div className="flex items-center  ">
+                      <div className="flex items-center">
+                        {/* Lists:
+                        {console.log(
+                          lensProfile?.attributes as AttributeData[]
+                        )} */}
                         <ImageProxied
                           category="post"
                           className=""
                           width="30px"
                           height="30px"
-                          src={lensProfile?.pictureUrl || '/img/profilePic.png'}
+                          src={pictureUrl}
+                          // src={lensProfile?.pictureUrl || '/img/profilePic.png'}
                           alt="avatar"
                         />
                         <p className="ml-2  text-base leading-4 text-gray-800 md:text-xl">
@@ -210,7 +237,7 @@ export const Navbar = () => {
                   <ImageProxied
                     category="profile"
                     src="/img/logo-extended.svg"
-                    alt="Lenstags Logo"
+                    alt=""
                     width={100}
                     height={60}
                   />
@@ -237,33 +264,56 @@ export const Navbar = () => {
                     </Link>
                   </div>
                 </div>
-                <div className="hidden w-1/2 lg:flex">
-                  <div className="flex w-full items-center justify-end pl-8">
-                    <div className="flex h-full items-center justify-center  border-black  px-8">
-                      <button className="flex align-middle">
-                        <Link href={'/create'}>
-                          <div className="button_top flex">
-                            <div>
-                              <ImageProxied
-                                category="profile"
-                                className="text-lensBlack"
-                                src="/assets/icons/plus.svg"
-                                alt="Lenstags Logo"
-                                width={20}
-                                height={20}
-                              />
+                {/* connect area */}
+                {lensProfile ? (
+                  <div className="hidden w-1/2 lg:flex">
+                    <div className="flex w-full items-center justify-end pl-8">
+                      <div className="flex h-full items-center justify-center  border-black  px-8">
+                        <button className="flex align-middle">
+                          <Link href={'/create'}>
+                            <div className="button_top flex">
+                              <div>
+                                <ImageProxied
+                                  category="profile"
+                                  className="text-lensBlack"
+                                  src="/assets/icons/plus.svg"
+                                  alt=""
+                                  width={20}
+                                  height={20}
+                                />
+                              </div>
+                              <div>CREATE</div>
                             </div>
-                            <div>CREATE</div>
-                          </div>
-                        </Link>
-                      </button>
-                    </div>
+                          </Link>
+                        </button>
+                      </div>
 
-                    <div className="flex h-full w-20 items-center justify-center  border-black">
-                      <div className="relative cursor-pointer text-gray-600 hover:text-black">
+                      <div className="flex h-full w-20 items-center justify-center  border-black">
+                        <div className="relative cursor-pointer text-gray-600 hover:text-black">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="icon icon-tabler icon-tabler-bell"
+                            width={28}
+                            height={28}
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" />
+                            <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                          </svg>
+                          <div className="absolute inset-0 m-auto mt-1 mr-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
+                        </div>
+                      </div>
+
+                      <div className="mr-4 flex h-full w-20 cursor-pointer  items-center justify-center border-black text-gray-600 hover:text-black">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-bell"
+                          className="icon icon-tabler icon-tabler-messages"
                           width={28}
                           height={28}
                           viewBox="0 0 24 24"
@@ -274,141 +324,139 @@ export const Navbar = () => {
                           strokeLinejoin="round"
                         >
                           <path stroke="none" d="M0 0h24v24H0z" />
-                          <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                          <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                          <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+                          <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
                         </svg>
-                        <div className="absolute inset-0 m-auto mt-1 mr-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
                       </div>
-                    </div>
-
-                    <div className="mr-4 flex h-full w-20 cursor-pointer  items-center justify-center border-black text-gray-600 hover:text-black">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="icon icon-tabler icon-tabler-messages"
-                        width={28}
-                        height={28}
-                        viewBox="0 0 24 24"
-                        strokeWidth="1.5"
-                        stroke="currentColor"
-                        fill="none"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+                      <div
+                        className="relative flex cursor-pointer items-center "
+                        onClick={() => setProfileView(!profileView)}
                       >
-                        <path stroke="none" d="M0 0h24v24H0z" />
-                        <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                        <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                      </svg>
-                    </div>
-                    <div
-                      className="relative flex cursor-pointer items-center"
-                      onClick={() => setProfile(!profile)}
-                    >
-                      <div className="rounded-full">
-                        {profile ? (
-                          <ul
-                            className=" absolute -left-16 rounded border-r bg-white font-extralight text-black shadow"
-                            style={{ marginTop: '4.4rem', marginLeft: '-4rem' }}
-                          >
-                            <li className="flex w-full cursor-pointer justify-between border-b px-5 py-3 ">
-                              <div className="fl first-letter:ex">
-                                <p className="text-xs">Connected as</p>
-                                <p className=" font-normal">
-                                  @{lensProfile?.handle}
-                                </p>
-                              </div>
-                            </li>
-                            <li className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-3">
-                              <div className="flex items-center">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="icon icon-tabler icon-tabler-user"
-                                  width={18}
-                                  height={18}
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="1.5"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path stroke="none" d="M0 0h24v24H0z" />
-                                  <circle cx={12} cy={7} r={4} />
-                                  <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
-                                </svg>
-                                <Link
-                                  href={'/settings'}
-                                  className="ml-2 hover:font-bold "
-                                >
-                                  Settings
-                                </Link>
-                              </div>
-                            </li>
-                            <li className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-3 hover:text-red-600">
-                              <div className="flex items-center">
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="icon icon-tabler icon-tabler-logout"
-                                  width={20}
-                                  height={20}
-                                  viewBox="0 0 24 24"
-                                  strokeWidth="1.5"
-                                  stroke="currentColor"
-                                  fill="none"
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                >
-                                  <path stroke="none" d="M0 0h24v24H0z" />
-                                  <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
-                                  <path d="M7 12h14l-3 -3m0 6l3 -3" />
-                                </svg>
-                                <span
-                                  className="ml-2 hover:text-red-600"
-                                  // FIXME should clear whole profile and token everywhere like in clearProfile()
-                                  onClick={handleDisconnect}
-                                >
-                                  Disconnect
-                                </span>
-                              </div>
-                            </li>
-                          </ul>
-                        ) : (
-                          ''
-                        )}
-                        <div className="relative m-0 p-0">
-                          <ImageProxied
-                            category="profile"
-                            height={35}
-                            width={35}
-                            objectFit="cover"
-                            src={
-                              lensProfile?.pictureUrl || '/img/profilePic.png'
-                            }
-                            alt="avatar"
-                          />
+                        <div className="items-center rounded-full">
+                          {profileView ? (
+                            <ul
+                              className=" absolute -left-16 rounded border-r bg-white font-extralight text-black shadow"
+                              style={{
+                                marginTop: '4.4rem',
+                                marginLeft: '-4rem'
+                              }}
+                            >
+                              <li className="flex w-full cursor-pointer justify-between border-b px-5 py-3 ">
+                                <div className="fl first-letter:ex">
+                                  <p className="text-xs">Connected as</p>
+                                  <p className=" font-normal">
+                                    {/* {profile ?? `@${profile?.handle}`} */}@
+                                    {lensProfile?.handle}
+                                  </p>
+                                </div>
+                              </li>
+                              <li className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-3">
+                                <div className="flex items-center">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="icon icon-tabler icon-tabler-user"
+                                    width={18}
+                                    height={18}
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="1.5"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path stroke="none" d="M0 0h24v24H0z" />
+                                    <circle cx={12} cy={7} r={4} />
+                                    <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
+                                  </svg>
+                                  <Link
+                                    href={'/settings'}
+                                    className="ml-2 hover:font-bold "
+                                  >
+                                    Settings
+                                  </Link>
+                                </div>
+                              </li>
+                              <li className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-3 hover:text-red-600">
+                                <div className="flex items-center">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="icon icon-tabler icon-tabler-logout"
+                                    width={20}
+                                    height={20}
+                                    viewBox="0 0 24 24"
+                                    strokeWidth="1.5"
+                                    stroke="currentColor"
+                                    fill="none"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path stroke="none" d="M0 0h24v24H0z" />
+                                    <path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" />
+                                    <path d="M7 12h14l-3 -3m0 6l3 -3" />
+                                  </svg>
+                                  <span
+                                    className="ml-2 hover:text-red-600"
+                                    // FIXME should clear whole profile and token everywhere like in clearProfile()
+                                    onClick={handleDisconnect}
+                                  >
+                                    Disconnect
+                                  </span>
+                                </div>
+                              </li>
+                            </ul>
+                          ) : (
+                            ''
+                          )}
+                          <div className="relative">
+                            <div className="flex items-center">
+                              <ImageProxied
+                                className="rounded-full"
+                                category="profile"
+                                height={50}
+                                width={50}
+                                objectFit="cover"
+                                src={pictureUrl}
+                                alt="avatar"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="cursor-pointer text-lensGray2 ease-linear visited:rotate-180 focus:rotate-0 active:rotate-0 ">
-                        <svg
-                          aria-haspopup="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-chevron-down"
-                          width={20}
-                          height={20}
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" />
-                          <polyline points="6 9 12 15 18 9" />
-                        </svg>
+                        <div className="cursor-pointer text-lensGray2 ease-linear visited:rotate-180 focus:rotate-0 active:rotate-0 ">
+                          <svg
+                            aria-haspopup="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="icon icon-tabler icon-tabler-chevron-down"
+                            width={20}
+                            height={20}
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" />
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="hidden w-1/2 justify-end lg:flex">
+                    <div className="flex h-full items-center justify-center  border-black">
+                      <button
+                        onClick={openConnectModal}
+                        className="flex align-middle"
+                      >
+                        <div className="button_top flex">
+                          <div>✦ CONNECT</div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
               <div
                 className=" visible   relative text-lensBlack lg:hidden"
@@ -420,7 +468,7 @@ export const Navbar = () => {
                     <ImageProxied
                       category="profile"
                       src="/img/logo-extended.svg"
-                      alt="Lenstags Logo"
+                      alt=""
                       width={100}
                       height={60}
                     />
@@ -430,7 +478,7 @@ export const Navbar = () => {
                       <ImageProxied
                         category="profile"
                         src="/assets/icons/x.svg"
-                        alt="Lenstags Logo"
+                        alt=""
                         width={20}
                         height={20}
                       />

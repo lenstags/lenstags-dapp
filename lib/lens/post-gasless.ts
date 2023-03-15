@@ -1,28 +1,24 @@
+import { APP_NAME, PUBLICATION_METADATA_VERSION } from '@lib/config';
 import { BigNumber, utils } from 'ethers';
-import { v4 as uuidv4 } from 'uuid';
-import { apolloClient } from './graphql/apollo-client';
-import { broadcastRequest } from './broadcast';
-import { getAddressFromSigner } from './ethers.service';
 import {
   CreatePostViaDispatcherDocument,
   CreatePublicPostRequest
 } from './graphql/generated';
-import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
-import { Metadata, PublicationMainFocus } from './interfaces/publication';
-import { uploadIpfs } from './ipfs';
-import { signCreatePostTypedData } from './publication-post';
-import { queryProfile } from './dispatcher';
+import {
+  Metadata,
+  PublicationMainFocus,
+  IbuiltPost
+} from './interfaces/publication';
 
-export interface postData {
-  title?: string;
-  name?: string;
-  abstract?: string;
-  content: string;
-  link?: string;
-  cover?: string;
-  tags?: string[];
-  // image?: Buffer[]
-}
+import { apolloClient } from './graphql/apollo-client';
+import { broadcastRequest } from './broadcast';
+import { getAddressFromSigner } from './ethers.service';
+import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
+import { queryProfile } from './dispatcher';
+import { signCreatePostTypedData } from './publication-post';
+import { uploadIpfs } from './ipfs';
+import { v4 as uuidv4 } from 'uuid';
+import { DEFAULT_METADATA_ATTRIBUTES } from './post';
 
 const createPostViaDispatcherRequest = async (
   request: CreatePublicPostRequest
@@ -83,7 +79,7 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
 
 export const createPostGasless = async (
   profileId: string,
-  builtPost: postData
+  builtPost: IbuiltPost
 ) => {
   if (!profileId) {
     throw new Error('Must define PROFILE_ID in the .env to run this');
@@ -93,7 +89,7 @@ export const createPostGasless = async (
   console.log('create post: address', address);
 
   // await login(address);
-
+  console.log('🟩🟩 BUILT POST: ', builtPost);
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     name: builtPost.name || '', //the title
@@ -102,16 +98,11 @@ export const createPostGasless = async (
     // TODO: image: post.image,
     imageMimeType: null,
     // TODO: external urls?
-    external_url: null,
+    external_url: builtPost.external_url,
     // TODO: coverPicture: post.cover,
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
-    attributes: [
-      {
-        traitType: 'string',
-        value: 'post'
-      }
-    ],
+    attributes: builtPost.attributes || DEFAULT_METADATA_ATTRIBUTES,
     locale: 'en-us',
     mainContentFocus: PublicationMainFocus.TEXT_ONLY,
     animation_url: '',
@@ -123,8 +114,8 @@ export const createPostGasless = async (
       // },
     ],
     // TODO: METADATA VERSION UNIFICATION
-    version: '2.0.0',
-    appId: 'lenstags'
+    version: PUBLICATION_METADATA_VERSION,
+    appId: APP_NAME.toLocaleLowerCase()
   });
 
   console.log('create post: ipfs result', ipfsResult);
@@ -132,6 +123,7 @@ export const createPostGasless = async (
   // hard coded to make the code example clear
   const createPostRequest = {
     profileId,
+    // contentURI: 'https://pastebin.com/uNPgZQub', // must validate its metadata
     contentURI: `ipfs://${ipfsResult.path}`,
     collectModule: {
       // feeCollectModule: {
@@ -145,7 +137,7 @@ export const createPostGasless = async (
       //   referralFee: 10.5,
       // },
       // revertCollectModule: true,
-      freeCollectModule: { followerOnly: true }
+      freeCollectModule: { followerOnly: false }
       // limitedFeeCollectModule: {
       //   amount: {
       //     currency: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
@@ -167,7 +159,7 @@ export const createPostGasless = async (
   console.log('create post: poll until indexed');
   const indexedResult = await pollUntilIndexed(result.txHash);
 
-  console.log('create post: profile has been indexed', result);
+  console.log('create post: has been indexed', result);
 
   const logs = indexedResult.txReceipt!.logs;
 
@@ -189,10 +181,19 @@ export const createPostGasless = async (
     profileCreatedEventLog[2]
   )[0];
 
-  console.log(
-    'create post: internal publication id',
-    profileId + '-' + BigNumber.from(publicationId).toHexString()
-  );
+  const internalPubId =
+    profileId + '-' + BigNumber.from(publicationId).toHexString();
 
-  return result;
+  const pubId = BigNumber.from(publicationId).toHexString();
+
+  const postResult = {
+    txHash: result.txHash,
+    txId: result.txId,
+    internalPubId,
+    pubId
+  };
+  // console.log('create post: internal publication id', internalPubId);
+  console.log('ACA1 created post result: ', postResult);
+
+  return postResult;
 };
