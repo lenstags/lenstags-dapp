@@ -18,9 +18,11 @@ export interface IbuiltPost {
   cover?: string;
   tags?: string[];
   external_url?: string;
+  originalPostId?: string;
   // attributes: AttributeData[];
   attributes: MetadataAttribute[];
-  // image?: Buffer[]
+  image?: Buffer | null; // single image
+  imageMimeType?: string | null;
 }
 
 // contract
@@ -37,7 +39,7 @@ export interface Metadata extends GenericMetadata {
   external_url?: string | null;
   name: string;
   attributes: MetadataAttribute[];
-  image?: string | null;
+  image?: Buffer | null; //single image
   imageMimeType?: string | null;
   media?: MediaOutput[];
   animation_url?: string;

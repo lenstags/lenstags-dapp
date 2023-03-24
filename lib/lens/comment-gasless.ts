@@ -12,13 +12,12 @@ import { APP_NAME } from '@lib/config';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { broadcastRequest } from './broadcast';
 import { profile } from './get-profile';
-// import { explicitStart, PROFILE_ID } from '../config';
 import { uploadIpfs } from '@lib/lens/ipfs';
 import { v4 as uuidv4 } from 'uuid';
 
 const prefix = 'create comment gasless';
 
-export const createCommentViaDispatcherRequest = async (
+const createCommentViaDispatcherRequest = async (
   request: CreatePublicCommentRequest
 ) => {
   const result = await apolloClient.mutate({

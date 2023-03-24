@@ -1,24 +1,30 @@
-import { APP_NAME, PUBLICATION_METADATA_VERSION } from '@lib/config';
+import {
+  APP_NAME,
+  IPFS_PROXY_URL,
+  PUBLICATION_METADATA_VERSION
+} from '@lib/config';
 import { BigNumber, utils } from 'ethers';
 import {
   CreatePostViaDispatcherDocument,
-  CreatePublicPostRequest
+  CreatePublicPostRequest,
+  PublicationReportingSpamSubreason
 } from './graphql/generated';
 import {
+  IbuiltPost,
   Metadata,
-  PublicationMainFocus,
-  IbuiltPost
+  PublicationMainFocus
 } from './interfaces/publication';
+import { uploadImageIpfs, uploadIpfs } from './ipfs';
 
+import { DEFAULT_METADATA_ATTRIBUTES } from './post';
 import { apolloClient } from './graphql/apollo-client';
 import { broadcastRequest } from './broadcast';
+import fs from 'fs';
 import { getAddressFromSigner } from './ethers.service';
 import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 import { queryProfile } from './dispatcher';
 import { signCreatePostTypedData } from './publication-post';
-import { uploadIpfs } from './ipfs';
 import { v4 as uuidv4 } from 'uuid';
-import { DEFAULT_METADATA_ATTRIBUTES } from './post';
 
 const createPostViaDispatcherRequest = async (
   request: CreatePublicPostRequest
@@ -86,34 +92,35 @@ export const createPostGasless = async (
   }
 
   const address = getAddressFromSigner();
+
+  let mediaResult = [];
+  if (builtPost.image) {
+    const imageIpfsResult = await uploadImageIpfs(builtPost.image);
+    mediaResult.push({
+      item: `${IPFS_PROXY_URL}${imageIpfsResult.path}`,
+      type: 'image/jpeg'
+    });
+  }
+
   console.log('create post: address', address);
 
-  // await login(address);
   console.log('🟩🟩 BUILT POST: ', builtPost);
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     name: builtPost.name || '', //the title
     description: builtPost.abstract, //the resume
     content: builtPost.content, //the details
-    // TODO: image: post.image,
-    imageMimeType: null,
-    // TODO: external urls?
+    imageMimeType: builtPost.imageMimeType,
     external_url: builtPost.external_url,
-    // TODO: coverPicture: post.cover,
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
     attributes: builtPost.attributes || DEFAULT_METADATA_ATTRIBUTES,
     locale: 'en-us',
-    mainContentFocus: PublicationMainFocus.TEXT_ONLY,
+    mainContentFocus: builtPost.image
+      ? PublicationMainFocus.IMAGE
+      : PublicationMainFocus.TEXT_ONLY,
     animation_url: '',
-    media: [
-      // {
-      //   item: 'https://scx2.b-cdn.net/gfx/news/hires/2018/lion.jpg',
-      //   // item: 'https://assets-global.website-files.com/5c38aa850637d1e7198ea850/5f4e173f16b537984687e39e_AAVE%20ARTICLE%20website%20main%201600x800.png',
-      //   type: 'image/jpeg',
-      // },
-    ],
-    // TODO: METADATA VERSION UNIFICATION
+    media: mediaResult,
     version: PUBLICATION_METADATA_VERSION,
     appId: APP_NAME.toLocaleLowerCase()
   });

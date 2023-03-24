@@ -1,7 +1,10 @@
-import React, { useContext, useState } from 'react';
+import { Configuration, OpenAIApi } from 'openai';
+import React, { useContext, useEffect, useState } from 'react';
 
 import CreatableSelect from 'react-select/creatable';
+import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import Editor from 'components/Editor';
+import { IbuiltPost } from '@lib/lens/interfaces/publication';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
 import Link from 'next/link';
@@ -9,22 +12,16 @@ import { NextPage } from 'next';
 import { ProfileContext } from 'components';
 import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
-import { createPost, DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
-import { createPostGasless } from '@lib/lens/post-gasless';
+import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
-import { createPostManager } from '@lib/lens/post';
-import { IbuiltPost } from '@lib/lens/interfaces/publication';
 
-const POST_SELF_COLLECT = true;
 const sleep = () =>
   new Promise((resolve) => {
     setTimeout(resolve, 2500);
   });
 
 const Create: NextPage = () => {
-  const [name, setName] = useState('');
-
   const [title, setTitle] = useState('');
   const [dispatcherStatus, setDispatcherStatus] = useState<boolean | undefined>(
     undefined
@@ -34,15 +31,35 @@ const Create: NextPage = () => {
   const [abstract, setAbstract] = useState('');
   const [editorContents, setEditorContents] = useState('');
   const [link, setLink] = useState('');
-  const [cover, setCover] = useState('');
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState([]);
+  const [cover, setCover] = useState<File>();
+  const [generatedImage, setGeneratedImage] = useState<any>();
 
   const [loading, setLoading] = useState(false);
   const handleChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
   };
+
+  //handles IA image generation
+  useEffect(() => {
+    const fetchData = async () => {
+      const configuration = new Configuration({
+        organization: 'org-Bxsu1oLlJ2mEEDGJRO6TiJCz',
+        apiKey: process.env.OPENAI_API_KEY
+      });
+      const openai = new OpenAIApi(configuration);
+      const response = await openai.createImage({
+        prompt: 'a muscled bull wearing an Argentine football t-shirt',
+        n: 1,
+        size: '256x256'
+      });
+      setGeneratedImage(response.data.data[0].url);
+    };
+
+    fetchData();
+  }, []);
 
   const lensProfile = useContext(ProfileContext);
   if (!lensProfile) {
@@ -61,13 +78,41 @@ const Create: NextPage = () => {
   const handleChangeEditor = (content: string) => setEditorContents(content);
 
   const handlePost = async () => {
+    // upload file to ipfs and get its url
+
+    let imageBuffer: Buffer | null = null;
+    if (cover) {
+      // read the file as a Buffer
+      const reader = new FileReader();
+      reader.readAsArrayBuffer(cover);
+      await new Promise((resolve, reject) => {
+        reader.onloadend = () => {
+          // imageBuffer = Buffer.from(reader.result);
+
+          if (reader.result instanceof ArrayBuffer) {
+            imageBuffer = Buffer.from(reader.result);
+          } else if (reader.result !== null) {
+            imageBuffer = Buffer.from(reader.result.toString());
+          } else {
+            // handle the case where reader.result is null
+          }
+          resolve(imageBuffer);
+        };
+
+        reader.onerror = () => {
+          reject(reader.error);
+        };
+      });
+    }
+
     const constructedPost: IbuiltPost = {
       attributes: DEFAULT_METADATA_ATTRIBUTES,
       name: title,
       abstract: abstract || '',
       content: editorContents || '',
       link: link,
-      cover: cover,
+      image: imageBuffer || null,
+      imageMimeType: 'image/jpeg',
       tags: selectedOption.map((r) => r['label'])
       // TODO: GET FILTER ARRAY FROM THE UI
       // title: title,
@@ -81,12 +126,6 @@ const Create: NextPage = () => {
     setLoading(true);
 
     try {
-      // collect post
-
-      // await (dispatcherStatus
-      //   ? await createPostGasless(lensProfile.id, constructedPost)
-      //   : await createPost(lensProfile.id, constructedPost));
-
       const result = await createPostManager(
         lensProfile,
         constructedPost,
@@ -98,7 +137,7 @@ const Create: NextPage = () => {
       // if (result.isOk) {
       setIsSuccessVisible(true);
       await sleep();
-      router.push('/');
+      router.push('/app');
       // } else {
       //   setIsErrorVisible(true);
       //   console.error(e);
@@ -142,9 +181,9 @@ const Create: NextPage = () => {
         <div className="my-6 rounded-lg bg-lensBlack ">
           <div className="input-translate flex w-full place-items-baseline  justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
             <div>
-              {' '}
               <p className="font-semibold">Title</p>
             </div>
+
             <div className="w-full">
               <input
                 className=" mx-4 w-full bg-white px-3 py-2 font-semibold text-lensBlack outline-none"
@@ -159,7 +198,10 @@ const Create: NextPage = () => {
             </div>
           </div>
         </div>
-
+        <div className="w-full py-4">
+          Generated AI image
+          <img src={generatedImage} alt="AI generated image" />
+        </div>
         <div className="z-20 my-6 rounded-lg bg-lensBlack">
           <div className="input-translate flex  w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6">
             <div>
@@ -232,9 +274,22 @@ const Create: NextPage = () => {
               />
             </div>
           </div>
+        </div>
+
+        <div className="my-6 flex items-center justify-between  rounded-lg">
+          <div className="w-full rounded-lg bg-lensBlack  ">
+            <div className=" w-12/12 input-translate  flex items-center  rounded-lg border-2 border-lensBlack bg-white py-3 px-6">
+              <div>
+                <p className="font-semibold">Cover</p>
+              </div>
+              <div className="px-6 text-sm text-lensGray2 ">
+                Upload image (Optional)
+              </div>
+            </div>
+          </div>
 
           <div className="flex h-full min-w-fit items-center justify-center  border-black  pl-8">
-            <button className="flex align-middle">
+            <button id="btnCover" className="flex align-middle">
               <Link href={'/create'}>
                 <div className="button_top flex">
                   <div>
@@ -254,36 +309,27 @@ const Create: NextPage = () => {
           </div>
         </div>
 
-        <div className="my-6 flex items-center justify-between  rounded-lg">
-          <div className="w-full rounded-lg bg-lensBlack  ">
-            <div className=" w-12/12 input-translate  flex items-center  rounded-lg border-2 border-lensBlack bg-white py-3 px-6">
-              <div>
-                <p className="font-semibold">Cover</p>
-              </div>
-              <div className="px-6 text-sm text-lensGray2 ">
-                Upload image (Optional)
-              </div>
+        <div className="my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex w-full place-items-baseline  justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
+            <div>
+              <p className="font-semibold">Cover</p>
             </div>
-          </div>
-
-          <div className="flex h-full min-w-fit items-center justify-center  border-black  pl-8">
-            <button className="flex align-middle">
-              <Link href={'/create'}>
-                <div className="button_top flex">
-                  <div>
-                    <ImageProxied
-                      category="profile"
-                      className="text-lensBlack"
-                      src="/assets/icons/photo.svg"
-                      alt=""
-                      width={20}
-                      height={20}
-                    />
-                  </div>
-                  <div>Add Cover</div>
-                </div>
-              </Link>
-            </button>
+            <div className="w-full">
+              <input
+                type="file"
+                name="cover"
+                id="cover"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files) {
+                    const file = e.target.files[0];
+                    if (file) {
+                      setCover(file);
+                    }
+                  }
+                }}
+              />
+            </div>
           </div>
         </div>
 

@@ -63,7 +63,7 @@ const App: NextPage = () => {
             <TagsFilter />
           </div>
 
-          <div className="container mx-auto px-4 md:px-12">
+          <div className="container mx-auto ">
             <div className="-mx-1 flex flex-wrap lg:-mx-4">
               {publications
                 ? publications.map((post, index) => (

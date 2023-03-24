@@ -18,7 +18,8 @@ const getPublicationRequest = async (request: PublicationQueryRequest) => {
 
 export const getPublication = async (publicationId: string) => {
   const result = await getPublicationRequest({ publicationId });
-  console.log('🥎 publication: result', result);
+
+  // console.log('🥎 publication: result', result);
 
   return result;
 };

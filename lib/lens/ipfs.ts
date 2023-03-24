@@ -1,8 +1,4 @@
-import {
-  INFURA_PROJECT_ID,
-  INFURA_SECRET,
-  PUBLICATION_METADATA_VERSION
-} from '../config';
+import { INFURA_PROJECT_ID, INFURA_SECRET } from '../config';
 
 import { Buffer } from 'buffer';
 import { create } from 'ipfs-http-client';
@@ -32,20 +28,12 @@ export const uploadIpfs = async <T>(data: T) => {
     `Basic ${Buffer.from(`${projectId}:${secret}`).toString('base64')}`
   );
   const result = await client.add(JSON.stringify(data));
-
   console.log('upload result ipfs', result);
   return result;
 };
 
-// export const baseMetadata = {
-//   version: PUBLICATION_METADATA_VERSION,
-//   contentWarning: null,
-//   attributes: [
-//     {
-//       traitType: 'string',
-//       key: 'type',
-//       value: 'post'
-//     }
-//   ],
-//   appId: 'lenstags'
-// };
+export const uploadImageIpfs = async (data: Buffer) => {
+  const result = await client.add(data);
+  console.log('image upload result ipfs', result);
+  return result;
+};

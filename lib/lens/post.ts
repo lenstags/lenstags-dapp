@@ -1,17 +1,23 @@
 import { APP_NAME, PUBLICATION_METADATA_VERSION } from '@lib/config';
 import {
-  PublicationMainFocus,
-  IbuiltPost
+  IbuiltPost,
+  MetadataAttribute,
+  PublicationMainFocus
 } from '@lib/lens/interfaces/publication';
 
 import { Metadata } from './interfaces/publication';
+import { MetadataDisplayType } from './interfaces/generic';
+import { Profile } from './graphql/generated';
 import { broadcastRequest } from './broadcast';
+import { commentGasless } from './comment-gasless';
+import { createPostGasless } from './post-gasless';
+import { freeCollect } from './collect';
 import { getAddressFromSigner } from './ethers.service';
+import { getLastComment } from './get-publications';
+import { getPublication } from './get-publication';
 import { signCreatePostTypedData } from './publication-post';
 import { uploadIpfs } from './ipfs';
 import { v4 as uuidv4 } from 'uuid';
-import { createPostGasless } from './post-gasless';
-import { freeCollect } from './collect';
 
 export const DEFAULT_METADATA_ATTRIBUTES = [
   {
@@ -159,6 +165,166 @@ export const createPostManager = async (
   return result;
 };
 
-export const addPostIdtoListId = async (postId: string, listId: string) => {
-  // get the list id
+export const addPostIdtoListId = async (
+  profileId: string,
+  listId: string,
+  postId: string
+) => {
+  //const commentList: string[] = []; // FIXME
+  console.log('profile> ', profileId);
+  console.log('listId> ', listId);
+  console.log('postId> ', postId);
+  //   profile>  0x4b87
+  //   post.ts?9c1d:175 listId>  0x4b87-0x0134
+  //   post.ts?9c1d:176 postId>  0x4b87-0x0150
+
+  const commentList = await getLastComment(listId); // all comments
+  // @ts-ignore
+  console.log('commentList ', commentList?.metadata.tags);
+
+  let arrPosts: any;
+  // // @ts-ignore
+
+  // commentList && arrPosts.push(commentList?.metadata.tags);
+  // @ts-ignore
+  if (commentList?.metadata.tags) {
+    // @ts-ignore
+    arrPosts = commentList?.metadata.tags;
+    console.log(
+      'populate array con posts existentes',
+      arrPosts,
+      commentList?.metadata.tags
+    );
+  }
+
+  if (!arrPosts || !arrPosts.includes(postId)) {
+    console.log('no incluye post, agregando comment');
+
+    if (!arrPosts) {
+      arrPosts = [postId];
+    } else {
+      arrPosts.push(postId);
+    }
+
+    // updates the array and adds to a new comment
+    // .push(postId);
+    console.log('arrPOSTS ', arrPosts);
+
+    const meta: MetadataAttribute = {
+      value: new Date().getTime().toString(),
+      displayType: MetadataDisplayType.date
+    };
+
+    const commentMetadata: Metadata = {
+      version: PUBLICATION_METADATA_VERSION,
+      mainContentFocus: PublicationMainFocus.TEXT_ONLY,
+      metadata_id: uuidv4(),
+      name: 'LensTags Content List™',
+      description: 'you-are-the-owner',
+      content: new Date().getTime().toString(),
+      locale: 'en-US',
+      // external_url: values.external_url,
+      // image: values.image,
+      // imageMimeType: values.imageMimeType,
+      attributes: [meta],
+      tags: arrPosts, // we will add here the post IDs
+      appId: APP_NAME
+    };
+
+    //TODO: use with no gasless too
+    const rrr = await commentGasless(profileId, listId, commentMetadata); /// this is the updated array!!!
+    console.log('comment add result:', rrr);
+  } else {
+    console.log('post already collected: ', postId, 'list: ', arrPosts);
+    return false;
+  }
+
+  const p = await getLastComment(listId);
+  console.log('PUBLICATION3 with new comments: ', p);
+
+  return true;
+
+  // // TODO: get comments before!
+  // const comments = await getPublication(listId);
+  // console.log('LIST ID: ', listId);
+  // console.log('PUBLICATION1 w comments?: ', comments);
+
+  // await commentGasless(profileId, listId, commentMetadata);
+  // const PUBLICATION2 = await getPublication(listId);
+  // console.log('PUBLICATION2 with new comments: ', PUBLICATION2);
+
+  // const p = await getPostComments(profileId, listId);
+};
+
+export const cloneAndCollectPost = async (lensProfile: any, postId: string) => {
+  const post = await getPublication(postId);
+  if (!post) {
+    throw 'Unknown error when retrieving post data';
+  }
+
+  const constructedPost: IbuiltPost = {
+    attributes: DEFAULT_METADATA_ATTRIBUTES,
+    name: post.metadata.name || '',
+    abstract: post.metadata.description || '',
+    content: post.metadata.content || '',
+    // TODO: recover the link!!!
+    // link: link,
+    // TODO: RECOVER THIS TOO!!!
+    // cover: cover,
+    originalPostId: postId,
+
+    // TODO: discuss later the monetization for clones
+    // @ts-ignore
+    tags: post.metadata.tags || []
+    // TODO: GET FILTER ARRAY FROM THE UIwww
+    // title: title,
+    // todo: image?: Buffer[]
+  };
+
+  try {
+    const newPost = await createPostManager(lensProfile, constructedPost, true);
+    console.log('colecteado y clonado: ', newPost.internalPubId);
+    return newPost.internalPubId;
+  } catch (e) {
+    console.log('error en clonado: ', e);
+    return null;
+  }
+};
+
+/// example!
+
+const postFav = async (
+  profileId: string,
+  listId: string,
+  postToBeFavedId: string
+) => {
+  const builtId = `${postToBeFavedId.replace('0x', '')}`;
+
+  const commentMetadata: Metadata = {
+    version: PUBLICATION_METADATA_VERSION,
+    mainContentFocus: PublicationMainFocus.TEXT_ONLY,
+    metadata_id: uuidv4(),
+    name: 'commentNAME..reemplacemePorAlgoMejor',
+    // description: values.description,
+    // content: values.content,
+    locale: 'en-US',
+    // external_url: values.external_url,
+    // image: values.image,
+    // imageMimeType: values.imageMimeType,
+    attributes: [],
+    tags: [builtId], // we will add here the post IDs
+    appId: APP_NAME
+  };
+
+  // TODO: get comments before!
+  const comments = await getPublication(listId);
+  console.log('LIST ID: ', listId);
+  console.log('PUBLICATION1 w comments?: ', comments);
+
+  await commentGasless(profileId, listId, commentMetadata);
+  const PUBLICATION2 = await getPublication(listId);
+  console.log('PUBLICATION2 with new comments: ', PUBLICATION2);
+
+  const p = await getLastComment(profileId, listId);
+  console.log('PUBLICATION3 with new comments: ', p);
 };

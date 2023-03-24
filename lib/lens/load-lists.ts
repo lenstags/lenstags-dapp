@@ -11,11 +11,11 @@ import { Profile } from './graphql/generated';
 import { ProfileContext } from 'components';
 import { createPost } from './post';
 import { createPostGasless } from './post-gasless';
+import { freeCollect } from './collect';
 import { queryProfile } from './dispatcher';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { useContext } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { freeCollect } from './collect';
 
 export interface typeList {
   name: string;
@@ -193,7 +193,7 @@ export const createUserList = async (lensProfile: any, name: string) => {
   // TODO: SELF COLLECT THIS POST, get the pubid of the new collected item
 
   const collectedPubId = await freeCollect(result.internalPubId);
-  const userListId = collectedPubId; // result.pubId; // TODO or internalPubId???
+  const userListId = result.internalPubId; // collectedPubId; // result.pubId; // TODO or internalPubId???
 
   // update profile metadata!
   // hacerlo en otra funcion updateProfileMetadata(profileId, attributes)
@@ -215,50 +215,50 @@ export const createUserList = async (lensProfile: any, name: string) => {
   // FIXME should write only what I sent!
 
   // deprecated
-  const attLocation: AttributeData = {
-    displayType: MetadataDisplayType.string,
-    traitType: 'string',
-    value:
-      profileResult?.attributes?.find(
-        (attribute) => attribute.key === 'location'
-      )?.value || '',
-    key: 'location'
-  };
+  // const attLocation: AttributeData = {
+  //   displayType: MetadataDisplayType.string,
+  //   traitType: 'string',
+  //   value:
+  //     profileResult?.attributes?.find(
+  //       (attribute) => attribute.key === 'location'
+  //     )?.value || '',
+  //   key: 'location'
+  // };
 
-  const attTwitter: AttributeData = {
-    displayType: MetadataDisplayType.string,
-    traitType: 'string',
-    value:
-      profileResult?.attributes?.find(
-        (attribute) => attribute.key === 'twitter'
-      )?.value || '',
-    key: 'twitter'
-  };
+  // const attTwitter: AttributeData = {
+  //   displayType: MetadataDisplayType.string,
+  //   traitType: 'string',
+  //   value:
+  //     profileResult?.attributes?.find(
+  //       (attribute) => attribute.key === 'twitter'
+  //     )?.value || '',
+  //   key: 'twitter'
+  // };
 
-  const attWebsite: AttributeData = {
-    displayType: MetadataDisplayType.string,
-    traitType: 'string',
-    value:
-      profileResult?.attributes?.find(
-        (attribute) => attribute.key === 'website'
-      )?.value || '',
-    key: 'website'
-  };
+  // const attWebsite: AttributeData = {
+  //   displayType: MetadataDisplayType.string,
+  //   traitType: 'string',
+  //   value:
+  //     profileResult?.attributes?.find(
+  //       (attribute) => attribute.key === 'website'
+  //     )?.value || '',
+  //   key: 'website'
+  // };
 
   // #endregion
   // aca creÉ el primer elemento con array
 
   // set on the first setup OK
 
-  const attCurrentLists: AttributeData = {
-    displayType: MetadataDisplayType.string,
-    traitType: 'string',
-    value:
-      profileResult?.attributes?.find(
-        (attribute) => attribute.key === 'website'
-      )?.value || '',
-    key: 'website'
-  };
+  // const attCurrentLists: AttributeData = {
+  //   displayType: MetadataDisplayType.string,
+  //   traitType: 'string',
+  //   value:
+  //     profileResult?.attributes?.find(
+  //       (attribute) => attribute.key === 'website'
+  //     )?.value || '',
+  //   key: 'website'
+  // };
 
   const currentLists = profileResult.attributes!.find(
     (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
@@ -282,6 +282,8 @@ export const createUserList = async (lensProfile: any, name: string) => {
     key: ATTRIBUTES_LIST_KEY // TODO: USE ATTRIBUTES_LIST_KEY ONCE IN PROD
   };
 
+  console.log('attLists', attLists);
+
   const profileMetadata: ProfileMetadata = {
     version: PROFILE_METADATA_VERSION,
     metadata_id: uuidv4(),
@@ -293,7 +295,6 @@ export const createUserList = async (lensProfile: any, name: string) => {
       (profileResult.attributes as AttributeData[])[0], // location
       (profileResult.attributes as AttributeData[])[1], // twitter
       (profileResult.attributes as AttributeData[])[2], // website
-      // attLocation, attTwitter, attWebsite,
       attLists
     ]
   };
@@ -318,9 +319,6 @@ export const createUserList = async (lensProfile: any, name: string) => {
   );
 
   console.log('>>>>  post created with type=list: ', result.internalPubId);
-
-  // return `${lensProfile.id}-${defaultListId}`;
-  // return { key: userListId, name: constructedUserPost.name };
   return newList;
 };
 
@@ -334,14 +332,3 @@ export const loadLists = async (lensProfileOld: any) => {
     ? JSON.parse(defaultListId)
     : await createDefaultList(lensProfile);
 };
-
-// como deberia ser la logica?
-/*
-  entro al sistema y 
-    verifico si tiene lista x default
-    sino la creo, proceso x unica vez
-  
-  al entrar deberia devolver en memoria un array con todas las listas
-  al favear me tiene que mostrar las listas
-  me tiene que permitir crear una lista y asignarsela al post clickeado
-*/

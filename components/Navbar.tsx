@@ -9,11 +9,17 @@ import { ProfileContext } from './LensAuthenticationProvider';
 import { TagsFilterContext } from './TagsFilterProvider';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { explore } from '../lib/lens/explore-publications';
+import { getLastComment } from '@lib/lens/get-publications';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 
 export const Navbar = () => {
+  const asyncFunc = async () => {
+    const p = await getLastComment('0x4b87-0x0178');
+    console.log('PUBLICATION3 with new comments: ', p);
+  };
+
   const { openConnectModal } = useConnectModal();
   const [show, setShow] = useState(false);
   const [profileView, setProfileView] = useState(false);
@@ -157,6 +163,30 @@ export const Navbar = () => {
                         </span>
                       </div>
                     </li>
+
+                    <li className="mb-4 cursor-pointer py-2 pl-6 text-sm leading-3 tracking-normal text-black hover:font-semibold  focus:outline-none">
+                      <div className="flex items-center">
+                        <div className="h-6 w-6 md:h-8 md:w-8">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="icon icon-tabler icon-tabler-compass"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            fill="none"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <path stroke="none" d="M0 0h24v24H0z" />
+                            <polyline points="8 16 10 10 16 8 14 14 8 16" />
+                            <circle cx={12} cy={12} r={9} />
+                          </svg>
+                        </div>
+                        <span className="ml-2 text-base md:text-2xl xl:text-base">
+                          <Link href={'/lists'}>My lists</Link>
+                        </span>
+                      </div>
+                    </li>
                   </ul>
                 </div>
                 <div className="w-full">
@@ -262,6 +292,27 @@ export const Navbar = () => {
                     <Link href={'#'}>
                       <a title="Soon">PROJECTS</a>
                     </Link>
+                  </div>
+                  <div
+                    className={`mx-2 rounded-lg border-2 border-lensBlack p-2 ${
+                      router.asPath === '/lists#' &&
+                      'bg-lensBlack text-lensGray'
+                    } hover:bg-lensBlack hover:text-lensGray`}
+                  >
+                    <Link href={'/lists'}>
+                      <a>MY LISTS</a>
+                    </Link>
+                  </div>
+
+                  <div className="flex items-center">
+                    <div className="h-6 w-6 md:h-8 md:w-8">
+                      <button
+                        className="bg-white text-black"
+                        onClick={asyncFunc}
+                      >
+                        test
+                      </button>
+                    </div>
                   </div>
                 </div>
                 {/* connect area */}
