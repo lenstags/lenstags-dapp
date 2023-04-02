@@ -114,7 +114,7 @@ export const Navbar = () => {
                     </div>
                   </div>
                   <ul aria-orientation="vertical" className=" py-6">
-                    <li className="cursor-pointer pl-6 pb-4 pt-5 text-sm leading-3 tracking-normal text-black hover:font-semibold focus:outline-none">
+                    <li className="text-gray cursor-pointer pb-4 pl-6 pt-5 text-sm leading-3 tracking-normal hover:font-semibold focus:outline-none">
                       <div className="flex items-center">
                         <div className="h-6 w-6 md:h-8 md:w-8">
                           <svg
@@ -211,7 +211,7 @@ export const Navbar = () => {
                         </p>
                       </div>
                       <ul className="flex">
-                        <li className="cursor-pointer pt-5 pb-3 text-white">
+                        <li className="cursor-pointer pb-3 pt-5 text-white">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-messages"
@@ -229,7 +229,7 @@ export const Navbar = () => {
                             <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
                           </svg>
                         </li>
-                        <li className="cursor-pointer pt-5 pb-3 pl-3 text-white">
+                        <li className="cursor-pointer pb-3 pl-3 pt-5 text-white">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-bell"
@@ -258,11 +258,11 @@ export const Navbar = () => {
           <div className="fixed top-0 z-50 w-full border-b-2 border-black">
             <nav
               className="relative z-10 flex h-16 items-center justify-end bg-lensGreen
-              px-10  animate-in slide-in-from-top
-              duration-500  lg:items-stretch lg:justify-between
+              px-10  text-sm animate-in
+              slide-in-from-top  duration-500 lg:items-stretch lg:justify-between
               "
             >
-              <div className="hidden  w-full pr-6 lg:flex">
+              <div className="hidden w-full pr-6 lg:flex">
                 <Link href={'/'}>
                   <ImageProxied
                     category="profile"
@@ -276,25 +276,26 @@ export const Navbar = () => {
                 <div className="h-full w-1/2 items-center pl-6 pr-24 text-black lg:flex">
                   {/**Here comes the Navbar items */}
                   <div
-                    className={`mx-2 rounded-lg border-2 border-lensBlack p-2 ${
+                    className={`mx-2 p-2 ${
                       router.asPath === '/explorer' &&
                       'bg-lensBlack text-lensGray'
                     } hover:bg-lensBlack hover:text-lensGray `}
                   >
                     <Link href={'/explorer'}>EXPLORE</Link>
                   </div>
+
                   <div
-                    className={`mx-2 rounded-lg border-2 border-lensBlack p-2 ${
+                    className={`mx-2  p-2 text-gray-400 ${
                       router.asPath === '/explorer#' &&
-                      'bg-lensBlack text-lensGray'
-                    } hover:bg-lensBlack hover:text-lensGray`}
+                      'bg-gray-400 text-gray-400'
+                    } hover:bg-gray hover:text-lensGray`}
                   >
                     <Link href={'#'}>
                       <a title="Soon">PROJECTS</a>
                     </Link>
                   </div>
                   <div
-                    className={`mx-2 rounded-lg border-2 border-lensBlack p-2 ${
+                    className={`mx-2  p-2 ${
                       router.asPath === '/lists#' &&
                       'bg-lensBlack text-lensGray'
                     } hover:bg-lensBlack hover:text-lensGray`}
@@ -304,6 +305,17 @@ export const Navbar = () => {
                     </Link>
                   </div>
 
+                  <div
+                    className={`mx-2 p-2 ${
+                      router.asPath === '/lists#' &&
+                      'bg-lensBlack text-lensGray'
+                    } hover:bg-lensBlack hover:text-lensGray`}
+                  >
+                    <Link href={'/my-creations'}>
+                      <a>MY CREATIONS</a>
+                    </Link>
+                  </div>
+                  {/* 
                   <div className="flex items-center">
                     <div className="h-6 w-6 md:h-8 md:w-8">
                       <button
@@ -313,7 +325,7 @@ export const Navbar = () => {
                         test
                       </button>
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 {/* connect area */}
                 {lensProfile ? (
@@ -357,7 +369,7 @@ export const Navbar = () => {
                             <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                             <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
                           </svg>
-                          <div className="absolute inset-0 m-auto mt-1 mr-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
+                          <div className="absolute inset-0 m-auto mr-1 mt-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
                         </div>
                       </div>
 
@@ -394,18 +406,27 @@ export const Navbar = () => {
                             >
                               <li className="flex w-full cursor-pointer justify-between border-b px-5 py-3 ">
                                 <div className="fl first-letter:ex">
-                                  <p className="text-xs">Connected as</p>
-                                  <p className=" font-normal">
-                                    {/* {profile ?? `@${profile?.handle}`} */}@
-                                    {lensProfile?.handle}
-                                  </p>
+                                  <Link
+                                    href={'/my-profile'}
+                                    className="ml-2 hover:font-bold "
+                                  >
+                                    <p>
+                                      <p className="text-xs font-thin text-gray-400">
+                                        Connected as
+                                      </p>
+                                      <span className=" text-green-500">@</span>
+                                      <span className=" text-green-700">
+                                        {lensProfile?.handle}
+                                      </span>
+                                    </p>
+                                  </Link>
                                 </div>
                               </li>
-                              <li className="flex w-full cursor-pointer items-center justify-between border-b px-5 py-3">
-                                <div className="flex items-center">
+                              <li className="items-left flex w-full cursor-pointer border-b px-5 py-3">
+                                <div className="float-left flex items-center text-left">
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
-                                    className="icon icon-tabler icon-tabler-user"
+                                    className="icon icon-tabler icon-tabler-user mr-2 hover:text-red-600"
                                     width={18}
                                     height={18}
                                     viewBox="0 0 24 24"
@@ -420,8 +441,31 @@ export const Navbar = () => {
                                     <path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" />
                                   </svg>
                                   <Link
-                                    href={'/settings'}
+                                    href={'/my-profile'}
                                     className="ml-2 hover:font-bold "
+                                  >
+                                    My profile
+                                  </Link>
+                                </div>
+                              </li>
+                              <li className="items-left flex w-full cursor-pointer border-b px-5 py-3">
+                                <div className="float-left flex items-center text-left">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="currentColor"
+                                    className="mr-1 h-6 w-6"
+                                  >
+                                    <path
+                                      fill-rule="evenodd"
+                                      d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 00-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 00-2.282.819l-.922 1.597a1.875 1.875 0 00.432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 000 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 00-.432 2.385l.922 1.597a1.875 1.875 0 002.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 002.28-.819l.923-1.597a1.875 1.875 0 00-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 000-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 00-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 00-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 00-1.85-1.567h-1.843zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z"
+                                      clip-rule="evenodd"
+                                    />
+                                  </svg>
+
+                                  <Link
+                                    href={'/settings'}
+                                    className=" hover:font-bold "
                                   >
                                     Settings
                                   </Link>

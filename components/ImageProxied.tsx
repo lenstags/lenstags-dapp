@@ -1,7 +1,9 @@
 import * as React from 'react';
+
+import { DEFAULT_IMAGE_POST, DEFAULT_IMAGE_PROFILE } from '@lib/config';
 import Image, { ImageProps } from 'next/image';
+
 import { getIPFSImage } from '@lib/helpers';
-import { DEFAULT_IMAGE_PROFILE, DEFAULT_IMAGE_POST } from '@lib/config';
 
 type ImageCategory = 'post' | 'profile';
 
@@ -10,18 +12,20 @@ interface imageProxiedProps extends ImageProps {
 }
 
 const ImageProxied: React.FC<imageProxiedProps> = (props) => {
+  let newSrc = props.src
+    ? getIPFSImage(props.src as string)
+    : props.category === 'post'
+    ? DEFAULT_IMAGE_POST
+    : DEFAULT_IMAGE_PROFILE;
+
   const newProps = {
     ...props,
-    src: props.src
-      ? getIPFSImage(props.src as string)
-      : props.category === 'post'
-      ? DEFAULT_IMAGE_POST
-      : DEFAULT_IMAGE_PROFILE
+    src: newSrc
   };
 
   return (
     <>
-      <Image alt={!props.alt ? 'Default text' : props.alt} {...newProps} />
+      <Image alt={!props.alt ? 'No contents' : props.alt} {...newProps} />
     </>
   );
 };

@@ -173,3 +173,100 @@ figcaption {
 .cap-right:hover figcaption {
   right: 0;
 }
+
+/* new ui */
+.lens-input {
+  @apply lens-container my-4 h-auto w-full items-baseline;
+}
+
+.lens-container {
+  background: #ffffff;
+  border: 1px solid rgba(217, 217, 217, 0.5);
+  box-shadow: 0px 3.5px 3.5px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+.lens-post {
+  background: #ffffff;
+  border: 1px solid rgba(217, 217, 217, 0.5);
+  box-shadow: 0px 3.5px 3.5px rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+}
+
+.scrollbar-hide {
+  /* Internet Explorer y Edge */
+  -ms-overflow-style: none;
+  /* Firefox */
+  scrollbar-width: none;
+  z-index: 0 !important;
+}
+.scrollbar-hide:hover {
+  /* Internet Explorer y Edge */
+  -ms-overflow-style: auto;
+  /* Firefox */
+  scrollbar-width: auto;
+}
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide:hover::-webkit-scrollbar {
+    display: block;
+  }
+  .scrollbar-hide::-webkit-scrollbar-thumb {
+    background-color: rgba(182, 61, 61, 0.5);
+    border-radius: 4px;
+  }
+  .scrollbar-hide::-webkit-scrollbar-track {
+    background-color: rgba(0, 0, 0, 0.024);
+  }
+}
+.scrollbar-hide::-webkit-scrollbar {
+  width: 3px;
+}
+
+.dropdown:hover .dropdown-menu {
+  display: block;
+}
+
+.lens-folder-tab {
+  box-sizing: border-box;
+  /* position: absolute; */
+  width: 84px;
+  height: 15px;
+  left: 193px;
+  top: 224px;
+  /* background: #f7f4db; */
+  background: #fffee8;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 0px 3.5px 3.5px rgba(0, 0, 0, 0.25);
+
+  border-bottom: 4px solid #fffee8;
+  border-top-right-radius: 8px;
+  border-top-left-radius: 8px;
+  z-index: 0;
+}
+
+.lens-folder-tab-empty {
+  z-index: 5;
+  box-sizing: border-box;
+  /* position: absolute; */
+  width: 84px;
+  height: 12px;
+  left: 193px;
+  top: 224px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-top-right-radius: 7.9227px;
+  border-top-left-radius: 7.9227px;
+  border-bottom: 0px;
+}
+
+.lens-folder {
+  background: #fffee8;
+  box-shadow: 0px 3.5px 3.5px rgba(0, 0, 0, 0.25);
+  border-top-right-radius: 8px;
+  border-top-left-radius: 0px;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+}

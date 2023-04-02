@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import ImageProxied from 'components/ImageProxied';
+import { Layout } from 'components/Layout';
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
 import moment from 'moment';
@@ -11,6 +12,7 @@ export default function ListDetails() {
   const { id } = router.query;
   const [post, setPost] = useState<any>();
   const [arrPosts, setArrPosts] = useState<any>([]);
+  const [tagsList, setTagsList] = useState<any>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +37,11 @@ export default function ListDetails() {
         arrIds.metadata.tags.map((id: string) => getPublication(id))
       );
       setArrPosts(arr);
+
+      const arrTags = Array.from(
+        new Set(arr.map((post) => post.metadata.tags).flat())
+      );
+      setTagsList(arrTags);
       console.log('oo post: ', oo);
       console.log('posts ', arr);
     };
@@ -44,17 +51,36 @@ export default function ListDetails() {
 
   return (
     post && (
-      <article className=" bg-white">
-        <div className="border-gray m-4 rounded-lg border-2 border-solid">
-          <header className="w-full items-center ">
-            <div className="row flex w-full justify-between">
-              <p className="p-4 text-xl font-extrabold">
-                {post.metadata.name || 'Untitled post'}
-              </p>
+      <Layout title="Lenstags | View list" pageDescription="View list">
+        <div
+          className="   h-64 w-full  px-6 py-6 pt-64 text-black"
+          style={{
+            backgroundImage:
+              "linear-gradient(to bottom, transparent, white), url('/img/backPost.jpg')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          {/* header */}
+          <header className="relative -top-20 items-center pt-8">
+            <div className="row flex justify-between px-14 ">
+              <div>
+                <p className="text-2xl font-extrabold">
+                  {post.metadata.name || 'Untitled post'}
+                </p>
+                <p className="my-2 font-sans">
+                  Last update: {moment(post.createdAt).format("MMM Do 'YY")}
+                </p>
+
+                <p className="mt-2 text-xs italic">
+                  {post.metadata.description || 'This list has no description'}
+                </p>
+              </div>
+
               {/* list menu */}
               <div className="cursor-pointer ">
                 <div className="dropdown relative inline-block">
-                  <div className="items-center rounded py-2 pt-4 pr-4  font-semibold  text-gray-700">
+                  <div className="items-center rounded py-2 pr-4 pt-4  font-semibold  text-gray-700">
                     <ImageProxied
                       category="profile"
                       src="/assets/icons/dots-vertical.svg"
@@ -66,7 +92,7 @@ export default function ListDetails() {
                   <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
                     <li className="">
                       <a
-                        className="whitespace-no-wrap block rounded-t-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
+                        className="whitespace-no-wrap block rounded-t-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
                         href="#"
                       >
                         Share
@@ -74,7 +100,7 @@ export default function ListDetails() {
                     </li>
                     <li className="">
                       <a
-                        className="whitespace-no-wrap block rounded-b-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
+                        className="whitespace-no-wrap block rounded-b-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
                         href="#"
                       >
                         Report
@@ -84,104 +110,161 @@ export default function ListDetails() {
                 </div>
               </div>
             </div>
-            <div className="border-gray flex border-t-2 border-solid p-4 text-gray-400">
-              <div className="w-2/4">
+
+            {/* <div className="flex">
                 <p className="mb-1">
-                  Created date: {moment(post.createdAt).format("MMM Do 'YY")}
-                </p>
-                <p className="mb-1">
-                  Last update: {moment(post.createdAt).format("MMM Do 'YY")}
-                </p>
-              </div>
-              <div className="w-2/4">
-                <p className="mb-1">
-                  Tags:
-                  <span className=" mx-2 rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400">
+                  <span className="rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400">
                     UX/UI
                   </span>
+                  <span className=" mx-2 rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400">
+                    Web3
+                  </span>
                 </p>
-                <p className="mb-1">12 times collected</p>
-                <p className=" mb-1 text-blue-600">List history</p>
-              </div>
-            </div>
-            <div className="border-gray border-t-2 border-solid p-4 text-gray-400">
-              {post.metadata.description || 'This list has no description'}
-            </div>
+              </div> */}
           </header>
-        </div>
-        {/* body */}
-        <div className="p-4">
-          <div className="flex w-full">
-            <input
-              type={'text'}
-              placeholder="Search in list..."
-              className=" my-4 w-full rounded-lg border-2 border-solid border-gray-100 bg-gray-50 px-2 py-1"
-            />
-            <button className=" ml-2  bg-transparent text-2xl text-black">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                className="h-6 w-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
-                />
-              </svg>
-            </button>
-            <button className=" ml-2 bg-transparent text-2xl text-black">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                className="h-6 w-6"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
-                />
-              </svg>
-            </button>
-          </div>
+          {/* body */}
+          <div className="relative -top-20 flex">
+            <div className="w-2/3 px-14 pt-4">
+              <p className="mt-4 font-semibold">
+                {arrPosts && arrPosts.length > 0
+                  ? ``
+                  : 'The list has no items yet, have you explored our awesome content?'}
+              </p>
 
-          <p className="mt-4 text-lg font-semibold">
-            {arrPosts && arrPosts.length > 0
-              ? `All content of the ${post.metadata.name} list`
-              : 'The list has no items yet, have you explored our awesome content?'}
-          </p>
+              <div className="flex">
+                <input
+                  type={'text'}
+                  placeholder="Search for Tags and keywords..."
+                  className=" my-4 w-full rounded-lg border-2 border-solid border-gray-100 bg-gray-50 px-2 py-1"
+                />
+                <button className="ml-2  bg-transparent text-2xl text-black">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="h-6 w-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+                    />
+                  </svg>
+                </button>
+                <button className=" ml-2 bg-transparent text-2xl text-black">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    className="h-6 w-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75"
+                    />
+                  </svg>
+                </button>
+              </div>
 
-          <div className="">
-            {arrPosts.map((p: any) => {
-              return (
-                <div
-                  key={p.id}
-                  className="border-gray mt-4 rounded-lg border-2 border-solid px-4 pt-4 pb-2"
-                >
-                  <div className="flex">
+              {arrPosts.map((p: any) => {
+                return (
+                  <div key={p.id} className="mt-6 flex w-full">
                     <ImageProxied
                       category="post"
-                      height={50}
-                      width={50}
+                      height={104}
+                      width={104}
                       objectFit="cover"
-                      className="block h-auto w-full"
+                      className="block h-auto rounded-md "
                       src={p.metadata.media[0]?.original.url}
                     />
-                    <div className="ml-4">
-                      <p className="text-xl">{p.metadata.name}</p>
-                      <p className="my-1">
-                        {p.metadata.description || 'No description'}
-                      </p>
-                    </div>
 
-                    {/* list menu */}
-                    {/* <div className="cursor-pointer ">
+                    <div className="w-full">
+                      <div className="ml-4">
+                        <div className="flex items-baseline">
+                          <p className="w-9/12 text-xl ">{p.metadata.name}</p>
+                          <span className="w-2/12 text-right text-xs">
+                            By {p.profile.name}
+                          </span>
+                          <span className="items-left w-1/12 text-right text-xs text-gray-400">
+                            {moment(p.createdAt).format('MMM D')}
+                          </span>
+                        </div>
+
+                        <p className="mt-1 text-sm">
+                          {p.metadata.description || 'No description'}
+                        </p>
+
+                        <div>
+                          <div className="flex w-full  text-black">
+                            <span className="flex items-center text-xs ">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                className="icon icon-tabler icon-tabler-messages"
+                                width={24}
+                                height={24}
+                                viewBox="0 0 24 24"
+                                strokeWidth={1}
+                                stroke="#718096"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path stroke="none" d="M0 0h24v24H0z" />
+                                <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+                                <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+                              </svg>
+
+                              {p.stats?.totalAmountOfComments || '0'}
+                            </span>
+
+                            <div className="flex w-10/12">
+                              <span className="mx-4 flex items-center text-xs ">
+                                <ImageProxied
+                                  category="profile"
+                                  src="/assets/icons/collect.svg"
+                                  alt="Collect"
+                                  width={20}
+                                  height={20}
+                                  style={{
+                                    filter: 'brightness(20%) contrast(0%)'
+                                  }}
+                                />
+                                {p.stats?.totalAmountOfCollects || '0'}
+                              </span>
+
+                              <span className="items-left text-left text-xs ">
+                                <ul className=" flex flex-wrap gap-1 py-2 text-xs">
+                                  {p.metadata.tags.map((tag: string) => (
+                                    <li
+                                      key={tag}
+                                      className=" mx-2 rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400"
+                                    >
+                                      {tag}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </span>
+                            </div>
+
+                            <div className="items-baseline place-self-center">
+                              <button
+                                key={p.id}
+                                className=" rounded-md bg-lensGreen px-1 py-1 text-right text-xs font-semibold shadow-sm shadow-gray-400"
+                              >
+                                + COLLECT
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* list menu */}
+                      {/* <div className="cursor-pointer ">
                       <div className="dropdown relative inline-block">
                         <div className="items-center rounded py-2 pt-4 pr-4  font-semibold  text-gray-700">
                           <ImageProxied
@@ -212,61 +295,51 @@ export default function ListDetails() {
                         </ul>
                       </div>
                     </div> */}
-                  </div>
-
-                  <footer className="flex items-center justify-between px-4 pt-4 text-right text-black">
-                    <span className="flex items-center text-xs ">
-                      By {p.profile.name} |
-                    </span>
-                    <span className="items-left flex text-left text-xs ">
-                      {moment(p.createdAt).format('MMM D')} |
-                    </span>
-
-                    <span className="items-left flex text-left text-xs ">
-                      <ul className=" flex flex-wrap gap-1 py-2 text-xs">
-                        {p.metadata.tags.map((tag: string) => (
-                          <li
-                            key={tag}
-                            className=" mx-2 rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400"
-                          >
-                            {tag}
-                          </li>
-                        ))}
-                      </ul>
-                    </span>
-                    <div className="flex w-2/4  ">
-                      <span className="flex items-center text-xs ">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-messages"
-                          width={24}
-                          height={24}
-                          viewBox="0 0 24 24"
-                          strokeWidth={1}
-                          stroke="#718096"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" />
-                          <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                          <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                        </svg>
-
-                        {p.stats?.totalAmountOfComments || '0'}
-                      </span>
-
-                      <button className=" mx-2 rounded-md bg-purple-400 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400">
-                        Collected
-                      </button>
                     </div>
-                  </footer>
-                </div>
-              );
-            })}
+                  </div>
+                );
+              })}
+            </div>
+            <div className="m-4 h-auto w-1/3 rounded-md bg-white p-4">
+              {/* <div className="bg-gray-100 px-4 py-2">
+                 
+                </div> */}
+
+              <div className="mt-4 bg-gray-100 px-4 py-2">
+                <p className="flex">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    className="mr-2 h-6 w-6"
+                  >
+                    <path
+                      fill-rule="evenodd"
+                      d="M5.25 2.25a3 3 0 00-3 3v4.318a3 3 0 00.879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 005.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 00-2.122-.879H5.25zM6.375 7.5a1.125 1.125 0 100-2.25 1.125 1.125 0 000 2.25z"
+                      clip-rule="evenodd"
+                    />
+                  </svg>
+                  {post.metadata.name} tags
+                </p>
+                <p className="mt-2 text-xs">
+                  <span className=" text-xs ">
+                    <ul className="flex origin-center flex-wrap place-items-center content-center items-center justify-center gap-1  self-center py-2 text-xs">
+                      {tagsList.map((tag: string) => (
+                        <li
+                          key={tag}
+                          className="mx-2 rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400"
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                  </span>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </article>
+      </Layout>
     )
   );
 }

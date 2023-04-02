@@ -1,6 +1,7 @@
+import React, { useContext, useEffect, useState } from 'react';
+
 /* eslint-disable @next/next/no-img-element */
 import ImageProxied from './ImageProxied';
-import React, { useContext, useEffect, useState } from 'react';
 // import { ProfileContext } from 'components/LensAuthenticationProvider';
 import { ProfileContext } from './LensAuthenticationProvider';
 
@@ -77,8 +78,8 @@ export const Profile = () => {
                     strokeWidth="2"
                     stroke="currentColor"
                     fill="none"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   >
                     {' '}
                     <path stroke="none" d="M0 0h24v24H0z" />{' '}

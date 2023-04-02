@@ -10,6 +10,7 @@ import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { addPostIdtoListId } from '@lib/lens/post';
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
+import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
 
@@ -75,6 +76,10 @@ const ExploreCard: FC<Props> = ({ post }) => {
     fetchData();
   }, [post]);
 
+  const handleRemove = async (postId: string) => {
+    return await hidePublication(postId);
+  };
+
   const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
     setValueListName(event.target.value);
 
@@ -133,7 +138,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
   return (
     <div
-      style={{ height: '400px' }}
+      // style={{ height: '360px' }}
+      key={post.id}
       className="my-1 w-full px-1 md:w-1/2 lg:my-4 lg:w-1/4 lg:px-4  "
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
@@ -141,32 +147,27 @@ const ExploreCard: FC<Props> = ({ post }) => {
       <article className="h-full">
         {/* favllect content goes here */}
         {isFavMenuVisible && (
-          <div className=" h-full rounded-lg bg-white px-0">
-            <div className="flex px-4">
+          <div className=" lens-post mt-3 h-full rounded-lg bg-white px-0">
+            <div className="flex px-2">
               <button
                 id="btnBack"
                 onClick={() => setFavMenuVisible(false)}
-                className="bg-white text-2xl "
+                className="bg-white text-xl "
               >
                 ←
               </button>
-              <h1 className="w-full items-center truncate text-ellipsis pt-1 text-center ">
+              <h1 className=" w-full items-center truncate text-ellipsis pl-1 pt-1 ">
                 {post.metadata.name || 'untitled'}
               </h1>
             </div>
 
-            {/* post titles */}
-            <div className="mb-3 px-4 text-center">
-              <p className="font-bold text-black"></p>
-            </div>
-
-            <div className="mx-4 mb-2">
+            <div className="m-2">
               <input
                 type="text"
                 autoComplete="off"
                 value={valueListName}
                 onChange={handleChangeListName}
-                className=" w-full rounded-lg border-2 border-solid border-gray-200 px-4 py-3 text-lg leading-none text-gray-600 outline-none"
+                className=" w-full rounded-lg border-2 border-solid border-gray-200 px-2 py-1 text-sm leading-none text-gray-600 outline-none"
                 name="tag-search-input"
                 id="tag-search-input"
                 // onKeyDown={handleKeyDown}
@@ -174,24 +175,34 @@ const ExploreCard: FC<Props> = ({ post }) => {
               />
             </div>
 
-            <div className="mb-4 h-4/6 overflow-visible overflow-y-scroll  border-b-2 border-solid border-gray-100 px-4">
-              {selectedList.map((list: typeList) => (
-                <button
-                  className=" my-1 w-full rounded-lg border-2 border-solid border-amber-100 bg-amber-50 py-3  text-lg text-black hover:bg-amber-100"
-                  key={list.key}
-                  value={list.key}
-                  onClick={() =>
-                    handleAddPostToList(
-                      lensProfile?.id,
-                      post.id,
-                      list.key,
-                      undefined
-                    )
-                  }
-                >
-                  {`${list.key}--${list.name}`}
-                </button>
-              ))}
+            <div className="scrollbar-hide z-10 mb-4 h-4/6 overflow-y-auto border-b-2 border-solid border-gray-100 px-2">
+              {selectedList.map((list: typeList) => {
+                console.log('LIST ', list);
+
+                return (
+                  <button
+                    className=" my-1 w-full rounded-lg border-solid 
+                       py-1  text-sm   hover:bg-amber-100"
+                    key={list.key}
+                    style={{
+                      color: '#745f2b',
+                      backgroundColor: '#fffee8',
+                      border: '1px solid #fdf4dc'
+                    }}
+                    value={list.key}
+                    onClick={() =>
+                      handleAddPostToList(
+                        lensProfile?.id,
+                        post.id,
+                        list.key,
+                        undefined
+                      )
+                    }
+                  >
+                    {`${list.key}--${list.name}`}
+                  </button>
+                );
+              })}
             </div>
 
             <footer className="text-center">
@@ -267,14 +278,13 @@ const ExploreCard: FC<Props> = ({ post }) => {
               }`}
             ></div>
             <div
-              className={`px-4 py-2 
+              className={`px-2 py-1
               ${isList ? 'lens-folder' : 'lens-post'}`}
             >
               {/* card contents */}
-              <h1 className="w-full items-center  md:p-2">
-                <div className="row flex w-full justify-between text-sm font-light text-black">
+              <h1 className="w-full items-center py-2">
+                <div className="flex w-full justify-between text-sm font-light text-black">
                   {/* profile */}
-
                   <Link href={`/profiles/${post.profile.id}`}>
                     <a
                       target="_blank"
@@ -301,7 +311,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                           <p className=" ">
                             {post.profile.name || post.profile.id}
                           </p>
-                          <p className="font-light text-gray-300">
+                          <p className="font-light text-gray-400">
                             @{post.profile.handle}
                           </p>
                         </div>
@@ -311,7 +321,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
                   {/* profile menu */}
                   <div className="dropdown relative inline-block cursor-pointer">
-                    <div className=" items-center rounded py-2 font-semibold text-gray-700">
+                    <div className="items-center rounded py-2 font-semibold text-gray-700">
                       <ImageProxied
                         category="profile"
                         src="/assets/icons/dots-vertical.svg"
@@ -320,18 +330,34 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         height={20}
                       />
                     </div>
-                    <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
+
+                    <ul
+                      className="dropdown-menu absolute  right-1 top-6 z-10 hidden rounded-lg border-2 border-gray-200 
+                      bg-gray-50 text-lensBlack shadow-lg "
+                    >
                       <li className="">
                         <a
-                          className="whitespace-no-wrap block rounded-t-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
+                          className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
                           href="#"
                         >
                           Share
                         </a>
                       </li>
+
+                      <li className="">
+                        {lensProfile && post.profile.id === lensProfile.id && (
+                          <span
+                            className="whitespace-no-wrap flex bg-gray-50  px-4 py-2 hover:bg-lensGreen hover:text-black"
+                            onClick={() => handleRemove(post.id)}
+                          >
+                            Remove
+                          </span>
+                        )}
+                      </li>
+
                       <li className="">
                         <a
-                          className="whitespace-no-wrap block rounded-b-lg bg-lensGray py-2 px-6 hover:bg-lensGray3 hover:text-lensGray2"
+                          className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
                           href="#"
                         >
                           Report
@@ -354,7 +380,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     );
                   }}
                 >
-                  <figure className="cap-right">
+                  {/* old inset tags */}
+                  {/* <figure className="cap-right">
                     {isList ? (
                       <ListImages postId={post.id} />
                     ) : (
@@ -370,46 +397,76 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
                     <figcaption className="p-1">
                       <ul className=" flex flex-wrap gap-1 py-2 text-xs">
-                        {post.metadata.tags.map((tag: string) => (
-                          <li
-                            key={tag}
-                            className="rounded-lg border-2 border-lensBlack bg-lensGreen px-2 font-semibold "
-                          >
-                            {tag}
-                          </li>
-                        ))}
+                        {post.metadata.tags.map((tag: string) => {
+                          return (
+                            <li
+                              key={`${post.id}${tag}`}
+                              className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
+                            >
+                              {tag.toUpperCase()}
+                            </li>
+                          );
+                        })}
                       </ul>
                     </figcaption>
-                  </figure>
+                  </figure> */}
 
-                  <div className="mb-3">
-                    <p className="font-bold text-lensBlack">
+                  {isList ? (
+                    <ListImages postId={post.id} />
+                  ) : (
+                    <ImageProxied
+                      category="post"
+                      height={'400px'}
+                      width={'600px'}
+                      // width={'100%'}
+                      // height={'100%'}
+                      objectFit="cover"
+                      className="blo ck w-full rounded-md"
+                      src={post.metadata.media[0]?.original.url}
+                    />
+                  )}
+
+                  <ul className=" flex flex-wrap justify-end gap-1 pb-2 text-right text-xs">
+                    {post.metadata.tags.map((tag: string) => {
+                      return (
+                        <li
+                          key={`${post.id}${tag}`}
+                          className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
+                        >
+                          {tag.toUpperCase()}
+                        </li>
+                      );
+                    })}
+
+                    {(!post.metadata.tags ||
+                      post.metadata.tags.length === 0) && (
+                      // !isList &&
+                      <li
+                        key={`${post.id}untagged`}
+                        className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
+                      >
+                        untagged
+                      </li>
+                    )}
+                  </ul>
+
+                  <div className="mb-1">
+                    <p
+                      title={post.metadata.name || 'untitled'}
+                      className="text-light truncate text-ellipsis"
+                    >
                       {post.metadata.name || 'untitled'}
                     </p>
-                    <p className="text-sm font-thin text-gray-500">
+                    <p className="text-xs font-thin text-gray-500">
                       {post.metadata.description || 'no-abstract'}
                     </p>
-                    <small className=" text-xs text-gray-400">{post.id}</small>
                   </div>
                 </a>
               </Link>
 
               {/* date and collected indicators*/}
               <div className="mb-2 flex justify-between">
-                <span
-                  className="mr-2 rounded-lg border-2 border-lensBlack bg-lensGray3 px-2 
-          py-0.5 text-xs font-light"
-                >
-                  12 Collected
-                </span>
-                <span
-                  className="rounded-lg border-2 border-lensBlack bg-lensGray px-2 py-0.5  
-           text-xs font-light"
-                >
-                  {moment(post.createdAt).format('MMM Do YY')}
-                </span>
-
-                {post.hasCollectedByMe ? (
+                {/* {post.hasCollectedByMe ? (
                   <span
                     className="rounded-lg border-2  border-solid border-amber-400 bg-amber-300 px-2 py-0.5  
 text-xs font-light"
@@ -423,37 +480,50 @@ text-xs font-light"
                   >
                     uncollected!
                   </span>
-                )}
+                )} */}
               </div>
 
-              <footer className="flex items-center justify-between  py-2 text-right text-black">
-                <div className="flex h-full items-center justify-center  border-black ">
-                  <button
-                    onClick={() => {
-                      refreshLists(lensProfile?.id);
-                      return setFavMenuVisible(!isListVisible);
-                    }}
-                    className="flex align-middle"
-                  >
-                    {lensProfile &&
-                    post.metadata.attributes[0].value === 'post' ? (
-                      <div className=" flex rounded-md bg-lensGreen px-2 py-1 ">
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/collect.svg"
-                          alt="Collect"
-                          width={20}
-                          height={20}
-                        />
-                        <div> COLLECT</div>
-                      </div>
-                    ) : (
-                      ''
-                    )}
-                  </button>
+              <footer className="flex items-center justify-between py-2 text-black">
+                <p className="mt-1 text-xs font-light text-gray-400">
+                  {moment(post.createdAt).format('MMM Do YY')}
+                </p>
+                <div className="flex items-end text-xs font-light">
+                  <ImageProxied
+                    category="profile"
+                    src="/assets/icons/collect.svg"
+                    alt="Collect"
+                    width={20}
+                    height={20}
+                  />
+                  {post.stats.totalAmountOfCollects}
                 </div>
 
-                <div className="flex items-center text-xs ">
+                <button
+                  onClick={() => {
+                    refreshLists(lensProfile?.id);
+                    return setFavMenuVisible(!isListVisible);
+                  }}
+                  className="flex text-right"
+                >
+                  {lensProfile &&
+                  post.metadata.attributes[0].value === 'post' ? (
+                    <div className=" flex items-end rounded-md bg-lensGreen px-2 py-1 text-xs ">
+                      {/* <ImageProxied
+                        category="profile"
+                        src="/assets/icons/collect.svg"
+                        alt="Collect"
+                        width={20}
+                        height={20}
+                      /> */}
+                      +COLLECT
+                    </div>
+                  ) : (
+                    ''
+                  )}
+                </button>
+
+                {/* comments */}
+                {/* <div className="flex items-center text-xs ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="icon icon-tabler icon-tabler-messages"
@@ -472,7 +542,7 @@ text-xs font-light"
                   </svg>
 
                   {post.profile.stats?.totalComments || '0'}
-                </div>
+                </div> */}
                 {isListVisible && (
                   <>
                     <br />
