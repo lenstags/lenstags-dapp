@@ -3,8 +3,9 @@ import {
   TypedDataField
 } from '@ethersproject/abstract-signer';
 import { ethers, utils } from 'ethers';
-import { omit } from '../helpers';
+
 import { MUMBAI_RPC_URL } from '../config';
+import { omit } from '../helpers';
 
 // getSigner function from injected web3 provider
 export const getSigner = () => {
@@ -37,7 +38,9 @@ export const signedTypeData = (
   const signer = getSigner();
   // remove the __typedname from the signature!
   return signer?._signTypedData(
+    // FIXME
     omit(domain, '__typename'),
+    // @ts-ignore
     omit(types, '__typename'),
     omit(value, '__typename')
   );

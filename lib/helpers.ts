@@ -9,7 +9,7 @@ export const prettyJSON = (message: string, obj: string) =>
 export const sleep = (milliseconds: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
 
-export const omit = (object: any, name: string) => omitDeep(object, name);
+export const omit = (object: any, name: string) => omitDeep(object, [name]);
 
 export const getIPFSImage = (url: string) => {
   if (!url?.includes('/')) {

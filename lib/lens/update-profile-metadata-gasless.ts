@@ -1,3 +1,4 @@
+import { ATTRIBUTES_LIST_KEY, PROFILE_METADATA_VERSION } from '@lib/config';
 import {
   AttributeData,
   ProfileMetadata
@@ -7,14 +8,13 @@ import {
   CreateSetProfileMetadataViaDispatcherDocument
 } from '@lib/lens/graphql/generated';
 
-import { ATTRIBUTES_LIST_KEY, PROFILE_METADATA_VERSION } from '@lib/config';
 import { MetadataDisplayType } from './interfaces/generic';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { broadcastRequest } from '@lib/lens/broadcast';
 // import { getAddressFromSigner } from '@lib/lens/ethers.service';
 import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 import { queryProfile } from '@lib/lens/dispatcher';
-import { signCreateSetProfileMetadataTypedData } from '../../pages/settings/set-profile-metadata';
+import { signCreateSetProfileMetadataTypedData } from './set-profile-metadata';
 import { uploadIpfs } from '@lib/lens/ipfs';
 import { v4 as uuidv4 } from 'uuid';
 

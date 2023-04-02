@@ -190,11 +190,11 @@ export const addPostIdtoListId = async (
   if (commentList?.metadata.tags) {
     // @ts-ignore
     arrPosts = commentList?.metadata.tags;
-    console.log(
-      'populate array con posts existentes',
-      arrPosts,
-      commentList?.metadata.tags
-    );
+    // console.log(
+    //   'populate array con posts existentes',
+    //   arrPosts,
+    //   commentList?.metadata.tags
+    // );
   }
 
   if (!arrPosts || !arrPosts.includes(postId)) {
@@ -289,42 +289,4 @@ export const cloneAndCollectPost = async (lensProfile: any, postId: string) => {
     console.log('error en clonado: ', e);
     return null;
   }
-};
-
-/// example!
-
-const postFav = async (
-  profileId: string,
-  listId: string,
-  postToBeFavedId: string
-) => {
-  const builtId = `${postToBeFavedId.replace('0x', '')}`;
-
-  const commentMetadata: Metadata = {
-    version: PUBLICATION_METADATA_VERSION,
-    mainContentFocus: PublicationMainFocus.TEXT_ONLY,
-    metadata_id: uuidv4(),
-    name: 'commentNAME..reemplacemePorAlgoMejor',
-    // description: values.description,
-    // content: values.content,
-    locale: 'en-US',
-    // external_url: values.external_url,
-    // image: values.image,
-    // imageMimeType: values.imageMimeType,
-    attributes: [],
-    tags: [builtId], // we will add here the post IDs
-    appId: APP_NAME
-  };
-
-  // TODO: get comments before!
-  const comments = await getPublication(listId);
-  console.log('LIST ID: ', listId);
-  console.log('PUBLICATION1 w comments?: ', comments);
-
-  await commentGasless(profileId, listId, commentMetadata);
-  const PUBLICATION2 = await getPublication(listId);
-  console.log('PUBLICATION2 with new comments: ', PUBLICATION2);
-
-  const p = await getLastComment(profileId, listId);
-  console.log('PUBLICATION3 with new comments: ', p);
 };
