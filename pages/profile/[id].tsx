@@ -20,7 +20,6 @@ const OtherProfile: NextPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!id) return;
-
       const profileResult = await queryProfile({ profileId: id });
       if (!profileResult) {
         return;
