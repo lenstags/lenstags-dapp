@@ -175,10 +175,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
               />
             </div>
 
-            <div className="scrollbar-hide z-10 mb-4 h-4/6 overflow-y-auto border-b-2 border-solid border-gray-100 px-2">
+            <div className="scrollbar-hide z-10 mb-4 h-56 overflow-y-auto border-b-2 border-solid border-gray-100 px-1">
               {selectedList.map((list: typeList) => {
-                console.log('LIST ', list);
-
                 return (
                   <button
                     className=" my-1 w-full rounded-lg border-solid 
@@ -199,7 +197,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       )
                     }
                   >
-                    {`${list.key}--${list.name}`}
+                    {list.name}
                   </button>
                 );
               })}
@@ -428,12 +426,13 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
                   <ul className=" flex flex-wrap justify-end gap-1 pb-2 text-right text-xs">
                     {post.metadata.tags.map((tag: string) => {
+                      const tagValue = `${post.id}${tag}`;
                       return (
                         <li
-                          key={`${post.id}${tag}`}
+                          key={tagValue}
                           className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
                         >
-                          {tag.toUpperCase()}
+                          {tag.replace('-', ' ').toUpperCase()}
                         </li>
                       );
                     })}
@@ -465,23 +464,6 @@ const ExploreCard: FC<Props> = ({ post }) => {
               </Link>
 
               {/* date and collected indicators*/}
-              <div className="mb-2 flex justify-between">
-                {/* {post.hasCollectedByMe ? (
-                  <span
-                    className="rounded-lg border-2  border-solid border-amber-400 bg-amber-300 px-2 py-0.5  
-text-xs font-light"
-                  >
-                    Collected
-                  </span>
-                ) : (
-                  <span
-                    className="rounded-lg border-2  bg-red-400 px-2 py-0.5  
-text-xs font-light"
-                  >
-                    uncollected!
-                  </span>
-                )} */}
-              </div>
 
               <footer className="flex items-center justify-between py-2 text-black">
                 <p className="mt-1 text-xs font-light text-gray-400">
@@ -492,6 +474,7 @@ text-xs font-light"
                     category="profile"
                     src="/assets/icons/collect.svg"
                     alt="Collect"
+                    title="Total amount of collects"
                     width={20}
                     height={20}
                   />
@@ -505,18 +488,18 @@ text-xs font-light"
                   }}
                   className="flex text-right"
                 >
-                  {lensProfile &&
-                  post.metadata.attributes[0].value === 'post' ? (
-                    <div className=" flex items-end rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                      {/* <ImageProxied
-                        category="profile"
-                        src="/assets/icons/collect.svg"
-                        alt="Collect"
-                        width={20}
-                        height={20}
-                      /> */}
-                      +COLLECT
-                    </div>
+                  {lensProfile ? (
+                    // && post.metadata.attributes[0].value === 'post'
+
+                    post.hasCollectedByMe ? (
+                      <div className=" flex items-end rounded-md bg-amber-100 px-2 py-1 text-xs ">
+                        Collected
+                      </div>
+                    ) : (
+                      <div className=" flex items-end rounded-md bg-lensGreen px-2 py-1 text-xs ">
+                        +COLLECT
+                      </div>
+                    )
                   ) : (
                     ''
                   )}

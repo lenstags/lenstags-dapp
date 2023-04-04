@@ -33,7 +33,6 @@ export const Navbar = () => {
   const { tags } = useContext(TagsFilterContext);
   const lensProfile = useContext(ProfileContext);
   // TODO: TEST THIS FOR NFT URI!!!
-
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
       ? lensProfile?.picture.original.url
@@ -159,7 +158,7 @@ export const Navbar = () => {
                           </svg>
                         </div>
                         <span className="ml-2 text-base md:text-2xl xl:text-base">
-                          <Link href={'/explorer'}>Explore</Link>
+                          <Link href={'/app'}>Explore</Link>
                         </span>
                       </div>
                     </li>
@@ -277,17 +276,15 @@ export const Navbar = () => {
                   {/**Here comes the Navbar items */}
                   <div
                     className={`mx-2 p-2 ${
-                      router.asPath === '/explorer' &&
-                      'bg-lensBlack text-lensGray'
+                      router.asPath === '/app' && 'bg-lensBlack text-lensGray'
                     } hover:bg-lensBlack hover:text-lensGray `}
                   >
-                    <Link href={'/explorer'}>EXPLORE</Link>
+                    <Link href={'/app'}>EXPLORE</Link>
                   </div>
 
                   <div
                     className={`mx-2  p-2 text-gray-400 ${
-                      router.asPath === '/explorer#' &&
-                      'bg-gray-400 text-gray-400'
+                      router.asPath === '/app#' && 'bg-gray-400 text-gray-400'
                     } hover:bg-gray hover:text-lensGray`}
                   >
                     <Link href={'#'}>

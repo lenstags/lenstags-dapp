@@ -188,7 +188,7 @@ const Create: NextPage = () => {
       link: link,
       image: imageBuffer || null,
       imageMimeType: 'image/jpeg',
-      tags: selectedOption.map((r) => r['label'])
+      tags: selectedOption.map((r) => r['value'])
       // TODO: GET FILTER ARRAY FROM THE UI
       // title: title,
       // todo: image?: Buffer[]

@@ -1,9 +1,9 @@
 const Pagination = () => {
   return (
     <>
-      <div className="flex items-center justify-center py-10 lg:px-0 sm:px-6 px-4">
-        <div className="lg:w-3/5 w-full  flex items-center justify-between border-t border-gray-200">
-          <div className="flex items-center pt-3 text-gray-600 hover:text-indigo-700 cursor-pointer">
+      <div className="flex items-center justify-center px-4 py-10 sm:px-6 lg:px-0">
+        <div className="flex w-full  items-center justify-between border-t border-gray-200 lg:w-3/5">
+          <div className="flex cursor-pointer items-center pt-3 text-gray-600 hover:text-indigo-700">
             <svg
               width={14}
               height={8}
@@ -33,13 +33,13 @@ const Pagination = () => {
                 strokeLinejoin="round"
               />
             </svg>
-            <p className="text-sm ml-3 font-medium leading-none ">Previous</p>
+            <p className="ml-3 text-sm font-medium leading-none ">Previous</p>
           </div>
-          <div className="sm:flex hidden">
-            <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
+          <div className="hidden sm:flex">
+            <p className="mr-4 cursor-pointer border-t border-transparent px-2 pt-3 text-sm font-medium leading-none text-gray-600 hover:border-indigo-400 hover:text-indigo-700">
               1
             </p>
-            <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
+            {/* <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
               2
             </p>
             <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
@@ -59,10 +59,10 @@ const Pagination = () => {
             </p>
             <p className="text-sm font-medium leading-none cursor-pointer text-gray-600 hover:text-indigo-700 border-t border-transparent hover:border-indigo-400 pt-3 mr-4 px-2">
               8
-            </p>
+            </p> */}
           </div>
-          <div className="flex items-center pt-3 text-gray-600 hover:text-indigo-700 cursor-pointer">
-            <p className="text-sm font-medium leading-none mr-3">Next</p>
+          <div className="flex cursor-pointer items-center pt-3 text-gray-600 hover:text-indigo-700">
+            <p className="mr-3 text-sm font-medium leading-none">Next</p>
             <svg
               width={14}
               height={8}

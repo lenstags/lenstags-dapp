@@ -87,7 +87,7 @@ export const LayoutLanding: FC<Props> = ({
                       </div>
                     </div>
                     <ul aria-orientation="vertical" className=" py-6">
-                      <li className="cursor-pointer pl-6 pb-4 pt-5 text-sm leading-3 tracking-normal text-black hover:font-semibold focus:outline-none">
+                      <li className="cursor-pointer pb-4 pl-6 pt-5 text-sm leading-3 tracking-normal text-black hover:font-semibold focus:outline-none">
                         <div className="flex items-center">
                           <div className="h-6 w-6 md:h-8 md:w-8">
                             <svg
@@ -132,7 +132,7 @@ export const LayoutLanding: FC<Props> = ({
                             </svg>
                           </div>
                           <span className="ml-2 text-base md:text-2xl xl:text-base">
-                            <Link href={'/explorer'}>Explore</Link>
+                            <Link href={'/app'}>Explore</Link>
                           </span>
                         </div>
                       </li>
@@ -143,7 +143,7 @@ export const LayoutLanding: FC<Props> = ({
                       <div className="flex w-full items-center justify-between px-6 pt-1">
                         <div className="flex items-center  "></div>
                         <ul className="flex">
-                          <li className="cursor-pointer pt-5 pb-3 text-white">
+                          <li className="cursor-pointer pb-3 pt-5 text-white">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="icon icon-tabler icon-tabler-messages"
@@ -161,7 +161,7 @@ export const LayoutLanding: FC<Props> = ({
                               <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
                             </svg>
                           </li>
-                          <li className="cursor-pointer pt-5 pb-3 pl-3 text-white">
+                          <li className="cursor-pointer pb-3 pl-3 pt-5 text-white">
                             <svg
                               xmlns="http://www.w3.org/2000/svg"
                               className="icon icon-tabler icon-tabler-bell"
@@ -208,19 +208,19 @@ export const LayoutLanding: FC<Props> = ({
                   <div className="h-full w-1/2 items-center pl-6 pr-24 text-black lg:flex">
                     {/**Here comes the Navbar items */}
                     <div className="mx-2 p-2  text-black">
-                      <Link href={'/explorer'}>About</Link>
+                      <Link href={'/app'}>About</Link>
                     </div>
 
                     <div className="mx-2 p-2  text-black">
-                      <Link href={'/explorer'}>Products</Link>
+                      <Link href={'/app'}>Products</Link>
                     </div>
 
                     <div className="mx-2 p-2  text-black">
-                      <Link href={'/explorer'}>Docs</Link>
+                      <Link href={'/app'}>Docs</Link>
                     </div>
 
                     <div className="mx-2 p-2  text-black">
-                      <Link href={'/explorer'}>Contact</Link>
+                      <Link href={'/app'}>Contact</Link>
                     </div>
                   </div>
                   <div className="hidden w-1/2 lg:flex">
