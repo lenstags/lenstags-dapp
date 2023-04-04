@@ -35,8 +35,6 @@ export const enable = async (profileId: any) => {
   const address = getAddressFromSigner();
   console.log('🤖 set dispatcher: address', address);
 
-  //   await login(address);
-
   const result = await enableDispatcherWithTypedData({
     profileId
     // leave it blank if you want to use the lens API dispatcher!

@@ -1,5 +1,5 @@
 import { Configuration, OpenAIApi } from 'openai';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import CreatableSelect from 'react-select/creatable';
 import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
@@ -7,12 +7,11 @@ import Editor from 'components/Editor';
 import { IbuiltPost } from '@lib/lens/interfaces/publication';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
-import Link from 'next/link';
 import { NextPage } from 'next';
 import { ProfileContext } from 'components';
 import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
-import cheerio from 'cheerio';
+import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
@@ -21,62 +20,12 @@ const sleep = () =>
   new Promise((resolve) => {
     setTimeout(resolve, 2500);
   });
+const configuration = new Configuration({
+  organization: 'org-Bxsu1oLlJ2mEEDGJRO6TiJCz',
+  apiKey: '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'
+});
 
-interface ParsedPage {
-  title: string | null;
-  coverImage: string | null;
-}
-
-// async function parsePage(url: string): Promise<ParsedPage> {
-//   const response = await fetch(url);
-//   const html = await response.text();
-//   const { window } = new JSDOM(html);
-//   const { document } = window;
-
-//   // Extract the page title
-//   const titleElement = document.querySelector('head title');
-//   const title = titleElement?.textContent || null;
-
-//   // Extract the main cover image
-//   let coverImageElement = document.querySelector('meta[property="og:image"]');
-//   let coverImage = coverImageElement?.getAttribute('content') || null;
-//   if (!coverImage) {
-//     const imgElements = document.querySelectorAll('img');
-//     for (let i = 0; i < imgElements.length; i++) {
-//       const imgSrc = imgElements[i].getAttribute('src') || '';
-//       if (imgSrc.includes('cover') || imgSrc.includes('thumbnail')) {
-//         coverImage = imgSrc;
-//         break;
-//       }
-//     }
-//   }
-
-//   return { title, coverImage };
-// }
-
-export async function parsePage(url: string): Promise<ParsedPage> {
-  const response = await fetch(url, {
-    method: 'GET',
-    mode: 'no-cors'
-  });
-  console.log(response);
-  const html = await response.text();
-  const $ = cheerio.load(html);
-
-  // Extract the page title
-  const title = $('head title').text() || null;
-
-  // Extract the main cover image
-  let coverImage = $('meta[property="og:image"]').attr('content') || null;
-  if (!coverImage) {
-    const images = $('img');
-    if (images.length > 0) {
-      coverImage = $(images[0]).attr('src') || null;
-    }
-  }
-
-  return { title, coverImage };
-}
+const openai = new OpenAIApi(configuration);
 
 const Create: NextPage = () => {
   const [title, setTitle] = useState('');
@@ -85,7 +34,7 @@ const Create: NextPage = () => {
   );
 
   const router = useRouter();
-  const [abstract, setAbstract] = useState('');
+  const [abstract, setAbstract] = useState<string | undefined>('');
   const [pageCover, setPageCover] = useState<any>('');
   const [pageTitle, setPageTitle] = useState<any>('');
 
@@ -95,37 +44,69 @@ const Create: NextPage = () => {
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
+  const [inputValue, setInputValue] = useState('');
+  const [imageURL, setImageURL] = useState('');
 
   const [loading, setLoading] = useState(false);
-  const [selectedOption, setSelectedOption] = useState([]);
+  const [loadingTLDR, setLoadingTLDR] = useState(false);
+  const [loadingIA, setLoadingIA] = useState(false);
 
+  const [selectedOption, setSelectedOption] = useState([]);
   const handleChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
   };
 
   //handles IA image generation
-  useEffect(() => {
-    const fetchData = async () => {
-      const configuration = new Configuration({
-        organization: 'org-Bxsu1oLlJ2mEEDGJRO6TiJCz',
-        apiKey: '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'
-      });
-      const openai = new OpenAIApi(configuration);
-      const response = await openai.createImage({
-        prompt: 'beautiful and modern scandinavian  logo',
-        n: 1,
-        size: '256x256'
-      });
-      setGeneratedImage(response.data.data[0].url);
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     if (!imageURL && editorContents) {
+  //       const response = await openai.createImage({
+  //         prompt: editorContents,
+  //         n: 1,
+  //         size: '256x256'
+  //       });
+  //       setGeneratedImage(response.data.data[0].url);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, [imageURL]);
 
   const lensProfile = useContext(ProfileContext);
   if (!lensProfile) {
     return null;
   }
+
+  const generateTLDR = async () => {
+    setLoadingTLDR(true);
+    if (editorContents) {
+      try {
+        const tldr = await openai.createCompletion({
+          model: 'text-davinci-003',
+          prompt: `${editorContents}\n\nTl;dr`,
+          temperature: 0.7,
+          max_tokens: 600,
+          top_p: 1.0,
+          frequency_penalty: 0.0,
+          presence_penalty: 1
+        });
+        console.log('TLDR ', tldr);
+        setAbstract(tldr?.data?.choices[0]?.text?.trim());
+      } catch (err) {
+        console.log(err);
+      }
+      setLoadingTLDR(false);
+    }
+  };
+
+  const checkIfUrl = (value: string): boolean => {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  };
 
   queryProfile({ profileId: lensProfile.id }).then((profile) => {
     setDispatcherStatus(
@@ -134,23 +115,48 @@ const Create: NextPage = () => {
     return;
   });
 
-  const initialContent = 'Write something nice and styled!';
+  const initialContent = 'Write something nice!';
+  const handleInputChange = _.debounce(
+    async (event: ChangeEvent<HTMLInputElement>) => {
+      const isUrl = checkIfUrl(event.target.value);
 
-  const handleLink = async (url: string) => {
-    // validate url and extract values
+      if (!isUrl) {
+        return;
+      }
+      const response = await fetch(
+        `http://api.linkpreview.net/?key=3a65e56b4a7ad7b9fb46a44a96bb607b&q=${event.target.value}`
+      );
+      const data = await response.json();
+      console.log('DATA ,', data);
+      setEditorContents(data.description as string);
+      setTitle(data.title as string);
+      setImageURL(data.image as string);
+    },
+    2000
+  );
 
-    const parsedPage: ParsedPage = await parsePage(url);
-    console.log('parsedPage ', parsedPage);
-    if (parsedPage) {
-      setPageCover(parsedPage.coverImage);
-      setPageTitle(parsedPage.title);
+  const handleIAImage = async () => {
+    // const fetchData = async () => {
+    setLoadingIA(true);
+    if (editorContents) {
+      const response = await openai.createImage({
+        prompt: editorContents,
+        n: 1,
+        size: '256x256'
+      });
+      setGeneratedImage(response.data.data[0].url);
     }
-    // onChange={(e) => handleLink(e.target.value)}
+    // };
+    setLoadingIA(false);
+  };
+
+  const handleLink = (event: ChangeEvent<HTMLInputElement>) => {
+    setInputValue(event.target.value);
+    handleInputChange(event);
   };
 
   const handleChangeEditor = (content: string) => setEditorContents(content);
   // todo lit protocol
-  // TODO ia tldr
 
   const handlePost = async () => {
     // upload file to ipfs and get its url
@@ -257,12 +263,13 @@ const Create: NextPage = () => {
         <div className="lens-input flex">
           <span className="ml-4 font-semibold">Link</span>
           <input
-            className="w-full bg-white px-4 py-2 outline-none"
+            autoComplete="false"
+            className="w-full bg-white px-4 py-2 text-xs outline-none"
             type="text"
             name="link"
             id="link"
             placeholder="Insert the link starting with 'https://'"
-            onChange={(e) => handleLink(e.target.value)}
+            onChange={handleLink}
           />
         </div>
 
@@ -273,7 +280,8 @@ const Create: NextPage = () => {
             type="text"
             name="title"
             id="title"
-            defaultValue={pageCover}
+            value={title}
+            // defaultValue={pageCover}
             onChange={(e) => {
               setTitle(e.target.value);
               return;
@@ -281,47 +289,146 @@ const Create: NextPage = () => {
           />
         </div>
 
-        <div className="lens-input flex">
+        <div className="lens-input flex place-items-center items-center">
           <span className="ml-4 font-semibold">Abstract</span>
           <input
-            className=" mx-4 w-full bg-white px-3 py-2 font-semibold text-lensBlack outline-none"
+            className=" mx-4 w-4/5 bg-white py-2 pl-3 text-xs font-semibold text-black outline-none"
             type="text"
             name="abstract"
+            value={abstract}
             id="abstract"
             onChange={(e) => setAbstract(e.target.value)}
           />
+
+          <button
+            onClick={generateTLDR}
+            className="flex w-1/5 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
+          >
+            Make TLDR
+            {loadingTLDR && (
+              <svg
+                className="ml-2 h-5 w-5 animate-spin items-center"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                ></circle>
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
+              </svg>
+            )}
+          </button>
         </div>
 
+        {/* {(imageURL || generatedImage) && ( */}
         <div className="lens-input">
-          <p className="ml-4 pt-2 font-semibold">Generated AI image</p>
-          <div className="p-4">
-            <img src={generatedImage} alt="AI generated image" />
+          <p className="my-2 ml-4">Image source</p>
+          {/* {imageURL ? ( */}
+          <div>
+            <p className="ml-4 pt-2 text-sm font-semibold">
+              Snapshot from the link
+            </p>
+            <div className="p-4  ">
+              {imageURL && (
+                <img
+                  className="  mx-auto "
+                  src={imageURL}
+                  alt="Image cover taken from the link"
+                />
+              )}
+            </div>
           </div>
-        </div>
+          {/* ) : ( */}
+          {/* generatedImage && ( */}
+          <div>
+            <div className="flex ">
+              <p className="ml-4 w-5/6 pt-2 text-sm font-semibold">
+                AI Generated from the contents
+              </p>
 
-        <div className="lens-input flex py-2">
-          <span className="ml-4 font-semibold">Cover</span>
-          <input
-            className="ml-4 w-full"
-            type="file"
-            name="cover"
-            id="cover"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files) {
-                const file = e.target.files[0];
-                if (file) {
-                  setCover(file);
+              <button
+                onClick={handleIAImage}
+                className="flex w-1/6 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
+              >
+                Refresh
+                {loadingIA && (
+                  <svg
+                    className="ml-2 h-5 w-5 animate-spin items-center"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                )}
+              </button>
+            </div>
+            <div className="  p-4 ">
+              {generatedImage && (
+                <img
+                  className="mx-auto"
+                  src={generatedImage}
+                  alt="AI generated image"
+                />
+              )}
+            </div>
+          </div>
+
+          <div className="my-2 flex">
+            <span className="ml-4 w-1/2 text-sm font-semibold">
+              Upload from file
+            </span>
+            <input
+              className="ml-4 w-1/2 rounded-md bg-gray-50 text-xs"
+              type="file"
+              name="cover"
+              id="cover"
+              accept="image/*"
+              onChange={(e) => {
+                if (e.target.files) {
+                  const file = e.target.files[0];
+                  if (file) {
+                    setCover(file);
+                  }
                 }
-              }
-            }}
-          />
+              }}
+            />
+          </div>
+          {/* )
+            )} */}
         </div>
+        {/* )} */}
+        {/* 
+        <div className="lens-input flex py-2">
+          
+        </div> */}
 
         <div className="lens-input -z-30">
           <div className="w-full">
             <Editor
-              initialContent={initialContent}
+              initialContent={editorContents}
               onChange={handleChangeEditor}
             />
           </div>
