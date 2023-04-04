@@ -283,7 +283,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
               <h1 className="w-full items-center py-2">
                 <div className="flex w-full justify-between text-sm font-light text-black">
                   {/* profile */}
-                  <Link href={`/profiles/${post.profile.id}`}>
+                  <Link href={`/profile/${post.profile.id}`}>
                     <a
                       target="_blank"
                       onClick={() => {

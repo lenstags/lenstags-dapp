@@ -7,36 +7,50 @@ import Link from 'next/link';
 import { NextPage } from 'next';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { useRouter } from 'next/router';
 
-const MyProfile: NextPage = () => {
+const OtherProfile: NextPage = () => {
+  const router = useRouter();
+  const { id } = router.query;
   const [publications, setPublications] = useState<any[]>([]);
   const [contentType, setContentType] = useState<any>('all');
+  const [lensProfile, setProfile] = useState<any>();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!id) return;
+
+      const profileResult = await queryProfile({ profileId: id });
+      if (!profileResult) {
+        return;
+      }
+      setProfile(profileResult);
+    };
+
+    fetchData().catch(console.error);
+  }, [id]);
 
   const { tags } = useContext(TagsFilterContext);
-  const lensProfile = useContext(ProfileContext);
+  //   const lensProfile = useContext(ProfileContext);
 
   useEffect(() => {
     explore({ tags }).then((data) => {
-      if (contentType === 'collected') {
-        setPublications(
-          data.items.filter((r) => r.profile.id !== lensProfile?.id)
-        );
-        return;
-      }
+      //   if (contentType === 'collected') {
+      //     setPublications(
+      //       data.items.filter((r) => r.profile.id !== lensProfile?.id)
+      //     );
+      //     return;
+      //   }
 
-      if (contentType === 'created') {
-        setPublications(
-          data.items.filter((r) => r.profile.id === lensProfile?.id)
-        );
-        return;
-      }
-
-      if (contentType === 'all') {
-        setPublications(data.items);
-        return;
-      }
+      //   if (contentType === 'created') {
+      setPublications(
+        data.items.filter((r) => r.profile.id === lensProfile?.id)
+      );
+      return;
+      //   }
     });
-  }, [contentType, tags]);
+  }, [lensProfile?.id, tags]);
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -47,11 +61,7 @@ const MyProfile: NextPage = () => {
 
   explore({ tags });
   return (
-    <Layout
-      title="Lenstags | Explore"
-      pageDescription="My profile"
-      screen={true}
-    >
+    <Layout title="Lenstags | Explore" pageDescription="Profile" screen={true}>
       <div className="w-full">
         {/* header */}
 
@@ -81,14 +91,20 @@ const MyProfile: NextPage = () => {
             </div>
             <div className="ml-6">
               <p className="mb-1 text-2xl font-semibold">{lensProfile?.name}</p>
-              <p className="mb-2 font-light">@{lensProfile?.handle}</p>
-              <div className="flex text-xs">
-                <div className="rounded-lg bg-black px-3 py-1 text-center text-white">
-                  <Link href={'/settings'}>Settings</Link>
-                </div>
-                <div className="ml-2 rounded-lg bg-black px-3 py-1 text-center text-white">
+              <p className="mb-2 text-sm font-light">@{lensProfile?.handle}</p>
+              <p>{lensProfile?.bio}</p>
+
+              <div className="my-2 flex text-xs">
+                <div className=" rounded-lg bg-black px-3 py-1 text-center text-white">
                   ...
                 </div>
+              </div>
+
+              <p className="mb-2 text-sm">Owned by: {lensProfile?.ownedBy}</p>
+              <div className=" flex cursor-pointer space-x-8 text-xs ">
+                <p> Followers: {lensProfile?.stats?.totalFollowers} </p>
+                <p> Following: {lensProfile?.stats?.totalFollowing} </p>
+                <p> Publications: {lensProfile?.stats?.totalPublications}</p>
               </div>
             </div>
           </div>
@@ -96,21 +112,21 @@ const MyProfile: NextPage = () => {
 
         <div className=" py-6 sm:mx-4 md:mx-20 lg:mx-44  xl:mx-44">
           <div className="flex space-x-2 text-sm text-black">
-            <button
+            {/* <button
               onClick={() => setContentType('all')}
               className="rounded-md border-2 border-solid border-black  bg-white px-2 text-center"
             >
               All
-            </button>
+            </button> */}
 
             <button
               onClick={() => setContentType('created')}
-              className="rounded-md border-2 border-solid border-black  bg-white px-2 text-center"
+              className="  bg-white px-2 text-center"
             >
-              + Created
+              Content created by {lensProfile?.name}
             </button>
 
-            <button
+            {/* <button
               onClick={() => setContentType('collected')}
               className="rounded-md border-2 border-solid border-black  bg-white px-2 text-center"
             >
@@ -144,13 +160,13 @@ const MyProfile: NextPage = () => {
                 </svg>
                 <span className="ml-1">Collected</span>
               </div>
-            </button>
+            </button> */}
           </div>
         </div>
       </div>
 
       {/* contents */}
-      <div className=" mx-auto w-11/12 md:w-4/5  ">
+      <div className=" mx-auto w-11/12  md:w-4/5  ">
         <div className="  flex flex-wrap  ">
           {publications
             ? publications.map((post, index) => (
@@ -163,4 +179,4 @@ const MyProfile: NextPage = () => {
   );
 };
 
-export default MyProfile;
+export default OtherProfile;
