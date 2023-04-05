@@ -647,219 +647,219 @@ const Home: NextPage = () => {
             </div>
 
             {/* team */}
-            <div className="mx-auto mt-12 flex max-w-[90vw] flex-wrap justify-center gap-8 rounded-lg border-4 border-solid border-lensGreen p-8  md:max-w-[880px]">
-              <div>
-                <p className="  ">
-                  {' '}
-                  <ImageProxied
-                    category="profile"
-                    src="/img/landing/team/fei.jpg"
-                    alt=""
-                    objectFit="cover"
-                    className="rounded-2xl"
-                    width={110}
-                    height={120}
-                  />
-                </p>
-                <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
-                  @0xfeiwian
-                </div>
-                <p className="mt-2 font-bold">CEO</p>
-                <div className="flex justify-center">
-                  <div>
-                    <Link href="https://twitter.com/0xfeiwian">
-                      <a
-                        target="_blank"
-                        className="rounded-md p-1 text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/twitter.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+            {/* <div className="  mx-auto mt-12 flex max-w-[90vw] flex-wrap justify-center gap-8 rounded-lg border-4 border-solid border-lensGreen p-8  md:max-w-[880px]">
+                <div>
+                  <p className="  ">
+                    {' '}
+                    <ImageProxied
+                      category="profile"
+                      src="/img/landing/team/fei.jpg"
+                      alt=""
+                      objectFit="cover"
+                      className="rounded-2xl"
+                      width={110}
+                      height={120}
+                    />
+                  </p>
+                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
+                    @0xfeiwian
                   </div>
-                  <div>
-                    <Link href="https://www.linkedin.com/in/franciscofab/">
-                      <a
-                        target="_blank"
-                        className="rounded-md p-1   text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/linkedin.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+                  <p className="mt-2 font-bold">CEO</p>
+                  <div className="flex justify-center">
+                    <div>
+                      <Link href="https://twitter.com/0xfeiwian">
+                        <a
+                          target="_blank"
+                          className="rounded-md p-1 text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/twitter.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
+                    <div>
+                      <Link href="https://www.linkedin.com/in/franciscofab/">
+                        <a
+                          target="_blank"
+                          className="rounded-md p-1   text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/linkedin.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <p className="  ">
-                  {' '}
-                  <ImageProxied
-                    category="profile"
-                    src="/img/landing/team/leo.png"
-                    alt=""
-                    objectFit="cover"
-                    className="rounded-2xl"
-                    width={110}
-                    height={120}
-                  />
-                </p>
-                <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
-                  @EthSagan
-                </div>
-                <p className="mt-2 font-bold">CTO</p>
-                <div className="flex justify-center">
-                  <div>
-                    <Link href="https://twitter.com/EthSagan">
-                      <a
-                        target="_blank"
-                        className="rounded-md  p-1 text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/twitter.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+                <div>
+                  <p className="  ">
+                    {' '}
+                    <ImageProxied
+                      category="profile"
+                      src="/img/landing/team/leo.png"
+                      alt=""
+                      objectFit="cover"
+                      className="rounded-2xl"
+                      width={110}
+                      height={120}
+                    />
+                  </p>
+                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
+                    @EthSagan
                   </div>
-                  <div>
-                    <Link href="https://www.linkedin.com/in/blockls/">
-                      <a
-                        target="_blank"
-                        className="rounded-md p-1  text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/linkedin.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+                  <p className="mt-2 font-bold">CTO</p>
+                  <div className="flex justify-center">
+                    <div>
+                      <Link href="https://twitter.com/EthSagan">
+                        <a
+                          target="_blank"
+                          className="rounded-md  p-1 text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/twitter.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
+                    <div>
+                      <Link href="https://www.linkedin.com/in/blockls/">
+                        <a
+                          target="_blank"
+                          className="rounded-md p-1  text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/linkedin.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <p className="  ">
-                  {' '}
-                  <ImageProxied
-                    category="profile"
-                    src="/img/landing/team/cande.png"
-                    alt=""
-                    objectFit="cover"
-                    className="rounded-2xl"
-                    width={110}
-                    height={120}
-                  />
-                </p>
-                <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
-                  @Candufaz
-                </div>
-                <p className="mt-2 font-bold">CMO</p>
-                <div className="flex justify-center">
-                  <div>
-                    <Link href="https://twitter.com/candufaz">
-                      <a
-                        target="_blank"
-                        className="rounded-md  p-1  text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/twitter.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+                <div>
+                  <p className="  ">
+                    {' '}
+                    <ImageProxied
+                      category="profile"
+                      src="/img/landing/team/cande.png"
+                      alt=""
+                      objectFit="cover"
+                      className="rounded-2xl"
+                      width={110}
+                      height={120}
+                    />
+                  </p>
+                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
+                    @Candufaz
                   </div>
-                  <div>
-                    <Link href="https://www.linkedin.com/in/candela-fazzano-b04551158/">
-                      <a
-                        target="_blank"
-                        className="rounded-md  p-1   text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/linkedin.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+                  <p className="mt-2 font-bold">CMO</p>
+                  <div className="flex justify-center">
+                    <div>
+                      <Link href="https://twitter.com/candufaz">
+                        <a
+                          target="_blank"
+                          className="rounded-md  p-1  text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/twitter.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
+                    <div>
+                      <Link href="https://www.linkedin.com/in/candela-fazzano-b04551158/">
+                        <a
+                          target="_blank"
+                          className="rounded-md  p-1   text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/linkedin.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div>
-                <p className="  ">
-                  {' '}
-                  <ImageProxied
-                    category="profile"
-                    src="/img/landing/team/nahue.png"
-                    alt=""
-                    objectFit="cover"
-                    className="rounded-2xl"
-                    width={110}
-                    height={120}
-                  />
-                </p>
-                <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
-                  @Crypto_nahue
-                </div>
-                <p className="mt-2 font-bold">COO</p>
-                <div className="flex justify-center">
-                  <div>
-                    <Link href="https://twitter.com/crypto_nahue">
-                      <a
-                        target="_blank"
-                        className="rounded-md   p-1 text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/twitter.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+                <div>
+                  <p className="  ">
+                    {' '}
+                    <ImageProxied
+                      category="profile"
+                      src="/img/landing/team/nahue.png"
+                      alt=""
+                      objectFit="cover"
+                      className="rounded-2xl"
+                      width={110}
+                      height={120}
+                    />
+                  </p>
+                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
+                    @Crypto_nahue
                   </div>
-                  <div>
-                    <Link href="www.linkedin.com/in/lucas-nahuel-gonzalez">
-                      <a
-                        target="_blank"
-                        className="rounded-md   p-1 text-2xl text-black"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/linkedin.svg"
-                          alt=""
-                          width={24}
-                          height={24}
-                        />
-                      </a>
-                    </Link>
+                  <p className="mt-2 font-bold">COO</p>
+                  <div className="flex justify-center">
+                    <div>
+                      <Link href="https://twitter.com/crypto_nahue">
+                        <a
+                          target="_blank"
+                          className="rounded-md   p-1 text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/twitter.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
+                    <div>
+                      <Link href="www.linkedin.com/in/lucas-nahuel-gonzalez">
+                        <a
+                          target="_blank"
+                          className="rounded-md   p-1 text-2xl text-black"
+                        >
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/linkedin.svg"
+                            alt=""
+                            width={24}
+                            height={24}
+                          />
+                        </a>
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              </div> */}
 
             {/* team */}
 

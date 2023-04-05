@@ -22,7 +22,7 @@ export interface typeList {
   key: string;
 }
 
-const createDefaultList = async (lensProfile: any) => {
+export const createDefaultList = async (lensProfile: any) => {
   // the setup of the default list
   const constructedDefaultPost = {
     name: 'my default list', // default list name

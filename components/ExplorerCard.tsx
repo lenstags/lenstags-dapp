@@ -185,7 +185,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 name="tag-search-input"
                 id="tag-search-input"
                 // onKeyDown={handleKeyDown}
-                placeholder="Filter lists..."
+                placeholder="Enter list name..."
               />
             </div>
 

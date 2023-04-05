@@ -6,12 +6,13 @@ import React, { useContext, useEffect, useState } from 'react';
 // import { ProfileContext } from 'components/ProfileContext';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
 
+import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { NextPage } from 'next';
 import { ProfileContext } from '../../components/LensAuthenticationProvider';
-import Toast from '../../components/Toast';
+import { createDefaultList } from '@lib/lens/load-lists';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -56,22 +57,19 @@ const Settings: NextPage = () => {
   }, [lensProfile]);
 
   const handleFindDefault = async () => {
-    // if (!lensProfile) {
-    //   throw 'No lens profile found';
-    // }
-    // const profileResult = await queryProfile({
-    //   profileId: lensProfile?.id
-    // });
+    const profileResult = await queryProfile({ profileId: lensProfile?.id });
 
-    const found =
-      profileValues.lists ||
-      profileValues?.attributes?.find(
-        (attribute: AttributeData) => attribute.key === 'lists0'
-      )?.value;
+    let defaultListId = profileResult?.attributes?.find(
+      (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
+    )?.value;
 
-    console.log('list result: ', found);
+    console.log('list result?: ', profileResult);
 
-    if (!found) {
+    if (!defaultListId) {
+      return defaultListId
+        ? JSON.parse(defaultListId)
+        : await createDefaultList(lensProfile);
+
       // FIXME
       // create the default and update the list
       // console.log(not);
@@ -180,7 +178,7 @@ const Settings: NextPage = () => {
       {hydrationLoading ? (
         <div>Loading...</div>
       ) : (
-        <div className="container mx-auto h-64 w-11/12 py-10 px-6 text-black md:w-1/2">
+        <div className="container mx-auto h-64 w-11/12 px-6 py-10 text-black md:w-1/2">
           <h1 className=" text-2xl">Settings</h1>
 
           <p className="px-6 py-4">Dispatcher</p>
@@ -205,7 +203,7 @@ const Settings: NextPage = () => {
                       dispatcherActive
                         ? 'bg-purple-400 hover:bg-purple-300'
                         : ' bg-green-100 hover:bg-lensGreen'
-                    } flex rounded-lg border-2 border-solid border-black py-2 px-3  text-white disabled:bg-gray-300 `}
+                    } flex rounded-lg border-2 border-solid border-black px-3 py-2  text-white disabled:bg-gray-300 `}
                   >
                     {loadingDispatcher && (
                       <svg
@@ -236,7 +234,7 @@ const Settings: NextPage = () => {
 
                 <button
                   onClick={handleFindDefault}
-                  className={`flex rounded-lg border-2 border-solid border-black py-2 px-3
+                  className={`flex rounded-lg border-2 border-solid border-black px-3 py-2
                    text-white disabled:bg-gray-300 `}
                 >
                   Find default list
