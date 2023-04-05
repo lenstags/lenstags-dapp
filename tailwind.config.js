@@ -174,8 +174,6 @@ module.exports = {
       lensWarning: '#FFCE71',
       lensinfo: '#5BD5F8',
 
-
-      
       inherit: colors.inherit,
       current: colors.current,
       transparent: colors.transparent,
@@ -347,6 +345,11 @@ module.exports = {
     fontFamily: {
       sans: [
         'Inter',
+        'NeutralFace',
+        'NeutrafaceText-Light',
+        'NeutrafaceText-Bold',
+        'NeutrafaceText-Demi',
+        'NeutrafaceText-Book',
         'ui-sans-serif',
         'system-ui',
         '-apple-system',
@@ -1004,6 +1007,9 @@ module.exports = {
       30: '30',
       40: '40',
       50: '50'
+    },
+    leading: {
+      15: '5rem'
     }
   },
   plugins: [require('tailwindcss-animate')]

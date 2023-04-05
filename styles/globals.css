@@ -6,9 +6,65 @@ html {
   background-color: #fff !important;
 }
 
+/*  div {
+  border: red solid 1px;
+} 
+ */
 @layer base {
   html {
     font-family: Inter, system-ui, sans-serif;
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'NeutralfaceText-Bold';
+    src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Bold.woff')
+      format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'NeutralfaceText-Demi';
+    src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Demi.woff')
+      format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'NeutralfaceText-Book';
+    src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Book.woff')
+      format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'NeutralFaceText-Light';
+    src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Light.woff')
+      format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'NeutralFace';
+    src: url('/assets/fonts/NeutralFace/NeutralFace.woff') format('woff');
+  }
+}
+
+@layer base {
+  @font-face {
+    font-display: swap;
+    font-family: 'NeutralFace-Bold';
+    src: url('/assets/fonts/NeutralFace/NeutralFace-Bold.woff') format('woff');
   }
 }
 
@@ -149,6 +205,7 @@ button:active .button_cards {
 @import url('./suneditor/suneditor.css');
 @import url('./inputs/inputs.css');
 @import url('./Cards/Cards.css');
+@import url('/ticker/ticker.css');
 
 figure {
   display: block;
@@ -270,3 +327,162 @@ figcaption {
   border-bottom-right-radius: 8px;
   border-bottom-left-radius: 8px;
 }
+
+.marquee {
+  width: 100vw;
+  overflow: hidden;
+}
+
+.marquee p {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 20s linear infinite;
+  justify-content: flex-start;
+}
+
+.marquee p:hover {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* .cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 4rem 5vw;
+  padding: 0; 
+  list-style-type: none;
+  font-size: 1rem;
+  background-color: transparent !important;
+} */
+
+.cards {
+  display: grid;
+  /*   grid-template-columns: repeat(auto-fit, minmax(300px, 2fr)); */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  /*   margin: 4rem 5vw; */
+  padding-top: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  list-style-type: none;
+  font-size: 1rem;
+  background-color: transparent !important;
+}
+
+.card {
+  position: relative;
+  display: block;
+  height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  border-right: solid;
+  border-bottom: solid;
+  border-top: solid 1px;
+  border-left: solid 1px;
+}
+
+.card__image {
+  width: 100%;
+  height: auto;
+}
+
+.card__overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border-radius: calc(var(--curve) * 1px);
+  background-color: var(--surface-color);
+  transform: translateY(100%);
+  transition: 0.2s ease-in-out;
+}
+
+.card:hover .card__overlay {
+  transform: translateY(0);
+}
+
+.card__header {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em;
+  border-radius: calc(var(--curve) * 1px) 0 0 0;
+  background-color: var(--surface-color);
+  transform: translateY(-100%);
+  transition: 0.2s ease-in-out;
+}
+
+.card__arc {
+  background-color: #ffaa00;
+  width: 80px;
+  height: 80px;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  z-index: 1;
+}
+
+.card__arc path {
+  fill: var(--surface-color);
+  d: path('M 40 80 c 22 0 40 -22 40 -40 v 40 Z');
+}
+
+.card:hover .card__header {
+  transform: translateY(0);
+}
+
+.card__thumb {
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+}
+
+.card__title {
+  font-size: 1em;
+  margin: 0 0 0.3em;
+  color: #6a515e;
+}
+
+.card__tagline {
+  display: block;
+  margin: 1em 0;
+  font-family: 'MockFlowFont';
+  font-size: 0.8em;
+  color: #d7bdca;
+}
+
+.card__status {
+  font-size: 0.8em;
+  color: #d7bdca;
+}
+
+.card__description {
+  /*   padding: 0 2em 2em; */
+  padding: 0em 1em 1em 1em;
+  /* margin: 2em; */
+  color: #000;
+  display: -webkit-box;
+  text-align: left;
+  /*   -webkit-box-orient: vertical; */
+  /*   -webkit-line-clamp: 3; */
+  overflow: hidden;
+}
+
+/* 
+.NeutralFace {
+  font-family: NeutralFace;
+}
+ */
