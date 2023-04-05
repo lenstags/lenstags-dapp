@@ -1,7 +1,7 @@
-import { Layout, ProfileContext, TagsFilter } from 'components';
 import { useEffect, useState } from 'react';
 
 import ImageProxied from 'components/ImageProxied';
+import { Layout } from 'components';
 import { getPublication } from '@lib/lens/get-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
@@ -12,6 +12,10 @@ export default function PostDetails() {
   const { id } = router.query;
   const [post, setPost] = useState<any>();
   const [lensProfile, setProfile] = useState<any>();
+
+  function createMarkup(innerHtml: string) {
+    return { __html: innerHtml };
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -24,6 +28,7 @@ export default function PostDetails() {
       }
       setProfile(profileResult);
       setPost(postObject);
+      console.log('ooo ', postObject);
     };
 
     fetchData().catch(console.error);
@@ -45,7 +50,6 @@ export default function PostDetails() {
       >
         <div className="w-full">
           {/* header */}
-
           <div
             style={{
               backgroundImage: `linear-gradient(to bottom, transparent, white), url(${post.metadata.media[0]?.original.url})`,
@@ -191,9 +195,16 @@ export default function PostDetails() {
                 </div>
               </div>
 
-              <p className=" font-thin text-gray-500">
-                {post.metadata.description || 'no-abstract'}
+              <p className=" text-sm font-thin text-gray-500">
+                {post.metadata.description || 'no--abstract'}
               </p>
+
+              <div
+                className="my-6 "
+                dangerouslySetInnerHTML={createMarkup(
+                  post.metadata.content || 'no-contents'
+                )}
+              ></div>
             </div>
 
             <ul className=" flex flex-wrap justify-start text-xs">
@@ -202,7 +213,7 @@ export default function PostDetails() {
                 return (
                   <li
                     key={tagValue}
-                    className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
+                    className=" mr-1 rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
                   >
                     {tag.replace('-', ' ').toUpperCase()}
                   </li>
