@@ -24,7 +24,6 @@ const MyProfile: NextPage = () => {
 
       if (contentType === 'created') {
         setPublications(
-          // data.items.filter((r) => r.profile.id === lensProfile?.id)
           data.items.filter(
             (r) =>
               r.profile.id === lensProfile?.id &&

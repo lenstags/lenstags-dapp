@@ -251,14 +251,14 @@ export default function ListDetails() {
                               </span>
                             </div>
 
-                            <div className="items-baseline place-self-center">
+                            {/* <div className="items-baseline place-self-center">
                               <button
                                 key={p.id}
                                 className=" rounded-md bg-lensGreen px-1 py-1 text-right text-xs font-semibold shadow-sm shadow-gray-400"
                               >
                                 + COLLECT
                               </button>
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </div>

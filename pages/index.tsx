@@ -653,11 +653,12 @@ const Home: NextPage = () => {
                   {' '}
                   <ImageProxied
                     category="profile"
-                    src="/img/landing/team/nahuel.jpg"
+                    src="/img/landing/team/fei.jpg"
                     alt=""
+                    objectFit="cover"
                     className="rounded-2xl"
-                    width={100}
-                    height={100}
+                    width={110}
+                    height={120}
                   />
                 </p>
                 <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
@@ -705,11 +706,12 @@ const Home: NextPage = () => {
                   {' '}
                   <ImageProxied
                     category="profile"
-                    src="/img/landing/team/nahuel.jpg"
+                    src="/img/landing/team/leo.png"
                     alt=""
+                    objectFit="cover"
                     className="rounded-2xl"
-                    width={100}
-                    height={100}
+                    width={110}
+                    height={120}
                   />
                 </p>
                 <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
@@ -757,11 +759,12 @@ const Home: NextPage = () => {
                   {' '}
                   <ImageProxied
                     category="profile"
-                    src="/img/landing/team/nahuel.jpg"
+                    src="/img/landing/team/cande.png"
                     alt=""
+                    objectFit="cover"
                     className="rounded-2xl"
-                    width={100}
-                    height={100}
+                    width={110}
+                    height={120}
                   />
                 </p>
                 <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
@@ -809,11 +812,12 @@ const Home: NextPage = () => {
                   {' '}
                   <ImageProxied
                     category="profile"
-                    src="/img/landing/team/nahuel.jpg"
+                    src="/img/landing/team/nahue.png"
                     alt=""
+                    objectFit="cover"
                     className="rounded-2xl"
-                    width={100}
-                    height={100}
+                    width={110}
+                    height={120}
                   />
                 </p>
                 <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
