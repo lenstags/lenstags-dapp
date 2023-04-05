@@ -23,8 +23,8 @@ const Home: NextPage = () => {
       'A hub of resources for your project plus access to analytics to keep track of engagement.'
   };
 
-  const [tabContent, setTabContent] = useState('');
-  const [tabTitle, setTabTitle] = useState('');
+  const [tabTitle, setTabTitle] = useState('BADGES');
+  const [tabContent, setTabContent] = useState(content.badges);
 
   const setTab = (
     title: string,
@@ -114,7 +114,8 @@ const Home: NextPage = () => {
         <div
           style={{
             display: 'flex',
-            paddingTop: '20px'
+            paddingTop: '20px',
+            paddingBottom: '80px'
             /* alignItems: 'center' */
             // justifyContent: 'center'
           }}
@@ -177,7 +178,7 @@ const Home: NextPage = () => {
           }}
         >
           <div>
-            <div className=" cards  mx-auto max-w-[90vw] list-none bg-none pt-8 md:pt-0 ">
+            <div className="cards  relative -top-12  mx-auto max-w-[90vw] list-none bg-none pt-8 md:pt-0 ">
               <div className="">
                 {' '}
                 <li className="hover:h-[278px]">

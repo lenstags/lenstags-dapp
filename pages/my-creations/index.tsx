@@ -1,4 +1,4 @@
-import { Layout, TagsFilter } from 'components';
+import { Layout, ProfileContext, TagsFilter } from 'components';
 import { useContext, useEffect, useState } from 'react';
 
 import ExplorerCard from 'components/ExplorerCard';
@@ -8,13 +8,16 @@ import { explore } from '@lib/lens/explore-publications';
 
 const Lists: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
-
+  const lensProfile = useContext(ProfileContext);
   const { tags } = useContext(TagsFilterContext);
 
   useEffect(() => {
+    // FIXME send the filter first!
     explore({ tags }).then((data) => {
       const filteredItems = data.items.filter(
-        (r) => r.metadata.attributes[0].value === 'post'
+        (r) =>
+          r.metadata.attributes[0].value === 'post' &&
+          r.profile.id === lensProfile?.id
       );
       setPublications(filteredItems);
     });

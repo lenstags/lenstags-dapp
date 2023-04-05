@@ -200,7 +200,7 @@ export default function PostDetails() {
               </p>
 
               <div
-                className="my-6 "
+                className="m-8 "
                 dangerouslySetInnerHTML={createMarkup(
                   post.metadata.content || 'no-contents'
                 )}

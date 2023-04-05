@@ -18,9 +18,7 @@ const MyProfile: NextPage = () => {
   useEffect(() => {
     explore({ tags }).then((data) => {
       if (contentType === 'collected') {
-        setPublications(
-          data.items.filter((r) => r.profile.id !== lensProfile?.id)
-        );
+        setPublications(data.items.filter((r) => r.hasCollectedByMe));
         return;
       }
 
@@ -32,7 +30,11 @@ const MyProfile: NextPage = () => {
       }
 
       if (contentType === 'all') {
-        setPublications(data.items);
+        setPublications(
+          data.items.filter(
+            (r) => r.profile.id === lensProfile?.id || r.hasCollectedByMe
+          )
+        );
         return;
       }
     });
@@ -44,8 +46,15 @@ const MyProfile: NextPage = () => {
       : lensProfile?.picture?.__typename === 'NftImage'
       ? lensProfile?.picture.uri
       : '/img/profilePic.png';
-
   explore({ tags });
+  // explore({ tags }).then((data) => {
+  //   setPublications(
+  //     data.items.filter(
+  //       (r) => r.profile.id === lensProfile?.id || r.hasCollectedByMe
+  //     )
+  //   );
+  // });
+
   return (
     <Layout
       title="Lenstags | Explore"
@@ -98,21 +107,21 @@ const MyProfile: NextPage = () => {
           <div className="flex space-x-2 text-sm text-black">
             <button
               onClick={() => setContentType('all')}
-              className="rounded-md border-2 border-solid border-black  bg-white px-2 text-center"
+              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
             >
               All
             </button>
 
             <button
               onClick={() => setContentType('created')}
-              className="rounded-md border-2 border-solid border-black  bg-white px-2 text-center"
+              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
             >
               Created
             </button>
 
             <button
               onClick={() => setContentType('collected')}
-              className="rounded-md border-2 border-solid border-black  bg-white px-2 text-center"
+              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
             >
               <div className="flex">
                 <span className="ml-1">Collected</span>

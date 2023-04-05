@@ -1,4 +1,5 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
+import { addPostIdtoListId, cloneAndCollectPost } from '@lib/lens/post';
 import { createUserList, typeList } from '@lib/lens/load-lists';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
@@ -7,7 +8,6 @@ import Link from 'next/link';
 import ListImages from './ListImages';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
-import { addPostIdtoListId } from '@lib/lens/post';
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
 import { hidePublication } from '@lib/lens/hide-publication';
