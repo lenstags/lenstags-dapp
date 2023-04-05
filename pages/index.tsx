@@ -65,7 +65,7 @@ const Home: NextPage = () => {
         <div
           style={{
             backgroundImage: "url('/img/landing/hero_background.png')",
-            backgroundSize: 'contain',
+            backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat',
             display: 'flex',
             alignItems: 'center',
@@ -199,9 +199,8 @@ const Home: NextPage = () => {
                       </div>
 
                       <p className="card__description font-[NeutralFaceText-Light] ">
-                        Discover the{' '}
-                        <strong>best content across the web</strong> with
-                        LensTags - the ultimate platform for organized and
+                        Unleash the <strong>best content across the web</strong>{' '}
+                        with LensTags - the ultimate platform for organized and
                         social discovery of resources.
                       </p>
                     </div>
@@ -293,7 +292,7 @@ const Home: NextPage = () => {
                       </div>
 
                       <p className="card__description font-[NeutralFaceText-Light]">
-                        Discover the best content about your favorites projects
+                        Locate the best content about your favorites projects
                       </p>
                     </div>
                   </a>
@@ -487,7 +486,7 @@ const Home: NextPage = () => {
             <div className="flex justify-center">
               <div
                 style={{
-                  backgroundSize: 'contain',
+                  backgroundSize: 'cover',
                   backgroundRepeat: 'no-repeat',
                   display: 'flex',
                   maxWidth: '90vw',

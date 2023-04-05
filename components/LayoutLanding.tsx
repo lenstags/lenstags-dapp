@@ -47,7 +47,6 @@ export const LayoutLanding: FC<Props> = ({
                 className="absolute h-full w-full bg-gray-800 opacity-50 lg:hidden"
                 onClick={() => setShow(!show)}
               />
-              layoutmini
               <div className="absolute z-40 h-full w-64 bg-lensGreen pb-4 shadow transition duration-150 ease-in-out sm:relative md:w-96 lg:hidden">
                 <div className="flex h-full w-full flex-col justify-between">
                   <div>
