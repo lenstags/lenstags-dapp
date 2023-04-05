@@ -432,7 +432,7 @@ const Home: NextPage = () => {
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
-                    stroke-width="3"
+                    strokeWidth="3"
                     fill="#6D1EDC"
                     className="mr-2 h-6 w-6"
                   >

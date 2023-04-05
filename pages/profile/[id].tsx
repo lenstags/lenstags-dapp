@@ -122,7 +122,7 @@ const OtherProfile: NextPage = () => {
               onClick={() => setContentType('created')}
               className="  bg-white px-2 text-center"
             >
-              Content created by {lensProfile?.name}
+              {/* d by {lensProfile?.name} */}
             </button>
 
             {/* <button

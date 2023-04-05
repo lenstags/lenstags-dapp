@@ -457,7 +457,11 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       {post.metadata.name || 'untitled'}
                     </p>
                     <p className="text-xs font-thin text-gray-500">
-                      {post.metadata.description || 'no-abstract'}
+                      {!isList ? (
+                        post.metadata.description || 'no-abstract'
+                      ) : (
+                        <br />
+                      )}
                     </p>
                   </div>
                 </a>
