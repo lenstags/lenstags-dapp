@@ -43,7 +43,7 @@ const createDefaultList = async (lensProfile: any) => {
 
   // get the postId!
   console.log(
-    '>>>> default post created with type=list: ',
+    '👉🏻👉🏻👉🏻👉🏻👉🏻👉🏻👉🏻 >>>> default post (list) created with type=list: ',
     result.internalPubId
   );
 
