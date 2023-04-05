@@ -63,7 +63,7 @@ const Settings: NextPage = () => {
       (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
     )?.value;
 
-    console.log('list result?: ', profileResult);
+    console.log('list result?: ', defaultListId);
 
     if (!defaultListId) {
       return defaultListId
