@@ -181,9 +181,9 @@ export const Navbar = () => {
                             <circle cx={12} cy={12} r={9} />
                           </svg>
                         </div>
-                        <span className="ml-2 text-base md:text-2xl xl:text-base">
+                        {/* <span className="ml-2 text-base md:text-2xl xl:text-base">
                           <Link href={'/lists'}>My lists</Link>
-                        </span>
+                        </span> */}
                       </div>
                     </li>
                   </ul>
@@ -291,7 +291,7 @@ export const Navbar = () => {
                       <a title="Soon">PROJECTS</a>
                     </Link>
                   </div>
-                  <div
+                  {/* <div
                     className={`mx-2  p-2 ${
                       router.asPath === '/lists#' &&
                       'bg-lensBlack text-lensGray'
@@ -300,8 +300,8 @@ export const Navbar = () => {
                     <Link href={'/lists'}>
                       <a>MY LISTS</a>
                     </Link>
-                  </div>
-
+                  </div> */}
+                  {/* 
                   <div
                     className={`mx-2 p-2 ${
                       router.asPath === '/lists#' &&
@@ -311,7 +311,7 @@ export const Navbar = () => {
                     <Link href={'/my-creations'}>
                       <a>MY CREATIONS</a>
                     </Link>
-                  </div>
+                  </div> */}
                   {/* 
                   <div className="flex items-center">
                     <div className="h-6 w-6 md:h-8 md:w-8">

@@ -24,7 +24,12 @@ const MyProfile: NextPage = () => {
 
       if (contentType === 'created') {
         setPublications(
-          data.items.filter((r) => r.profile.id === lensProfile?.id)
+          // data.items.filter((r) => r.profile.id === lensProfile?.id)
+          data.items.filter(
+            (r) =>
+              r.profile.id === lensProfile?.id &&
+              r.metadata.attributes[0].value === 'post'
+          )
         );
         return;
       }
@@ -33,6 +38,17 @@ const MyProfile: NextPage = () => {
         setPublications(
           data.items.filter(
             (r) => r.profile.id === lensProfile?.id || r.hasCollectedByMe
+          )
+        );
+        return;
+      }
+
+      if (contentType === 'lists') {
+        setPublications(
+          data.items.filter(
+            (r) =>
+              r.profile.id === lensProfile?.id &&
+              r.metadata.attributes[0].value === 'list'
           )
         );
         return;
@@ -116,7 +132,7 @@ const MyProfile: NextPage = () => {
               onClick={() => setContentType('created')}
               className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
             >
-              Created
+              My posts
             </button>
 
             <button
@@ -124,7 +140,16 @@ const MyProfile: NextPage = () => {
               className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
             >
               <div className="flex">
-                <span className="ml-1">Collected</span>
+                <span className="">Collected</span>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setContentType('lists')}
+              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
+            >
+              <div className="flex">
+                <span className="">My lists</span>
               </div>
             </button>
           </div>

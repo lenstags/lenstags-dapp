@@ -23,6 +23,10 @@ const ExploreCard: FC<Props> = ({ post }) => {
   const isList = post.metadata.attributes[0].value === 'list';
   const lensProfile = useContext(ProfileContext);
   const [isFavMenuVisible, setFavMenuVisible] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
+  const [dotColor, setDotColor] = useState('');
+  const [dotTitle, setDotTitle] = useState('');
+
   const [valueListName, setValueListName] = useState('');
   const [isListVisible, setIsListVisible] = useState(false);
   const [isListExistent, setIsListExistent] = useState(false);
@@ -106,10 +110,17 @@ const ExploreCard: FC<Props> = ({ post }) => {
     listId?: string,
     name?: string
   ) => {
+    setIsPosting(true);
+    setDotColor(' border-red-400 bg-red-600 ');
+    setDotTitle('Creating post');
+    setFavMenuVisible(false);
+
     // verifies if selected list does exist in the current profile, if not, create it
     if (!listId) {
       // FIXME: DON'T RETURN AN OBJECT?
       // TODO: OPTIMIZE IT
+      setDotColor(' border-red-400 bg-black');
+      setDotTitle('Creating list');
       listId = (await createUserList(lensProfile, name!)).key;
       console.log('List (post) ID returned to the UI: ', listId);
     }
@@ -121,7 +132,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
     // }
 
     // just add the post to the list
-
+    setDotColor(' border-yellow-400 bg-yellow-600 ');
+    setDotTitle('Indexing list');
     const addResult = await addPostIdtoListId(
       profileId,
       listId!,
@@ -131,8 +143,10 @@ const ExploreCard: FC<Props> = ({ post }) => {
     console.log('finished, ', addResult);
     // TODO: SHOW SOME UI BOX
     // TODO: update lists in UI!
+    setDotColor(' border-blue-400 bg-blue-600 ');
+    setDotTitle('Finished');
+    setIsPosting(false);
 
-    setFavMenuVisible(false);
     return;
   };
 
@@ -457,11 +471,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       {post.metadata.name || 'untitled'}
                     </p>
                     <p className="text-xs font-thin text-gray-500">
-                      {!isList ? (
-                        post.metadata.description || 'no-abstract'
-                      ) : (
-                        <br />
-                      )}
+                      {!isList ? post.metadata.description || ' ' : <br />}
                     </p>
                   </div>
                 </a>
@@ -500,8 +510,38 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         Collected
                       </div>
                     ) : (
-                      <div className=" flex items-end rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                        +COLLECT
+                      <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
+                        {/* <div className="absolute inset-0 m-auto mr-1 mt-1 h-2 w-2   animate-spin rounded-full border border-white bg-red-600" /> */}
+                        +ADD TO LIST
+                        {isPosting && (
+                          <div className="relative flex items-center">
+                            <div
+                              title={dotTitle}
+                              className={`absolute inset-0 m-auto mr-1 h-1 w-1 animate-ping
+                                rounded-full border ${dotColor}`}
+                            />
+                            <svg
+                              className="ml-3 h-3 w-3 animate-spin items-center"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                              ></circle>
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              ></path>
+                            </svg>
+                          </div>
+                        )}
                       </div>
                     )
                   ) : (

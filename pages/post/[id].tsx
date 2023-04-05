@@ -145,7 +145,7 @@ export default function PostDetails() {
           </div>
 
           {/* contents */}
-          <div className=" mx-auto w-11/12  md:w-4/5  ">
+          <div className=" mx-auto mb-14  w-11/12 md:w-4/5">
             <div className="mb-4 w-full">
               <div className=" mb-2 flex justify-between ">
                 <p
@@ -196,7 +196,7 @@ export default function PostDetails() {
               </div>
 
               <p className=" text-sm font-thin text-gray-500">
-                {post.metadata.description || 'no--abstract'}
+                {post.metadata.description || ' '}
               </p>
 
               <div
