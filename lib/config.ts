@@ -1,4 +1,4 @@
-export const APP_NAME = 'LensTags_Alpha2.0';
+export const APP_NAME = 'lenstags_alpha_0.0.2.1';
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
 export const DEFAULT_IMAGE_POST = '/img/post.png';

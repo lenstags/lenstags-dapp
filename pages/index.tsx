@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
+import { APP_NAME } from '@lib/config';
 import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import { LayoutLanding } from 'components/LayoutLanding';
@@ -868,6 +869,12 @@ const Home: NextPage = () => {
                 <div>
                   <h1 className="mt-3  font-[NeutralFace] text-base text-[#868585] md:mt-0 md:text-[16px]">
                     <a href="#">PRIVACY POLICY</a>
+                  </h1>
+                </div>
+
+                <div>
+                  <h1 className="mt-3  font-[NeutralFace] text-base text-[#868585] md:mt-0 md:text-[16px]">
+                    <a href="#">{APP_NAME}</a>
                   </h1>
                 </div>
               </div>
