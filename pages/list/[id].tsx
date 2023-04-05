@@ -185,16 +185,21 @@ export default function ListDetails() {
 
                     <div className="w-full">
                       <div className="ml-4">
-                        <div className="flex items-baseline">
-                          <p className="w-9/12 text-xl ">{p.metadata.name}</p>
-                          <span className="w-2/12 text-right text-xs">
-                            By {p.profile.name}
-                          </span>
-                          <span className="items-left w-1/12 text-right text-xs text-gray-400">
-                            {moment(p.createdAt).format('MMM D')}
-                          </span>
-                        </div>
-
+                        <a
+                          href={`/post/${p.id}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <div className="flex items-baseline">
+                            <p className="w-9/12 text-xl ">{p.metadata.name}</p>
+                            <span className="w-2/12 text-right text-xs">
+                              By {p.profile.name}
+                            </span>
+                            <span className="items-left w-1/12 text-right text-xs text-gray-400">
+                              {moment(p.createdAt).format('MMM D')}
+                            </span>
+                          </div>
+                        </a>
                         <p className="mt-1 text-sm">
                           {p.metadata.description || 'No description'}
                         </p>
