@@ -106,9 +106,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
     listId?: string,
     name?: string
   ) => {
-    // verify if selected list does exist in the current profile, if not, create it
+    // verifies if selected list does exist in the current profile, if not, create it
     if (!listId) {
-      // FIXME: DON'T RETURN AND OBJECT?
+      // FIXME: DON'T RETURN AN OBJECT?
       // TODO: OPTIMIZE IT
       listId = (await createUserList(lensProfile, name!)).key;
       console.log('List (post) ID returned to the UI: ', listId);

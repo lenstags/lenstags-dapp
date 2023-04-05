@@ -1,6 +1,7 @@
 import { Configuration, OpenAIApi } from 'openai';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
+import CollapsiblePanels from 'components/Panels';
 import CreatableSelect from 'react-select/creatable';
 import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import Editor from 'components/Editor';
@@ -15,6 +16,15 @@ import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
+
+const checkIfUrl = (value: string): boolean => {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 const sleep = () =>
   new Promise((resolve) => {
@@ -56,22 +66,6 @@ const Create: NextPage = () => {
     setSelectedOption(selectedOptions);
   };
 
-  //handles IA image generation
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     if (!imageURL && editorContents) {
-  //       const response = await openai.createImage({
-  //         prompt: editorContents,
-  //         n: 1,
-  //         size: '256x256'
-  //       });
-  //       setGeneratedImage(response.data.data[0].url);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [imageURL]);
-
   const lensProfile = useContext(ProfileContext);
   if (!lensProfile) {
     return null;
@@ -96,15 +90,6 @@ const Create: NextPage = () => {
         console.log(err);
       }
       setLoadingTLDR(false);
-    }
-  };
-
-  const checkIfUrl = (value: string): boolean => {
-    try {
-      new URL(value);
-      return true;
-    } catch {
-      return false;
     }
   };
 
@@ -154,6 +139,106 @@ const Create: NextPage = () => {
     setInputValue(event.target.value);
     handleInputChange(event);
   };
+
+  const panels = [
+    {
+      id: 'panel1',
+      title: 'Link snapshot',
+      content: (
+        <div>
+          <p className="  ml-4 pt-2 text-xs font-semibold text-gray-600">
+            Paste a link in the upper field to extract a preview
+          </p>
+          <div className="p-4  ">
+            {imageURL && (
+              <img
+                className="  mx-auto "
+                src={imageURL}
+                alt="Image cover taken from the link"
+              />
+            )}
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'panel2',
+      title: 'AI Generated from the contents',
+      content: (
+        <div>
+          <div className="flex ">
+            <p className="mx-2 ml-4 w-5/6 pt-2 text-xs font-semibold text-gray-600">
+              Write something in the editor below and click on Generate
+            </p>
+
+            <button
+              onClick={handleIAImage}
+              className="flex w-1/6 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
+            >
+              Generate
+              {loadingIA && (
+                <svg
+                  className="ml-2 h-5 w-5 animate-spin items-center"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              )}
+            </button>
+          </div>
+          <div className="  p-4 ">
+            {generatedImage && (
+              <img
+                className="mx-auto"
+                src={generatedImage}
+                alt="AI generated image"
+              />
+            )}
+          </div>
+        </div>
+      )
+    },
+    {
+      id: 'panel3',
+      title: 'Upload from file',
+      content: (
+        <div className="my-2 flex">
+          <span className="ml-4 w-1/2 text-xs font-semibold text-gray-600">
+            Click and select a file
+          </span>
+          <input
+            className="ml-4 w-1/2 rounded-md bg-gray-50 text-xs"
+            type="file"
+            name="cover"
+            id="cover"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files) {
+                const file = e.target.files[0];
+                if (file) {
+                  setCover(file);
+                }
+              }
+            }}
+          />
+        </div>
+      )
+    }
+  ];
 
   const handleChangeEditor = (content: string) => setEditorContents(content);
   // todo lit protocol
@@ -289,6 +374,7 @@ const Create: NextPage = () => {
           />
         </div>
 
+        {/* abstract */}
         <div className="lens-input flex place-items-center items-center">
           <span className="ml-4 font-semibold">Abstract</span>
           <input
@@ -330,100 +416,12 @@ const Create: NextPage = () => {
           </button>
         </div>
 
-        {/* {(imageURL || generatedImage) && ( */}
         <div className="lens-input">
           <p className="my-2 ml-4">Image source</p>
-          {/* {imageURL ? ( */}
-          <div>
-            <p className="ml-4 pt-2 text-sm font-semibold">
-              Snapshot from the link
-            </p>
-            <div className="p-4  ">
-              {imageURL && (
-                <img
-                  className="  mx-auto "
-                  src={imageURL}
-                  alt="Image cover taken from the link"
-                />
-              )}
-            </div>
+          <div className="px-4">
+            <CollapsiblePanels panels={panels} />
           </div>
-          {/* ) : ( */}
-          {/* generatedImage && ( */}
-          <div>
-            <div className="flex ">
-              <p className="ml-4 w-5/6 pt-2 text-sm font-semibold">
-                AI Generated from the contents
-              </p>
-
-              <button
-                onClick={handleIAImage}
-                className="flex w-1/6 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
-              >
-                Refresh
-                {loadingIA && (
-                  <svg
-                    className="ml-2 h-5 w-5 animate-spin items-center"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                )}
-              </button>
-            </div>
-            <div className="  p-4 ">
-              {generatedImage && (
-                <img
-                  className="mx-auto"
-                  src={generatedImage}
-                  alt="AI generated image"
-                />
-              )}
-            </div>
-          </div>
-
-          <div className="my-2 flex">
-            <span className="ml-4 w-1/2 text-sm font-semibold">
-              Upload from file
-            </span>
-            <input
-              className="ml-4 w-1/2 rounded-md bg-gray-50 text-xs"
-              type="file"
-              name="cover"
-              id="cover"
-              accept="image/*"
-              onChange={(e) => {
-                if (e.target.files) {
-                  const file = e.target.files[0];
-                  if (file) {
-                    setCover(file);
-                  }
-                }
-              }}
-            />
-          </div>
-          {/* )
-            )} */}
         </div>
-        {/* )} */}
-        {/* 
-        <div className="lens-input flex py-2">
-          
-        </div> */}
 
         <div className="lens-input -z-30">
           <div className="w-full">
