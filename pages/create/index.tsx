@@ -109,7 +109,7 @@ const Create: NextPage = () => {
         return;
       }
       const response = await fetch(
-        `http://api.linkpreview.net/?key=3a65e56b4a7ad7b9fb46a44a96bb607b&q=${event.target.value}`
+        `https://api.linkpreview.net/?key=3a65e56b4a7ad7b9fb46a44a96bb607b&q=${event.target.value}`
       );
       const data = await response.json();
       console.log('DATA ,', data);
