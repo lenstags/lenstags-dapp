@@ -29,8 +29,8 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.6.0",
     "react-select": "^5.7.0",
-    "suneditor": "^2.44.5",
-    "suneditor-react": "^2.16.5",
+    "suneditor": "^2.44.12",
+    "suneditor-react": "^3.5.0",
     "urql": "^3.0.3",
     "uuid": "^9.0.0",
     "wagmi": "^0.12.7"
