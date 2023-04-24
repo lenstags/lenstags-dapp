@@ -100,11 +100,25 @@ export const createPostGasless = async (
       item: `${IPFS_PROXY_URL}${imageIpfsResult.path}`,
       type: 'image/jpeg'
     });
+    console.log('🟩🟩🟩🟩🟩🟩 BUILT IMAGEimageIpfsResult: ', imageIpfsResult);
   }
 
   console.log('create post: address', address);
 
   console.log('🟩🟩 BUILT POST: ', builtPost);
+  const otherAttributes = [
+    {
+      traitType: 'string',
+      key: 'userLink',
+      value: builtPost.link || 'NO-LINK'
+    },
+    {
+      traitType: 'string',
+      key: 'customData',
+      value: builtPost.originalPostId || ''
+    }
+  ];
+  const na = builtPost.attributes.concat(otherAttributes);
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     name: builtPost.name || '', //the title
@@ -114,7 +128,7 @@ export const createPostGasless = async (
     external_url: builtPost.external_url,
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
-    attributes: builtPost.attributes || DEFAULT_METADATA_ATTRIBUTES,
+    attributes: na || DEFAULT_METADATA_ATTRIBUTES,
     locale: 'en-us',
     mainContentFocus: builtPost.image
       ? PublicationMainFocus.IMAGE

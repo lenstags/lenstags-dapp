@@ -1,6 +1,5 @@
 import { GenericMetadata, MetadataDisplayType } from './generic';
 
-// import { AttributeData } from './profile-metadata';
 import { MediaOutput } from '../graphql/generated';
 
 export interface MetadataAttribute {
@@ -37,6 +36,7 @@ export interface Metadata extends GenericMetadata {
   description?: string;
   content?: string;
   external_url?: string | null;
+  link?: string | null;
   name: string;
   attributes: MetadataAttribute[];
   image?: Buffer | null; //single image

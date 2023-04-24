@@ -1,5 +1,4 @@
-import { MdExpandLess, MdExpandMore } from 'react-icons/md';
-
+import { MdExpandMore } from 'react-icons/md';
 import { useState } from 'react';
 
 type Panel = {
@@ -10,27 +9,36 @@ type Panel = {
 
 type CollapsiblePanelsProps = {
   panels: Panel[];
+  onActivePanelChange: (activePanel: string | null) => void;
 };
 
-const CollapsiblePanels = ({ panels }: CollapsiblePanelsProps) => {
+const CollapsiblePanels = ({
+  panels,
+  onActivePanelChange
+}: CollapsiblePanelsProps) => {
   const [activePanel, setActivePanel] = useState<string | null>(panels[0].id);
 
   const handleClick = (id: string) => {
-    setActivePanel(id === activePanel ? null : id);
+    setActivePanel(id);
+    onActivePanelChange(id);
   };
 
   return (
-    <div>
+    <div className="my-4">
       {panels.map(({ id, title, content }) => (
         <div key={id}>
           <div
-            className={` mx-4 flex items-center justify-between border-b  py-3 
-              ${id === activePanel ? 'bg-white' : 'cursor-pointer  '}`}
+            className={` mx-4 flex items-center justify-between rounded-lg border-t px-3  py-3 
+              ${
+                id === activePanel
+                  ? 'bg-white '
+                  : 'cursor-pointer text-gray-300 hover:bg-gray-50 hover:text-gray-600 '
+              }`}
             onClick={() => handleClick(id)}
           >
             <h2 className="text-sm font-semibold">{title}</h2>
             {id === activePanel ? (
-              <MdExpandLess className="text-gray-600" />
+              ''
             ) : (
               <MdExpandMore className="text-gray-600" />
             )}

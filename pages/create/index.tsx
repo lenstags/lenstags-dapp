@@ -1,4 +1,3 @@
-import { Configuration, OpenAIApi } from 'openai';
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import CollapsiblePanels from 'components/Panels';
@@ -6,7 +5,6 @@ import CreatableSelect from 'react-select/creatable';
 import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import Editor from 'components/Editor';
 import { IbuiltPost } from '@lib/lens/interfaces/publication';
-import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
 import { NextPage } from 'next';
 import { ProfileContext } from 'components';
@@ -16,6 +14,13 @@ import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
+
+async function getBufferFromElement(url: string) {
+  const response = await fetch(`/api/proxy?imageUrl=${url}`);
+  const arrayBuffer = await response.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+  return buffer;
+}
 
 const checkIfUrl = (value: string): boolean => {
   try {
@@ -30,40 +35,46 @@ const sleep = () =>
   new Promise((resolve) => {
     setTimeout(resolve, 2500);
   });
-const configuration = new Configuration({
-  organization: 'org-Bxsu1oLlJ2mEEDGJRO6TiJCz',
-  apiKey: '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'
-});
-
-const openai = new OpenAIApi(configuration);
 
 const Create: NextPage = () => {
   const [title, setTitle] = useState('');
   const [dispatcherStatus, setDispatcherStatus] = useState<boolean | undefined>(
     undefined
   );
-
   const router = useRouter();
   const [abstract, setAbstract] = useState<string | undefined>('');
-  const [pageCover, setPageCover] = useState<any>('');
-  const [pageTitle, setPageTitle] = useState<any>('');
-
   const [editorContents, setEditorContents] = useState('');
-  const [link, setLink] = useState('');
+  const [sourceUrl, setSourceUrl] = useState('');
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
+  const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
+
   const [inputValue, setInputValue] = useState('');
   const [imageURL, setImageURL] = useState('');
+  const [actualPanel, setActualPanel] = useState<string | null>('panelAI');
 
   const [loading, setLoading] = useState(false);
   const [loadingTLDR, setLoadingTLDR] = useState(false);
   const [loadingIA, setLoadingIA] = useState(false);
-
   const [selectedOption, setSelectedOption] = useState([]);
+  const [plainText, setPlainText] = useState('');
+
+  useEffect(() => {
+    const html = editorContents;
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    const text = div.textContent;
+    setPlainText(text || '');
+  }, [editorContents]);
+
   const handleChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
+  };
+
+  const handleActivePanelChange = (selectedPanel: string | null) => {
+    setActualPanel(selectedPanel);
   };
 
   const lensProfile = useContext(ProfileContext);
@@ -71,21 +82,32 @@ const Create: NextPage = () => {
     return null;
   }
 
+  const fetchLinkPreview = async (url: string) => {
+    const response = await fetch(`/api/linkPreview?url=${url}`);
+    const jsonResponse = await response.json();
+    return jsonResponse.data;
+  };
+
+  const fetchTLDR = async (text: string) => {
+    const response = await fetch(`/api/tldr?text=${text}`);
+    const jsonResponse = await response.json();
+    return jsonResponse.data;
+  };
+
+  const fetchImageAI = async (text: string) => {
+    const response = await fetch(`/api/imageAI?text=${text}`);
+    const jsonResponse = await response.json();
+    return jsonResponse.data;
+  };
+
   const generateTLDR = async () => {
     setLoadingTLDR(true);
-    if (editorContents) {
+    if (plainText) {
       try {
-        const tldr = await openai.createCompletion({
-          model: 'text-davinci-003',
-          prompt: `${editorContents}\n\nTl;dr`,
-          temperature: 0.7,
-          max_tokens: 600,
-          top_p: 1.0,
-          frequency_penalty: 0.0,
-          presence_penalty: 1
-        });
-        console.log('TLDR ', tldr);
-        setAbstract(tldr?.data?.choices[0]?.text?.trim());
+        console.log('plainText ', plainText);
+
+        const dataTLDR = await fetchTLDR(plainText);
+        setAbstract(dataTLDR?.choices[0]?.text?.trim());
       } catch (err) {
         console.log(err);
       }
@@ -100,7 +122,6 @@ const Create: NextPage = () => {
     return;
   });
 
-  const initialContent = 'Write something nice!';
   const handleInputChange = _.debounce(
     async (event: ChangeEvent<HTMLInputElement>) => {
       const isUrl = checkIfUrl(event.target.value);
@@ -108,30 +129,24 @@ const Create: NextPage = () => {
       if (!isUrl) {
         return;
       }
-      const response = await fetch(
-        `https://api.linkpreview.net/?key=3a65e56b4a7ad7b9fb46a44a96bb607b&q=${event.target.value}`
-      );
-      const data = await response.json();
-      console.log('DATA ,', data);
-      setEditorContents(data.description as string);
+
+      const data = await fetchLinkPreview(event.target.value);
+      setSourceUrl(event.target.value);
       setTitle(data.title as string);
       setImageURL(data.image as string);
+      setEditorContents(data.description as string);
     },
     2000
   );
 
   const handleIAImage = async () => {
-    // const fetchData = async () => {
     setLoadingIA(true);
-    if (editorContents) {
-      const response = await openai.createImage({
-        prompt: editorContents,
-        n: 1,
-        size: '256x256'
-      });
-      setGeneratedImage(response.data.data[0].url);
+    if (title) {
+      const response = await fetchImageAI(title.substring(0, 1000));
+      const imageB64 = 'data:image/png;base64,' + response.data[0].b64_json;
+      setGeneratedImage(imageB64);
+      setGeneratedImage2(response.data[0].b64_json);
     }
-    // };
     setLoadingIA(false);
   };
 
@@ -140,29 +155,92 @@ const Create: NextPage = () => {
     handleInputChange(event);
   };
 
+  const handleChangeEditor = (content: string) => setEditorContents(content);
+
+  const handlePost = async () => {
+    // upload file to ipfs and get its url
+    let imageBuffer: Buffer | null = null;
+
+    if (actualPanel === 'panelUpload') {
+      if (cover) {
+        // read the file as a Buffer
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(cover);
+
+        await new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+            if (reader.result instanceof ArrayBuffer) {
+              imageBuffer = Buffer.from(reader.result);
+            } else if (reader.result !== null) {
+              imageBuffer = Buffer.from(reader.result.toString());
+            } else {
+              // TODO: handle the case where reader.result is null
+            }
+            resolve(imageBuffer);
+          };
+
+          reader.onerror = () => {
+            reject(reader.error);
+          };
+        });
+      }
+    }
+
+    if (actualPanel === 'panelLink') {
+      imageBuffer = await getBufferFromElement(imageURL);
+    }
+
+    if (actualPanel === 'panelAI') {
+      imageBuffer = Buffer.from(generatedImage2, 'base64');
+    }
+
+    const constructedPost: IbuiltPost = {
+      attributes: DEFAULT_METADATA_ATTRIBUTES,
+      name: title,
+      abstract: abstract || '',
+      content: editorContents || '',
+      link: sourceUrl,
+      image: imageBuffer || null,
+      imageMimeType: 'image/jpeg',
+      tags: selectedOption.map((r) => r['value'])
+      // TODO: GET FILTER ARRAY FROM THE UI
+      // title: title,
+      // todo: image?: Buffer[]
+    };
+
+    if (!lensProfile) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const result = await createPostManager(
+        lensProfile,
+        constructedPost,
+        // POST_SELF_COLLECT
+        false
+      );
+      console.log('POST RESULT: ', result);
+      // FIXME
+      // if (result.isOk) {
+      setIsSuccessVisible(true);
+      await sleep();
+      router.push('/app');
+      // } else {
+      //   setIsErrorVisible(true);
+      //   console.error(e);
+      // }
+    } catch (e: any) {
+      setIsErrorVisible(true);
+      console.error(e);
+      setLoading(false);
+    }
+  };
+
   const panels = [
     {
-      id: 'panel1',
-      title: 'Link snapshot',
-      content: (
-        <div>
-          <p className="  ml-4 pt-2 text-xs font-semibold text-gray-600">
-            Paste a link in the upper field to extract a preview
-          </p>
-          <div className="p-4  ">
-            {imageURL && (
-              <img
-                className="  mx-auto "
-                src={imageURL}
-                alt="Image cover taken from the link"
-              />
-            )}
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'panel2',
+      id: 'panelAI',
       title: 'AI Generated from the contents',
       content: (
         <div>
@@ -203,6 +281,7 @@ const Create: NextPage = () => {
           <div className="  p-4 ">
             {generatedImage && (
               <img
+                id="generatedImage"
                 className="mx-auto"
                 src={generatedImage}
                 alt="AI generated image"
@@ -213,7 +292,29 @@ const Create: NextPage = () => {
       )
     },
     {
-      id: 'panel3',
+      id: 'panelLink',
+      title: 'Link snapshot',
+      content: (
+        <div>
+          <p className="  ml-4 pt-2 text-xs font-semibold text-gray-600">
+            Paste a link in the upper field to extract a preview
+          </p>
+          <div className="p-4  ">
+            {imageURL && (
+              <img
+                id="imageURL"
+                className="  mx-auto "
+                src={imageURL}
+                alt="Image cover taken from the link"
+              />
+            )}
+          </div>
+        </div>
+      )
+    },
+
+    {
+      id: 'panelUpload',
       title: 'Upload from file',
       content: (
         <div className="my-2 flex">
@@ -240,81 +341,6 @@ const Create: NextPage = () => {
     }
   ];
 
-  const handleChangeEditor = (content: string) => setEditorContents(content);
-  // todo lit protocol
-
-  const handlePost = async () => {
-    // upload file to ipfs and get its url
-
-    let imageBuffer: Buffer | null = null;
-    if (cover) {
-      // read the file as a Buffer
-      const reader = new FileReader();
-      reader.readAsArrayBuffer(cover);
-      await new Promise((resolve, reject) => {
-        reader.onloadend = () => {
-          // imageBuffer = Buffer.from(reader.result);
-
-          if (reader.result instanceof ArrayBuffer) {
-            imageBuffer = Buffer.from(reader.result);
-          } else if (reader.result !== null) {
-            imageBuffer = Buffer.from(reader.result.toString());
-          } else {
-            // handle the case where reader.result is null
-          }
-          resolve(imageBuffer);
-        };
-
-        reader.onerror = () => {
-          reject(reader.error);
-        };
-      });
-    }
-
-    const constructedPost: IbuiltPost = {
-      attributes: DEFAULT_METADATA_ATTRIBUTES,
-      name: title,
-      abstract: abstract || '',
-      content: editorContents || '',
-      link: link,
-      image: imageBuffer || null,
-      imageMimeType: 'image/jpeg',
-      tags: selectedOption.map((r) => r['value'])
-      // TODO: GET FILTER ARRAY FROM THE UI
-      // title: title,
-      // todo: image?: Buffer[]
-    };
-
-    if (!lensProfile) {
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      const result = await createPostManager(
-        lensProfile,
-        constructedPost,
-        // POST_SELF_COLLECT
-        false
-      );
-      console.log('POST RESULT: ', result);
-      // FIXME
-      // if (result.isOk) {
-      setIsSuccessVisible(true);
-      await sleep();
-      router.push('/app');
-      // } else {
-      //   setIsErrorVisible(true);
-      //   console.error(e);
-      // }
-    } catch (e: any) {
-      setIsErrorVisible(true);
-      console.error(e);
-      setLoading(false);
-    }
-  };
-
   return (
     <Layout title="Lenstags | Create post" pageDescription="Create post">
       <div className="container mx-auto h-64  w-11/12 px-6 py-6 text-black md:w-1/2">
@@ -335,12 +361,12 @@ const Create: NextPage = () => {
                   : 'rounded-lg bg-red-300 px-2 py-1  text-xs'
               }
             >
-              Gasless tx are{' '}
+              Gasless tx{' '}
               {dispatcherStatus === undefined
                 ? 'loading...'
                 : dispatcherStatus
-                ? 'Enabled'
-                : 'Disabled'}
+                ? 'enabled'
+                : 'disabled'}
             </button>
           </div>
         </div>
@@ -349,7 +375,7 @@ const Create: NextPage = () => {
           <span className="ml-4 font-semibold">Link</span>
           <input
             autoComplete="false"
-            className="w-full bg-white px-4 py-2 text-xs outline-none"
+            className=" w-full bg-white px-4 py-2  outline-none"
             type="text"
             name="link"
             id="link"
@@ -366,10 +392,8 @@ const Create: NextPage = () => {
             name="title"
             id="title"
             value={title}
-            // defaultValue={pageCover}
             onChange={(e) => {
               setTitle(e.target.value);
-              return;
             }}
           />
         </div>
@@ -419,7 +443,10 @@ const Create: NextPage = () => {
         <div className="lens-input">
           <p className="my-2 ml-4">Image source</p>
           <div className="px-4">
-            <CollapsiblePanels panels={panels} />
+            <CollapsiblePanels
+              panels={panels}
+              onActivePanelChange={handleActivePanelChange}
+            />
           </div>
         </div>
 

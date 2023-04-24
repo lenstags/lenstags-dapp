@@ -6,7 +6,6 @@ export const ATTRIBUTES_LIST_KEY = 'list_warehouse_1';
 export const PROFILE_METADATA_VERSION = '1.0.0';
 export const PUBLICATION_METADATA_VERSION = '2.0.0';
 export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
-export const PK = 'YOUR_PK';
 
 export const MUMBAI_RPC_URL = 'https://rpc-mumbai.matic.today';
 export const LENS_API = 'https://api-mumbai.lens.dev/';
@@ -14,8 +13,18 @@ export const LENS_HUB_CONTRACT = '0x60Ae865ee4C725cd04353b5AAb364553f56ceF82';
 export const LENS_PERIPHERY_CONTRACT =
   '0xD5037d72877808cdE7F669563e9389930AF404E8';
 export const LENS_PERIPHERY_NAME = 'LensPeriphery';
-export const INFURA_PROJECT_ID = '2FtLXLpfvzpENl2Xm3K0ElHdGDc';
-export const INFURA_SECRET = '2ec4307c38429b097dd373c3b69b890b';
+
+interface EnvConfig {
+  [key: string]: string | undefined;
+}
+
+export const envConfig: EnvConfig = {
+  INFURA_PROJECT_ID: process.env.INFURA_PROJECT_ID,
+  INFURA_SECRET: process.env.INFURA_SECRET,
+  AUTH_OPENAI_ORGANIZATION: process.env.AUTH_OPENAI_ORGANIZATION,
+  AUTH_OPENAI_APIKEY: process.env.AUTH_OPENAI_APIKEY,
+  AUTH_LINKPREVIEW_KEY: process.env.AUTH_LINKPREVIEW_KEY
+};
 
 export const LENS_FOLLOW_NFT_ABI = [
   {

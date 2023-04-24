@@ -392,50 +392,56 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     );
                   }}
                 >
-                  {/* old inset tags */}
-                  {/* <figure className="cap-right">
-                    {isList ? (
-                      <ListImages postId={post.id} />
-                    ) : (
-                      <ImageProxied
-                        category="post"
-                        height={220}
-                        width={600}
-                        objectFit="cover"
-                        className="block h-auto w-full"
-                        src={post.metadata.media[0]?.original.url}
-                      />
-                    )}
-
-                    <figcaption className="p-1">
-                      <ul className=" flex flex-wrap gap-1 py-2 text-xs">
-                        {post.metadata.tags.map((tag: string) => {
-                          return (
-                            <li
-                              key={`${post.id}${tag}`}
-                              className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
-                            >
-                              {tag.toUpperCase()}
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </figcaption>
-                  </figure> */}
-
                   {isList ? (
                     <ListImages postId={post.id} />
                   ) : (
-                    <ImageProxied
-                      category="post"
-                      height={'400px'}
-                      width={'600px'}
-                      // width={'100%'}
-                      // height={'100%'}
-                      objectFit="cover"
-                      className="blo ck w-full rounded-md"
-                      src={post.metadata.media[0]?.original.url}
-                    />
+                    <div className="relative ">
+                      {/* link provided by the user */}
+                      {post.metadata.attributes[1]?.value && (
+                        <div
+                          style={{
+                            bottom: '5%'
+                            // mixBlendMode: 'difference'
+                          }}
+                          className="-top-30 absolute z-10  text-xs 
+                            text-white mix-blend-difference hover:text-lensGreen hover:mix-blend-difference"
+                          title="Jump straight to the original post 🌐"
+                        >
+                          <a
+                            target="_blank"
+                            rel="noreferrer"
+                            className=" justify-end"
+                            href={post.metadata.attributes[1]?.value}
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth="1.5"
+                              stroke="currentColor"
+                              className="h-6 w-6"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M6.115 5.19l.319 1.913A6 6 0 008.11 10.36L9.75 12l-.387.775c-.217.433-.132.956.21 1.298l1.348 1.348c.21.21.329.497.329.795v1.089c0 .426.24.815.622 1.006l.153.076c.433.217.956.132 1.298-.21l.723-.723a8.7 8.7 0 002.288-4.042 1.087 1.087 0 00-.358-1.099l-1.33-1.108c-.251-.21-.582-.299-.905-.245l-1.17.195a1.125 1.125 0 01-.98-.314l-.295-.295a1.125 1.125 0 010-1.591l.13-.132a1.125 1.125 0 011.3-.21l.603.302a.809.809 0 001.086-1.086L14.25 7.5l1.256-.837a4.5 4.5 0 001.528-1.732l.146-.292M6.115 5.19A9 9 0 1017.18 4.64M6.115 5.19A8.965 8.965 0 0112 3c1.929 0 3.716.607 5.18 1.64"
+                              />
+                            </svg>
+                          </a>
+                        </div>
+                      )}
+
+                      <ImageProxied
+                        category="post"
+                        height={'400px'}
+                        width={'600px'}
+                        // width={'100%'}
+                        // height={'100%'}
+                        objectFit="cover"
+                        className=" w-full rounded-md"
+                        src={post.metadata.media[0]?.original.url}
+                      />
+                    </div>
                   )}
 
                   <ul className=" flex flex-wrap justify-end gap-1 pb-2 text-right text-xs">
@@ -470,8 +476,29 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     >
                       {post.metadata.name || 'untitled'}
                     </p>
-                    <p className="text-xs font-thin text-gray-500">
+                    <p
+                      className="my-1 overflow-auto text-xs font-thin text-gray-500"
+                      style={{
+                        height: '32px',
+                        overflowY: 'scroll'
+                      }}
+                    >
                       {!isList ? post.metadata.description || ' ' : <br />}
+                      <style>{`
+                      ::-webkit-scrollbar {
+                        width: 5px;
+                      }
+                      ::-webkit-scrollbar-thumb {
+                        background-color: rgba(0, 0, 0, 0.07);
+                        border-radius: 5px;
+                      }
+                      ::-webkit-scrollbar-thumb:hover {
+                        background-color: rgba(0, 0, 0, 0.5);
+                      }
+                      ::-webkit-scrollbar-track {
+                        background-color: transparent;
+                      }
+                    `}</style>
                     </p>
                   </div>
                 </a>

@@ -9,6 +9,7 @@ import { Metadata } from './interfaces/publication';
 import { MetadataDisplayType } from './interfaces/generic';
 import { Profile } from './graphql/generated';
 import { broadcastRequest } from './broadcast';
+import { builtinModules } from 'module';
 import { commentGasless } from './comment-gasless';
 import { createPostGasless } from './post-gasless';
 import { freeCollect } from './collect';
@@ -32,18 +33,14 @@ export const createPost = async (profileId: string, builtPost: IbuiltPost) => {
     throw new Error('Must define profileId');
   }
 
-  // TODO CHECK THIS
-  // const address = await getAddressFromSigner();
-  // console.log('creating post: address', address);
-
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
-    // TODO: image: post.image,
+    image: builtPost.image,
+    link: builtPost.link,
     imageMimeType: null,
     content: builtPost.content,
     name: builtPost.title || '',
     external_url: builtPost.external_url, // the list is editabl here
-    // TODO: coverPicture: post.cover,
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
     // attributes: [
