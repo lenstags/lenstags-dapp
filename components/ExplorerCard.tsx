@@ -152,7 +152,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
   return (
     <div
-      // style={{ height: '360px' }}
+      // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
       className="my-1 w-full px-1 md:w-1/2 lg:my-4 lg:w-1/4 lg:px-4  "
     >
@@ -238,46 +238,6 @@ const ExploreCard: FC<Props> = ({ post }) => {
               </button>
             </footer>
 
-            {/* <div className="mt-4  p-2 text-left">
-
-              <select
-                className=" bg-lensGreen"
-                value={selectedList}
-                onChange={handleChange}
-              >
-                <option value="">Pick a list</option>
-                {lists.map((list: any) => (
-                  <option key={list.key} value={list.key}>
-                    {list.name}
-                  </option>
-                ))}
-              </select>
-
-              <button className="bg-white px-3 py-1 text-black">Set</button>
-              <button className="bg-white px-3 py-1 text-black">
-                + New list
-              </button>
-            </div> */}
-
-            {/* <button
-              onClick={() => setIsListVisible(!isListVisible)}
-              className="flex align-middle"
-            >
-              {lensProfile ? (
-                <div className="button_cards flex">
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/collect.svg"
-                    alt="Collect"
-                    width={20}
-                    height={20}
-                  />
-                  <div>Favllect</div>
-                </div>
-              ) : (
-                ''
-              )}
-            </button> */}
           </div>
         )}
 

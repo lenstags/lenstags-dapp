@@ -110,17 +110,6 @@ export default function ListDetails() {
                 </div>
               </div>
             </div>
-
-            {/* <div className="flex">
-                <p className="mb-1">
-                  <span className="rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400">
-                    UX/UI
-                  </span>
-                  <span className=" mx-2 rounded-md bg-purple-100 px-2 py-1 text-xs font-semibold shadow-sm shadow-gray-400">
-                    Web3
-                  </span>
-                </p>
-              </div> */}
           </header>
           {/* body */}
           <div className="relative -top-20 flex">
@@ -256,14 +245,6 @@ export default function ListDetails() {
                               </span>
                             </div>
 
-                            {/* <div className="items-baseline place-self-center">
-                              <button
-                                key={p.id}
-                                className=" rounded-md bg-lensGreen px-1 py-1 text-right text-xs font-semibold shadow-sm shadow-gray-400"
-                              >
-                                + COLLECT
-                              </button>
-                            </div> */}
                           </div>
                         </div>
                       </div>
