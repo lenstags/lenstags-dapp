@@ -2,7 +2,6 @@ import {
   CreateSetDispatcherTypedDataDocument,
   Profile,
   ProfileDocument,
-  ProfileQuery,
   SetDispatcherRequest,
   SingleProfileQueryRequest
 } from './graphql/generated';
@@ -28,12 +27,15 @@ export const enableDispatcherWithTypedData = async (
 };
 
 export const enable = async (profileId: any) => {
+
   if (!profileId) {
     throw new Error('Must define profileId');
   }
 
   const address = getAddressFromSigner();
   console.log('🤖 set dispatcher: address', address);
+
+  //   await login(address);
 
   const result = await enableDispatcherWithTypedData({
     profileId
@@ -69,6 +71,7 @@ export const enable = async (profileId: any) => {
     }
   });
   console.log('set dispatcher: tx hash', tx.hash);
+
 };
 
 const disableDispatcherWithTypedData = async (
@@ -85,6 +88,7 @@ const disableDispatcherWithTypedData = async (
 };
 
 export const disable = async (profileId: any) => {
+
   if (!profileId) {
     throw new Error('Must define PROFILE_ID in the .env to run this');
   }
@@ -127,12 +131,11 @@ export const disable = async (profileId: any) => {
     }
   });
   console.log('disable dispatcher: tx hash', tx.hash);
+
 };
 
 // TODO: move to its own file
-export async function queryProfile(
-  request: SingleProfileQueryRequest
-): Promise<ProfileQuery['profile']> {
+export async function queryProfile(request: SingleProfileQueryRequest) {
   const result = await apolloClient.query({
     query: ProfileDocument,
     variables: {

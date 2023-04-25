@@ -11,7 +11,6 @@ export default function PostDetails() {
   useEffect(() => {
     const storedObject = localStorage.getItem('LENS_PROFILE') || '';
     const myObject = JSON.parse(storedObject);
-    console.log('no deberia ir aca');
     setProfile(myObject);
   }, [id]);
 

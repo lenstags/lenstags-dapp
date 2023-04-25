@@ -1,30 +1,29 @@
-import {
-  APP_NAME,
-  IPFS_PROXY_URL,
-  PUBLICATION_METADATA_VERSION
-} from '@lib/config';
 import { BigNumber, utils } from 'ethers';
 import {
   CreatePostViaDispatcherDocument,
-  CreatePublicPostRequest,
-  PublicationReportingSpamSubreason
+  CreatePublicPostRequest
 } from './graphql/generated';
-import {
-  IbuiltPost,
-  Metadata,
-  PublicationMainFocus
-} from './interfaces/publication';
-import { uploadImageIpfs, uploadIpfs } from './ipfs';
+import { Metadata, PublicationMainFocus } from './interfaces/publication';
 
-import { DEFAULT_METADATA_ATTRIBUTES } from './post';
 import { apolloClient } from './graphql/apollo-client';
 import { broadcastRequest } from './broadcast';
-import fs from 'fs';
 import { getAddressFromSigner } from './ethers.service';
 import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 import { queryProfile } from './dispatcher';
 import { signCreatePostTypedData } from './publication-post';
+import { uploadIpfs } from './ipfs';
 import { v4 as uuidv4 } from 'uuid';
+
+export interface postData {
+  title?: string;
+  name?: string;
+  abstract?: string;
+  content: string;
+  link?: string;
+  cover?: string;
+  tags?: string[];
+  // image?: Buffer[]
+}
 
 const createPostViaDispatcherRequest = async (
   request: CreatePublicPostRequest
@@ -85,58 +84,48 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
 
 export const createPostGasless = async (
   profileId: string,
-  builtPost: IbuiltPost
+  builtPost: postData
 ) => {
   if (!profileId) {
     throw new Error('Must define PROFILE_ID in the .env to run this');
   }
 
   const address = getAddressFromSigner();
-
-  let mediaResult = [];
-  if (builtPost.image) {
-    const imageIpfsResult = await uploadImageIpfs(builtPost.image);
-    mediaResult.push({
-      item: `${IPFS_PROXY_URL}${imageIpfsResult.path}`,
-      type: 'image/jpeg'
-    });
-    console.log('🟩🟩🟩🟩🟩🟩 BUILT IMAGEimageIpfsResult: ', imageIpfsResult);
-  }
-
   console.log('create post: address', address);
 
-  console.log('🟩🟩 BUILT POST: ', builtPost);
-  const otherAttributes = [
-    {
-      traitType: 'string',
-      key: 'userLink',
-      value: builtPost.link || 'NO-LINK'
-    },
-    {
-      traitType: 'string',
-      key: 'customData',
-      value: builtPost.originalPostId || ''
-    }
-  ];
-  const na = builtPost.attributes.concat(otherAttributes);
+  // await login(address);
+
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     name: builtPost.name || '', //the title
     description: builtPost.abstract, //the resume
     content: builtPost.content, //the details
-    imageMimeType: builtPost.imageMimeType,
-    external_url: builtPost.external_url,
+    // TODO: image: post.image,
+    imageMimeType: null,
+    // TODO: external urls?
+    external_url: null,
+    // TODO: coverPicture: post.cover,
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
-    attributes: na || DEFAULT_METADATA_ATTRIBUTES,
+    attributes: [
+      {
+        traitType: 'string',
+        value: 'post'
+      }
+    ],
     locale: 'en-us',
-    mainContentFocus: builtPost.image
-      ? PublicationMainFocus.IMAGE
-      : PublicationMainFocus.TEXT_ONLY,
+    mainContentFocus: PublicationMainFocus.TEXT_ONLY,
     animation_url: '',
-    media: mediaResult,
-    version: PUBLICATION_METADATA_VERSION,
-    appId: APP_NAME.toLocaleLowerCase()
+    media: [
+      // {
+      //   item: 'https://scx2.b-cdn.net/gfx/news/hires/2018/lion.jpg',
+      //   // item: 'https://assets-global.website-files.com/5c38aa850637d1e7198ea850/5f4e173f16b537984687e39e_AAVE%20ARTICLE%20website%20main%201600x800.png',
+      //   type: 'image/jpeg',
+      // },
+    ],
+    // TODO: METADATA VERSION UNIFICATION
+    version: '2.0.0',
+    appId: 'lenstags'
   });
 
   console.log('create post: ipfs result', ipfsResult);
@@ -144,7 +133,6 @@ export const createPostGasless = async (
   // hard coded to make the code example clear
   const createPostRequest = {
     profileId,
-    // contentURI: 'https://pastebin.com/uNPgZQub', // must validate its metadata
     contentURI: `ipfs://${ipfsResult.path}`,
     collectModule: {
       // feeCollectModule: {
@@ -158,7 +146,7 @@ export const createPostGasless = async (
       //   referralFee: 10.5,
       // },
       // revertCollectModule: true,
-      freeCollectModule: { followerOnly: false }
+      freeCollectModule: { followerOnly: true }
       // limitedFeeCollectModule: {
       //   amount: {
       //     currency: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',
@@ -180,7 +168,7 @@ export const createPostGasless = async (
   console.log('create post: poll until indexed');
   const indexedResult = await pollUntilIndexed(result.txHash);
 
-  console.log('create post: has been indexed', result);
+  console.log('create post: profile has been indexed', result);
 
   const logs = indexedResult.txReceipt!.logs;
 
@@ -202,19 +190,10 @@ export const createPostGasless = async (
     profileCreatedEventLog[2]
   )[0];
 
-  const internalPubId =
-    profileId + '-' + BigNumber.from(publicationId).toHexString();
+  console.log(
+    'create post: internal publication id',
+    profileId + '-' + BigNumber.from(publicationId).toHexString()
+  );
 
-  const pubId = BigNumber.from(publicationId).toHexString();
-
-  const postResult = {
-    txHash: result.txHash,
-    txId: result.txId,
-    internalPubId,
-    pubId
-  };
-  // console.log('create post: internal publication id', internalPubId);
-  console.log('ACA1 created post result: ', postResult);
-
-  return postResult;
+  return result;
 };

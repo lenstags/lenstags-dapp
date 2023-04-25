@@ -16,7 +16,6 @@ import { login } from '@lib/lens/login';
 import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 import { uploadIpfs } from './ipfs';
 import { v4 as uuidv4 } from 'uuid';
-import { PUBLICATION_METADATA_VERSION } from '@lib/config';
 
 export const createPostTypedData = async (request: CreatePublicPostRequest) => {
   const result = await apolloClient.mutate({
@@ -48,7 +47,6 @@ export const signCreatePostTypedData = async (
   return { result, signature };
 };
 
-// DEPRECATED
 const createPost = async (profileId: string) => {
   if (!profileId) {
     throw new Error('Must define PROFILE_ID in the .env to run this');
@@ -60,7 +58,7 @@ const createPost = async (profileId: string) => {
   await login(address);
 
   const ipfsResult = await uploadIpfs<Metadata>({
-    version: PUBLICATION_METADATA_VERSION,
+    version: '2.0.0',
     mainContentFocus: PublicationMainFocus.TEXT_ONLY,
     metadata_id: uuidv4(),
     description: 'Description',
@@ -92,9 +90,7 @@ const createPost = async (profileId: string) => {
       //   referralFee: 10.5,
       // },
       // revertCollectModule: true,
-      // freeCollectModule: { followerOnly: true }
-      freeCollectModule: { followerOnly: false }
-
+      freeCollectModule: { followerOnly: true }
       // limitedFeeCollectModule: {
       //   amount: {
       //     currency: '0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889',

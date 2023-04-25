@@ -3,8 +3,7 @@ import {
   ApolloLink,
   DefaultOptions,
   HttpLink,
-  InMemoryCache,
-  from
+  InMemoryCache
 } from '@apollo/client/core';
 
 import { getFromLocalStorage } from '../localStorage';

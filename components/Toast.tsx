@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const DISMISS_TIMEOUT = 5000;
 
@@ -15,24 +15,21 @@ const Toast: React.FC<ToastProps> = ({ text, level }) => {
     return () => clearTimeout(timeoutId);
   }, [DISMISS_TIMEOUT]);
 
-  if (isDismissed) {
-    // setDismissed(false);
-    return null;
-  }
+  if (isDismissed) return null;
 
   return (
-    <div className=" fixed bottom-8 right-8 z-50 m-auto w-80 rounded-lg border-2 border-solid border-black bg-lensGreen px-2 py-3 text-center text-lg font-light text-black">
+    <div className="bg-lensSucess fixed px-2 py-4 font-light text-lg text-black text-center rounded-lg bottom-4 right-8 m-auto w-80 z-50">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="icon icon-tabler icon-tabler-ad-2 float-left"
         width="24"
         height="24"
         viewBox="0 0 24 24"
-        strokeWidth="2"
+        stroke-width="2"
         stroke="currentColor"
         fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        stroke-linecap="round"
+        stroke-linejoin="round"
       >
         <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
         <path d="M11.933 5h-6.933v16h13v-8"></path>
@@ -43,9 +40,9 @@ const Toast: React.FC<ToastProps> = ({ text, level }) => {
         <path d="M19 9h2"></path>
       </svg>
 
-      <span className="m- mr-2 ">{text}</span>
+      <span className="mr-2 m- ">{text}</span>
       <button
-        className="float-right rounded-lg bg-transparent p-1 text-black"
+        className="text-black bg-transparent p-1 rounded-lg float-right"
         onClick={() => setDismissed(true)}
       >
         <svg
@@ -54,11 +51,11 @@ const Toast: React.FC<ToastProps> = ({ text, level }) => {
           width="24"
           height="24"
           viewBox="0 0 24 24"
-          strokeWidth="2"
+          stroke-width="2"
           stroke="currentColor"
           fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          stroke-linecap="round"
+          stroke-linejoin="round"
         >
           <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
           <line x1="18" y1="6" x2="6" y2="18"></line>

@@ -1,35 +1,18 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { createPost, postData } from '@lib/lens/post';
 
-import CollapsiblePanels from 'components/Panels';
 import CreatableSelect from 'react-select/creatable';
-import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import Editor from 'components/Editor';
-import { IbuiltPost } from '@lib/lens/interfaces/publication';
+import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
+import Link from 'next/link';
 import { NextPage } from 'next';
 import { ProfileContext } from 'components';
 import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
-import _ from 'lodash';
-import { createPostManager } from '@lib/lens/post';
+import { createPostGasless } from '@lib/lens/post-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
-
-async function getBufferFromElement(url: string) {
-  const response = await fetch(`/api/proxy?imageUrl=${url}`);
-  const arrayBuffer = await response.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
-  return buffer;
-}
-
-const checkIfUrl = (value: string): boolean => {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 const sleep = () =>
   new Promise((resolve) => {
@@ -37,82 +20,31 @@ const sleep = () =>
   });
 
 const Create: NextPage = () => {
+  const [name, setName] = useState('');
+
   const [title, setTitle] = useState('');
   const [dispatcherStatus, setDispatcherStatus] = useState<boolean | undefined>(
     undefined
   );
+
   const router = useRouter();
-  const [abstract, setAbstract] = useState<string | undefined>('');
+  const [abstract, setAbstract] = useState('');
   const [editorContents, setEditorContents] = useState('');
-  const [sourceUrl, setSourceUrl] = useState('');
+  const [link, setLink] = useState('');
+  const [cover, setCover] = useState('');
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
-  const [cover, setCover] = useState<File>();
-  const [generatedImage, setGeneratedImage] = useState<any>();
-  const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
-
-  const [imageURL, setImageURL] = useState('');
-  const [actualPanel, setActualPanel] = useState<string | null>('panelAI');
+  const [selectedOption, setSelectedOption] = useState([]);
 
   const [loading, setLoading] = useState(false);
-  const [loadingTLDR, setLoadingTLDR] = useState(false);
-  const [loadingIA, setLoadingIA] = useState(false);
-  const [selectedOption, setSelectedOption] = useState([]);
-  const [plainText, setPlainText] = useState('');
-
-  useEffect(() => {
-    const html = editorContents;
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    const text = div.textContent;
-    setPlainText(text || '');
-  }, [editorContents]);
-
   const handleChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
-  };
-
-  const handleActivePanelChange = (selectedPanel: string | null) => {
-    setActualPanel(selectedPanel);
   };
 
   const lensProfile = useContext(ProfileContext);
   if (!lensProfile) {
     return null;
   }
-
-  const fetchLinkPreview = async (url: string) => {
-    const response = await fetch(`/api/linkPreview?url=${url}`);
-    const jsonResponse = await response.json();
-    return jsonResponse.data;
-  };
-
-  const fetchTLDR = async (text: string) => {
-    const response = await fetch(`/api/tldr?text=${text}`);
-    const jsonResponse = await response.json();
-    return jsonResponse.data;
-  };
-
-  const fetchImageAI = async (text: string) => {
-    const response = await fetch(`/api/imageAI?text=${text}`);
-    const jsonResponse = await response.json();
-    return jsonResponse.data;
-  };
-
-  const generateTLDR = async () => {
-    setLoadingTLDR(true);
-    if (plainText) {
-      try {
-        console.log('plainText ', plainText);
-
-        const dataTLDR = await fetchTLDR(plainText);
-        setAbstract(dataTLDR?.choices[0]?.text?.trim());
-      } catch (err) {
-        console.log(err);
-      }
-      setLoadingTLDR(false);
-    }
-  };
 
   queryProfile({ profileId: lensProfile.id }).then((profile) => {
     setDispatcherStatus(
@@ -121,80 +53,20 @@ const Create: NextPage = () => {
     return;
   });
 
-  const handleInputChange = _.debounce(
-    async (event: ChangeEvent<HTMLInputElement>) => {
-      const isUrl = checkIfUrl(event.target.value);
-
-      if (!isUrl) {
-        return;
-      }
-
-      const data = await fetchLinkPreview(event.target.value);
-      setSourceUrl(event.target.value);
-      setTitle(data.title as string);
-      setImageURL(data.image as string);
-      setEditorContents(data.description as string);
-    },
-    2000
-  );
-
-  const handleIAImage = async () => {
-    setLoadingIA(true);
-    if (title) {
-      const response = await fetchImageAI(title.substring(0, 1000));
-      const imageB64 = 'data:image/png;base64,' + response.data[0].b64_json;
-      setGeneratedImage(imageB64);
-      setGeneratedImage2(response.data[0].b64_json);
-    }
-    setLoadingIA(false);
-  };
+  const initialContent = 'Write something nice and styled!';
 
   const handleChangeEditor = (content: string) => setEditorContents(content);
 
-  const handlePost = async () => { // upload file to ipfs and get its url
-    let imageBuffer: Buffer | null = null;
-
-    if (actualPanel === 'panelUpload') {
-      if (cover) { // read the file as a Buffer
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(cover);
-        await new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-            if (reader.result instanceof ArrayBuffer) {
-              imageBuffer = Buffer.from(reader.result);
-            } else if (reader.result !== null) {
-              imageBuffer = Buffer.from(reader.result.toString());
-            } else {
-              // TODO: handle the case where reader.result is null
-            }
-            resolve(imageBuffer);
-          };
-          reader.onerror = () => {
-            reject(reader.error);
-          };
-        });
-      }
-    }
-
-    if (actualPanel === 'panelLink') {
-      imageBuffer = await getBufferFromElement(imageURL);
-    }
-
-    if (actualPanel === 'panelAI') {
-      imageBuffer = Buffer.from(generatedImage2, 'base64');
-    }
-
-    const constructedPost: IbuiltPost = {
-      attributes: DEFAULT_METADATA_ATTRIBUTES,
+  const handlePost = async () => {
+    const constructedPost = {
       name: title,
+      // title: title,
       abstract: abstract || '',
       content: editorContents || '',
-      link: sourceUrl,
-      image: imageBuffer || null,
-      imageMimeType: 'image/jpeg',
-      tags: selectedOption.map((r) => r['value'])
+      link: link,
+      cover: cover,
       // TODO: GET FILTER ARRAY FROM THE UI
-      // title: title,
+      tags: selectedOption.map((r) => r['label'])
       // todo: image?: Buffer[]
     };
 
@@ -205,22 +77,19 @@ const Create: NextPage = () => {
     setLoading(true);
 
     try {
-      const result = await createPostManager(
-        lensProfile,
-        constructedPost,
-        // POST_SELF_COLLECT
-        false
-      );
-      console.log('POST RESULT: ', result);
-      // FIXME
-      // if (result.isOk) {
+      // collect post
+      if (!lensProfile) {
+        return;
+      }
+
+      await (dispatcherStatus
+        ? await createPostGasless(lensProfile.id, constructedPost)
+        : await createPost(lensProfile.id, constructedPost));
+
       setIsSuccessVisible(true);
+
       await sleep();
-      router.push('/app');
-      // } else {
-      //   setIsErrorVisible(true);
-      //   console.error(e);
-      // }
+      router.push('/');
     } catch (e: any) {
       setIsErrorVisible(true);
       console.error(e);
@@ -228,112 +97,9 @@ const Create: NextPage = () => {
     }
   };
 
-  const panels = [
-    {
-      id: 'panelAI',
-      title: 'AI Generated from the contents',
-      content: (
-        <div>
-          <div className="flex ">
-            <p className="mx-2 ml-4 w-5/6 pt-2 text-xs font-semibold text-gray-600">
-              Write something in the editor below and click on Generate
-            </p>
-
-            <button
-              onClick={handleIAImage}
-              className="flex w-1/6 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
-            >
-              Generate
-              {loadingIA && (
-                <svg
-                  className="ml-2 h-5 w-5 animate-spin items-center"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
-              )}
-            </button>
-          </div>
-          <div className="  p-4 ">
-            {generatedImage && (
-              <img
-                id="generatedImage"
-                className="mx-auto"
-                src={generatedImage}
-                alt="AI generated image"
-              />
-            )}
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'panelLink',
-      title: 'Link snapshot',
-      content: (
-        <div>
-          <p className="  ml-4 pt-2 text-xs font-semibold text-gray-600">
-            Paste a link in the upper field to extract a preview
-          </p>
-          <div className="p-4  ">
-            {imageURL && (
-              <img
-                id="imageURL"
-                className="  mx-auto "
-                src={imageURL}
-                alt="Image cover taken from the link"
-              />
-            )}
-          </div>
-        </div>
-      )
-    },
-
-    {
-      id: 'panelUpload',
-      title: 'Upload from file',
-      content: (
-        <div className="my-2 flex">
-          <span className="ml-4 w-1/2 text-xs font-semibold text-gray-600">
-            Click and select a file
-          </span>
-          <input
-            className="ml-4 w-1/2 rounded-md bg-gray-50 text-xs"
-            type="file"
-            name="cover"
-            id="cover"
-            accept="image/*"
-            onChange={(e) => {
-              if (e.target.files) {
-                const file = e.target.files[0];
-                if (file) {
-                  setCover(file);
-                }
-              }
-            }}
-          />
-        </div>
-      )
-    }
-  ];
-
   return (
     <Layout title="Lenstags | Create post" pageDescription="Create post">
-      <div className="container mx-auto h-64  w-11/12 px-6 py-6 text-black md:w-1/2">
+      <div className="container mx-auto h-64  w-11/12 py-6 px-6 text-black md:w-1/2">
         <div className="text-xl font-semibold">
           <span className="text-left">Create post</span>
           <div
@@ -351,123 +117,160 @@ const Create: NextPage = () => {
                   : 'rounded-lg bg-red-300 px-2 py-1  text-xs'
               }
             >
-              Gasless tx{' '}
+              Gasless tx are{' '}
               {dispatcherStatus === undefined
                 ? 'loading...'
                 : dispatcherStatus
-                ? 'enabled'
-                : 'disabled'}
+                ? 'Enabled'
+                : 'Disabled'}
+            </button>
+          </div>
+        </div>
+        <div className="my-6 rounded-lg bg-lensBlack ">
+          <div className="input-translate flex w-full place-items-baseline  justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
+            <div>
+              {' '}
+              <p className="font-semibold">Title</p>
+            </div>
+            <div className="w-full">
+              <input
+                className=" mx-4 w-full bg-white px-3 py-2 font-semibold text-lensBlack outline-none"
+                type="text"
+                name="title"
+                id="title"
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  return;
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="z-20 my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex  w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6">
+            <div>
+              <p className="font-semibold">Tags</p>
+            </div>
+            <div className="w-full border-0 pl-4 ">
+              <CreatableSelect
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    boxShadow: 'none',
+                    borderColor: 'transparent',
+                    '&:hover': {
+                      borderColor: 'transparent'
+                    }
+                  })
+                }}
+                menuPortalTarget={document.querySelector('body')}
+                isMulti
+                onChange={handleChange}
+                options={TAGS}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
+            <div>
+              {' '}
+              <p className="font-semibold">Link</p>
+            </div>
+            <div className="w-full">
+              <input
+                className="  w-full bg-white py-2 px-6 text-lensPurple outline-none"
+                type="text"
+                name="link"
+                id="link"
+                placeholder="Insert the link starting with 'https://'"
+                onChange={(e) => setLink(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-6 py-1">
+            <div>
+              {' '}
+              <p className="font-semibold">Abstract</p>
+            </div>
+            <div className="w-full">
+              <input
+                className=" mx-4 w-full bg-white px-3 py-2 font-semibold text-lensBlack outline-none"
+                type="text"
+                name="abstract"
+                id="abstract"
+                onChange={(e) => setAbstract(e.target.value)}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="my-6 rounded-lg bg-lensBlack">
+          <div className="input-translate flex w-full place-items-baseline justify-between rounded-lg border-2 border-lensBlack bg-white px-2 py-1">
+            <div className="w-full">
+              <Editor
+                initialContent={initialContent}
+                onChange={handleChangeEditor}
+              />
+            </div>
+          </div>
+
+          <div className="flex h-full min-w-fit items-center justify-center  border-black  pl-8">
+            <button className="flex align-middle">
+              <Link href={'/create'}>
+                <div className="button_top flex">
+                  <div>
+                    <ImageProxied
+                      category="profile"
+                      className="text-lensBlack"
+                      src="/assets/icons/photo.svg"
+                      alt="Lenstags Logo"
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  <div>Add Cover</div>
+                </div>
+              </Link>
             </button>
           </div>
         </div>
 
-        <div className="lens-input flex">
-          <span className="ml-4 font-semibold">Link</span>
-          <input
-            autoComplete="false"
-            className=" w-full bg-white px-4 py-2  outline-none"
-            type="text"
-            name="link"
-            id="link"
-            placeholder="Insert the link starting with 'https://'"
-            onChange={ handleInputChange }
-          />
-        </div>
-
-        <div className="lens-input flex">
-          <span className="ml-4 font-semibold">Title</span>
-          <input
-            className="w-full bg-white px-4 py-2 outline-none"
-            type="text"
-            name="title"
-            id="title"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
-          />
-        </div>
-
-        {/* abstract */}
-        <div className="lens-input flex place-items-center items-center">
-          <span className="ml-4 font-semibold">Abstract</span>
-          <input
-            className=" mx-4 w-4/5 bg-white py-2 pl-3 text-xs font-semibold text-black outline-none"
-            type="text"
-            name="abstract"
-            value={abstract}
-            id="abstract"
-            onChange={(e) => setAbstract(e.target.value)}
-          />
-
-          <button
-            onClick={generateTLDR}
-            className="flex w-1/5 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
-          >
-            Make TLDR
-            {loadingTLDR && (
-              <svg
-                className="ml-2 h-5 w-5 animate-spin items-center"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            )}
-          </button>
-        </div>
-
-        <div className="lens-input">
-          <p className="my-2 ml-4">Image source</p>
-          <div className="px-4">
-            <CollapsiblePanels
-              panels={panels}
-              onActivePanelChange={handleActivePanelChange}
-            />
+        <div className="my-6 flex items-center justify-between  rounded-lg">
+          <div className="w-full rounded-lg bg-lensBlack  ">
+            <div className=" w-12/12 input-translate  flex items-center  rounded-lg border-2 border-lensBlack bg-white py-3 px-6">
+              <div>
+                <p className="font-semibold">Cover</p>
+              </div>
+              <div className="px-6 text-sm text-lensGray2 ">
+                Upload image (Optional)
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div className="lens-input -z-30">
-          <div className="w-full">
-            <Editor
-              initialContent={editorContents}
-              onChange={handleChangeEditor}
-            />
-          </div>
-        </div>
-
-        <div className="lens-input z-20 my-6 flex ">
-          <span className="ml-4 font-semibold">Tags</span>
-          <div className="w-full border-0 pl-4 ">
-            <CreatableSelect
-              styles={{
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  boxShadow: 'none',
-                  borderColor: 'transparent',
-                  '&:hover': {
-                    borderColor: 'transparent'
-                  }
-                })
-              }}
-              menuPortalTarget={document.querySelector('body')}
-              isMulti
-              onChange={handleChange}
-              options={TAGS}
-            />
+          <div className="flex h-full min-w-fit items-center justify-center  border-black  pl-8">
+            <button className="flex align-middle">
+              <Link href={'/create'}>
+                <div className="button_top flex">
+                  <div>
+                    <ImageProxied
+                      category="profile"
+                      className="text-lensBlack"
+                      src="/assets/icons/photo.svg"
+                      alt="Lenstags Logo"
+                      width={20}
+                      height={20}
+                    />
+                  </div>
+                  <div>Add Cover</div>
+                </div>
+              </Link>
+            </button>
           </div>
         </div>
 

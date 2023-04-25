@@ -1,19 +1,14 @@
-import { ProfileQuery } from './graphql/generated';
-
-const LS_LENS_STORE = 'lens_store';
+const LS_LENS_STORE = 'lens.store';
 
 export type LensLocalStorage = {
   accessToken: string;
   refreshToken: string;
-  profile: ProfileQuery['profile'];
-  // bio: string;
-  // canUseRelay: boolean | undefined;
-  // coverUrl: string | null;
-  // id: string;
-  // handle: string;
-  // name: string;
-  // pictureUrl: string | null;
-  // attributes: AttributeData[];
+  handle: string;
+  name: string;
+  pictureUrl: string | null;
+  id: string;
+  bio: string;
+  canUseRelay: boolean | undefined;
 };
 
 export const getFromLocalStorage = (): LensLocalStorage | null => {

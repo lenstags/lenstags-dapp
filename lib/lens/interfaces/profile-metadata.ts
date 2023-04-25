@@ -11,9 +11,5 @@ export interface ProfileMetadata extends GenericMetadata {
   name?: string;
   bio?: string;
   cover_picture?: string;
-  profile_picture?: string;
-  location?: string;
-  website?: string;
-  twitter?: string;
   attributes: AttributeData[];
 }

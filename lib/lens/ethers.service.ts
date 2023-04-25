@@ -38,9 +38,7 @@ export const signedTypeData = (
   const signer = getSigner();
   // remove the __typedname from the signature!
   return signer?._signTypedData(
-    // FIXME
     omit(domain, '__typename'),
-    // @ts-ignore
     omit(types, '__typename'),
     omit(value, '__typename')
   );

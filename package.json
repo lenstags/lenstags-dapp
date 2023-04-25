@@ -11,29 +11,25 @@
   "dependencies": {
     "@apollo/client": "^3.7.1",
     "@heroicons/react": "^2.0.12",
-    "@rainbow-me/rainbowkit": "^0.12.4",
-    "cheerio": "^1.0.0-rc.12",
-    "cors-anywhere": "^0.4.4",
+    "@rainbow-me/rainbowkit": "^0.8.1",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
     "graphql": "^16.6.0",
     "ipfs-http-client": "^59.0.0",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "multiselect-react-dropdown": "^2.0.25",
     "next": "12.3.1",
     "omit-deep": "^0.3.0",
-    "openai": "^3.2.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.6.0",
     "react-select": "^5.7.0",
-    "suneditor": "^2.44.12",
-    "suneditor-react": "^3.5.0",
+    "suneditor": "^2.44.3",
+    "suneditor-react": "^2.16.5",
     "urql": "^3.0.3",
     "uuid": "^9.0.0",
-    "wagmi": "^0.12.7"
+    "wagmi": "^0.10.1"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.7",
@@ -49,12 +45,11 @@
     "eslint-config-next": "12.3.1",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "http-proxy-middleware": "^2.0.6",
     "postcss": "^8.4.18",
     "prettier": "^2.8.3",
     "prettier-plugin-tailwindcss": "^0.2.1",
     "tailwindcss": "^3.2.1",
     "tailwindcss-animate": "^1.0.5",
-    "typescript": "5.0.2"
+    "typescript": "4.8.4"
   }
 }

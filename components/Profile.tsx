@@ -1,41 +1,36 @@
+/* eslint-disable @next/next/no-img-element */
+
 import React, { useContext, useEffect, useState } from 'react';
 
-/* eslint-disable @next/next/no-img-element */
 import ImageProxied from './ImageProxied';
-// import { ProfileContext } from 'components/LensAuthenticationProvider';
-import { ProfileContext } from './LensAuthenticationProvider';
+import { ProfileContext } from 'components/LensAuthenticationProvider';
 
 export const Profile = () => {
   const lensProfile = useContext(ProfileContext);
-  console.log('lensProfile de perfil:::: ', lensProfile);
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
+  console.log(lensProfile);
+
   return (
     <div className="mb-5">
-      <div className="bg-greenLengs flex flex-col items-start justify-between rounded-t py-4 px-5 shadow sm:flex-row sm:items-center">
+      <div className="bg-greenLengs py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between px-5 shadow rounded-t">
         <div className="flex items-center  sm:mb-0 md:mb-0 lg:mb-0 xl:mb-0">
-          <div className="relative h-24 w-24 ">
+          <div className="relative w-24 h-24 ">
             <ImageProxied
               category="profile"
               className=" rounded-full"
               width="100%"
               height="100%"
-              src={pictureUrl}
+              src={lensProfile?.pictureUrl || '/img/profilePic.png'}
               alt="avatar"
             />
           </div>
           <div className="ml-2">
-            <h2 className="text-2xl font-semibold text-black">
+            <h2 className="text-black text-2xl font-semibold">
               {lensProfile?.name}
             </h2>
-            <span className=" font-mono text-slate-400 ">
+            <span className=" text-slate-400 font-mono ">
               @{lensProfile?.handle}
             </span>
-            <p className="cursor-pointer text-xs font-normal text-gray-600 hover:text-gray-700 dark:text-gray-400">
+            <p className="font-normal text-xs text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-700">
               Edit Profile
             </p>
           </div>
@@ -44,7 +39,7 @@ export const Profile = () => {
         <div>
           <div className="flex">
             <div>
-              <div className="ml-2 flex rounded-none border border-black  px-6 py-2 text-sm font-normal text-black transition duration-150 ease-in-out hover:border-2 hover:font-bold focus:outline-none sm:ml-3">
+              <div className="flex ml-2 sm:ml-3 font-normal focus:outline-none  hover:font-bold transition duration-150 ease-in-out border border-black hover:border-2 rounded-none text-black px-6 py-2 text-sm">
                 <div>
                   <svg
                     className="h-5 w-5 text-black"
@@ -62,13 +57,13 @@ export const Profile = () => {
                 </div>
 
                 <div>
-                  <button className="pl-2">Mensagggge</button>
+                  <button className="pl-2">Mensagge</button>
                 </div>
               </div>
             </div>
 
             <div>
-              <div className="ml-2 flex rounded-none border border-black  px-6 py-2 text-sm font-normal text-black transition duration-150 ease-in-out hover:border-2 hover:font-bold focus:outline-none sm:ml-3">
+              <div className="flex ml-2 sm:ml-3 font-normal focus:outline-none  hover:font-bold transition duration-150 ease-in-out border border-black hover:border-2 rounded-none text-black px-6 py-2 text-sm">
                 <div>
                   <svg
                     className="h-5 w-5 text-black"
@@ -78,8 +73,8 @@ export const Profile = () => {
                     strokeWidth="2"
                     stroke="currentColor"
                     fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                   >
                     {' '}
                     <path stroke="none" d="M0 0h24v24H0z" />{' '}

@@ -1,4 +1,4 @@
-import 'suneditor/dist/css/suneditor.min.css';
+import 'suneditor/dist/css/suneditor.min.css'; // Sun Editor's CSS File
 
 import dynamic from 'next/dynamic';
 
@@ -21,6 +21,7 @@ const Editor = ({ initialContent = '', onChange }: Props) => (
       buttonList: [
         ['undo', 'redo'],
         [
+          'formatBlock',
           'font',
           'fontSize',
           'fontColor',
@@ -28,10 +29,20 @@ const Editor = ({ initialContent = '', onChange }: Props) => (
           'paragraphStyle',
           'blockquote'
         ],
-        ['bold', 'underline', 'italic'],
-        ['removeFormat']
-        // ['table', 'list', 'codeView'],
-        // ['preview', 'save']
+        [
+          'bold',
+          'underline',
+          'italic',
+          'strike',
+          'subscript',
+          'superscript',
+          'hiliteColor'
+        ],
+        ['removeFormat'],
+        ['outdent', 'indent'],
+        ['table', 'list', 'codeView'],
+        ['link', 'image', 'video'],
+        ['preview', 'save']
       ]
     }}
   />

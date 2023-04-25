@@ -1,17 +1,41 @@
-.Lens_Cards:hover {
-  /* Pull the button upwards when hovered */
-  transform: translate(0.25em, 0.25em);
-  transition: transform 0.1s ease;
-}
+.Lens_CardsDiv {
 
-.Lens_CardsCards:focus .Lens_Cards:focus {
-  /* Pull the button upwards when hovered */
-  transform: translate(0em, 0em);
-  transition: transform 0.1s ease;
-}
+    box-sizing: border-box;
+    border-radius: 8px;
+    background: Black;
+    color: #121400;
+    transition: transform 0.1s ease;
+   }
+   
+   .Lens_Cards {
+     box-sizing: border-box;
+     border: 2px solid black;
+     border-radius: 8px;
+     padding: 8px;
+     color: #121400;
+    }
+   
+    .Lens_Cards:hover {
+     /* Pull the button upwards when hovered */
+     transform: translate(0.25em, 0.25em);
+    transition: transform 0.1s ease;
+    
+   }
+   
+   .Lens_CardsCards:focus .Lens_Cards:focus {
+     /* Pull the button upwards when hovered */
+     transform: translate(0em, 0em);
+    transition: transform 0.1s ease;
+    
+   }
+   
+   
+   .Lens_CardsDiv:active .Lens_Cards {
+     /* Push the button downwards when pressed */
+     transition: transform 0.1s ease;
+     transform: translate(0em, 0em);
+   }
 
-.Lens_CardsDiv:active .Lens_Cards {
-  /* Push the button downwards when pressed */
-  transition: transform 0.1s ease;
-  transform: translate(0em, 0em);
-}
+   .dropdown:hover .dropdown-menu {
+    display: block;
+  }
