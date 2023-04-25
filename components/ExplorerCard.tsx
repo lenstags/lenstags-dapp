@@ -401,7 +401,6 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         <div
                           style={{
                             bottom: '5%'
-                            // mixBlendMode: 'difference'
                           }}
                           className="-top-30 absolute z-10  text-xs 
                             text-white mix-blend-difference hover:text-lensGreen hover:mix-blend-difference"
