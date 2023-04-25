@@ -22,6 +22,11 @@ async function getBufferFromElement(url: string) {
   return buffer;
 }
 
+type ToastContent = {
+  message?: string;
+  level?: string;
+};
+
 const checkIfUrl = (value: string): boolean => {
   try {
     new URL(value);
@@ -47,6 +52,11 @@ const Create: NextPage = () => {
   const [sourceUrl, setSourceUrl] = useState('');
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
+
+  const [toast, setToast] = useState<ToastContent>({});
+
+  const [isToastVisible, setToastVisible] = useState(false);
+
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
@@ -151,11 +161,21 @@ const Create: NextPage = () => {
 
   const handleChangeEditor = (content: string) => setEditorContents(content);
 
-  const handlePost = async () => { // upload file to ipfs and get its url
+  const handlePost = async () => {
+    // upload file to ipfs and get its url
+    if (!title) {
+      console.log('XXXttt ', title);
+      toast.level = 'warning';
+      toast.message = 'Title is required!';
+      setToastVisible(true);
+      return;
+    }
+
     let imageBuffer: Buffer | null = null;
 
     if (actualPanel === 'panelUpload') {
-      if (cover) { // read the file as a Buffer
+      if (cover) {
+        // read the file as a Buffer
         const reader = new FileReader();
         reader.readAsArrayBuffer(cover);
         await new Promise((resolve, reject) => {
@@ -177,11 +197,15 @@ const Create: NextPage = () => {
     }
 
     if (actualPanel === 'panelLink') {
-      imageBuffer = await getBufferFromElement(imageURL);
+      const imgTarget = imageURL ? imageURL : 'public/img/post.png';
+      imageBuffer = await getBufferFromElement(imgTarget);
+      console.log('imgTarget ', imageBuffer);
     }
 
     if (actualPanel === 'panelAI') {
-      imageBuffer = Buffer.from(generatedImage2, 'base64');
+      imageBuffer = generatedImage2
+        ? Buffer.from(generatedImage2, 'base64')
+        : null;
     }
 
     const constructedPost: IbuiltPost = {
@@ -214,7 +238,12 @@ const Create: NextPage = () => {
       console.log('POST RESULT: ', result);
       // FIXME
       // if (result.isOk) {
-      setIsSuccessVisible(true);
+      // setIsSuccessVisible(true);
+
+      toast.message = 'Post created successfully!';
+      toast.level = 'success';
+      setToastVisible(true);
+
       await sleep();
       router.push('/app');
       // } else {
@@ -370,7 +399,7 @@ const Create: NextPage = () => {
             name="link"
             id="link"
             placeholder="Insert the link starting with 'https://'"
-            onChange={ handleInputChange }
+            onChange={handleInputChange}
           />
         </div>
 
@@ -472,28 +501,38 @@ const Create: NextPage = () => {
         </div>
 
         <div className="text-right">
-          {isSuccessVisible && (
+          {/* {isSuccessVisible && (
             <Toast text="Post created successfully!" level="success" />
           )}
           {isErrorVisible && (
             <Toast text="Something went wrong" level="error" />
-          )}
+          )} */}
 
+          {isToastVisible && <Toast text={toast.message} level={toast.level} />}
           <div className="pb-6 text-right">
             <div className="flex h-full min-w-fit items-center  justify-end border-black   pl-8 ">
-              <button
-                disabled={loading}
-                onClick={() =>
-                  handlePost().then(() => {
-                    // useWaitFiveSeconds();
-                  })
-                }
-                className="flex align-middle"
-              >
-                <div className="button_Nobg flex items-center bg-lensPurple text-lensGray">
-                  {loading && (
+              {!loading ? (
+                <button
+                  onClick={() =>
+                    handlePost().then(() => {
+                      // FIXME
+                      // useWaitFiveSeconds();
+                    })
+                  }
+                  className="flex align-middle"
+                >
+                  <div className="button_Nobg flex items-center bg-lensPurple text-lensGray">
+                    <div className="px-4 py-2 text-xl">Create post</div>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  // disabled={loading}
+                  className="flex cursor-default align-middle"
+                >
+                  <div className=" flex items-center rounded-lg border-2 bg-white text-gray-400">
                     <svg
-                      className="ml-2 h-5 w-5 animate-spin"
+                      className="ml-4 h-5 w-5 animate-spin"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -512,10 +551,10 @@ const Create: NextPage = () => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                  )}
-                  <div className="px-4 py-2 text-xl">Create Post</div>
-                </div>
-              </button>
+                    <div className="py-2 pl-2 pr-4 text-xl">Posting </div>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
         </div>
