@@ -1,13 +1,19 @@
-const LS_LENS_STORE = "lens.store";
+import { ProfileQuery } from './graphql/generated';
+
+const LS_LENS_STORE = 'lens_store';
 
 export type LensLocalStorage = {
   accessToken: string;
   refreshToken: string;
-  handle: string;
-  name: string;
-  pictureUrl: string | null;
-  id: string;
-  bio: string;
+  profile: ProfileQuery['profile'];
+  // bio: string;
+  // canUseRelay: boolean | undefined;
+  // coverUrl: string | null;
+  // id: string;
+  // handle: string;
+  // name: string;
+  // pictureUrl: string | null;
+  // attributes: AttributeData[];
 };
 
 export const getFromLocalStorage = (): LensLocalStorage | null => {
@@ -25,6 +31,8 @@ export const getFromLocalStorage = (): LensLocalStorage | null => {
 };
 
 export const setLensLocalStorage = (lensStore: LensLocalStorage) => {
+  console.log('seteando storage: ', lensStore);
+  console.log('type storage: ', typeof lensStore.profile?.attributes);
   window.localStorage.setItem(LS_LENS_STORE, JSON.stringify(lensStore));
 };
 

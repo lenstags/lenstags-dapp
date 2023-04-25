@@ -1,7 +1,8 @@
-import Head from "next/head";
-import React, { FC, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
-import { Navbar, UnauthorizedScreen } from "components";
+import { Navbar, UnauthorizedScreen } from 'components';
+import React, { FC, useEffect, useState } from 'react';
+
+import Head from 'next/head';
+import { useAccount } from 'wagmi';
 
 interface Props {
   title: string;
@@ -14,12 +15,12 @@ export const Layout: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen,
+  screen
 }) => {
   const { isConnected } = useAccount();
-  const [hydrationLoading, sethydrationLoading] = useState(true);
+  const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
-    sethydrationLoading(false);
+    setHydrationLoading(false);
   }, []);
 
   if (hydrationLoading) {
@@ -27,7 +28,7 @@ export const Layout: FC<Props> = ({
       <div role="status">
         <svg
           aria-hidden="true"
-          className="mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-lime-300"
+          className="mr-2 h-8 w-8 animate-spin fill-lime-300 text-gray-200 dark:text-gray-600"
           viewBox="0 0 100 101"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -55,11 +56,13 @@ export const Layout: FC<Props> = ({
       </Head>
       {isConnected ? (
         <>
-          {" "}
+          {' '}
           <nav>
             <Navbar />
           </nav>
-          <main className={`${!screen ? "h-screen" : "h-full"} bg-white mt-16`}>
+          <main
+            className={`${!screen ? 'h-screen' : 'h-full'} mt-16 bg-white `}
+          >
             {children}
           </main>
         </>

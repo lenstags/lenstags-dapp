@@ -1,58 +1,138 @@
-import "@rainbow-me/rainbowkit/styles.css";
+import '@rainbow-me/rainbowkit/styles.css';
 
-import jwt from "jsonwebtoken";
-import { createContext, useEffect, useState } from "react";
-import { useAccount } from "wagmi";
 import {
-  createAuthenticationAdapter,
-  RainbowKitAuthenticationProvider,
-} from "@rainbow-me/rainbowkit";
-import { generateChallenge, authenticate } from "@lib/lens/login";
-import { setAuthenticationToken } from "@lib/lens/graphql/apollo-client";
-import { getDefaultProfile } from "@lib/lens/default-profile";
-import {
+  LensLocalStorage,
   deleteLensLocalStorage,
   getFromLocalStorage,
-  LensLocalStorage,
-  setLensLocalStorage,
-} from "@lib/lens/localStorage";
-import { refresh } from "@lib/lens/refresh";
+  setLensLocalStorage
+} from '@lib/lens/localStorage';
+import { Profile, ProfileQuery } from '@lib/lens/graphql/generated';
+import {
+  RainbowKitAuthenticationProvider,
+  createAuthenticationAdapter
+} from '@rainbow-me/rainbowkit';
+import { authenticate, generateChallenge } from '@lib/lens/login';
+import { createContext, useEffect, useState } from 'react';
 
-type Profile = {
-  handle: string;
-  name: string;
-  pictureUrl: string | null;
-  id: string;
-  bio: string;
-};
+import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import { AttributeData } from '@lib/lens/interfaces/profile-metadata';
+import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
+import { getDefaultProfile } from '@lib/lens/default-profile';
+import jwt from 'jsonwebtoken';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { refresh } from '@lib/lens/refresh';
+import { setAuthenticationToken } from '@lib/lens/graphql/apollo-client';
+import { useAccount } from 'wagmi';
 
-export const ProfileContext = createContext<Profile | null>(null);
+export const ProfileContext = createContext<ProfileQuery['profile'] | null>(
+  null
+);
 
 export default function LensAuthenticationProvider({
-  children,
+  children
 }: {
   children: React.ReactNode;
 }) {
   const { address } = useAccount();
-  const [profile, setProfile] = useState<Profile | null>(null);
-
+  const [profile, setProfile] = useState<ProfileQuery['profile'] | null>(null);
+  console.log('🧨 1 - ', profile);
   const clearProfile = () => {
     setAuthenticationToken(null);
-    setAuthenticationStatus("unauthenticated");
+    setAuthenticationStatus('unauthenticated');
     setProfile(null);
     deleteLensLocalStorage();
   };
 
   const setAuthenticated = (lensStore: LensLocalStorage) => {
     setAuthenticationToken(lensStore.accessToken);
-    setAuthenticationStatus("authenticated");
-    setProfile({
-      handle: lensStore.handle,
-      pictureUrl: lensStore.pictureUrl,
-      name: lensStore.name,
-      id: lensStore.id,
-      bio: lensStore.bio,
-    });
+    setAuthenticationStatus('authenticated');
+    const attLocation: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      // traitType: 'sss',
+      // value: (lensStore.attributes as any)['location'].value,
+      value:
+        lensStore?.profile?.attributes?.find(
+          (attribute) => attribute.key === 'location'
+        )?.value || '',
+      key: 'location'
+    };
+
+    const attTwitter: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      // traitType: 'sss',
+      // value: (lensStore.attributes as any)['twitter'].value,
+      value:
+        lensStore?.profile?.attributes?.find(
+          (attribute) => attribute.key === 'twitter'
+        )?.value || '',
+      key: 'twitter'
+    };
+
+    const attWebsite: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      // traitType: 'sss',
+      // value: (lensStore.attributes as any)['website'].value,
+      value:
+        lensStore?.profile?.attributes?.find(
+          (attribute) => attribute.key === 'website'
+        )?.value || '',
+      key: 'website'
+    };
+
+    const attLists: AttributeData = {
+      displayType: MetadataDisplayType.string,
+      // traitType: 'sss',
+      // value: (lensStore.attributes as any)['website'].value,
+      value:
+        lensStore?.profile?.attributes?.find(
+          (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
+        )?.value || '',
+      key: ATTRIBUTES_LIST_KEY
+    };
+
+    console.log('--------');
+
+    console.log('-- ', attLists);
+    // TODO FIXME
+    // SERA QUE HAY DATOS INCOMPLETOS???
+    console.log(
+      '<<************************************************************'
+    );
+
+    const p: ProfileQuery['profile'] = lensStore.profile;
+
+    // @ts-ignore
+    const attt = lensStore.profile.attributes;
+    console.log('pp 1: ', lensStore.profile);
+    console.log('pp 2: ', p);
+    console.log('pp 3: ', attt);
+
+    // @ts-ignore
+    console.log('pp 4: ', lensStore.profile.attributes);
+    console.log('pp 5: ', p?.attributes);
+    console.log(
+      '>>************************************************************'
+    );
+    // console.log('lenstore.profile ', lensStore.profile);
+    // console.log('--p1 ', p);
+
+    if (p) {
+      if (
+        lensStore?.profile?.attributes?.find(
+          (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
+        )
+      ) {
+        p.attributes = [attLocation, attTwitter, attWebsite, attLists];
+      } else {
+        p.attributes = [attLocation, attTwitter, attWebsite];
+      }
+    }
+
+    setProfile(p);
+    console.log('--p2 ', p);
+    // console.log('--profile ', profile);
+
+    // console.log('🔴 setProfile: ', p);
   };
 
   useEffect(() => {
@@ -80,7 +160,7 @@ export default function LensAuthenticationProvider({
             const newLensStore = {
               ...lensStore,
               accessToken: newToken.accessToken,
-              refreshToken: newToken.refreshToken,
+              refreshToken: newToken.refreshToken
             };
             setLensLocalStorage(newLensStore);
             setAuthenticated(newLensStore);
@@ -94,16 +174,17 @@ export default function LensAuthenticationProvider({
     }
 
     setAuthenticated(lensStore);
+    // console.log('🔴 setAuthenticated ', lensStore);
   }, [address]);
 
   const [authenticationStatus, setAuthenticationStatus] = useState<
-    "loading" | "authenticated" | "unauthenticated"
-  >("unauthenticated");
+    'loading' | 'authenticated' | 'unauthenticated'
+  >('unauthenticated');
 
   const authenticationAdapter = createAuthenticationAdapter({
     getNonce: async () => {
       const challenge = await generateChallenge({
-        address,
+        address
       });
 
       return challenge.text;
@@ -123,24 +204,97 @@ export default function LensAuthenticationProvider({
       }
 
       const authenticatedResult = await authenticate({ address, signature });
-      const profile = await getDefaultProfile(address);
+      const pro = await getDefaultProfile(address); //🥵
 
-      if (!profile) {
+      if (!pro) {
+        throw `Cannot find default profile for ${address} `;
+      }
+
+      // profileQuery > profile
+      const profil: ProfileQuery['profile'] = await queryProfile({
+        profileId: pro.id
+      });
+
+      if (!profil) {
         return false;
       }
 
       // @ts-ignore
-      const pictureUrl = profile?.picture?.original?.url;
+      const pictureUrl = profil?.picture?.original?.url;
+      let coverUrl;
+
+      if (profil?.coverPicture?.__typename === 'MediaSet') {
+        coverUrl = profil?.coverPicture.original.url;
+      }
+      if (profil?.coverPicture?.__typename === 'NftImage') {
+        coverUrl = profil?.coverPicture.uri as string;
+      }
+
+      // FIXME Attributes type fixes
+
+      const attLocation: AttributeData = {
+        displayType: MetadataDisplayType.string,
+        // traitType: 'sss',
+        // value: (profile.attributes as any)['location'].value,
+        value:
+          profil?.attributes?.find((attribute) => attribute.key === 'location')
+            ?.value || '',
+        key: 'location'
+      };
+
+      const attTwitter: AttributeData = {
+        displayType: MetadataDisplayType.string,
+        // traitType: 'sss',
+        // value: (profile.attributes as any)['twitter'].value,
+        // value: profile.attributes?.entries. ['twitter'].value,
+        value:
+          profil?.attributes?.find((attribute) => attribute.key === 'twitter')
+            ?.value || '',
+        key: 'twitter'
+      };
+
+      const attWebsite: AttributeData = {
+        displayType: MetadataDisplayType.string,
+        // traitType: 'sss',
+        // value: (profile.attributes as any)['website'].value,
+        value:
+          profil?.attributes?.find((attribute) => attribute.key === 'website')
+            ?.value || '',
+        key: 'website'
+      };
+
+      const attLists: AttributeData = {
+        displayType: MetadataDisplayType.string,
+        // traitType: 'string',
+        // value: JSON.stringify(favIDsArray), // TODO CAN IT BE NON-STRINGIFIED?
+
+        value:
+          profil?.attributes?.find(
+            (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
+          )?.value || '',
+
+        key: ATTRIBUTES_LIST_KEY // TODO: USE ATTRIBUTES_LIST_KEY ONCE IN PROD
+      };
+
+      console.log('>>>>>> ', profil.attributes);
+
+      // TODO: LENSTORE OBJECT IS INCOMPLETE!
+
+      const attributesFixed: AttributeData[] = [
+        attLocation,
+        attWebsite,
+        attTwitter,
+        attLists
+      ];
+
+      profil.attributes = attributesFixed;
 
       const lensStore: LensLocalStorage = {
         accessToken: authenticatedResult.accessToken,
         refreshToken: authenticatedResult.refreshToken,
-        handle: profile.handle,
-        name: profile.name as string,
-        pictureUrl,
-        id: profile.id as string,
-        bio: profile.bio as string,
+        profile: profil
       };
+
       setLensLocalStorage(lensStore);
       setAuthenticated(lensStore);
 
@@ -150,7 +304,7 @@ export default function LensAuthenticationProvider({
     signOut: async () => {
       deleteLensLocalStorage();
       setAuthenticationToken(null);
-    },
+    }
   });
 
   return (

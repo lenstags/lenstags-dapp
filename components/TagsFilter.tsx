@@ -1,40 +1,43 @@
-import { useContext } from "react";
-import { useState } from "react";
-import { TAGS } from "../lib/tags";
-import { TagsFilterContext } from "./TagsFilterProvider";
+import CreatableSelect from 'react-select/creatable';
+import { TAGS } from '../lib/lens/tags';
+import { TagsFilterContext } from './TagsFilterProvider';
+import { useContext } from 'react';
+import { useState } from 'react';
 
-const selectedtyle = "bg-greenLengs text-black border-black shadow";
+const selectedStyle = 'bg-lensGreen text-black border-black shadow';
 
 // TODO Improve UI when there are too many tags for two lines
 export const TagsFilter = () => {
-  const [selected, setSelected] = useState<boolean[]>([]);
   const { setTags } = useContext(TagsFilterContext);
 
-  const toggleSelected = (index: number) => {
-    const newSelected = [...selected];
-    newSelected[index] = !selected[index];
-    setSelected(newSelected);
+  const [selectedOption, setSelectedOption] = useState([]);
 
-    const tags = TAGS.map((tag) => tag.id).filter(
-      (_, index) => newSelected[index]
-    );
-
-    setTags(tags);
+  const handleChange = (selectedOptions: any) => {
+    setSelectedOption(selectedOptions);
+    setTags(selectedOptions.map((t: any) => t.value));
   };
 
   return (
-    <div className="text-zinc-400 flex gap-2 text-xs flex-wrap max-h-16 overflow-hidden">
-      {TAGS.map((tag, index) => (
-        <span
-          className={`${
-            selected[index] ? selectedtyle : "border-zinc-400"
-          } px-2 py-1 whitespace-nowrap flex-1 flex justify-center cursor-pointer select-none border`}
-          key={index}
-          onClick={() => toggleSelected(index)}
-        >
-          {tag.title}
-        </span>
-      ))}
+    <div className="lens-input z-20 my-4 flex ">
+      <span className="ml-4 font-semibold">Tags</span>
+      <div className="w-full border-0 pl-4 ">
+        <CreatableSelect
+          styles={{
+            control: (baseStyles, state) => ({
+              ...baseStyles,
+              boxShadow: 'none',
+              borderColor: 'transparent',
+              '&:hover': {
+                borderColor: 'transparent'
+              }
+            })
+          }}
+          menuPortalTarget={document.querySelector('body')}
+          isMulti
+          onChange={handleChange}
+          options={TAGS}
+        />
+      </div>
     </div>
   );
-}
+};

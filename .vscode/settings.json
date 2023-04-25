@@ -1,5 +1,8 @@
 {
     "cSpell.words": [
-        "Lenstags"
-    ]
+        "ipfs",
+        "Lenstags",
+        "uuidv"
+    ],
+    "dotenv.enableAutocloaking": false
 }

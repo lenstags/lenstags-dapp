@@ -2,25 +2,26 @@ import {
   ApolloClient,
   ApolloLink,
   DefaultOptions,
-  from,
   HttpLink,
   InMemoryCache,
-} from "@apollo/client/core";
-import { onError } from "@apollo/client/link/error";
-import { getFromLocalStorage } from "../localStorage";
+  from
+} from '@apollo/client/core';
 
-const API_URL = "https://api.lens.dev";
+import { getFromLocalStorage } from '../localStorage';
+import { onError } from '@apollo/client/link/error';
+
+const API_URL = 'https://api-mumbai.lens.dev';
 let authenticationToken: string | null = null;
 
-const defaultOptions: DefaultOptions = {
+export const defaultOptions: DefaultOptions = {
   watchQuery: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "ignore",
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'ignore'
   },
   query: {
-    fetchPolicy: "no-cache",
-    errorPolicy: "all",
-  },
+    fetchPolicy: 'no-cache',
+    errorPolicy: 'all'
+  }
 };
 
 export const setAuthenticationToken = (token: string | null) => {
@@ -37,7 +38,7 @@ export const getAuthenticationToken = () => {
 
 const httpLink = new HttpLink({
   uri: API_URL,
-  fetch,
+  fetch
 });
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -56,8 +57,8 @@ const authLink = new ApolloLink((operation, forward) => {
 
   operation.setContext({
     headers: {
-      "x-access-token": token ? `Bearer ${token}` : "",
-    },
+      'x-access-token': token ? `Bearer ${token}` : ''
+    }
   });
 
   return forward(operation);
@@ -66,5 +67,5 @@ const authLink = new ApolloLink((operation, forward) => {
 export const apolloClient = new ApolloClient({
   link: from([errorLink, authLink, httpLink]),
   cache: new InMemoryCache(),
-  defaultOptions: defaultOptions,
+  defaultOptions: defaultOptions
 });

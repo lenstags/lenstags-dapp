@@ -1,26 +1,27 @@
-import "../styles/globals.css";
-import type { AppProps } from "next/app";
-import "@rainbow-me/rainbowkit/styles.css";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
-import { chain, configureChains, createClient, WagmiConfig } from "wagmi";
-import { publicProvider } from "wagmi/providers/public";
-import LensAuthenticationProvider from "components/LensAuthenticationProvider";
-import TagsFilterProvider from "components/TagsFilterProvider";
+import '../styles/globals.css';
+import type { AppProps } from 'next/app';
+import '@rainbow-me/rainbowkit/styles.css';
+import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
+import { configureChains, createClient, WagmiConfig } from 'wagmi';
+import { polygon, polygonMumbai } from '@wagmi/core/chains';
+import { publicProvider } from 'wagmi/providers/public';
+import LensAuthenticationProvider from 'components/LensAuthenticationProvider';
+import TagsFilterProvider from 'components/TagsFilterProvider';
 
 const { chains, provider } = configureChains(
-  [chain.polygon, chain.polygonMumbai],
+  [polygonMumbai],
   [publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "My RainbowKit App",
-  chains,
+  appName: 'My RainbowKit App',
+  chains
 });
 
 const wagmiClient = createClient({
   autoConnect: true,
   connectors,
-  provider,
+  provider
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -28,9 +29,9 @@ function MyApp({ Component, pageProps }: AppProps) {
     <WagmiConfig client={wagmiClient}>
       <LensAuthenticationProvider>
         <RainbowKitProvider chains={chains}>
-        <TagsFilterProvider>
-          <Component {...pageProps} />
-        </TagsFilterProvider>
+          <TagsFilterProvider>
+            <Component {...pageProps} />
+          </TagsFilterProvider>
         </RainbowKitProvider>
       </LensAuthenticationProvider>
     </WagmiConfig>
