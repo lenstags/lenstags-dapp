@@ -1,4 +1,4 @@
-import 'suneditor/dist/css/suneditor.min.css'; // Sun Editor's CSS File
+import 'suneditor/dist/css/suneditor.min.css';
 
 import dynamic from 'next/dynamic';
 

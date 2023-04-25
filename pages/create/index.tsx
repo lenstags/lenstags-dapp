@@ -51,7 +51,6 @@ const Create: NextPage = () => {
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
 
-  const [inputValue, setInputValue] = useState('');
   const [imageURL, setImageURL] = useState('');
   const [actualPanel, setActualPanel] = useState<string | null>('panelAI');
 
@@ -150,23 +149,15 @@ const Create: NextPage = () => {
     setLoadingIA(false);
   };
 
-  const handleLink = (event: ChangeEvent<HTMLInputElement>) => {
-    setInputValue(event.target.value);
-    handleInputChange(event);
-  };
-
   const handleChangeEditor = (content: string) => setEditorContents(content);
 
-  const handlePost = async () => {
-    // upload file to ipfs and get its url
+  const handlePost = async () => { // upload file to ipfs and get its url
     let imageBuffer: Buffer | null = null;
 
     if (actualPanel === 'panelUpload') {
-      if (cover) {
-        // read the file as a Buffer
+      if (cover) { // read the file as a Buffer
         const reader = new FileReader();
         reader.readAsArrayBuffer(cover);
-
         await new Promise((resolve, reject) => {
           reader.onloadend = () => {
             if (reader.result instanceof ArrayBuffer) {
@@ -178,7 +169,6 @@ const Create: NextPage = () => {
             }
             resolve(imageBuffer);
           };
-
           reader.onerror = () => {
             reject(reader.error);
           };
@@ -380,7 +370,7 @@ const Create: NextPage = () => {
             name="link"
             id="link"
             placeholder="Insert the link starting with 'https://'"
-            onChange={handleLink}
+            onChange={ handleInputChange }
           />
         </div>
 
