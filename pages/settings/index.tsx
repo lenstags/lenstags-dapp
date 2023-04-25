@@ -3,7 +3,6 @@ import {
   ProfileMetadata
 } from '@lib/lens/interfaces/profile-metadata';
 import React, { useContext, useEffect, useState } from 'react';
-// import { ProfileContext } from 'components/ProfileContext';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
@@ -15,6 +14,8 @@ import { ProfileContext } from '../../components/LensAuthenticationProvider';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { v4 as uuidv4 } from 'uuid';
+
+// import { ProfileContext } from 'components/ProfileContext';
 
 const Settings: NextPage = () => {
   const lensProfile = useContext(ProfileContext);
@@ -435,44 +436,6 @@ const Settings: NextPage = () => {
                       objectFit="cover"
                     />
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <p className="px-6 py-4">Actives lists</p>
-          <div
-            style={{ borderWidth: '0.5px', borderColor: '#949494' }}
-            className="rounded-md font-extralight shadow-md"
-          >
-            <div className="mx-6 my-4">
-              <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                <div className="col-span-2">Attributes</div>
-                <div className="col-span-10">
-                  {
-                    profileValues?.attributes?.find(
-                      (attribute: AttributeData) => attribute.key === 'lists'
-                    )?.value
-
-                    // {"displayType":"string",
-                    // "traitType":"string",
-                    // "key":"twitter",
-                    // "value":"@lenstags",
-                    // "__typename":"Attribute"}
-
-                    // JSON.stringify(profileValues)
-                  }
-                </div>
-              </div>
-
-              <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                <div className="col-span-2">Website</div>
-                <div className="col-span-10">
-                  {
-                    profileValues?.attributes?.find(
-                      (attribute: AttributeData) => attribute.key === 'website'
-                    )?.value
-                  }
                 </div>
               </div>
             </div>
