@@ -7,13 +7,41 @@ import Link from 'next/link';
 import { NextPage } from 'next';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
+import { queryProfile } from '@lib/lens/dispatcher';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [contentType, setContentType] = useState<any>('all');
+  const [lensProfile, setProfile] = useState<any>();
 
   const { tags } = useContext(TagsFilterContext);
-  const lensProfile = useContext(ProfileContext);
+  const lp = useContext(ProfileContext);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!lp) return;
+
+      const profileResult = await queryProfile({ profileId: lp.id });
+      if (!profileResult) return;
+
+      const pic =
+        profileResult.picture?.__typename === 'MediaSet'
+          ? profileResult.picture?.original.url
+          : profileResult.picture?.__typename === 'NftImage'
+          ? profileResult.picture.uri
+          : '/img/profilePic.png';
+
+      // setPictureUrl(pic);
+      setProfile(profileResult);
+      console.log(' --------- profile ', profileResult);
+      // window.localStorage.setItem(
+      //   'LENS_PROFILE',
+      //   JSON.stringify(profileResult)
+      // );
+      // setHydrationLoading(false);
+    };
+    fetchData().catch(console.error);
+  }, [lp]);
 
   useEffect(() => {
     explore({ tags }).then((data) => {
@@ -53,7 +81,7 @@ const MyProfile: NextPage = () => {
         return;
       }
     });
-  }, [contentType, tags]);
+  }, [contentType, lensProfile?.id, tags]);
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -81,8 +109,7 @@ const MyProfile: NextPage = () => {
 
         <div
           style={{
-            backgroundImage:
-              "linear-gradient(to bottom, transparent, white), url('/img/back.png')",
+            backgroundImage: `linear-gradient(to bottom, transparent, white), url('${lensProfile?.coverPicture?.original?.url}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}

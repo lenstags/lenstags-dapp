@@ -12,6 +12,7 @@ import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
 import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
+import { getBufferFromUpload } from '@lib/helpers'; // FIXME
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 
@@ -175,6 +176,8 @@ const Create: NextPage = () => {
 
     if (actualPanel === 'panelUpload') {
       if (cover) {
+        // FIXME
+        // imageBuffer = await getBufferFromUpload(cover);
         // read the file as a Buffer
         const reader = new FileReader();
         reader.readAsArrayBuffer(cover);

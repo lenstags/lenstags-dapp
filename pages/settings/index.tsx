@@ -1,3 +1,5 @@
+/* eslint-disable @next/next/no-img-element */
+
 import {
   AttributeData,
   ProfileMetadata
@@ -6,12 +8,14 @@ import React, { useContext, useEffect, useState } from 'react';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import FileInput from 'components/FileInput';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { NextPage } from 'next';
 import { ProfileContext } from '../../components/LensAuthenticationProvider';
 import { createDefaultList } from '@lib/lens/load-lists';
+import { imageToBase64 } from '@lib/helpers';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -27,6 +31,10 @@ const Settings: NextPage = () => {
   const [profileValues, setProfileValues] = useState<any>({});
   const [hydrationLoading, setHydrationLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [cover, setCover] = useState<File>();
+  const [coverImage, setCoverImage] = useState<string>('');
+  // const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string>('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,6 +64,30 @@ const Settings: NextPage = () => {
     };
     fetchData().catch(console.error);
   }, [lensProfile]);
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files && e.target.files[0];
+    if (selectedFile) {
+      // setSelectedImage(selectedFile);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImageUrl(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files && e.target.files[0];
+    if (selectedFile) {
+      // setSelectedImage(selectedFile);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPictureUrl(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
   const handleFindDefault = async () => {
     const profileResult = await queryProfile({ profileId: lensProfile?.id });
@@ -121,6 +153,7 @@ const Settings: NextPage = () => {
       { name: 'default', key: '0x222' } // set on the first setup
       // { name: 'anotherlist', key: '0x344' }
     ];
+
     const attLists: AttributeData = {
       displayType: MetadataDisplayType.string,
       traitType: 'string',
@@ -140,14 +173,46 @@ const Settings: NextPage = () => {
     // "__typename":"Attribute"}
 
     // default list setup
+    // let coverSrc = '';
+    // if (imageUrl) {
 
+    //   let imageBuffer: Buffer | null;
+    //   const reader = new FileReader();
+    //   reader.readAsArrayBuffer(cover);
+    //   await new Promise((resolve, reject) => {
+    //     reader.onloadend = () => {
+    //       if (reader.result instanceof ArrayBuffer) {
+    //         imageBuffer = Buffer.from(reader.result);
+    //         const base64String = imageBuffer.toString('base64');
+    //         coverSrc = `data:image/jpeg;base64,${base64String}`;
+    //         setCoverImage(coverSrc);
+    //         console.log('ssss ', coverSrc);
+    //       } else if (reader.result !== null) {
+    //         imageBuffer = Buffer.from(reader.result.toString());
+    //         const base64String = imageBuffer.toString('base64');
+    //         coverSrc = `data:image/jpeg;base64,${base64String}`;
+    //         setCoverImage(coverSrc);
+    //         console.log(' CoverImageCoverImage ', coverSrc);
+    //       } else {
+    //         // TODO: handle the case where reader.result is null
+    //       }
+    //       console.log(' imageBuffer  ', imageBuffer);
+    //       resolve(imageBuffer);
+    //     };
+    //     reader.onerror = () => {
+    //       reject(reader.error);
+    //     };
+    //   });
+    // }
+    console.log(' 🅾️🅾️🅾️🅾️🅾️🅾️🅾️🅾️ ', pictureUrl);
     const profileMetadata: ProfileMetadata = {
       version: '1.0.0', // TODO: centralize this!
       metadata_id: uuidv4(),
       name: profileValues.name,
       bio: profileValues.bio || 'empty bio',
-      cover_picture: 'https://picsum.photos/200/333',
-      profile_picture: 'https://picsum.photos/200/444',
+      cover_picture: imageUrl || (await imageToBase64('/img/back.png')),
+      profile_picture:
+        pictureUrl || (await imageToBase64('/img/profilePic.png')),
       attributes: [attLocation, attTwitter, attWebsite, attLists]
     };
 
@@ -249,27 +314,6 @@ const Settings: NextPage = () => {
             style={{ borderWidth: '0.5px', borderColor: '#949494' }}
             className="rounded-md font-extralight shadow-md"
           >
-            {/* TODO: row, COMPONENTIZE THIS!*/}
-            {/* <div className="px-6 py-4">
-              <div className="flex items-center">
-                <span className="">Name</span>
-                <input
-                  className=" mx-4 rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 outline-none"
-                  type="text"
-                  name="name"
-                  id="name"
-                  defaultValue={profileValues?.name || ''}
-                  onChange={(e) =>
-                    setProfileValues({ ...profileValues, name: e.target.value })
-                  }
-                />
-
-                <span className="w-full py-2 text-right text-sm text-gray-400 ">
-                  Profile id&nbsp; {lensProfile?.id || 'no-name'}
-                </span>
-              </div>
-            </div> */}
-
             <div className="mx-6 my-4">
               <div className="mb-4 grid grid-cols-12 items-center gap-4">
                 <div className="col-span-2">Handle</div>
@@ -402,11 +446,10 @@ const Settings: NextPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-12 items-center gap-4">
-                <div className="col-span-2">
-                  Profile pic
-                  {/* <span className="ml-6">Profile</span> */}
-                </div>
+              {/* <div className="grid grid-cols-12 items-center gap-4"> */}
+              <div className=" grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Profile pic</div>
+
                 <div className="col-span-3">
                   <div className="px-6 py-4">
                     <ImageProxied
@@ -420,26 +463,95 @@ const Settings: NextPage = () => {
                     />
                   </div>
                 </div>
-                <div className="col-span-1">
-                  Cover
-                  {/* <span className="ml-6">Cover</span> */}
-                </div>
+                <FileInput handleImageChange={handlePictureChange} />
+              </div>
+
+              {/* <div className="col-span-1">
+                Cover
+                <span
+                  className="focus:border-brand-400 mx-2   cursor-pointer rounded-md border border-gray-300 bg-white
+                 px-4 py-2   text-sm text-gray-700  shadow-md
+                 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                >
+                  <div className="flex">
+                    <img
+                      className=" "
+                      src="/assets/icons/addFile.svg"
+                      alt="Add file"
+                      width={20}
+                      height={20}
+                    />
+                    <label>
+                      Choose File
+                      <input
+                        className="hidden"
+                        name="cover"
+                        id="cover"
+                        accept=".png, .jpg, .jpeg"
+                        type="file"
+                        onChange={handleImageChange}
+                      />
+                    </label>
+                  </div>
+                </span>
+              </div> */}
+
+              <div className=" grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Cover</div>
+
+                <FileInput handleImageChange={handleCoverChange} />
+
+                {/* <label
+                  className="focus:border-brand-400 col-span-3 cursor-pointer appearance-none rounded-md border border-gray-300
+                   bg-gray-100
+                 px-4  py-2 text-sm
+                 text-gray-700 shadow-md focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+                >
+                  <div className="flex items-center">
+                    <img
+                      className="mr-2"
+                      src="/assets/icons/addFile.svg"
+                      alt="Choose file"
+                      width={20}
+                      height={20}
+                    />
+                    Choose File
+                    <input
+                      className="hidden"
+                      name="cover"
+                      id="cover"
+                      accept=".png, .jpg, .jpeg"
+                      type="file"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                </label> */}
+              </div>
+
+              {imageUrl && (
                 <div className="col-span-5">
                   <div className="w-full px-6 py-4">
-                    <ImageProxied
-                      category="profile"
+                    <img
                       className="w-full rounded-lg"
-                      src={pictureUrl}
+                      src={imageUrl}
                       alt="User cover picture"
-                      width={100}
-                      height={100}
-                      objectFit="cover"
+                      // width={100}
+                      // height={100}
+                      // objectFit="cover"
                     />
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
+
+          <button
+            onClick={handleClickSave}
+            className={`flex rounded-lg border-2 border-solid border-black px-3 py-2
+                   text-white disabled:bg-gray-300 `}
+          >
+            Save
+          </button>
         </div>
       )}
     </Layout>
