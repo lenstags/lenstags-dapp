@@ -24,6 +24,7 @@ import { createDefaultList } from '@lib/lens/load-lists';
 import { setProfileImageUri } from '@lib/lens/set-profile-image-uri-gasless';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { uploadImageIpfs } from '@lib/lens/ipfs';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
 
 // import { ProfileContext } from 'components/ProfileContext';
@@ -39,6 +40,7 @@ const Settings: NextPage = () => {
   const defaultLensProfile = useContext(ProfileContext); // TODO update lensProfile after save!
   const [lensProfile, setLensProfile] = useState(defaultLensProfile);
   // const { config } = useContext(AppContext); // TODO use later
+  const snackbar = useSnackbar();
 
   const [dispatcherActive, setDispatcherActive] = useState(false);
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
@@ -206,6 +208,10 @@ const Settings: NextPage = () => {
     updateProfileMetadata(lensProfile.id, profileMetadata)
       .then((updateResult) => {
         console.log('update result> ', updateResult);
+        snackbar.showMessage(
+          '✅ Profile updated successfully'
+          // 'Undo', () => handleUndo()
+        );
         setIsSuccessVisible(true);
         updateLocalStorageProfile(lensProfile.id);
       })
@@ -232,7 +238,7 @@ const Settings: NextPage = () => {
       {hydrationLoading ? (
         <div>Loading...</div>
       ) : (
-        <div className="container mx-auto h-64 w-11/12 px-6 py-10 text-black md:w-1/2">
+        <div className="md:w-1/2 container mx-auto h-64 w-11/12 px-6 py-10 text-black">
           <h1 className=" text-2xl">Settings</h1>
 
           <p className="px-6 py-4">Dispatcher</p>
@@ -288,6 +294,7 @@ const Settings: NextPage = () => {
 
                 {}
                 <p
+                  // FIXME
                   onDoubleClick={handleFindDefault}
                   // onClick={handleFindDefault}
                   className={`flex rounded-lg border-2 border-solid border-black px-3 py-2

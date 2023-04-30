@@ -12,9 +12,9 @@ import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
 import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
-import { getBufferFromUpload } from '@lib/helpers'; // FIXME
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -44,6 +44,8 @@ const sleep = () =>
 
 const Create: NextPage = () => {
   const [title, setTitle] = useState('');
+  const snackbar = useSnackbar();
+
   const [dispatcherStatus, setDispatcherStatus] = useState<boolean | undefined>(
     undefined
   );
@@ -165,10 +167,7 @@ const Create: NextPage = () => {
   const handlePost = async () => {
     // upload file to ipfs and get its url
     if (!title) {
-      console.log('XXXttt ', title);
-      toast.level = 'warning';
-      toast.message = 'Title is required!';
-      setToastVisible(true);
+      snackbar.showMessage('⚠️ Attention: Title is required!');
       return;
     }
 
@@ -193,7 +192,7 @@ const Create: NextPage = () => {
             resolve(imageBuffer);
           };
           reader.onerror = () => {
-            reject(reader.error);
+            return snackbar.showMessage('❌ Upload failed! Please try again.');
           };
         });
       }
@@ -226,7 +225,7 @@ const Create: NextPage = () => {
     };
 
     if (!lensProfile) {
-      return;
+      snackbar.showMessage('❌ You are not connected!');
     }
 
     setLoading(true);
@@ -242,10 +241,11 @@ const Create: NextPage = () => {
       // FIXME
       // if (result.isOk) {
       // setIsSuccessVisible(true);
+      snackbar.showMessage('👌🏻 Post created successfully!');
 
-      toast.message = 'Post created successfully!';
-      toast.level = 'success';
-      setToastVisible(true);
+      // toast.message = 'Post created successfully!';
+      // toast.level = 'success';
+      // setToastVisible(true);
 
       await sleep();
       router.push('/app');
@@ -254,8 +254,9 @@ const Create: NextPage = () => {
       //   console.error(e);
       // }
     } catch (e: any) {
-      setIsErrorVisible(true);
+      // setIsErrorVisible(true);
       console.error(e);
+      snackbar.showMessage('❌ Error: ' + e.message);
       setLoading(false);
     }
   };
@@ -365,7 +366,7 @@ const Create: NextPage = () => {
 
   return (
     <Layout title="Lenstags | Create post" pageDescription="Create post">
-      <div className="container mx-auto h-64  w-11/12 px-6 py-6 text-black md:w-1/2">
+      <div className="md:w-1/2 container mx-auto  h-64 w-11/12 px-6 py-6 text-black">
         <div className="text-xl font-semibold">
           <span className="text-left">Create post</span>
           <div

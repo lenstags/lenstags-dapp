@@ -29,7 +29,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
   const [dotTitle, setDotTitle] = useState('');
   const snackbar = useSnackbar();
   const [isDeleted, setIsDeleted] = useState(false);
-
+  const [opacity, setOpacity] = useState(1);
+  const [pointerEvents, setPointerEvents] = useState<any>('all');
   const [valueListName, setValueListName] = useState('');
   const [isListVisible, setIsListVisible] = useState(false);
   const [isListExistent, setIsListExistent] = useState(false);
@@ -89,6 +90,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
         '🗑️ Post removed successfully'
         // 'Undo', () => handleUndo()
       );
+      setOpacity(0.3);
+      setPointerEvents('none');
       setIsDeleted(true);
     });
 
@@ -162,16 +165,17 @@ const ExploreCard: FC<Props> = ({ post }) => {
     <div
       // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
-      className={`my-1 w-full px-1 md:w-1/2 lg:my-4 lg:w-1/4 lg:px-4 ${
-        isDeleted ? 'bg-gray-300' : ''
-      } `}
+      id="CardContainer"
+      className="   md:w-1/2 lg:w-1/4 my-1 w-full px-1 lg:my-4 lg:px-4"
+      style={{ opacity, pointerEvents }}
+      // style={{ opacity: 0.2 }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
 
       <article className="h-full">
         {/* favllect content goes here */}
         {isFavMenuVisible && (
-          <div className=" lens-post mt-3 h-full rounded-lg bg-white px-0">
+          <div className=" lens-post opac mt-3 h-full rounded-lg bg-white px-0">
             <div className="flex px-2">
               <button
                 id="btnBack"
