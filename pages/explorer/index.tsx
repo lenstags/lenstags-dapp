@@ -18,7 +18,7 @@ const Explorer: NextPage = () => {
   explore({ tags });
   return (
     <Layout title="Lenstags | Explore" pageDescription="Explore" screen={true}>
-      <div className="  mx-auto w-11/12  py-4 md:w-4/5  ">
+      <div className="  md:w-4/5 mx-auto  w-11/12 py-4  ">
         <TagsFilter />
 
         <div className="h-auto w-full">{/* <Pagination /> */}</div>

@@ -6,6 +6,7 @@ import Head from 'next/head';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
 import Pagination from 'components/Pagination';
+import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { explore } from '@lib/lens/explore-publications';
 
@@ -19,11 +20,19 @@ const App: NextPage = () => {
   const { tags } = useContext(TagsFilterContext);
 
   useEffect(() => {
-    explore({ tags }).then((data) => setPublications(data.items));
+    explore({ tags }).then((data) => {
+      return setPublications(data.items);
+    });
   }, [tags]);
 
   if (hydrationLoading) {
-    return <h1>Loading...</h1>;
+    return (
+      <div className="flex">
+        <div className="my-8 justify-center">
+          <Spinner h="10" w="10" />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -54,20 +63,23 @@ const App: NextPage = () => {
         <meta name="theme-color" content="#ffffff" />
       </Head>
       <Layout title={'Lenstags | Home'} pageDescription={'Welcome!'}>
-        <div className="container mx-auto h-64 w-11/12 px-6 py-10 md:w-4/5 ">
+        <div className="md:w-4/5 container mx-auto h-64 w-11/12 px-6 py-10 ">
           {/* <Profile /> */}
           {/* <Tabs /> */}
           <div className="mb-3">
             <TagsFilter />
           </div>
-
           <div className="container mx-auto ">
-            <div className="-mx-1 flex flex-wrap lg:-mx-4">
-              {publications
-                ? publications.map((post, index) => (
-                    <ExplorerCard post={post} key={index} />
-                  ))
-                : null}
+            <div className="-mx-1 flex flex-wrap justify-center lg:-mx-4">
+              {publications.length > 0 ? (
+                publications.map((post, index) => (
+                  <ExplorerCard post={post} key={index} />
+                ))
+              ) : (
+                <div className="my-8">
+                  <Spinner h="10" w="10" />
+                </div>
+              )}
             </div>
           </div>
           <div className="h-auto w-full">

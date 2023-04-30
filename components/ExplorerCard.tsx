@@ -166,7 +166,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
       // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
       id="CardContainer"
-      className="   md:w-1/2 lg:w-1/4 my-1 w-full px-1 lg:my-4 lg:px-4"
+      className=" md:w-1/2 lg:w-1/4 s   my-1 w-full px-1 animate-in fade-in-50  duration-1000 lg:my-4 lg:px-4"
       style={{ opacity, pointerEvents }}
       // style={{ opacity: 0.2 }}
     >
@@ -411,7 +411,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         // width={'100%'}
                         // height={'100%'}
                         objectFit="cover"
-                        className=" w-full rounded-md"
+                        className=" w-full rounded-md  animate-in fade-in-50 duration-1000"
                         src={post.metadata.media[0]?.original.url}
                       />
                     </div>

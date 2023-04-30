@@ -304,9 +304,9 @@ export const Navbar = () => {
 
                   <div className=" mx-2 p-2 text-gray-400">
                     <Link href={'#'}>
-                      <a className="cursor-default" title="Soon">
+                      <p className="cursor-default" title="Soon">
                         PROJECTS
-                      </a>
+                      </p>
                     </Link>
                   </div>
 
