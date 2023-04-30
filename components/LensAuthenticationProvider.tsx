@@ -35,21 +35,17 @@ export default function LensAuthenticationProvider({
 }) {
   const { address } = useAccount();
   const [profile, setProfile] = useState<ProfileQuery['profile'] | null>(null);
-  console.log('🧨 1 - ', profile);
   const clearProfile = () => {
     setAuthenticationToken(null);
     setAuthenticationStatus('unauthenticated');
     setProfile(null);
     deleteLensLocalStorage();
   };
-
   const setAuthenticated = (lensStore: LensLocalStorage) => {
     setAuthenticationToken(lensStore.accessToken);
     setAuthenticationStatus('authenticated');
     const attLocation: AttributeData = {
       displayType: MetadataDisplayType.string,
-      // traitType: 'sss',
-      // value: (lensStore.attributes as any)['location'].value,
       value:
         lensStore?.profile?.attributes?.find(
           (attribute) => attribute.key === 'location'
@@ -59,8 +55,6 @@ export default function LensAuthenticationProvider({
 
     const attTwitter: AttributeData = {
       displayType: MetadataDisplayType.string,
-      // traitType: 'sss',
-      // value: (lensStore.attributes as any)['twitter'].value,
       value:
         lensStore?.profile?.attributes?.find(
           (attribute) => attribute.key === 'twitter'
@@ -70,8 +64,6 @@ export default function LensAuthenticationProvider({
 
     const attWebsite: AttributeData = {
       displayType: MetadataDisplayType.string,
-      // traitType: 'sss',
-      // value: (lensStore.attributes as any)['website'].value,
       value:
         lensStore?.profile?.attributes?.find(
           (attribute) => attribute.key === 'website'
@@ -81,8 +73,6 @@ export default function LensAuthenticationProvider({
 
     const attLists: AttributeData = {
       displayType: MetadataDisplayType.string,
-      // traitType: 'sss',
-      // value: (lensStore.attributes as any)['website'].value,
       value:
         lensStore?.profile?.attributes?.find(
           (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
@@ -90,11 +80,10 @@ export default function LensAuthenticationProvider({
       key: ATTRIBUTES_LIST_KEY
     };
 
-    console.log('--------');
+    console.log('l---attLists-----');
 
-    console.log('-- ', attLists);
+    console.log('attLists-- ', attLists);
     // TODO FIXME
-    // SERA QUE HAY DATOS INCOMPLETOS???
     console.log(
       '<<************************************************************'
     );
@@ -113,19 +102,15 @@ export default function LensAuthenticationProvider({
     console.log(
       '>>************************************************************'
     );
-    // console.log('lenstore.profile ', lensStore.profile);
-    // console.log('--p1 ', p);
 
-    if (p) {
+    if (p && lensStore?.profile?.attributes) {
+      const attributes = [attLocation, attTwitter, attWebsite];
       if (
-        lensStore?.profile?.attributes?.find(
-          (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-        )
+        lensStore.profile.attributes.find((a) => a.key === ATTRIBUTES_LIST_KEY)
       ) {
-        p.attributes = [attLocation, attTwitter, attWebsite, attLists];
-      } else {
-        p.attributes = [attLocation, attTwitter, attWebsite];
+        attributes.push(attLists);
       }
+      p.attributes = attributes;
     }
 
     setProfile(p);
@@ -204,7 +189,7 @@ export default function LensAuthenticationProvider({
       }
 
       const authenticatedResult = await authenticate({ address, signature });
-      const pro = await getDefaultProfile(address); //🥵
+      const pro = await getDefaultProfile(address); // TODO Check when defaultProfilen't
 
       if (!pro) {
         throw `Cannot find default profile for ${address} `;
@@ -289,6 +274,12 @@ export default function LensAuthenticationProvider({
 
       profil.attributes = attributesFixed;
 
+      // TODO
+      console.log(
+        'TOKENS DE LA APP ',
+        authenticatedResult.accessToken,
+        authenticatedResult.refreshToken
+      );
       const lensStore: LensLocalStorage = {
         accessToken: authenticatedResult.accessToken,
         refreshToken: authenticatedResult.refreshToken,

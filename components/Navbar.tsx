@@ -1,13 +1,17 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 
 import React, { useContext, useEffect, useState } from 'react';
+import {
+  deleteLensLocalStorage,
+  getFromLocalStorage
+} from 'lib/lens/localStorage';
 
-import { AttributeData } from '@lib/lens/interfaces/profile-metadata';
+import { AppContext } from 'context/AppContext';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
+import { MediaSet } from '@lib/lens/graphql/generated';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { TagsFilterContext } from './TagsFilterProvider';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { explore } from '../lib/lens/explore-publications';
 import { getLastComment } from '@lib/lens/get-publications';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
@@ -15,13 +19,13 @@ import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 
 export const Navbar = () => {
-  const asyncFunc = async () => {
-    const p = await getLastComment('0x4b87-0x0178');
-    console.log('PUBLICATION3 with new comments: ', p);
-  };
-
+  // const asyncFunc = async () => {
+  //   const p = await getLastComment('0x4b87-0x0178');
+  //   console.log('PUBLICATION3 with new comments: ', p);
+  // };
   const { openConnectModal } = useConnectModal();
-  const [show, setShow] = useState(false);
+  const { config, updateConfig } = useContext(AppContext);
+  const [showMobileNav, setShowMobileNav] = useState(false);
   const [profileView, setProfileView] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
@@ -30,15 +34,20 @@ export const Navbar = () => {
     deleteLensLocalStorage();
     disconnect();
   };
+
   const { tags } = useContext(TagsFilterContext);
   const lensProfile = useContext(ProfileContext);
-  // TODO: TEST THIS FOR NFT URI!!!
+  // TODO: TEST THIS FOR NFT URI
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
       ? lensProfile?.picture.original.url
       : lensProfile?.picture?.__typename === 'NftImage'
       ? lensProfile?.picture.uri
       : '/img/profilePic.png';
+
+  const toggleDarkMode = () => {
+    updateConfig({ isDarkMode: !config.isDarkMode });
+  };
 
   const router = useRouter();
 
@@ -53,18 +62,28 @@ export const Navbar = () => {
         ' of: ',
         data.items.length
       );
-      // console.log('tagsss ', tags);
+      // console.log('tags ', tags);
     });
   }, [tags, lensProfile]);
 
+  // const mediaSet = getFromLocalStorage()?.profile?.picture as MediaSet;
+  // const [storePic, setStorePic] = useState(mediaSet.original.url || '');
+  // useEffect(() => {
+  //   const media = getFromLocalStorage()?.profile?.picture as MediaSet;
+  //   const storedMedia = media.original.url;
+  //   if (storedMedia !== storePic) {
+  //     setStorePic(storedMedia);
+  //   }
+  // }, [storePic]);
+
   return (
     <>
-      <div className="h-full w-full bg-gray-100">
+      <div className="h-full w-full">
         <div className="flex-no-wrap flex">
-          {/*Mobile responsive sidebar*/}
+          {/* Mobile responsive sidebar */}
           <div
             className={
-              show
+              showMobileNav
                 ? 'absolute z-40 h-full w-full  translate-x-0  transform '
                 : '   absolute z-40 h-full w-full  -translate-x-full transform'
             }
@@ -72,7 +91,7 @@ export const Navbar = () => {
           >
             <div
               className="absolute h-full w-full bg-gray-800 opacity-50 lg:hidden"
-              onClick={() => setShow(!show)}
+              onClick={() => setShowMobileNav(!showMobileNav)}
             />
             <div className="absolute z-40 h-full w-64 bg-lensGreen pb-4 shadow  transition duration-150 ease-in-out sm:relative md:w-96 lg:hidden">
               <div className="flex h-full w-full flex-col justify-between">
@@ -92,7 +111,7 @@ export const Navbar = () => {
                     <div
                       id="closeSideBar"
                       className="flex h-10 w-10 items-center justify-center"
-                      onClick={() => setShow(!show)}
+                      onClick={() => setShowMobileNav(!showMobileNav)}
                     >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -210,7 +229,7 @@ export const Navbar = () => {
                         </p>
                       </div>
                       <ul className="flex">
-                        <li className="cursor-pointer pb-3 pt-5 text-white">
+                        {/* <li className="cursor-pointer pb-3 pt-5 text-white">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-messages"
@@ -227,8 +246,8 @@ export const Navbar = () => {
                             <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
                             <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
                           </svg>
-                        </li>
-                        <li className="cursor-pointer pb-3 pl-3 pt-5 text-white">
+                        </li> */}
+                        {/* <li className="cursor-pointer pb-3 pl-3 pt-5 text-white">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             className="icon icon-tabler icon-tabler-bell"
@@ -245,7 +264,7 @@ export const Navbar = () => {
                             <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
                             <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
                           </svg>
-                        </li>
+                        </li> */}
                       </ul>
                     </div>
                   </div>
@@ -254,12 +273,13 @@ export const Navbar = () => {
             </div>
           </div>
 
+          {/* Desktop sidebar */}
           <div className="fixed top-0 z-50 w-full border-b-2 border-black">
             <nav
-              className="relative z-10 flex h-16 items-center justify-end bg-lensGreen
-              px-10  text-sm animate-in
-              slide-in-from-top  duration-500 lg:items-stretch lg:justify-between
-              "
+              className={`relative z-10 flex h-16 items-center justify-end bg-lensGreen
+              px-10  text-sm lg:items-stretch lg:justify-between
+              ${config.firstRun && ' '}  
+              `}
             >
               <div className="hidden w-full pr-6 lg:flex">
                 <Link href={'/'}>
@@ -273,24 +293,51 @@ export const Navbar = () => {
                 </Link>
 
                 <div className="h-full w-1/2 items-center pl-6 pr-24 text-black lg:flex">
-                  {/**Here comes the Navbar items */}
+                  {/* Here comes the Navbar items */}
                   <div
-                    className={`mx-2 p-2 ${
-                      router.asPath === '/app' && 'bg-lensBlack text-lensGray'
+                    className={`mx-4 cursor-pointer rounded-md p-2  px-3 ${
+                      router.asPath === '/app' && ' bg-gray-700 text-lensGray'
                     } hover:bg-lensBlack hover:text-lensGray `}
                   >
                     <Link href={'/app'}>EXPLORE</Link>
                   </div>
 
-                  <div
-                    className={`mx-2  p-2 text-gray-400 ${
-                      router.asPath === '/app#' && 'bg-gray-400 text-gray-400'
-                    } hover:bg-gray hover:text-lensGray`}
-                  >
+                  <div className=" mx-2 p-2 text-gray-400">
                     <Link href={'#'}>
-                      <a title="Soon">PROJECTS</a>
+                      <a className="cursor-default" title="Soon">
+                        PROJECTS
+                      </a>
                     </Link>
                   </div>
+
+                  {/* <div>
+                    <label htmlFor="darkmode-toggle">Dark Mode</label>
+                    <input
+                      type="checkbox"
+                      id="darkmode-toggle"
+                      checked={config.isDarkMode}
+                      onChange={toggleDarkMode}
+                    />
+                  </div>
+
+                  <div
+                    className={config.isDarkMode ? 'bg-red-200' : 'bg-blue-200'}
+                  >
+                    Enabled
+                  </div> */}
+
+                  {/* <button
+                    onClick={() => {
+                      if (config.firstRun) {
+                        updateConfig({ firstRun: false });
+                        const lensStore = getFromLocalStorage();
+                        lensStore?.firstRun = false;
+                      }
+                    }}
+                  >
+                    Got it!
+                  </button> */}
+
                   {/* <div
                     className={`mx-2  p-2 ${
                       router.asPath === '/lists#' &&
@@ -348,7 +395,7 @@ export const Navbar = () => {
                         </button>
                       </div>
 
-                      <div className="flex h-full w-20 items-center justify-center  border-black">
+                      {/* <div className="flex h-full w-20 items-center justify-center  border-black">
                         <div className="relative cursor-pointer text-gray-600 hover:text-black">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -368,9 +415,9 @@ export const Navbar = () => {
                           </svg>
                           <div className="absolute inset-0 m-auto mr-1 mt-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
                         </div>
-                      </div>
+                      </div> */}
 
-                      <div className="mr-4 flex h-full w-20 cursor-pointer  items-center justify-center border-black text-gray-600 hover:text-black">
+                      {/* <div className="mr-4 flex h-full w-20 cursor-pointer  items-center justify-center border-black text-gray-600 hover:text-black">
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           className="icon icon-tabler icon-tabler-messages"
@@ -387,7 +434,7 @@ export const Navbar = () => {
                           <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
                           <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
                         </svg>
-                      </div>
+                      </div> */}
                       <div
                         className="relative flex cursor-pointer items-center "
                         onClick={() => setProfileView(!profileView)}
@@ -552,7 +599,7 @@ export const Navbar = () => {
               </div>
               <div
                 className=" visible   relative text-lensBlack lg:hidden"
-                onClick={() => setShow(!show)}
+                onClick={() => setShowMobileNav(!showMobileNav)}
               >
                 <div className="flex w-screen items-center justify-between">
                   <div className="ml-20">
@@ -566,7 +613,7 @@ export const Navbar = () => {
                     />
                   </div>
                   <div className="mr-3">
-                    {show ? (
+                    {showMobileNav ? (
                       <ImageProxied
                         category="profile"
                         src="/assets/icons/x.svg"
@@ -594,7 +641,6 @@ export const Navbar = () => {
                         <line x1={4} y1={16} x2={20} y2={16} />
                       </svg>
                     )}
-                    {''}
                   </div>
                 </div>
               </div>

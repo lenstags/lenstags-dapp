@@ -1,13 +1,19 @@
 /* eslint-disable @next/next/no-img-element */
 
 import {
+  ATTRIBUTES_LIST_KEY,
+  DEFAULT_IMAGE_IPFS_PROFILE,
+  IPFS_PROXY_URL
+} from '@lib/config';
+import {
   AttributeData,
   ProfileMetadata
 } from '@lib/lens/interfaces/profile-metadata';
 import React, { useContext, useEffect, useState } from 'react';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
+import { imageToBase64, pickPicture } from '@lib/helpers';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import { AppContext } from 'context/AppContext';
 import FileInput from 'components/FileInput';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
@@ -15,14 +21,25 @@ import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { NextPage } from 'next';
 import { ProfileContext } from '../../components/LensAuthenticationProvider';
 import { createDefaultList } from '@lib/lens/load-lists';
-import { imageToBase64 } from '@lib/helpers';
+import { setProfileImageUri } from '@lib/lens/set-profile-image-uri-gasless';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
+import { uploadImageIpfs } from '@lib/lens/ipfs';
 import { v4 as uuidv4 } from 'uuid';
 
 // import { ProfileContext } from 'components/ProfileContext';
 
+export const updateLocalStorageProfile = (profileId: string) =>
+  queryProfile({ profileId })
+    .then((profileResult) =>
+      window.localStorage.setItem('LENS_PROFILE', JSON.stringify(profileResult))
+    )
+    .catch((err) => console.log('Error storing updated profile: ', err));
+
 const Settings: NextPage = () => {
-  const lensProfile = useContext(ProfileContext);
+  const defaultLensProfile = useContext(ProfileContext); // TODO update lensProfile after save!
+  const [lensProfile, setLensProfile] = useState(defaultLensProfile);
+  // const { config } = useContext(AppContext); // TODO use later
+
   const [dispatcherActive, setDispatcherActive] = useState(false);
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
@@ -31,30 +48,28 @@ const Settings: NextPage = () => {
   const [profileValues, setProfileValues] = useState<any>({});
   const [hydrationLoading, setHydrationLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [cover, setCover] = useState<File>();
-  const [coverImage, setCoverImage] = useState<string>('');
-  // const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState<string>('');
+  const [coverUrlBase64, setCoverUrlBase64] = useState<string>('');
+  const [imageBuffer, setImageBuffer] = useState<Buffer | null>(null);
+  const [profileChanged, setProfileChanged] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!lensProfile) return;
-
-      const profileResult = await queryProfile({ profileId: lensProfile.id });
+      if (!defaultLensProfile) return;
+      const profileResult = await queryProfile({
+        profileId: defaultLensProfile.id
+      });
+      setLensProfile(profileResult);
       setDispatcherActive(
         profileResult?.dispatcher?.canUseRelay
           ? profileResult?.dispatcher?.canUseRelay
           : false
       );
 
-      const pic =
-        lensProfile.picture?.__typename === 'MediaSet'
-          ? lensProfile.picture?.original.url
-          : lensProfile.picture?.__typename === 'NftImage'
-          ? lensProfile.picture.uri
-          : '/img/profilePic.png';
+      const pic = pickPicture(profileResult?.picture, '/img/profilePic.png');
+      const cov = pickPicture(profileResult?.coverPicture, '/img/back.png');
 
       setPictureUrl(pic);
+      setCoverUrlBase64(cov);
       setProfileValues(profileResult);
       window.localStorage.setItem(
         'LENS_PROFILE',
@@ -63,15 +78,14 @@ const Settings: NextPage = () => {
       setHydrationLoading(false);
     };
     fetchData().catch(console.error);
-  }, [lensProfile]);
+  }, [defaultLensProfile]);
 
   const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files && e.target.files[0];
     if (selectedFile) {
-      // setSelectedImage(selectedFile);
       const reader = new FileReader();
       reader.onload = () => {
-        setImageUrl(reader.result as string);
+        setCoverUrlBase64(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
     }
@@ -80,10 +94,13 @@ const Settings: NextPage = () => {
   const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files && e.target.files[0];
     if (selectedFile) {
-      // setSelectedImage(selectedFile);
       const reader = new FileReader();
       reader.onload = () => {
-        setPictureUrl(reader.result as string);
+        const base64 = reader.result as string;
+        setPictureUrl(base64);
+        const bytes = Buffer.from(base64.split(',')[1], 'base64');
+        setImageBuffer(bytes);
+        setProfileChanged(true);
       };
       reader.readAsDataURL(selectedFile);
     }
@@ -95,7 +112,6 @@ const Settings: NextPage = () => {
     let defaultListId = profileResult?.attributes?.find(
       (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
     )?.value;
-
     console.log('list result?: ', defaultListId);
 
     if (!defaultListId) {
@@ -116,6 +132,7 @@ const Settings: NextPage = () => {
 
     setSaving(true);
 
+    // FIXME Simplify this
     const attLocation: AttributeData = {
       displayType: MetadataDisplayType.string,
       traitType: 'string',
@@ -166,76 +183,47 @@ const Settings: NextPage = () => {
       key: 'lists0'
     };
 
-    // {"displayType":"string",
-    // "traitType":"string",
-    // "key":"twitter",
-    // "value":"@lenstags",
-    // "__typename":"Attribute"}
+    let newPictureUrl: string; // url original or uploaded
 
-    // default list setup
-    // let coverSrc = '';
-    // if (imageUrl) {
+    if (profileChanged && imageBuffer) {
+      const imageIpfsResult = await uploadImageIpfs(imageBuffer); // uploads picture to ipfs
+      newPictureUrl = `ipfs://${imageIpfsResult.path}`;
+      await setProfileImageUri(lensProfile.id, dispatcherActive, newPictureUrl);
+    } else {
+      newPictureUrl = pickPicture(lensProfile.picture, '/img/profilePic.png'); // let's keep the original url
+    }
 
-    //   let imageBuffer: Buffer | null;
-    //   const reader = new FileReader();
-    //   reader.readAsArrayBuffer(cover);
-    //   await new Promise((resolve, reject) => {
-    //     reader.onloadend = () => {
-    //       if (reader.result instanceof ArrayBuffer) {
-    //         imageBuffer = Buffer.from(reader.result);
-    //         const base64String = imageBuffer.toString('base64');
-    //         coverSrc = `data:image/jpeg;base64,${base64String}`;
-    //         setCoverImage(coverSrc);
-    //         console.log('ssss ', coverSrc);
-    //       } else if (reader.result !== null) {
-    //         imageBuffer = Buffer.from(reader.result.toString());
-    //         const base64String = imageBuffer.toString('base64');
-    //         coverSrc = `data:image/jpeg;base64,${base64String}`;
-    //         setCoverImage(coverSrc);
-    //         console.log(' CoverImageCoverImage ', coverSrc);
-    //       } else {
-    //         // TODO: handle the case where reader.result is null
-    //       }
-    //       console.log(' imageBuffer  ', imageBuffer);
-    //       resolve(imageBuffer);
-    //     };
-    //     reader.onerror = () => {
-    //       reject(reader.error);
-    //     };
-    //   });
-    // }
-    console.log(' 🅾️🅾️🅾️🅾️🅾️🅾️🅾️🅾️ ', pictureUrl);
     const profileMetadata: ProfileMetadata = {
       version: '1.0.0', // TODO: centralize this!
       metadata_id: uuidv4(),
       name: profileValues.name,
       bio: profileValues.bio || 'empty bio',
-      cover_picture: imageUrl || (await imageToBase64('/img/back.png')),
-      profile_picture:
-        pictureUrl || (await imageToBase64('/img/profilePic.png')),
+      cover_picture: coverUrlBase64 || (await imageToBase64('/img/back.png')),
+      profile_picture: newPictureUrl,
       attributes: [attLocation, attTwitter, attWebsite, attLists]
     };
 
-    await updateProfileMetadata(lensProfile.id, profileMetadata);
-    setSaving(false);
-    const profileResult = await queryProfile({
-      profileId: lensProfile.id
-    });
-
-    console.log(' MY PROFILE UPDATED 💙💙💙💙 ', profileResult);
-    setIsSuccessVisible(true);
-
-    window.localStorage.setItem('LENS_PROFILE', JSON.stringify(profileResult));
+    updateProfileMetadata(lensProfile.id, profileMetadata)
+      .then((updateResult) => {
+        console.log('update result> ', updateResult);
+        setIsSuccessVisible(true);
+        updateLocalStorageProfile(lensProfile.id);
+      })
+      .catch((err) => {
+        console.log('ERRORR ', err); // TODO show toast error
+      })
+      .finally(() => {
+        setSaving(false);
+      });
   };
 
   const handleClickDispatcher = async () => {
     if (lensProfile) {
       setLoadingDispatcher(true);
       dispatcherActive
-        ? await disable(lensProfile.id)
-        : await enable(lensProfile.id).then(() => console.log('termine'));
+        ? await disable(lensProfile.id).then(() => setDispatcherActive(false))
+        : await enable(lensProfile.id).then(() => setDispatcherActive(true));
     }
-    // router.push('/');
     return;
   };
 
@@ -298,13 +286,15 @@ const Settings: NextPage = () => {
                   </button>
                 </div>
 
-                <button
-                  onClick={handleFindDefault}
+                {}
+                <p
+                  onDoubleClick={handleFindDefault}
+                  // onClick={handleFindDefault}
                   className={`flex rounded-lg border-2 border-solid border-black px-3 py-2
                    text-white disabled:bg-gray-300 `}
                 >
                   Find default list
-                </button>
+                </p>
               </div>
             </div>
           </div>
@@ -500,40 +490,15 @@ const Settings: NextPage = () => {
                 <div className="col-span-2">Cover</div>
 
                 <FileInput handleImageChange={handleCoverChange} />
-
-                {/* <label
-                  className="focus:border-brand-400 col-span-3 cursor-pointer appearance-none rounded-md border border-gray-300
-                   bg-gray-100
-                 px-4  py-2 text-sm
-                 text-gray-700 shadow-md focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                >
-                  <div className="flex items-center">
-                    <img
-                      className="mr-2"
-                      src="/assets/icons/addFile.svg"
-                      alt="Choose file"
-                      width={20}
-                      height={20}
-                    />
-                    Choose File
-                    <input
-                      className="hidden"
-                      name="cover"
-                      id="cover"
-                      accept=".png, .jpg, .jpeg"
-                      type="file"
-                      onChange={handleImageChange}
-                    />
-                  </div>
-                </label> */}
               </div>
 
-              {imageUrl && (
+              {coverUrlBase64 && (
                 <div className="col-span-5">
                   <div className="w-full px-6 py-4">
                     <img
+                      // TODO use crop on coming version
                       className="w-full rounded-lg"
-                      src={imageUrl}
+                      src={coverUrlBase64}
                       alt="User cover picture"
                       // width={100}
                       // height={100}

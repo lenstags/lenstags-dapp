@@ -69,3 +69,10 @@ export function readFile(file: Blob): Promise<string> {
     reader.readAsDataURL(file);
   });
 }
+
+export const pickPicture = (elementPicture: any, defaultPNG: string) =>
+  elementPicture?.__typename === 'MediaSet'
+    ? elementPicture?.original.url
+    : elementPicture?.__typename === 'NftImage'
+    ? elementPicture.uri
+    : defaultPNG;

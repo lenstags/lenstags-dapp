@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  background-color: #fff !important;
-}
 
 /*  div {
   border: red solid 1px;

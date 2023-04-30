@@ -1,6 +1,8 @@
 export const APP_NAME = 'lenstags_alpha_0.0.2.4';
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
+export const DEFAULT_IMAGE_IPFS_PROFILE =
+  'Qmf1BoAdUg9UaUYafEBJN1XVSiWWi4HQuReSs5Q2ZrPMDe';
 export const DEFAULT_IMAGE_POST = '/img/post.png';
 export const ATTRIBUTES_LIST_KEY = 'list_warehouse_1';
 export const PROFILE_METADATA_VERSION = '1.0.0';

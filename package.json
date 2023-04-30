@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.7.1",
+    "@emotion/styled": "^11.10.8",
     "@heroicons/react": "^2.0.12",
     "@rainbow-me/rainbowkit": "^0.12.4",
     "cheerio": "^1.0.0-rc.12",
@@ -20,6 +21,7 @@
     "ipfs-http-client": "^59.0.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
+    "material-ui-snackbar-provider": "^2.0.0",
     "moment": "^2.29.4",
     "multiselect-react-dropdown": "^2.0.25",
     "next": "12.3.1",

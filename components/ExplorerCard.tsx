@@ -13,6 +13,7 @@ import { getPublication } from '@lib/lens/get-publication';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface Props {
   post: any;
@@ -26,6 +27,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
   const [isPosting, setIsPosting] = useState(false);
   const [dotColor, setDotColor] = useState('');
   const [dotTitle, setDotTitle] = useState('');
+  const snackbar = useSnackbar();
+  const [isDeleted, setIsDeleted] = useState(false);
 
   const [valueListName, setValueListName] = useState('');
   const [isListVisible, setIsListVisible] = useState(false);
@@ -80,9 +83,14 @@ const ExploreCard: FC<Props> = ({ post }) => {
     fetchData();
   }, [post]);
 
-  const handleRemove = async (postId: string) => {
-    return await hidePublication(postId);
-  };
+  const handleRemove = (postId: string) =>
+    hidePublication(postId).then((res) => {
+      snackbar.showMessage(
+        '🗑️ Post removed successfully'
+        // 'Undo', () => handleUndo()
+      );
+      setIsDeleted(true);
+    });
 
   const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
     setValueListName(event.target.value);
@@ -154,7 +162,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
     <div
       // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
-      className="my-1 w-full px-1 md:w-1/2 lg:my-4 lg:w-1/4 lg:px-4  "
+      className={`my-1 w-full px-1 md:w-1/2 lg:my-4 lg:w-1/4 lg:px-4 ${
+        isDeleted ? 'bg-gray-300' : ''
+      } `}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
 
@@ -237,7 +247,6 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 ✦ CREATE AND ADD
               </button>
             </footer>
-
           </div>
         )}
 
@@ -303,39 +312,40 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       />
                     </div>
 
-                    <ul
-                      className="dropdown-menu absolute  right-1 top-6 z-10 hidden rounded-lg border-2 border-gray-200 
-                      bg-gray-50 text-lensBlack shadow-lg "
+                    <div
+                      className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
+                       border-gray-200 
+                      bg-gray-50 text-lensBlack shadow-lg  shadow-gray-400 "
                     >
-                      <li className="">
+                      <p className="">
                         <a
                           className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
                           href="#"
                         >
                           Share
                         </a>
-                      </li>
+                      </p>
 
-                      <li className="">
+                      <p className="">
+                        <a
+                          className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
+                          href="#"
+                        >
+                          Report
+                        </a>
+                      </p>
+
+                      <p className="">
                         {lensProfile && post.profile.id === lensProfile.id && (
                           <span
-                            className="whitespace-no-wrap flex bg-gray-50  px-4 py-2 hover:bg-lensGreen hover:text-black"
+                            className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
                             onClick={() => handleRemove(post.id)}
                           >
                             Remove
                           </span>
                         )}
-                      </li>
-
-                      <li className="">
-                        <a
-                          className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                          href="#"
-                        >
-                          Report
-                        </a>
-                      </li>
-                    </ul>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </h1>

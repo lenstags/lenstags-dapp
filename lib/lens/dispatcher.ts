@@ -32,7 +32,7 @@ export const enable = async (profileId: any) => {
     throw new Error('Must define profileId');
   }
 
-  const address = getAddressFromSigner();
+  const address = await getAddressFromSigner();
   console.log('🤖 set dispatcher: address', address);
 
   const result = await enableDispatcherWithTypedData({

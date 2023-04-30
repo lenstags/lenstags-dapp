@@ -98,7 +98,7 @@ const createComment = async (profileId: string) => {
     throw new Error('Must define PROFILE_ID in the .env to run this');
   }
 
-  const address = getAddressFromSigner();
+  const address = await getAddressFromSigner();
   console.log(`${prefix}: address`, address);
 
   const ipfsResult = await uploadIpfs<Metadata>({

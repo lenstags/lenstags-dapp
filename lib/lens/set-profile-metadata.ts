@@ -2,8 +2,6 @@ import {
   CreatePublicSetProfileMetadataUriRequest,
   CreateSetProfileMetadataTypedDataDocument
 } from '@lib/lens/graphql/generated';
-// import { login } from '../authentication/login';
-// import { explicitStart, PROFILE_ID } from '../config';
 import {
   getAddressFromSigner,
   signedTypeData,
@@ -12,7 +10,6 @@ import {
 
 import { ProfileMetadata } from '@lib/lens/interfaces/profile-metadata';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
-// import { lensPeriphery } from '../lens-hub';
 import { getLensPeriphery } from '@lib/lens/lens-hub';
 import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 import { uploadIpfs } from '@lib/lens/ipfs';
@@ -56,7 +53,7 @@ export const signCreateSetProfileMetadataTypedData = async (
 //     throw new Error('Must define PROFILE_ID in the .env to run this');
 //   }
 
-//   const address = getAddressFromSigner();
+//   const address =await  getAddressFromSigner();
 //   console.log('create profile metadata: address', address);
 
 //   //   await login(address);

@@ -1,15 +1,16 @@
-import { apolloClient } from './graphql/apollo-client';
-import { login } from '@lib/lens/login';
+import {
+  CreateFollowTypedDataDocument,
+  FollowRequest
+} from './graphql/generated';
 import {
   getAddressFromSigner,
   signedTypeData,
   splitSignature
 } from './ethers.service';
-import {
-  CreateFollowTypedDataDocument,
-  FollowRequest
-} from './graphql/generated';
+
+import { apolloClient } from './graphql/apollo-client';
 import { lensHub } from './lens-hub';
+import { login } from '@lib/lens/login';
 
 export const createFollowTypedData = async (request: FollowRequest) => {
   const result = await apolloClient.mutate({
@@ -23,10 +24,8 @@ export const createFollowTypedData = async (request: FollowRequest) => {
 };
 
 export const follow = async (profileId: string = '0x11') => {
-  const address = getAddressFromSigner();
+  const address = await getAddressFromSigner();
   console.log('follow: address', address);
-
-  await login(address);
 
   const result = await createFollowTypedData({
     follow: [
