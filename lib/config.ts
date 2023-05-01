@@ -4,7 +4,7 @@ export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
 export const DEFAULT_IMAGE_IPFS_PROFILE =
   'Qmf1BoAdUg9UaUYafEBJN1XVSiWWi4HQuReSs5Q2ZrPMDe';
 export const DEFAULT_IMAGE_POST = '/img/post.png';
-export const ATTRIBUTES_LIST_KEY = 'list_warehouse_1';
+export const ATTRIBUTES_LIST_KEY = 'list_warehouse_3';
 export const PROFILE_METADATA_VERSION = '1.0.0';
 export const PUBLICATION_METADATA_VERSION = '2.0.0';
 export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';

@@ -152,13 +152,15 @@ const Create: NextPage = () => {
   );
 
   const handleIAImage = async () => {
-    setLoadingIA(true);
-    if (title) {
-      const response = await fetchImageAI(title.substring(0, 1000));
-      const imageB64 = 'data:image/png;base64,' + response.data[0].b64_json;
-      setGeneratedImage(imageB64);
-      setGeneratedImage2(response.data[0].b64_json);
+    if (!title) {
+      snackbar.showMessage('⚠️ Attention: Title is required!');
+      return;
     }
+    setLoadingIA(true);
+    const response = await fetchImageAI(title.substring(0, 1000));
+    const imageB64 = 'data:image/png;base64,' + response.data[0].b64_json;
+    setGeneratedImage(imageB64);
+    setGeneratedImage2(response.data[0].b64_json);
     setLoadingIA(false);
   };
 
@@ -269,7 +271,7 @@ const Create: NextPage = () => {
         <div>
           <div className="flex ">
             <p className="mx-2 ml-4 w-5/6 pt-2 text-xs font-semibold text-gray-600">
-              Write something in the editor below and click on Generate
+              Write something in the title and click Generate
             </p>
 
             <button

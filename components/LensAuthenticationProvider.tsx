@@ -80,28 +80,25 @@ export default function LensAuthenticationProvider({
       key: ATTRIBUTES_LIST_KEY
     };
 
-    console.log('l---attLists-----');
-
-    console.log('attLists-- ', attLists);
-    // TODO FIXME
-    console.log(
-      '<<************************************************************'
-    );
+    // TODO logging FIXME
+    // console.log('attLists-- ', attLists);
 
     const p: ProfileQuery['profile'] = lensStore.profile;
 
     // @ts-ignore
     const attt = lensStore.profile.attributes;
-    console.log('pp 1: ', lensStore.profile);
-    console.log('pp 2: ', p);
-    console.log('pp 3: ', attt);
 
-    // @ts-ignore
-    console.log('pp 4: ', lensStore.profile.attributes);
-    console.log('pp 5: ', p?.attributes);
-    console.log(
-      '>>************************************************************'
-    );
+    // TODO LOGGING
+    // console.log('pp 1: ', lensStore.profile);
+    // console.log('pp 2: ', p);
+    // console.log('pp 3: ', attt);
+
+    // // @ts-ignore
+    // console.log('pp 4: ', lensStore.profile.attributes);
+    // console.log('pp 5: ', p?.attributes);
+    // console.log(
+    //   '>>************************************************************'
+    // );
 
     if (p && lensStore?.profile?.attributes) {
       const attributes = [attLocation, attTwitter, attWebsite];
@@ -114,7 +111,8 @@ export default function LensAuthenticationProvider({
     }
 
     setProfile(p);
-    console.log('--p2 ', p);
+    // TODO LOGGING
+    // console.log('--p2 ', p);
     // console.log('--profile ', profile);
 
     // console.log('🔴 setProfile: ', p);
@@ -261,7 +259,8 @@ export default function LensAuthenticationProvider({
         key: ATTRIBUTES_LIST_KEY // TODO: USE ATTRIBUTES_LIST_KEY ONCE IN PROD
       };
 
-      console.log('>>>>>> ', profil.attributes);
+      // TODO LOGGING
+      // console.log('>>>>>> PROFILE ATTRIBUTES ', profil.attributes);
 
       // TODO: LENSTORE OBJECT IS INCOMPLETE!
 
@@ -274,12 +273,12 @@ export default function LensAuthenticationProvider({
 
       profil.attributes = attributesFixed;
 
-      // TODO
-      console.log(
-        'TOKENS DE LA APP ',
-        authenticatedResult.accessToken,
-        authenticatedResult.refreshToken
-      );
+      // TODO LOGGING
+      // console.log(
+      //   'TOKENS DE LA APP ',
+      //   authenticatedResult.accessToken,
+      //   authenticatedResult.refreshToken
+      // );
       const lensStore: LensLocalStorage = {
         accessToken: authenticatedResult.accessToken,
         refreshToken: authenticatedResult.refreshToken,

@@ -20,7 +20,7 @@ interface Props {
 }
 
 const ExploreCard: FC<Props> = ({ post }) => {
-  // fetch data for current post, get the latest coments
+  // fetch data for current post, get the latest comments
   const isList = post.metadata.attributes[0].value === 'list';
   const lensProfile = useContext(ProfileContext);
   const [isFavMenuVisible, setFavMenuVisible] = useState(false);
@@ -35,11 +35,16 @@ const ExploreCard: FC<Props> = ({ post }) => {
   const [isListVisible, setIsListVisible] = useState(false);
   const [isListExistent, setIsListExistent] = useState(false);
 
+  // const profil: ProfileQuery['profile'] = await queryProfile({
+  //   profileId: pro.id
+  // });
+
   const firstList = JSON.parse(
     lensProfile?.attributes?.find(
       (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
     )?.value || `[]`
   );
+  console.log('firstList ', firstList, lensProfile);
 
   const [lists, setLists] = useState<typeList[]>(firstList);
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
@@ -147,7 +152,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
     setDotTitle('Indexing list');
     const addResult = await addPostIdtoListId(
       profileId,
-      listId!,
+      `${profileId}-${listId!}`,
       selectedPostId
     );
 
@@ -166,16 +171,19 @@ const ExploreCard: FC<Props> = ({ post }) => {
       // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
       id="CardContainer"
-      className=" md:w-1/2 lg:w-1/4 s   my-1 w-full px-1 animate-in fade-in-50  duration-1000 lg:my-4 lg:px-4"
+      className=" md:w-1/2 lg:w-1/4 s my-1 w-full px-1 animate-in fade-in-50  duration-1000 lg:my-4 lg:px-4"
       style={{ opacity, pointerEvents }}
       // style={{ opacity: 0.2 }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
 
-      <article className="h-full">
+      <article className="h-f ull ">
         {/* favllect content goes here */}
         {isFavMenuVisible && (
-          <div className=" lens-post opac mt-3 h-full rounded-lg bg-white px-0">
+          <div
+            style={{ height: '360px' }}
+            className=" lens-post mt-3 h-full rounded-lg bg-white px-0"
+          >
             <div className="flex px-2">
               <button
                 id="btnBack"
@@ -199,7 +207,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 name="tag-search-input"
                 id="tag-search-input"
                 // onKeyDown={handleKeyDown}
-                placeholder="Enter list name..."
+                placeholder="Select a list or type one..."
               />
             </div>
 
@@ -225,7 +233,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       )
                     }
                   >
-                    {list.name}
+                    {list.name} {list.key}
                   </button>
                 );
               })}
@@ -263,6 +271,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
               }`}
             ></div>
             <div
+              style={{ height: '360px' }}
               className={`px-2 py-1
               ${isList ? 'lens-folder' : 'lens-post'}`}
             >
@@ -270,39 +279,42 @@ const ExploreCard: FC<Props> = ({ post }) => {
               <h1 className="w-full items-center py-2">
                 <div className="flex w-full justify-between text-sm font-light text-black">
                   {/* profile */}
-                  <Link href={`/profile/${post.profile.id}`}>
-                    <a
-                      target="_blank"
+                  <a
+                    rel="noreferrer"
+                    href={`/profile/${post.profile.id}`}
+                    target="_blank"
+                  >
+                    <div
                       onClick={() => {
                         window.localStorage.setItem(
                           'LENS_PROFILE',
                           JSON.stringify(post.profile)
                         );
                       }}
+                      className="col-span-3 flex cursor-pointer justify-between"
                     >
-                      <div className="col-span-3  flex justify-between">
-                        <ImageProxied
-                          category="profile"
-                          title={`Loading from ${post.profile.picture?.original?.url}`}
-                          alt="Profile"
-                          height={40}
-                          width={40}
-                          objectFit="cover"
-                          className="h-12 w-12 cursor-pointer rounded-full"
-                          src={post.profile.picture?.original?.url}
-                        />
+                      <ImageProxied
+                        category="profile"
+                        title={`Loading from ${post.profile.picture?.original?.url}`}
+                        alt="Profile"
+                        height={40}
+                        width={40}
+                        objectFit="cover"
+                        className="h-12 w-12 cursor-pointer rounded-full"
+                        src={post.profile.picture?.original?.url}
+                      />
 
-                        <div className="col-span-1 cursor-pointer pl-2">
-                          <p className=" ">
-                            {post.profile.name || post.profile.id}
-                          </p>
-                          <p className="font-light text-gray-400">
-                            @{post.profile.handle}
-                          </p>
-                        </div>
+                      <div className="col-span-1 cursor-pointer pl-2">
+                        <p className=" ">
+                          {post.profile.name || post.profile.id}
+                        </p>
+                        <p className="font-light text-gray-400">
+                          @{post.profile.handle}
+                        </p>
                       </div>
-                    </a>
-                  </Link>
+                    </div>
+                    {/* </a> */}
+                  </a>
 
                   {/* profile menu */}
                   <div className="dropdown relative inline-block cursor-pointer">
@@ -322,12 +334,12 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       bg-gray-50 text-lensBlack shadow-lg  shadow-gray-400 "
                     >
                       <p className="">
-                        <a
+                        <span
                           className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                          href="#"
+                          // href="#"
                         >
                           Share
-                        </a>
+                        </span>
                       </p>
 
                       <p className="">
@@ -354,110 +366,110 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 </div>
               </h1>
 
-              <Link href={isList ? `/list/${post.id}` : `/post/${post.id}`}>
-                <a
-                  target="_blank"
-                  onClick={() => {
-                    // TODO: fix this
-                    console.log('POST ', post);
-                    window.localStorage.setItem(
-                      'LENS_POST',
-                      JSON.stringify(post)
-                    );
-                  }}
-                >
-                  {isList ? (
-                    <ListImages postId={post.id} />
-                  ) : (
-                    <div className="relative ">
-                      {/* link provided by the user */}
-                      {post.metadata.attributes[1]?.value && (
-                        <div
-                          style={{
-                            bottom: '5%'
-                          }}
-                          className="-top-30 absolute z-10  text-xs 
+              {/* <Link > */}
+              <a
+                rel="noreferrer"
+                target="_blank"
+                href={isList ? `/list/${post.id}` : `/post/${post.id}`}
+                onClick={() => {
+                  // TODO: fix this
+                  window.localStorage.setItem(
+                    'LENS_POST',
+                    JSON.stringify(post)
+                  );
+                }}
+              >
+                {isList ? (
+                  <ListImages postId={post.id} />
+                ) : (
+                  <div className="relative ">
+                    {/* link provided by the user */}
+                    {post.metadata.attributes[1]?.value && (
+                      <div
+                        style={{
+                          bottom: '5%'
+                        }}
+                        className="-top-30 absolute z-10  text-xs 
                             text-white mix-blend-difference hover:text-lensGreen hover:mix-blend-difference"
-                          title="Jump straight to the original post 🌐"
-                        >
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            className=" justify-end"
-                            href={post.metadata.attributes[1]?.value}
-                          >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="1.5"
-                              stroke="currentColor"
-                              className="h-6 w-6"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6.115 5.19l.319 1.913A6 6 0 008.11 10.36L9.75 12l-.387.775c-.217.433-.132.956.21 1.298l1.348 1.348c.21.21.329.497.329.795v1.089c0 .426.24.815.622 1.006l.153.076c.433.217.956.132 1.298-.21l.723-.723a8.7 8.7 0 002.288-4.042 1.087 1.087 0 00-.358-1.099l-1.33-1.108c-.251-.21-.582-.299-.905-.245l-1.17.195a1.125 1.125 0 01-.98-.314l-.295-.295a1.125 1.125 0 010-1.591l.13-.132a1.125 1.125 0 011.3-.21l.603.302a.809.809 0 001.086-1.086L14.25 7.5l1.256-.837a4.5 4.5 0 001.528-1.732l.146-.292M6.115 5.19A9 9 0 1017.18 4.64M6.115 5.19A8.965 8.965 0 0112 3c1.929 0 3.716.607 5.18 1.64"
-                              />
-                            </svg>
-                          </a>
-                        </div>
-                      )}
-
-                      <ImageProxied
-                        category="post"
-                        height={'400px'}
-                        width={'600px'}
-                        // width={'100%'}
-                        // height={'100%'}
-                        objectFit="cover"
-                        className=" w-full rounded-md  animate-in fade-in-50 duration-1000"
-                        src={post.metadata.media[0]?.original.url}
-                      />
-                    </div>
-                  )}
-
-                  <ul className=" flex flex-wrap justify-end gap-1 pb-2 text-right text-xs">
-                    {post.metadata.tags.map((tag: string) => {
-                      const tagValue = `${post.id}${tag}`;
-                      return (
-                        <li
-                          key={tagValue}
-                          className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
-                        >
-                          {tag.replace('-', ' ').toUpperCase()}
-                        </li>
-                      );
-                    })}
-
-                    {(!post.metadata.tags ||
-                      post.metadata.tags.length === 0) && (
-                      // !isList &&
-                      <li
-                        key={`${post.id}untagged`}
-                        className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
+                        title="Jump straight to the original post 🌐"
                       >
-                        untagged
-                      </li>
+                        <Link
+                          target="_blank"
+                          rel="noreferrer"
+                          className=" justify-end"
+                          href={post.metadata.attributes[1]?.value}
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            strokeWidth="1.5"
+                            stroke="currentColor"
+                            className="h-6 w-6"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M6.115 5.19l.319 1.913A6 6 0 008.11 10.36L9.75 12l-.387.775c-.217.433-.132.956.21 1.298l1.348 1.348c.21.21.329.497.329.795v1.089c0 .426.24.815.622 1.006l.153.076c.433.217.956.132 1.298-.21l.723-.723a8.7 8.7 0 002.288-4.042 1.087 1.087 0 00-.358-1.099l-1.33-1.108c-.251-.21-.582-.299-.905-.245l-1.17.195a1.125 1.125 0 01-.98-.314l-.295-.295a1.125 1.125 0 010-1.591l.13-.132a1.125 1.125 0 011.3-.21l.603.302a.809.809 0 001.086-1.086L14.25 7.5l1.256-.837a4.5 4.5 0 001.528-1.732l.146-.292M6.115 5.19A9 9 0 1017.18 4.64M6.115 5.19A8.965 8.965 0 0112 3c1.929 0 3.716.607 5.18 1.64"
+                            />
+                          </svg>
+                        </Link>
+                      </div>
                     )}
-                  </ul>
 
-                  <div className="mb-1">
-                    <p
-                      title={post.metadata.name || 'untitled'}
-                      className="text-light truncate text-ellipsis"
+                    <ImageProxied
+                      category="post"
+                      height={'400px'}
+                      width={'600px'}
+                      // width={'100%'}
+                      // height={'100%'}
+                      objectFit="cover"
+                      className=" w-full rounded-md  animate-in fade-in-50 duration-1000"
+                      src={post.metadata.media[0]?.original.url}
+                    />
+                  </div>
+                )}
+
+                <ul className=" flex flex-wrap justify-end gap-1 pb-2 text-right text-xs">
+                  {post.metadata.tags.map((tag: string) => {
+                    const tagValue = `${post.id}${tag}`;
+                    return (
+                      <li
+                        key={tagValue}
+                        className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
+                      >
+                        {tag.replace('-', ' ').toUpperCase()}
+                      </li>
+                    );
+                  })}
+
+                  {(!post.metadata.tags || post.metadata.tags.length === 0) && (
+                    // !isList &&
+                    <li
+                      key={`${post.id}untagged`}
+                      className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
                     >
-                      {post.metadata.name || 'untitled'}
-                    </p>
-                    <p
-                      className="my-1 overflow-auto text-xs font-thin text-gray-500"
-                      style={{
-                        height: '32px',
-                        overflowY: 'scroll'
-                      }}
-                    >
-                      {!isList ? post.metadata.description || ' ' : <br />}
-                      <style>{`
+                      untagged
+                    </li>
+                  )}
+                </ul>
+
+                <div className="mb-1">
+                  <p
+                    title={post.metadata.name || 'untitled'}
+                    className="text-light truncate text-ellipsis"
+                  >
+                    {post.metadata.name || 'untitled'}
+                  </p>
+                  <p
+                    className="my-1 overflow-auto text-xs font-thin text-gray-500"
+                    style={{
+                      height: '32px',
+                      overflowY: 'scroll'
+                    }}
+                  >
+                    {!isList ? post.metadata.description || ' ' : <br />}
+                    <style>{`
                       ::-webkit-scrollbar {
                         width: 5px;
                       }
@@ -472,10 +484,10 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         background-color: transparent;
                       }
                     `}</style>
-                    </p>
-                  </div>
-                </a>
-              </Link>
+                  </p>
+                </div>
+              </a>
+              {/* </Link> */}
 
               {/* date and collected indicators*/}
 
@@ -512,7 +524,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     ) : (
                       <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
                         {/* <div className="absolute inset-0 m-auto mr-1 mt-1 h-2 w-2   animate-spin rounded-full border border-white bg-red-600" /> */}
-                        +ADD TO LIST
+                        +COLLECT
                         {isPosting && (
                           <div className="relative flex items-center">
                             <div

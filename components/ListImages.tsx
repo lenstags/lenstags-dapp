@@ -2,10 +2,11 @@ import { DEFAULT_IMAGE_POST, DEFAULT_IMAGE_PROFILE } from '@lib/config';
 import Image, { ImageProps } from 'next/image';
 import { useEffect, useState } from 'react';
 
-// import { Comment } from '@lib/lens/graphql/generated';
-// import { getIPFSImage } from '@lib/helpers';
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
+
+// import { Comment } from '@lib/lens/graphql/generated';
+// import { getIPFSImage } from '@lib/helpers';
 
 interface listImageProps {
   postId: string;
@@ -44,7 +45,12 @@ const ListImages: React.FC<listImageProps> = (props) => {
   }, [props.postId]);
 
   return (
-    <div className="flex w-full">
+    <div
+      style={{
+        height: '170px'
+      }}
+      className="flex w-full"
+    >
       {URLImages.length > 0 ? (
         URLImages.map((urlImage: string, index: number) => {
           const marginLeft = index === 0 ? 0 : '-100px';
@@ -58,9 +64,10 @@ const ListImages: React.FC<listImageProps> = (props) => {
               }}
             >
               <Image
-                height={'140px'}
-                width={'140px'}
-                className="m-2 rounded-md bg-stone-100"
+                height={'170px'}
+                width={'158px'}
+                style={{ maxHeight: '170px' }}
+                className=" rounded-md  bg-stone-100 p-2  "
                 alt={'Default text'}
                 src={urlImage}
                 objectFit="cover"

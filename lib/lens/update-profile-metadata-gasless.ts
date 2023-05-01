@@ -111,6 +111,7 @@ export const updateProfileMetadata = async (
   // console.log('create profile: address', address);
 
   const ipfsResult = await uploadIpfs<ProfileMetadata>(profileMetadata);
+  console.log('XXXX ', profileMetadata.cover_picture);
   console.log('create profile: ipfs result', ipfsResult);
 
   // hard coded to make the code example clear
@@ -177,8 +178,8 @@ export const updateProfileMetadata = async (
 //     metadata_id: uuidv4(),
 //     name: profileResult.name || undefined,
 //     bio: profileResult.bio || 'empty bio',
-//     cover_picture: 'https://picsum.photos/200/333', // TODO
-//     profile_picture: 'https://picsum.photos/200/444', // FIXME
+//     cover_picture: 'https://picsum.photos/200/333',
+//     profile_picture: 'https://picsum.photos/200/444',
 //     attributes: [attLocation, attTwitter, attWebsite, attLists]
 //   };
 

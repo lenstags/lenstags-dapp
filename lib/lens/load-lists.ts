@@ -12,6 +12,7 @@ import { ProfileContext } from 'components';
 import { createPost } from './post';
 import { createPostGasless } from './post-gasless';
 import { freeCollect } from './collect';
+import { pickPicture } from '@lib/helpers';
 import { queryProfile } from './dispatcher';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { useContext } from 'react';
@@ -25,7 +26,7 @@ export interface typeList {
 export const createDefaultList = async (lensProfile: any) => {
   // the setup of the default list
   const constructedDefaultPost = {
-    name: 'my default list', // default list name
+    name: 'Collected items', // default list name
     content: 'text to be deleted if useless',
     appId: APP_NAME,
     attributes: [
@@ -126,8 +127,11 @@ export const createDefaultList = async (lensProfile: any) => {
     metadata_id: uuidv4(),
     name: profileResult.name || undefined,
     bio: profileResult.bio || '- empty bio -',
-    cover_picture: 'https://picsum.photos/200/333', // TODO usar el que trae de queryProfile
-    profile_picture: 'https://picsum.photos/200/444', // FIXME
+    cover_picture: pickPicture(
+      profileResult.coverPicture,
+      '/img/profilePic.png'
+    ),
+    profile_picture: pickPicture(profileResult.picture, '/img/profilePic.png'),
     attributes: [
       (profileResult.attributes as AttributeData[])[0], // location
       (profileResult.attributes as AttributeData[])[1], // twitter
@@ -289,8 +293,11 @@ export const createUserList = async (lensProfile: any, name: string) => {
     metadata_id: uuidv4(),
     name: profileResult.name || undefined,
     bio: profileResult.bio || '- empty bio -',
-    cover_picture: 'https://picsum.photos/200/333', // TODO usar el que trae de queryProfile
-    profile_picture: 'https://picsum.photos/200/444', // FIXME
+    cover_picture: pickPicture(
+      profileResult.coverPicture,
+      '/img/profilePic.png'
+    ),
+    profile_picture: pickPicture(profileResult.picture, '/img/profilePic.png'),
     attributes: [
       (profileResult.attributes as AttributeData[])[0], // location
       (profileResult.attributes as AttributeData[])[1], // twitter

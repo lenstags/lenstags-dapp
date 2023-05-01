@@ -11,7 +11,7 @@ import {
 } from '@lib/lens/interfaces/profile-metadata';
 import React, { useContext, useEffect, useState } from 'react';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
-import { imageToBase64, pickPicture } from '@lib/helpers';
+import { getIPFSImage, imageToBase64, pickPicture } from '@lib/helpers';
 
 import { AppContext } from 'context/AppContext';
 import FileInput from 'components/FileInput';
@@ -20,7 +20,7 @@ import { Layout } from 'components';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { NextPage } from 'next';
 import { ProfileContext } from '../../components/LensAuthenticationProvider';
-import { createDefaultList } from '@lib/lens/load-lists';
+import { Spinner } from 'components/Spinner';
 import { setProfileImageUri } from '@lib/lens/set-profile-image-uri-gasless';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { uploadImageIpfs } from '@lib/lens/ipfs';
@@ -43,8 +43,6 @@ const Settings: NextPage = () => {
   const snackbar = useSnackbar();
 
   const [dispatcherActive, setDispatcherActive] = useState(false);
-  const [isSuccessVisible, setIsSuccessVisible] = useState(false);
-  const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [pictureUrl, setPictureUrl] = useState('/img/profilePic.png');
   const [loadingDispatcher, setLoadingDispatcher] = useState(false);
   const [profileValues, setProfileValues] = useState<any>({});
@@ -52,7 +50,11 @@ const Settings: NextPage = () => {
   const [saving, setSaving] = useState(false);
   const [coverUrlBase64, setCoverUrlBase64] = useState<string>('');
   const [imageBuffer, setImageBuffer] = useState<Buffer | null>(null);
+  const [coverBuffer, setCoverBuffer] = useState<Buffer | null>(null);
+
+  setCoverBuffer;
   const [profileChanged, setProfileChanged] = useState(false);
+  const [coverChanged, setCoverChanged] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,12 +68,11 @@ const Settings: NextPage = () => {
           ? profileResult?.dispatcher?.canUseRelay
           : false
       );
-
       const pic = pickPicture(profileResult?.picture, '/img/profilePic.png');
       const cov = pickPicture(profileResult?.coverPicture, '/img/back.png');
-
+      console.log('COV ', profileResult);
       setPictureUrl(pic);
-      setCoverUrlBase64(cov);
+      setCoverUrlBase64(getIPFSImage(cov));
       setProfileValues(profileResult);
       window.localStorage.setItem(
         'LENS_PROFILE',
@@ -87,7 +88,11 @@ const Settings: NextPage = () => {
     if (selectedFile) {
       const reader = new FileReader();
       reader.onload = () => {
-        setCoverUrlBase64(reader.result as string);
+        const base64 = reader.result as string;
+        setCoverUrlBase64(base64);
+        const bytes = Buffer.from(base64.split(',')[1], 'base64');
+        setCoverBuffer(bytes);
+        setCoverChanged(true);
       };
       reader.readAsDataURL(selectedFile);
     }
@@ -108,28 +113,10 @@ const Settings: NextPage = () => {
     }
   };
 
-  const handleFindDefault = async () => {
-    const profileResult = await queryProfile({ profileId: lensProfile?.id });
-
-    let defaultListId = profileResult?.attributes?.find(
-      (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-    )?.value;
-    console.log('list result?: ', defaultListId);
-
-    if (!defaultListId) {
-      return defaultListId
-        ? JSON.parse(defaultListId)
-        : await createDefaultList(lensProfile);
-
-      // FIXME
-      // create the default and update the list
-      // console.log(not);
-    }
-  };
-
   const handleClickSave = async () => {
     if (!lensProfile) {
-      throw 'No lens profile found';
+      snackbar.showMessage('⚠️ Your wallet is disconnected, please log in.');
+      return;
     }
 
     setSaving(true);
@@ -169,7 +156,8 @@ const Settings: NextPage = () => {
     };
 
     const listsObject = [
-      { name: 'default', key: '0x222' } // set on the first setup
+      // FIXME
+      { name: 'Collected items', key: '0x222' } // set on the first setup
       // { name: 'anotherlist', key: '0x344' }
     ];
 
@@ -182,12 +170,14 @@ const Settings: NextPage = () => {
         //   (attribute: AttributeData) => attribute.key === 'lists0'
         // )?.value,
         JSON.stringify(listsObject),
-      key: 'lists0'
+      key: ATTRIBUTES_LIST_KEY
     };
 
     let newPictureUrl: string; // url original or uploaded
+    let newCoverUrl: string; // url original or uploaded
 
     if (profileChanged && imageBuffer) {
+      snackbar.showMessage('⏱️ Uploading profile picture...');
       const imageIpfsResult = await uploadImageIpfs(imageBuffer); // uploads picture to ipfs
       newPictureUrl = `ipfs://${imageIpfsResult.path}`;
       await setProfileImageUri(lensProfile.id, dispatcherActive, newPictureUrl);
@@ -195,28 +185,35 @@ const Settings: NextPage = () => {
       newPictureUrl = pickPicture(lensProfile.picture, '/img/profilePic.png'); // let's keep the original url
     }
 
+    if (coverChanged && coverBuffer) {
+      snackbar.showMessage('⏱️ Uploading cover picture...');
+      const imageIpfsResult = await uploadImageIpfs(coverBuffer); // uploads picture to ipfs
+      newCoverUrl = `ipfs://${imageIpfsResult.path}`;
+    } else {
+      newCoverUrl = pickPicture(
+        lensProfile.coverPicture,
+        '/img/profilePic.png'
+      ); // let's keep the original url
+    }
+    snackbar.showMessage('⏱️ Saving it all...');
+
     const profileMetadata: ProfileMetadata = {
       version: '1.0.0', // TODO: centralize this!
       metadata_id: uuidv4(),
       name: profileValues.name,
       bio: profileValues.bio || 'empty bio',
-      cover_picture: coverUrlBase64 || (await imageToBase64('/img/back.png')),
+      cover_picture: newCoverUrl || (await imageToBase64('/img/back.png')),
       profile_picture: newPictureUrl,
       attributes: [attLocation, attTwitter, attWebsite, attLists]
     };
 
     updateProfileMetadata(lensProfile.id, profileMetadata)
-      .then((updateResult) => {
-        console.log('update result> ', updateResult);
-        snackbar.showMessage(
-          '✅ Profile updated successfully'
-          // 'Undo', () => handleUndo()
-        );
-        setIsSuccessVisible(true);
+      .then(() => {
+        snackbar.showMessage('✅ Profile updated successfully');
         updateLocalStorageProfile(lensProfile.id);
       })
       .catch((err) => {
-        console.log('ERRORR ', err); // TODO show toast error
+        snackbar.showMessage('❌ Unexpected error: ' + err.message);
       })
       .finally(() => {
         setSaving(false);
@@ -236,7 +233,11 @@ const Settings: NextPage = () => {
   return (
     <Layout title="Lenstags | Settings" pageDescription="Settings">
       {hydrationLoading ? (
-        <div>Loading...</div>
+        <div className="flex justify-center">
+          <div className="my-8 justify-center">
+            <Spinner h="10" w="10" />
+          </div>
+        </div>
       ) : (
         <div className="md:w-1/2 container mx-auto h-64 w-11/12 px-6 py-10 text-black">
           <h1 className=" text-2xl">Settings</h1>
@@ -291,17 +292,6 @@ const Settings: NextPage = () => {
                     {dispatcherActive ? 'Disable' : 'Enable'}
                   </button>
                 </div>
-
-                {}
-                <p
-                  // FIXME
-                  onDoubleClick={handleFindDefault}
-                  // onClick={handleFindDefault}
-                  className={`flex rounded-lg border-2 border-solid border-black px-3 py-2
-                   text-white disabled:bg-gray-300 `}
-                >
-                  Find default list
-                </p>
               </div>
             </div>
           </div>
@@ -463,36 +453,6 @@ const Settings: NextPage = () => {
                 <FileInput handleImageChange={handlePictureChange} />
               </div>
 
-              {/* <div className="col-span-1">
-                Cover
-                <span
-                  className="focus:border-brand-400 mx-2   cursor-pointer rounded-md border border-gray-300 bg-white
-                 px-4 py-2   text-sm text-gray-700  shadow-md
-                 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-white"
-                >
-                  <div className="flex">
-                    <img
-                      className=" "
-                      src="/assets/icons/addFile.svg"
-                      alt="Add file"
-                      width={20}
-                      height={20}
-                    />
-                    <label>
-                      Choose File
-                      <input
-                        className="hidden"
-                        name="cover"
-                        id="cover"
-                        accept=".png, .jpg, .jpeg"
-                        type="file"
-                        onChange={handleImageChange}
-                      />
-                    </label>
-                  </div>
-                </span>
-              </div> */}
-
               <div className=" grid grid-cols-12 items-center gap-4">
                 <div className="col-span-2">Cover</div>
 
@@ -517,13 +477,25 @@ const Settings: NextPage = () => {
             </div>
           </div>
 
-          <button
-            onClick={handleClickSave}
-            className={`flex rounded-lg border-2 border-solid border-black px-3 py-2
-                   text-white disabled:bg-gray-300 `}
-          >
-            Save
-          </button>
+          <div className="flex justify-end py-4">
+            {!saving ? (
+              <button
+                onClick={handleClickSave}
+                className="flex items-center  rounded-lg border-2 border-solid
+                 border-black bg-lensPurple px-4 py-2 text-xl text-white"
+              >
+                Save
+              </button>
+            ) : (
+              <span
+                className="flex items-center  rounded-lg border-2 border-solid border-gray-500
+                 bg-gray-400 px-4 py-2 text-xl text-white"
+              >
+                <Spinner h="5" w="5" />
+                <span className="ml-2">Saving</span>
+              </span>
+            )}
+          </div>
         </div>
       )}
     </Layout>

@@ -1,22 +1,24 @@
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 
 import React, { useContext, useEffect, useState } from 'react';
-import {
-  deleteLensLocalStorage,
-  getFromLocalStorage
-} from 'lib/lens/localStorage';
 
 import { AppContext } from 'context/AppContext';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
-import { MediaSet } from '@lib/lens/graphql/generated';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { TagsFilterContext } from './TagsFilterProvider';
-import { explore } from '../lib/lens/explore-publications';
-import { getLastComment } from '@lib/lens/get-publications';
+import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
+
+// import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+
+// import { MediaSet } from '@lib/lens/graphql/generated';
+// import { TagsFilterContext } from './TagsFilterProvider';
+// import { createDefaultList } from '@lib/lens/load-lists';
+// import { explore } from '../lib/lens/explore-publications';
+// import { getLastComment } from '@lib/lens/get-publications';
+// import { queryProfile } from '@lib/lens/dispatcher';
 
 export const Navbar = () => {
   // const asyncFunc = async () => {
@@ -26,6 +28,7 @@ export const Navbar = () => {
   const { openConnectModal } = useConnectModal();
   const { config, updateConfig } = useContext(AppContext);
   const [showMobileNav, setShowMobileNav] = useState(false);
+
   const [profileView, setProfileView] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
@@ -35,8 +38,9 @@ export const Navbar = () => {
     disconnect();
   };
 
-  const { tags } = useContext(TagsFilterContext);
+  // const { tags } = useContext(TagsFilterContext);
   const lensProfile = useContext(ProfileContext);
+
   // TODO: TEST THIS FOR NFT URI
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -50,31 +54,6 @@ export const Navbar = () => {
   };
 
   const router = useRouter();
-
-  /// TODO: check this
-  useEffect(() => {
-    explore({ tags }).then((data) => {
-      // TODO Integrate with card listing
-      // console.log(' de lensProfile: ', lensProfile);
-      console.log(
-        'EXPLORER-DATA 🏄🏽‍♂️🏄🏽‍♂️🏄🏽‍♂️',
-        data.items[0],
-        ' of: ',
-        data.items.length
-      );
-      // console.log('tags ', tags);
-    });
-  }, [tags, lensProfile]);
-
-  // const mediaSet = getFromLocalStorage()?.profile?.picture as MediaSet;
-  // const [storePic, setStorePic] = useState(mediaSet.original.url || '');
-  // useEffect(() => {
-  //   const media = getFromLocalStorage()?.profile?.picture as MediaSet;
-  //   const storedMedia = media.original.url;
-  //   if (storedMedia !== storePic) {
-  //     setStorePic(storedMedia);
-  //   }
-  // }, [storePic]);
 
   return (
     <>
@@ -101,6 +80,7 @@ export const Navbar = () => {
                       <Link href={'/'}>
                         <ImageProxied
                           category="profile"
+                          priority={true}
                           src="/img/logo-extended.svg"
                           alt=""
                           width={100}
@@ -201,8 +181,8 @@ export const Navbar = () => {
                           </svg>
                         </div>
                         {/* <span className="ml-2 text-base md:text-2xl xl:text-base">
-                          <Link href={'/lists'}>My lists</Link>
-                        </span> */}
+                  <Link href={'/lists'}>My lists</Link>
+                </span> */}
                       </div>
                     </li>
                   </ul>
@@ -212,9 +192,9 @@ export const Navbar = () => {
                     <div className="flex w-full items-center justify-between px-6 pt-1">
                       <div className="flex items-center">
                         {/* Lists:
-                        {console.log(
-                          lensProfile?.attributes as AttributeData[]
-                        )} */}
+                {console.log(
+                  lensProfile?.attributes as AttributeData[]
+                )} */}
                         <ImageProxied
                           category="post"
                           className=""
@@ -230,41 +210,41 @@ export const Navbar = () => {
                       </div>
                       <ul className="flex">
                         {/* <li className="cursor-pointer pb-3 pt-5 text-white">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="icon icon-tabler icon-tabler-messages"
-                            width={24}
-                            height={24}
-                            viewBox="0 0 24 24"
-                            strokeWidth={1}
-                            stroke="#718096"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                            <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                          </svg>
-                        </li> */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="icon icon-tabler icon-tabler-messages"
+                    width={24}
+                    height={24}
+                    viewBox="0 0 24 24"
+                    strokeWidth={1}
+                    stroke="#718096"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" />
+                    <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+                    <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+                  </svg>
+                </li> */}
                         {/* <li className="cursor-pointer pb-3 pl-3 pt-5 text-white">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="icon icon-tabler icon-tabler-bell"
-                            width={24}
-                            height={24}
-                            viewBox="0 0 24 24"
-                            strokeWidth={1}
-                            stroke="#718096"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                          </svg>
-                        </li> */}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="icon icon-tabler icon-tabler-bell"
+                    width={24}
+                    height={24}
+                    viewBox="0 0 24 24"
+                    strokeWidth={1}
+                    stroke="#718096"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" />
+                    <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                    <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                  </svg>
+                </li> */}
                       </ul>
                     </div>
                   </div>
@@ -277,9 +257,9 @@ export const Navbar = () => {
           <div className="fixed top-0 z-50 w-full border-b-2 border-black">
             <nav
               className={`relative z-10 flex h-16 items-center justify-end bg-lensGreen
-              px-10  text-sm lg:items-stretch lg:justify-between
-              ${config.firstRun && ' '}  
-              `}
+      px-10  text-sm lg:items-stretch lg:justify-between
+      ${config.firstRun && ' '}  
+      `}
             >
               <div className="hidden w-full pr-6 lg:flex">
                 <Link href={'/'}>
@@ -311,65 +291,65 @@ export const Navbar = () => {
                   </div>
 
                   {/* <div>
-                    <label htmlFor="darkmode-toggle">Dark Mode</label>
-                    <input
-                      type="checkbox"
-                      id="darkmode-toggle"
-                      checked={config.isDarkMode}
-                      onChange={toggleDarkMode}
-                    />
-                  </div>
+            <label htmlFor="darkmode-toggle">Dark Mode</label>
+            <input
+              type="checkbox"
+              id="darkmode-toggle"
+              checked={config.isDarkMode}
+              onChange={toggleDarkMode}
+            />
+          </div>
 
-                  <div
-                    className={config.isDarkMode ? 'bg-red-200' : 'bg-blue-200'}
-                  >
-                    Enabled
-                  </div> */}
+          <div
+            className={config.isDarkMode ? 'bg-red-200' : 'bg-blue-200'}
+          >
+            Enabled
+          </div> */}
 
                   {/* <button
-                    onClick={() => {
-                      if (config.firstRun) {
-                        updateConfig({ firstRun: false });
-                        const lensStore = getFromLocalStorage();
-                        lensStore?.firstRun = false;
-                      }
-                    }}
-                  >
-                    Got it!
-                  </button> */}
+            onClick={() => {
+              if (config.firstRun) {
+                updateConfig({ firstRun: false });
+                const lensStore = getFromLocalStorage();
+                lensStore?.firstRun = false;
+              }
+            }}
+          >
+            Got it!
+          </button> */}
 
                   {/* <div
-                    className={`mx-2  p-2 ${
-                      router.asPath === '/lists#' &&
-                      'bg-lensBlack text-lensGray'
-                    } hover:bg-lensBlack hover:text-lensGray`}
-                  >
-                    <Link href={'/lists'}>
-                      <a>MY LISTS</a>
-                    </Link>
-                  </div> */}
+            className={`mx-2  p-2 ${
+              router.asPath === '/lists#' &&
+              'bg-lensBlack text-lensGray'
+            } hover:bg-lensBlack hover:text-lensGray`}
+          >
+            <Link href={'/lists'}>
+              <a>MY LISTS</a>
+            </Link>
+          </div> */}
                   {/* 
-                  <div
-                    className={`mx-2 p-2 ${
-                      router.asPath === '/lists#' &&
-                      'bg-lensBlack text-lensGray'
-                    } hover:bg-lensBlack hover:text-lensGray`}
-                  >
-                    <Link href={'/my-creations'}>
-                      <a>MY CREATIONS</a>
-                    </Link>
-                  </div> */}
+          <div
+            className={`mx-2 p-2 ${
+              router.asPath === '/lists#' &&
+              'bg-lensBlack text-lensGray'
+            } hover:bg-lensBlack hover:text-lensGray`}
+          >
+            <Link href={'/my-creations'}>
+              <a>MY CREATIONS</a>
+            </Link>
+          </div> */}
                   {/* 
-                  <div className="flex items-center">
-                    <div className="h-6 w-6 md:h-8 md:w-8">
-                      <button
-                        className="bg-white text-black"
-                        onClick={asyncFunc}
-                      >
-                        test
-                      </button>
-                    </div>
-                  </div> */}
+          <div className="flex items-center">
+            <div className="h-6 w-6 md:h-8 md:w-8">
+              <button
+                className="bg-white text-black"
+                onClick={asyncFunc}
+              >
+                test
+              </button>
+            </div>
+          </div> */}
                 </div>
                 {/* connect area */}
                 {lensProfile ? (
@@ -396,45 +376,45 @@ export const Navbar = () => {
                       </div>
 
                       {/* <div className="flex h-full w-20 items-center justify-center  border-black">
-                        <div className="relative cursor-pointer text-gray-600 hover:text-black">
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="icon icon-tabler icon-tabler-bell"
-                            width={28}
-                            height={28}
-                            viewBox="0 0 24 24"
-                            strokeWidth="1.5"
-                            stroke="currentColor"
-                            fill="none"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <path stroke="none" d="M0 0h24v24H0z" />
-                            <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
-                            <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
-                          </svg>
-                          <div className="absolute inset-0 m-auto mr-1 mt-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
-                        </div>
-                      </div> */}
+                <div className="relative cursor-pointer text-gray-600 hover:text-black">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="icon icon-tabler icon-tabler-bell"
+                    width={28}
+                    height={28}
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.5"
+                    stroke="currentColor"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" />
+                    <path d="M10 5a2 2 0 0 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" />
+                    <path d="M9 17v1a3 3 0 0 0 6 0v-1" />
+                  </svg>
+                  <div className="absolute inset-0 m-auto mr-1 mt-1 h-2 w-2 animate-ping rounded-full border border-white bg-red-600" />
+                </div>
+              </div> */}
 
                       {/* <div className="mr-4 flex h-full w-20 cursor-pointer  items-center justify-center border-black text-gray-600 hover:text-black">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="icon icon-tabler icon-tabler-messages"
-                          width={28}
-                          height={28}
-                          viewBox="0 0 24 24"
-                          strokeWidth="1.5"
-                          stroke="currentColor"
-                          fill="none"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <path stroke="none" d="M0 0h24v24H0z" />
-                          <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                          <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                        </svg>
-                      </div> */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="icon icon-tabler icon-tabler-messages"
+                  width={28}
+                  height={28}
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" />
+                  <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
+                  <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
+                </svg>
+              </div> */}
                       <div
                         className="relative flex cursor-pointer items-center "
                         onClick={() => setProfileView(!profileView)}
@@ -501,9 +481,9 @@ export const Navbar = () => {
                                     className="mr-1 h-6 w-6"
                                   >
                                     <path
-                                      fill-rule="evenodd"
+                                      fillRule="evenodd"
                                       d="M11.078 2.25c-.917 0-1.699.663-1.85 1.567L9.05 4.889c-.02.12-.115.26-.297.348a7.493 7.493 0 00-.986.57c-.166.115-.334.126-.45.083L6.3 5.508a1.875 1.875 0 00-2.282.819l-.922 1.597a1.875 1.875 0 00.432 2.385l.84.692c.095.078.17.229.154.43a7.598 7.598 0 000 1.139c.015.2-.059.352-.153.43l-.841.692a1.875 1.875 0 00-.432 2.385l.922 1.597a1.875 1.875 0 002.282.818l1.019-.382c.115-.043.283-.031.45.082.312.214.641.405.985.57.182.088.277.228.297.35l.178 1.071c.151.904.933 1.567 1.85 1.567h1.844c.916 0 1.699-.663 1.85-1.567l.178-1.072c.02-.12.114-.26.297-.349.344-.165.673-.356.985-.57.167-.114.335-.125.45-.082l1.02.382a1.875 1.875 0 002.28-.819l.923-1.597a1.875 1.875 0 00-.432-2.385l-.84-.692c-.095-.078-.17-.229-.154-.43a7.614 7.614 0 000-1.139c-.016-.2.059-.352.153-.43l.84-.692c.708-.582.891-1.59.433-2.385l-.922-1.597a1.875 1.875 0 00-2.282-.818l-1.02.382c-.114.043-.282.031-.449-.083a7.49 7.49 0 00-.985-.57c-.183-.087-.277-.227-.297-.348l-.179-1.072a1.875 1.875 0 00-1.85-1.567h-1.843zM12 15.75a3.75 3.75 0 100-7.5 3.75 3.75 0 000 7.5z"
-                                      clip-rule="evenodd"
+                                      clipRule="evenodd"
                                     />
                                   </svg>
 
