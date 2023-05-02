@@ -89,7 +89,9 @@ const Create: NextPage = () => {
     setActualPanel(selectedPanel);
   };
 
-  const lensProfile = useContext(ProfileContext);
+  // const lensProfile = useContext(ProfileContext);
+  const { profile: lensProfile } = useContext(ProfileContext);
+
   if (!lensProfile) {
     return null;
   }

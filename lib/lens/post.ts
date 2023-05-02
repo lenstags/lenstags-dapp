@@ -195,7 +195,7 @@ export const addPostIdtoListId = async (
   }
 
   if (!arrPosts || !arrPosts.includes(postId)) {
-    console.log('no incluye post, agregando comment');
+    console.log('no previously collected, adding comment');
 
     if (!arrPosts) {
       arrPosts = [postId];
@@ -237,7 +237,7 @@ export const addPostIdtoListId = async (
   }
 
   const p = await getLastComment(listId);
-  console.log('PUBLICATION3 with new comments: ', p);
+  console.log('Post (that in fact it is a list) with new comments: ', p);
 
   return true;
 

@@ -55,7 +55,7 @@ export const createDefaultList = async (lensProfile: any) => {
   ////////////////////
 
   // got the postId, and ADD it to the profile.metadata
-  const defaultListId = result.pubId; // TODO or internalPubId???
+  const defaultListId = result.internalPubId; // TODO or internalPubId???
 
   // update profile metadata!
   // hacerlo en otra funcion updateProfileMetadata(profileId, attributes)

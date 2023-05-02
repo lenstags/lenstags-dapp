@@ -15,7 +15,8 @@ const MyProfile: NextPage = () => {
   const [lensProfile, setProfile] = useState<any>();
 
   const { tags } = useContext(TagsFilterContext);
-  const lp = useContext(ProfileContext);
+  // const lp = useContext(ProfileContext);
+  const { profile: lp } = useContext(ProfileContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -183,7 +184,7 @@ const MyProfile: NextPage = () => {
       </div>
 
       {/* contents */}
-      <div className=" mx-auto w-11/12 md:w-4/5  ">
+      <div className=" md:w-4/5 mx-auto w-11/12  ">
         <div className="  flex flex-wrap  ">
           {publications
             ? publications.map((post, index) => (

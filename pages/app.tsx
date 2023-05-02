@@ -27,7 +27,8 @@ const App: NextPage = () => {
   const [ready, setReady] = useState(false);
 
   const snackbar = useSnackbar();
-  const lensProfile = useContext(ProfileContext);
+  // const lensProfile = useContext(ProfileContext);
+  const { profile: lensProfile } = useContext(ProfileContext);
 
   useEffect(() => {
     const findDefault = async () => {

@@ -37,7 +37,10 @@ export const updateLocalStorageProfile = (profileId: string) =>
     .catch((err) => console.log('Error storing updated profile: ', err));
 
 const Settings: NextPage = () => {
-  const defaultLensProfile = useContext(ProfileContext); // TODO update lensProfile after save!
+  // const defaultLensProfile = useContext(ProfileContext); // TODO update lensProfile after save!
+
+  const { profile: defaultLensProfile } = useContext(ProfileContext);
+
   const [lensProfile, setLensProfile] = useState(defaultLensProfile);
   // const { config } = useContext(AppContext); // TODO use later
   const snackbar = useSnackbar();
@@ -209,7 +212,7 @@ const Settings: NextPage = () => {
 
     updateProfileMetadata(lensProfile.id, profileMetadata)
       .then(() => {
-        snackbar.showMessage('✅ Profile updated successfully');
+        snackbar.showMessage('🟩 Profile updated successfully 👤');
         updateLocalStorageProfile(lensProfile.id);
       })
       .catch((err) => {
@@ -249,7 +252,7 @@ const Settings: NextPage = () => {
           >
             <div className="flex items-center px-6 py-4">
               <div className="items-center">
-                The transaction Dispatcher is{' '}
+                The transaction Dispatcher is
                 <span className="  ml-2 rounded-lg   border-amber-200 bg-amber-100 px-3 py-1  text-amber-600">
                   {dispatcherActive ? 'Active' : 'Inactive'}
                 </span>

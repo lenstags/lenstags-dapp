@@ -11,15 +11,6 @@ import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 
-// import { ATTRIBUTES_LIST_KEY } from '@lib/config';
-
-// import { MediaSet } from '@lib/lens/graphql/generated';
-// import { TagsFilterContext } from './TagsFilterProvider';
-// import { createDefaultList } from '@lib/lens/load-lists';
-// import { explore } from '../lib/lens/explore-publications';
-// import { getLastComment } from '@lib/lens/get-publications';
-// import { queryProfile } from '@lib/lens/dispatcher';
-
 export const Navbar = () => {
   // const asyncFunc = async () => {
   //   const p = await getLastComment('0x4b87-0x0178');
@@ -28,7 +19,7 @@ export const Navbar = () => {
   const { openConnectModal } = useConnectModal();
   const { config, updateConfig } = useContext(AppContext);
   const [showMobileNav, setShowMobileNav] = useState(false);
-
+  const { authenticationStatus } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
@@ -39,7 +30,7 @@ export const Navbar = () => {
   };
 
   // const { tags } = useContext(TagsFilterContext);
-  const lensProfile = useContext(ProfileContext);
+  const { profile: lensProfile } = useContext(ProfileContext);
 
   // TODO: TEST THIS FOR NFT URI
   const pictureUrl =
@@ -257,9 +248,9 @@ export const Navbar = () => {
           <div className="fixed top-0 z-50 w-full border-b-2 border-black">
             <nav
               className={`relative z-10 flex h-16 items-center justify-end bg-lensGreen
-      px-10  text-sm lg:items-stretch lg:justify-between
-      ${config.firstRun && ' '}  
-      `}
+              px-10  text-sm lg:items-stretch lg:justify-between
+              ${config.firstRun && ' '}  
+              `}
             >
               <div className="hidden w-full pr-6 lg:flex">
                 <Link href={'/'}>

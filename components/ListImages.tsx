@@ -67,7 +67,7 @@ const ListImages: React.FC<listImageProps> = (props) => {
                 height={'170px'}
                 width={'158px'}
                 style={{ maxHeight: '170px' }}
-                className=" rounded-md  bg-stone-100 p-2  "
+                className="rounded-md bg-stone-100 p-2  "
                 alt={'Default text'}
                 src={urlImage}
                 objectFit="cover"
