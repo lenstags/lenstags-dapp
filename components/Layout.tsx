@@ -60,9 +60,7 @@ export const Layout: FC<Props> = ({
           <nav>
             <Navbar />
           </nav>
-          <main
-            className={`${!screen ? 'h-screen' : 'h-full'} mt-16 bg-white `}
-          >
+          <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}>
             {children}
           </main>
         </>

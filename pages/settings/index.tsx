@@ -1,52 +1,81 @@
+/* eslint-disable @next/next/no-img-element */
+
+import {
+  ATTRIBUTES_LIST_KEY,
+  DEFAULT_IMAGE_IPFS_PROFILE,
+  IPFS_PROXY_URL
+} from '@lib/config';
 import {
   AttributeData,
   ProfileMetadata
 } from '@lib/lens/interfaces/profile-metadata';
 import React, { useContext, useEffect, useState } from 'react';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
+import { getIPFSImage, imageToBase64, pickPicture } from '@lib/helpers';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import { AppContext } from 'context/AppContext';
+import FileInput from 'components/FileInput';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { NextPage } from 'next';
 import { ProfileContext } from '../../components/LensAuthenticationProvider';
-import { createDefaultList } from '@lib/lens/load-lists';
+import { Spinner } from 'components/Spinner';
+import { setProfileImageUri } from '@lib/lens/set-profile-image-uri-gasless';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
+import { uploadImageIpfs } from '@lib/lens/ipfs';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
 
 // import { ProfileContext } from 'components/ProfileContext';
 
+export const updateLocalStorageProfile = (profileId: string) =>
+  queryProfile({ profileId })
+    .then((profileResult) =>
+      window.localStorage.setItem('LENS_PROFILE', JSON.stringify(profileResult))
+    )
+    .catch((err) => console.log('Error storing updated profile: ', err));
+
 const Settings: NextPage = () => {
-  const lensProfile = useContext(ProfileContext);
+  // const defaultLensProfile = useContext(ProfileContext); // TODO update lensProfile after save!
+
+  const { profile: defaultLensProfile } = useContext(ProfileContext);
+
+  const [lensProfile, setLensProfile] = useState(defaultLensProfile);
+  // const { config } = useContext(AppContext); // TODO use later
+  const snackbar = useSnackbar();
+
   const [dispatcherActive, setDispatcherActive] = useState(false);
-  const [isSuccessVisible, setIsSuccessVisible] = useState(false);
-  const [isErrorVisible, setIsErrorVisible] = useState(false);
   const [pictureUrl, setPictureUrl] = useState('/img/profilePic.png');
   const [loadingDispatcher, setLoadingDispatcher] = useState(false);
   const [profileValues, setProfileValues] = useState<any>({});
   const [hydrationLoading, setHydrationLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [coverUrlBase64, setCoverUrlBase64] = useState<string>('');
+  const [imageBuffer, setImageBuffer] = useState<Buffer | null>(null);
+  const [coverBuffer, setCoverBuffer] = useState<Buffer | null>(null);
+
+  setCoverBuffer;
+  const [profileChanged, setProfileChanged] = useState(false);
+  const [coverChanged, setCoverChanged] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!lensProfile) return;
-
-      const profileResult = await queryProfile({ profileId: lensProfile.id });
+      if (!defaultLensProfile) return;
+      const profileResult = await queryProfile({
+        profileId: defaultLensProfile.id
+      });
+      setLensProfile(profileResult);
       setDispatcherActive(
         profileResult?.dispatcher?.canUseRelay
           ? profileResult?.dispatcher?.canUseRelay
           : false
       );
-
-      const pic =
-        lensProfile.picture?.__typename === 'MediaSet'
-          ? lensProfile.picture?.original.url
-          : lensProfile.picture?.__typename === 'NftImage'
-          ? lensProfile.picture.uri
-          : '/img/profilePic.png';
-
+      const pic = pickPicture(profileResult?.picture, '/img/profilePic.png');
+      const cov = pickPicture(profileResult?.coverPicture, '/img/back.png');
+      console.log('COV ', profileResult);
       setPictureUrl(pic);
+      setCoverUrlBase64(getIPFSImage(cov));
       setProfileValues(profileResult);
       window.localStorage.setItem(
         'LENS_PROFILE',
@@ -55,35 +84,47 @@ const Settings: NextPage = () => {
       setHydrationLoading(false);
     };
     fetchData().catch(console.error);
-  }, [lensProfile]);
+  }, [defaultLensProfile]);
 
-  const handleFindDefault = async () => {
-    const profileResult = await queryProfile({ profileId: lensProfile?.id });
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files && e.target.files[0];
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        setCoverUrlBase64(base64);
+        const bytes = Buffer.from(base64.split(',')[1], 'base64');
+        setCoverBuffer(bytes);
+        setCoverChanged(true);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
 
-    let defaultListId = profileResult?.attributes?.find(
-      (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-    )?.value;
-
-    console.log('list result?: ', defaultListId);
-
-    if (!defaultListId) {
-      return defaultListId
-        ? JSON.parse(defaultListId)
-        : await createDefaultList(lensProfile);
-
-      // FIXME
-      // create the default and update the list
-      // console.log(not);
+  const handlePictureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files && e.target.files[0];
+    if (selectedFile) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        setPictureUrl(base64);
+        const bytes = Buffer.from(base64.split(',')[1], 'base64');
+        setImageBuffer(bytes);
+        setProfileChanged(true);
+      };
+      reader.readAsDataURL(selectedFile);
     }
   };
 
   const handleClickSave = async () => {
     if (!lensProfile) {
-      throw 'No lens profile found';
+      snackbar.showMessage('⚠️ Your wallet is disconnected, please log in.');
+      return;
     }
 
     setSaving(true);
 
+    // FIXME Simplify this
     const attLocation: AttributeData = {
       displayType: MetadataDisplayType.string,
       traitType: 'string',
@@ -118,9 +159,11 @@ const Settings: NextPage = () => {
     };
 
     const listsObject = [
-      { name: 'default', key: '0x222' } // set on the first setup
+      // FIXME
+      { name: 'Collected items', key: '0x222' } // set on the first setup
       // { name: 'anotherlist', key: '0x344' }
     ];
+
     const attLists: AttributeData = {
       displayType: MetadataDisplayType.string,
       traitType: 'string',
@@ -130,56 +173,76 @@ const Settings: NextPage = () => {
         //   (attribute: AttributeData) => attribute.key === 'lists0'
         // )?.value,
         JSON.stringify(listsObject),
-      key: 'lists0'
+      key: ATTRIBUTES_LIST_KEY
     };
 
-    // {"displayType":"string",
-    // "traitType":"string",
-    // "key":"twitter",
-    // "value":"@lenstags",
-    // "__typename":"Attribute"}
+    let newPictureUrl: string; // url original or uploaded
+    let newCoverUrl: string; // url original or uploaded
 
-    // default list setup
+    if (profileChanged && imageBuffer) {
+      snackbar.showMessage('⏱️ Uploading profile picture...');
+      const imageIpfsResult = await uploadImageIpfs(imageBuffer); // uploads picture to ipfs
+      newPictureUrl = `ipfs://${imageIpfsResult.path}`;
+      await setProfileImageUri(lensProfile.id, dispatcherActive, newPictureUrl);
+    } else {
+      newPictureUrl = pickPicture(lensProfile.picture, '/img/profilePic.png'); // let's keep the original url
+    }
+
+    if (coverChanged && coverBuffer) {
+      snackbar.showMessage('⏱️ Uploading cover picture...');
+      const imageIpfsResult = await uploadImageIpfs(coverBuffer); // uploads picture to ipfs
+      newCoverUrl = `ipfs://${imageIpfsResult.path}`;
+    } else {
+      newCoverUrl = pickPicture(
+        lensProfile.coverPicture,
+        '/img/profilePic.png'
+      ); // let's keep the original url
+    }
+    snackbar.showMessage('⏱️ Saving it all...');
 
     const profileMetadata: ProfileMetadata = {
       version: '1.0.0', // TODO: centralize this!
       metadata_id: uuidv4(),
       name: profileValues.name,
       bio: profileValues.bio || 'empty bio',
-      cover_picture: 'https://picsum.photos/200/333',
-      profile_picture: 'https://picsum.photos/200/444',
+      cover_picture: newCoverUrl || (await imageToBase64('/img/back.png')),
+      profile_picture: newPictureUrl,
       attributes: [attLocation, attTwitter, attWebsite, attLists]
     };
 
-    await updateProfileMetadata(lensProfile.id, profileMetadata);
-    setSaving(false);
-    const profileResult = await queryProfile({
-      profileId: lensProfile.id
-    });
-
-    console.log(' MY PROFILE UPDATED 💙💙💙💙 ', profileResult);
-    setIsSuccessVisible(true);
-
-    window.localStorage.setItem('LENS_PROFILE', JSON.stringify(profileResult));
+    updateProfileMetadata(lensProfile.id, profileMetadata)
+      .then(() => {
+        snackbar.showMessage('🟩 Profile updated successfully 👤');
+        updateLocalStorageProfile(lensProfile.id);
+      })
+      .catch((err) => {
+        snackbar.showMessage('❌ Unexpected error: ' + err.message);
+      })
+      .finally(() => {
+        setSaving(false);
+      });
   };
 
   const handleClickDispatcher = async () => {
     if (lensProfile) {
       setLoadingDispatcher(true);
       dispatcherActive
-        ? await disable(lensProfile.id)
-        : await enable(lensProfile.id).then(() => console.log('termine'));
+        ? await disable(lensProfile.id).then(() => setDispatcherActive(false))
+        : await enable(lensProfile.id).then(() => setDispatcherActive(true));
     }
-    // router.push('/');
     return;
   };
 
   return (
     <Layout title="Lenstags | Settings" pageDescription="Settings">
       {hydrationLoading ? (
-        <div>Loading...</div>
+        <div className="flex justify-center">
+          <div className="my-8 justify-center">
+            <Spinner h="10" w="10" />
+          </div>
+        </div>
       ) : (
-        <div className="container mx-auto h-64 w-11/12 px-6 py-10 text-black md:w-1/2">
+        <div className="md:w-1/2 container mx-auto h-64 w-11/12 px-6 py-10 text-black">
           <h1 className=" text-2xl">Settings</h1>
 
           <p className="px-6 py-4">Dispatcher</p>
@@ -189,7 +252,7 @@ const Settings: NextPage = () => {
           >
             <div className="flex items-center px-6 py-4">
               <div className="items-center">
-                The transaction Dispatcher is{' '}
+                The transaction Dispatcher is
                 <span className="  ml-2 rounded-lg   border-amber-200 bg-amber-100 px-3 py-1  text-amber-600">
                   {dispatcherActive ? 'Active' : 'Inactive'}
                 </span>
@@ -232,14 +295,6 @@ const Settings: NextPage = () => {
                     {dispatcherActive ? 'Disable' : 'Enable'}
                   </button>
                 </div>
-
-                <button
-                  onClick={handleFindDefault}
-                  className={`flex rounded-lg border-2 border-solid border-black px-3 py-2
-                   text-white disabled:bg-gray-300 `}
-                >
-                  Find default list
-                </button>
               </div>
             </div>
           </div>
@@ -249,27 +304,6 @@ const Settings: NextPage = () => {
             style={{ borderWidth: '0.5px', borderColor: '#949494' }}
             className="rounded-md font-extralight shadow-md"
           >
-            {/* TODO: row, COMPONENTIZE THIS!*/}
-            {/* <div className="px-6 py-4">
-              <div className="flex items-center">
-                <span className="">Name</span>
-                <input
-                  className=" mx-4 rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 outline-none"
-                  type="text"
-                  name="name"
-                  id="name"
-                  defaultValue={profileValues?.name || ''}
-                  onChange={(e) =>
-                    setProfileValues({ ...profileValues, name: e.target.value })
-                  }
-                />
-
-                <span className="w-full py-2 text-right text-sm text-gray-400 ">
-                  Profile id&nbsp; {lensProfile?.id || 'no-name'}
-                </span>
-              </div>
-            </div> */}
-
             <div className="mx-6 my-4">
               <div className="mb-4 grid grid-cols-12 items-center gap-4">
                 <div className="col-span-2">Handle</div>
@@ -402,11 +436,10 @@ const Settings: NextPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-12 items-center gap-4">
-                <div className="col-span-2">
-                  Profile pic
-                  {/* <span className="ml-6">Profile</span> */}
-                </div>
+              {/* <div className="grid grid-cols-12 items-center gap-4"> */}
+              <div className=" grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Profile pic</div>
+
                 <div className="col-span-3">
                   <div className="px-6 py-4">
                     <ImageProxied
@@ -420,25 +453,51 @@ const Settings: NextPage = () => {
                     />
                   </div>
                 </div>
-                <div className="col-span-1">
-                  Cover
-                  {/* <span className="ml-6">Cover</span> */}
-                </div>
+                <FileInput handleImageChange={handlePictureChange} />
+              </div>
+
+              <div className=" grid grid-cols-12 items-center gap-4">
+                <div className="col-span-2">Cover</div>
+
+                <FileInput handleImageChange={handleCoverChange} />
+              </div>
+
+              {coverUrlBase64 && (
                 <div className="col-span-5">
                   <div className="w-full px-6 py-4">
-                    <ImageProxied
-                      category="profile"
+                    <img
+                      // TODO use crop on coming version
                       className="w-full rounded-lg"
-                      src={pictureUrl}
+                      src={coverUrlBase64}
                       alt="User cover picture"
-                      width={100}
-                      height={100}
-                      objectFit="cover"
+                      // width={100}
+                      // height={100}
+                      // objectFit="cover"
                     />
                   </div>
                 </div>
-              </div>
+              )}
             </div>
+          </div>
+
+          <div className="flex justify-end py-4">
+            {!saving ? (
+              <button
+                onClick={handleClickSave}
+                className="flex items-center  rounded-lg border-2 border-solid
+                 border-black bg-lensPurple px-4 py-2 text-xl text-white"
+              >
+                Save
+              </button>
+            ) : (
+              <span
+                className="flex items-center  rounded-lg border-2 border-solid border-gray-500
+                 bg-gray-400 px-4 py-2 text-xl text-white"
+              >
+                <Spinner h="5" w="5" />
+                <span className="ml-2">Saving</span>
+              </span>
+            )}
           </div>
         </div>
       )}

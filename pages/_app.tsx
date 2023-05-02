@@ -1,12 +1,17 @@
 import '../styles/globals.css';
-import type { AppProps } from 'next/app';
 import '@rainbow-me/rainbowkit/styles.css';
-import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
-import { configureChains, createClient, WagmiConfig } from 'wagmi';
+
+import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import { WagmiConfig, configureChains, createClient } from 'wagmi';
 import { polygon, polygonMumbai } from '@wagmi/core/chains';
-import { publicProvider } from 'wagmi/providers/public';
+
+import { APP_NAME } from '@lib/config';
+import type { AppProps } from 'next/app';
+import { AppProvider } from 'context/AppContext';
 import LensAuthenticationProvider from 'components/LensAuthenticationProvider';
+import { SnackbarProvider } from 'material-ui-snackbar-provider';
 import TagsFilterProvider from 'components/TagsFilterProvider';
+import { publicProvider } from 'wagmi/providers/public';
 
 const { chains, provider } = configureChains(
   [polygonMumbai],
@@ -14,7 +19,7 @@ const { chains, provider } = configureChains(
 );
 
 const { connectors } = getDefaultWallets({
-  appName: 'My RainbowKit App',
+  appName: APP_NAME,
   chains
 });
 
@@ -27,13 +32,17 @@ const wagmiClient = createClient({
 function MyApp({ Component, pageProps }: AppProps) {
   return (
     <WagmiConfig client={wagmiClient}>
-      <LensAuthenticationProvider>
-        <RainbowKitProvider chains={chains}>
-          <TagsFilterProvider>
-            <Component {...pageProps} />
-          </TagsFilterProvider>
-        </RainbowKitProvider>
-      </LensAuthenticationProvider>
+      <SnackbarProvider SnackbarProps={{ autoHideDuration: 3000 }}>
+        <LensAuthenticationProvider>
+          <AppProvider>
+            <RainbowKitProvider chains={chains}>
+              <TagsFilterProvider>
+                <Component {...pageProps} />
+              </TagsFilterProvider>
+            </RainbowKitProvider>
+          </AppProvider>
+        </LensAuthenticationProvider>
+      </SnackbarProvider>
     </WagmiConfig>
   );
 }

@@ -31,8 +31,9 @@ export const getFromLocalStorage = (): LensLocalStorage | null => {
 };
 
 export const setLensLocalStorage = (lensStore: LensLocalStorage) => {
-  console.log('seteando storage: ', lensStore);
-  console.log('type storage: ', typeof lensStore.profile?.attributes);
+  // TODO LOGGING
+  // console.log('seteando storage: ', lensStore);
+  // console.log('type storage: ', typeof lensStore.profile?.attributes);
   window.localStorage.setItem(LS_LENS_STORE, JSON.stringify(lensStore));
 };
 

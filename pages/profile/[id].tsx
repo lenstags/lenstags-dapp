@@ -63,11 +63,9 @@ const OtherProfile: NextPage = () => {
     <Layout title="Lenstags | Explore" pageDescription="Profile" screen={true}>
       <div className="w-full">
         {/* header */}
-
         <div
           style={{
-            backgroundImage:
-              "linear-gradient(to bottom, transparent, white), url('/img/back.png')",
+            backgroundImage: `linear-gradient(to bottom, transparent, white), url('${lensProfile?.coverPicture?.original?.url}')`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}

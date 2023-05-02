@@ -91,7 +91,7 @@ export const createPostGasless = async (
     throw new Error('Must define PROFILE_ID in the .env to run this');
   }
 
-  const address = getAddressFromSigner();
+  const address = await getAddressFromSigner();
 
   let mediaResult = [];
   if (builtPost.image) {

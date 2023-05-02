@@ -1,12 +1,14 @@
-import { useCreateSetProfileMetadataTypedDataMutation } from '@lib/lens/graphql/generated';
-import { useEffect, useState } from 'react';
-import { ProfileMetadata } from '@lib/lens/interfaces/profile-metadata'; //'types/profile-metadata'
 import { signedTypeData, splitSignature } from '@lib/lens/ethers.service';
-import { uploadIpfs } from '@lib/lens/ipfs';
+import { useEffect, useState } from 'react';
+
+import { ProfileMetadata } from '@lib/lens/interfaces/profile-metadata'; //'types/profile-metadata'
 import { getLensPeriphery } from '@lib/lens/lens-hub';
-// import { useAuth } from './use-auth';
-import { useIndexedTx } from './use-indexed-tx';
 import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
+import { uploadIpfs } from '@lib/lens/ipfs';
+import { useCreateSetProfileMetadataTypedDataMutation } from '@lib/lens/graphql/generated';
+import { useIndexedTx } from './use-indexed-tx';
+
+// import { useAuth } from './use-auth';
 
 export const useSetProfileMetadata = () => {
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ export const useSetProfileMetadata = () => {
   ) => {
     try {
       setLoading(true);
-      //   const address = await getAddressFromSigner();
+      //   const address =   getAddressFromSigner();
       //   await login(address);
       const ipfsResult = await uploadIpfs<ProfileMetadata>(metadata);
       const createProfileMetadataRequest = {

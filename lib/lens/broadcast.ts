@@ -1,9 +1,9 @@
-import { apolloClient } from './graphql/apollo-client';
-import { login } from '@lib/lens/login';
-
-import { getAddressFromSigner, signedTypeData } from './ethers.service';
-import { createFollowTypedData } from './follow';
 import { BroadcastDocument, BroadcastRequest } from './graphql/generated';
+import { getAddressFromSigner, signedTypeData } from './ethers.service';
+
+import { apolloClient } from './graphql/apollo-client';
+import { createFollowTypedData } from './follow';
+import { login } from '@lib/lens/login';
 import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 
 export const broadcastRequest = async (request: BroadcastRequest) => {

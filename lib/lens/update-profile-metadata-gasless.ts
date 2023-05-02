@@ -11,34 +11,40 @@ import {
 import { MetadataDisplayType } from './interfaces/generic';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { broadcastRequest } from '@lib/lens/broadcast';
-// import { getAddressFromSigner } from '@lib/lens/ethers.service';
 import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { signCreateSetProfileMetadataTypedData } from './set-profile-metadata';
 import { uploadIpfs } from '@lib/lens/ipfs';
-import { v4 as uuidv4 } from 'uuid';
+
+// import { getAddressFromSigner } from '@lib/lens/ethers.service';
 
 const createSetProfileMetadataViaDispatcherRequest = async (
   profileRequest: CreatePublicSetProfileMetadataUriRequest
 ) => {
+  // try {
+  console.log('apolloClient ', apolloClient);
   const result = await apolloClient.mutate({
     mutation: CreateSetProfileMetadataViaDispatcherDocument,
     variables: {
       request: profileRequest
     }
   });
-
   return result.data!.createSetProfileMetadataViaDispatcher;
+  // } catch (error) {
+  //   console.log('EEEE RR ', error);
+  // }
 };
 
 const setMetadata = async (
   createMetadataRequest: CreatePublicSetProfileMetadataUriRequest
 ) => {
+  // tested but authn't
+  // const address = getAddressFromSigner();
+  // console.log('setMetadata: address', address);
+
   const profileResult = await queryProfile({
     profileId: createMetadataRequest.profileId
   });
-
-  console.log(' 😻 createMetadataRequest ', createMetadataRequest);
 
   if (!profileResult) {
     throw new Error('Could not find profile');
@@ -101,10 +107,11 @@ export const updateProfileMetadata = async (
     throw new Error('No profileId');
   }
 
-  // const address = getAddressFromSigner();
+  // const address = await getAddressFromSigner();
   // console.log('create profile: address', address);
 
   const ipfsResult = await uploadIpfs<ProfileMetadata>(profileMetadata);
+  console.log('XXXX ', profileMetadata.cover_picture);
   console.log('create profile: ipfs result', ipfsResult);
 
   // hard coded to make the code example clear
@@ -171,8 +178,8 @@ export const updateProfileMetadata = async (
 //     metadata_id: uuidv4(),
 //     name: profileResult.name || undefined,
 //     bio: profileResult.bio || 'empty bio',
-//     cover_picture: 'https://picsum.photos/200/333', // TODO
-//     profile_picture: 'https://picsum.photos/200/444', // FIXME
+//     cover_picture: 'https://picsum.photos/200/333',
+//     profile_picture: 'https://picsum.photos/200/444',
 //     attributes: [attLocation, attTwitter, attWebsite, attLists]
 //   };
 

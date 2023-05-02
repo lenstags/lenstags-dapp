@@ -32,7 +32,7 @@ export const LayoutLanding: FC<Props> = ({
       </Head>
 
       <nav>
-        <div className="h-full w-full bg-gray-100">
+        <div className="h-full w-full bg-black">
           <div className="flex-no-wrap flex">
             {/*Mobile responsive sidebar*/}
             <div
@@ -289,7 +289,7 @@ export const LayoutLanding: FC<Props> = ({
           </div>
         </div>
       </nav>
-      <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16 bg-white`}>
+      <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16 bg-black`}>
         {children}
       </main>
     </>
