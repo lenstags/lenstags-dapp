@@ -250,24 +250,22 @@ const Settings: NextPage = () => {
             style={{ borderWidth: '0.5px', borderColor: '#949494' }}
             className="rounded-md font-extralight shadow-md"
           >
-            <div className="flex items-center px-6 py-4">
+            <div className="flex items-center justify-between px-6 py-4">
               <div className="items-center">
-                The transaction Dispatcher is
-                <span className="  ml-2 rounded-lg   border-amber-200 bg-amber-100 px-3 py-1  text-amber-600">
-                  {dispatcherActive ? 'Active' : 'Inactive'}
-                </span>
+                The transaction Dispatcher is{' '}
+                {dispatcherActive ? 'active' : 'inactive'}.
               </div>
 
-              <div className="relative ml-4 inline-flex cursor-pointer items-center">
-                <div className="flex items-center justify-center">
+              <div className="relative ml-4 inline-flex  cursor-pointer ">
+                <div className="flex   justify-end">
                   <button
                     disabled={loadingDispatcher}
                     onClick={handleClickDispatcher}
                     className={`text-black ${
                       dispatcherActive
-                        ? 'bg-purple-400 hover:bg-purple-300'
-                        : ' bg-green-100 hover:bg-lensGreen'
-                    } flex rounded-lg border-2 border-solid border-black px-3 py-2  text-white disabled:bg-gray-300 `}
+                        ? 'bg-red-400 hover:bg-red-500'
+                        : ' bg-green-500 hover:bg-green-400 '
+                    } lack flex rounded-lg border-2 border-b border-solid px-3 py-2  text-white disabled:bg-gray-300 `}
                   >
                     {loadingDispatcher && (
                       <svg
