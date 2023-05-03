@@ -300,7 +300,8 @@ export default function PostDetails() {
                   key={`${post.id}untagged`}
                   className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
                 >
-                  untagged
+                  {' '}
+                  {/* untagged */}
                 </li>
               )}
             </ul>

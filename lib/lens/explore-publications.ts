@@ -25,6 +25,7 @@ export interface IExplorePublications {
 export const explore = async (filter?: IExplorePublications) => {
   const reqQuery: ExplorePublicationRequest = {
     sortCriteria: PublicationSortCriteria.Latest,
+    noRandomize: true,
     sources: [LENSTAGS_SOURCE],
     limit: 50,
     publicationTypes: [PublicationTypes.Post],

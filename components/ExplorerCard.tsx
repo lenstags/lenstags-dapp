@@ -205,9 +205,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
       // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
       id="CardContainer"
-      className=" md:w-1/2 lg:w-1/4 s my-1 w-full px-1 animate-in fade-in-50  duration-1000 lg:my-4 lg:px-4"
+      className=" md:w-1/2 lg:w-1/4 w- full px-1 py-2 animate-in fade-in-50 duration-1000  lg:px-4"
       style={{ opacity, pointerEvents }}
-      // style={{ opacity: 0.2 }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
       {openReconnect ? (
@@ -223,7 +222,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
           </button>
         </div>
       ) : (
-        <article className="h-f ull ">
+        <article>
           {/* favllect content goes here */}
           {isFavMenuVisible && (
             <div
@@ -318,7 +317,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 }`}
               ></div>
               <div
-                style={{ height: '360px' }}
+                style={{ position: 'relative', height: '360px' }}
                 className={`px-2 py-1
               ${isList ? 'lens-folder' : 'lens-post'}`}
               >
@@ -498,7 +497,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         key={`${post.id}untagged`}
                         className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
                       >
-                        untagged
+                        {/* untagged */}{' '}
                       </li>
                     )}
                   </ul>
@@ -539,11 +538,14 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 {/* </Link> */}
 
                 {/* date and collected indicators*/}
-                <footer className="flex items-center justify-between py-2 text-black">
-                  <p className="mt-1 text-xs font-light text-gray-400">
+                <footer
+                  style={{ position: 'absolute', bottom: 0 }}
+                  className="grid grid-cols-3   items-center    py-2 text-xs text-black"
+                >
+                  <p className="mt-1 font-light text-gray-400">
                     {moment(post.createdAt).format('MMM Do YY')}
                   </p>
-                  <div className="flex items-end text-xs font-light">
+                  <div className="flex items-end  font-light">
                     <ImageProxied
                       category="profile"
                       src="/assets/icons/collect.svg"
@@ -559,7 +561,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     // && post.metadata.attributes[0].value === 'post'
                     <div
                       title="You do own this item!"
-                      className="flex cursor-default items-end rounded-md bg-amber-100 px-2 py-1 text-xs "
+                      className="flex   cursor-default items-end rounded-md bg-amber-100 px-1 py-1 text-right text-xs "
                     >
                       COLLECTED
                     </div>
