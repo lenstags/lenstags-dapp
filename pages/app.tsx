@@ -144,7 +144,7 @@ const App: NextPage = () => {
               <p className="py-4">Yours, The LensTags team ⚜️</p>
 
               <p className="pb-4 text-xs">
-                P.S.: Meanwhile, we are been performing some setup tasks in
+                P.S.: Meanwhile, we are performing some setup tasks in
                 background, fasten your seat belts! 🚀
               </p>
 

@@ -39,7 +39,7 @@ export const createPost = async (profileId: string, builtPost: IbuiltPost) => {
     link: builtPost.link,
     imageMimeType: null,
     content: builtPost.content,
-    name: builtPost.title || '',
+    name: builtPost.title || ' ',
     external_url: builtPost.external_url, // the list is editabl here
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
@@ -261,9 +261,9 @@ export const cloneAndCollectPost = async (lensProfile: any, postId: string) => {
 
   const constructedPost: IbuiltPost = {
     attributes: DEFAULT_METADATA_ATTRIBUTES,
-    name: post.metadata.name || '',
-    abstract: post.metadata.description || '',
-    content: post.metadata.content || '',
+    name: post.metadata.name || ' ',
+    abstract: post.metadata.description || ' ',
+    content: post.metadata.content || ' ',
     // TODO: recover the link!!!
     // link: link,
     // TODO: RECOVER THIS TOO!!!

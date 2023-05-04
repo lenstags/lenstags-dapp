@@ -216,7 +216,7 @@ const Create: NextPage = () => {
 
     const constructedPost: IbuiltPost = {
       attributes: DEFAULT_METADATA_ATTRIBUTES,
-      name: title,
+      name: title || ' ',
       abstract: abstract || '',
       content: editorContents || '',
       link: sourceUrl,
