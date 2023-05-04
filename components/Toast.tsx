@@ -1,14 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const DISMISS_TIMEOUT = 5000;
 
 interface ToastProps {
-  text: string;
-  level: string;
+  text?: string;
+  level?: string;
 }
 
 const Toast: React.FC<ToastProps> = ({ text, level }) => {
   const [isDismissed, setDismissed] = useState(false);
+  let color = level === 'warning' && ' bg-amber-200 ';
+  color = level === 'error' && ' bg-red-200 ';
+  color = level === 'info' && ' bg-cyan-200 ';
+  color = level === 'success' && ' bg-lensGreen ';
+
+  // const [levelColor, setLevelColour] = useState(color);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => setDismissed(true), DISMISS_TIMEOUT);
@@ -21,7 +27,10 @@ const Toast: React.FC<ToastProps> = ({ text, level }) => {
   }
 
   return (
-    <div className=" fixed bottom-8 right-8 z-50 m-auto w-80 rounded-lg border-2 border-solid border-black bg-lensGreen px-2 py-3 text-center text-lg font-light text-black">
+    <div
+      className={`${color} fixed bottom-8 right-8 z-50 m-auto w-80 rounded-lg border-2 border-solid
+      border-black px-2 py-3 text-center text-lg font-light text-black`}
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         className="icon icon-tabler icon-tabler-ad-2 float-left"

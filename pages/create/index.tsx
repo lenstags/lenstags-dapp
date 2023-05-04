@@ -14,6 +14,7 @@ import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -21,6 +22,11 @@ async function getBufferFromElement(url: string) {
   const buffer = Buffer.from(arrayBuffer);
   return buffer;
 }
+
+type ToastContent = {
+  message?: string;
+  level?: string;
+};
 
 const checkIfUrl = (value: string): boolean => {
   try {
@@ -38,6 +44,8 @@ const sleep = () =>
 
 const Create: NextPage = () => {
   const [title, setTitle] = useState('');
+  const snackbar = useSnackbar();
+
   const [dispatcherStatus, setDispatcherStatus] = useState<boolean | undefined>(
     undefined
   );
@@ -47,6 +55,11 @@ const Create: NextPage = () => {
   const [sourceUrl, setSourceUrl] = useState('');
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const [isErrorVisible, setIsErrorVisible] = useState(false);
+
+  const [toast, setToast] = useState<ToastContent>({});
+
+  const [isToastVisible, setToastVisible] = useState(false);
+
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
@@ -76,7 +89,9 @@ const Create: NextPage = () => {
     setActualPanel(selectedPanel);
   };
 
-  const lensProfile = useContext(ProfileContext);
+  // const lensProfile = useContext(ProfileContext);
+  const { profile: lensProfile } = useContext(ProfileContext);
+
   if (!lensProfile) {
     return null;
   }
@@ -139,23 +154,34 @@ const Create: NextPage = () => {
   );
 
   const handleIAImage = async () => {
-    setLoadingIA(true);
-    if (title) {
-      const response = await fetchImageAI(title.substring(0, 1000));
-      const imageB64 = 'data:image/png;base64,' + response.data[0].b64_json;
-      setGeneratedImage(imageB64);
-      setGeneratedImage2(response.data[0].b64_json);
+    if (!title) {
+      snackbar.showMessage('⚠️ Attention: Title is required!');
+      return;
     }
+    setLoadingIA(true);
+    const response = await fetchImageAI(title.substring(0, 1000));
+    const imageB64 = 'data:image/png;base64,' + response.data[0].b64_json;
+    setGeneratedImage(imageB64);
+    setGeneratedImage2(response.data[0].b64_json);
     setLoadingIA(false);
   };
 
   const handleChangeEditor = (content: string) => setEditorContents(content);
 
-  const handlePost = async () => { // upload file to ipfs and get its url
+  const handlePost = async () => {
+    // upload file to ipfs and get its url
+    if (!title) {
+      snackbar.showMessage('⚠️ Attention: Title is required!');
+      return;
+    }
+
     let imageBuffer: Buffer | null = null;
 
     if (actualPanel === 'panelUpload') {
-      if (cover) { // read the file as a Buffer
+      if (cover) {
+        // FIXME
+        // imageBuffer = await getBufferFromUpload(cover);
+        // read the file as a Buffer
         const reader = new FileReader();
         reader.readAsArrayBuffer(cover);
         await new Promise((resolve, reject) => {
@@ -170,18 +196,22 @@ const Create: NextPage = () => {
             resolve(imageBuffer);
           };
           reader.onerror = () => {
-            reject(reader.error);
+            return snackbar.showMessage('❌ Upload failed! Please try again.');
           };
         });
       }
     }
 
     if (actualPanel === 'panelLink') {
-      imageBuffer = await getBufferFromElement(imageURL);
+      const imgTarget = imageURL ? imageURL : 'public/img/post.png';
+      imageBuffer = await getBufferFromElement(imgTarget);
+      console.log('imgTarget ', imageBuffer);
     }
 
     if (actualPanel === 'panelAI') {
-      imageBuffer = Buffer.from(generatedImage2, 'base64');
+      imageBuffer = generatedImage2
+        ? Buffer.from(generatedImage2, 'base64')
+        : null;
     }
 
     const constructedPost: IbuiltPost = {
@@ -199,7 +229,7 @@ const Create: NextPage = () => {
     };
 
     if (!lensProfile) {
-      return;
+      snackbar.showMessage('❌ You are not connected!');
     }
 
     setLoading(true);
@@ -214,7 +244,13 @@ const Create: NextPage = () => {
       console.log('POST RESULT: ', result);
       // FIXME
       // if (result.isOk) {
-      setIsSuccessVisible(true);
+      // setIsSuccessVisible(true);
+      snackbar.showMessage('👌🏻 Post created successfully!');
+
+      // toast.message = 'Post created successfully!';
+      // toast.level = 'success';
+      // setToastVisible(true);
+
       await sleep();
       router.push('/app');
       // } else {
@@ -222,8 +258,9 @@ const Create: NextPage = () => {
       //   console.error(e);
       // }
     } catch (e: any) {
-      setIsErrorVisible(true);
+      // setIsErrorVisible(true);
       console.error(e);
+      snackbar.showMessage('❌ Error: ' + e.message);
       setLoading(false);
     }
   };
@@ -236,7 +273,7 @@ const Create: NextPage = () => {
         <div>
           <div className="flex ">
             <p className="mx-2 ml-4 w-5/6 pt-2 text-xs font-semibold text-gray-600">
-              Write something in the editor below and click on Generate
+              Write something in the title and click Generate
             </p>
 
             <button
@@ -333,7 +370,7 @@ const Create: NextPage = () => {
 
   return (
     <Layout title="Lenstags | Create post" pageDescription="Create post">
-      <div className="container mx-auto h-64  w-11/12 px-6 py-6 text-black md:w-1/2">
+      <div className="md:w-1/2 container mx-auto  h-64 w-11/12 px-6 py-6 text-black">
         <div className="text-xl font-semibold">
           <span className="text-left">Create post</span>
           <div
@@ -370,7 +407,7 @@ const Create: NextPage = () => {
             name="link"
             id="link"
             placeholder="Insert the link starting with 'https://'"
-            onChange={ handleInputChange }
+            onChange={handleInputChange}
           />
         </div>
 
@@ -472,28 +509,38 @@ const Create: NextPage = () => {
         </div>
 
         <div className="text-right">
-          {isSuccessVisible && (
+          {/* {isSuccessVisible && (
             <Toast text="Post created successfully!" level="success" />
           )}
           {isErrorVisible && (
             <Toast text="Something went wrong" level="error" />
-          )}
+          )} */}
 
+          {isToastVisible && <Toast text={toast.message} level={toast.level} />}
           <div className="pb-6 text-right">
             <div className="flex h-full min-w-fit items-center  justify-end border-black   pl-8 ">
-              <button
-                disabled={loading}
-                onClick={() =>
-                  handlePost().then(() => {
-                    // useWaitFiveSeconds();
-                  })
-                }
-                className="flex align-middle"
-              >
-                <div className="button_Nobg flex items-center bg-lensPurple text-lensGray">
-                  {loading && (
+              {!loading ? (
+                <button
+                  onClick={() =>
+                    handlePost().then(() => {
+                      // FIXME
+                      // useWaitFiveSeconds();
+                    })
+                  }
+                  className="flex align-middle"
+                >
+                  <div className="button_Nobg flex items-center bg-lensPurple text-lensGray">
+                    <div className="px-4 py-2 text-xl">Create post</div>
+                  </div>
+                </button>
+              ) : (
+                <button
+                  // disabled={loading}
+                  className="flex cursor-default align-middle"
+                >
+                  <div className=" flex items-center rounded-lg border-2 bg-white text-gray-400">
                     <svg
-                      className="ml-2 h-5 w-5 animate-spin"
+                      className="ml-4 h-5 w-5 animate-spin"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"
@@ -512,10 +559,10 @@ const Create: NextPage = () => {
                         d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                       ></path>
                     </svg>
-                  )}
-                  <div className="px-4 py-2 text-xl">Create Post</div>
-                </div>
-              </button>
+                    <div className="py-2 pl-2 pr-4 text-xl">Posting </div>
+                  </div>
+                </button>
+              )}
             </div>
           </div>
         </div>

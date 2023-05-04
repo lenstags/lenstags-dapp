@@ -21,3 +21,58 @@ export const getIPFSImage = (url: string) => {
       : url;
   }
 };
+
+export const getBufferFromUpload = async (cover: File): Promise<any> => {
+  let imageBuffer: Buffer | null;
+  // read the file as a Buffer
+  const reader = new FileReader();
+  reader.readAsArrayBuffer(cover);
+  await new Promise((resolve, reject) => {
+    reader.onloadend = () => {
+      if (reader.result instanceof ArrayBuffer) {
+        imageBuffer = Buffer.from(reader.result);
+      } else if (reader.result !== null) {
+        imageBuffer = Buffer.from(reader.result.toString());
+      } else {
+        // TODO: handle the case where reader.result is null
+      }
+      return resolve(imageBuffer);
+    };
+    reader.onerror = () => {
+      return reject(reader.error);
+    };
+  });
+};
+
+export const imageToBase64 = async (imageUrl: string): Promise<string> => {
+  const response = await fetch(imageUrl);
+  const blob = await response.blob();
+
+  return new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(blob);
+    reader.onloadend = () => {
+      const base64String = reader.result as string;
+      resolve(base64String);
+    };
+  });
+};
+
+export function readFile(file: Blob): Promise<string> {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.addEventListener(
+      'load',
+      () => resolve(reader.result as string),
+      false
+    );
+    reader.readAsDataURL(file);
+  });
+}
+
+export const pickPicture = (elementPicture: any, defaultPNG: string) =>
+  elementPicture?.__typename === 'MediaSet'
+    ? elementPicture?.original.url
+    : elementPicture?.__typename === 'NftImage'
+    ? elementPicture.uri
+    : defaultPNG;

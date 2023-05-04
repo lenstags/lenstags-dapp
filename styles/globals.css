@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  background-color: #fff !important;
-}
 
 /*  div {
   border: red solid 1px;
@@ -13,6 +10,18 @@ html {
 @layer base {
   html {
     font-family: Inter, system-ui, sans-serif;
+  }
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
   }
 }
 
@@ -290,7 +299,7 @@ figcaption {
   box-sizing: border-box;
   /* position: absolute; */
   width: 84px;
-  height: 15px;
+  height: 12px;
   left: 193px;
   top: 224px;
   /* background: #f7f4db; */

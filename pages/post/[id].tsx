@@ -1,21 +1,56 @@
 import { useEffect, useState } from 'react';
 
+import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components';
+import { ProfileQuery } from '@lib/lens/graphql/generated';
+import { Spinner } from 'components/Spinner';
 import { getPublication } from '@lib/lens/get-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { typeList } from '@lib/lens/load-lists';
+import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 export default function PostDetails() {
   const router = useRouter();
   const { id } = router.query;
   const [post, setPost] = useState<any>();
   const [lensProfile, setProfile] = useState<any>();
+  const [isPosting, setIsPosting] = useState(false);
+  const [dotColor, setDotColor] = useState('');
+  const [dotTitle, setDotTitle] = useState('');
+  const snackbar = useSnackbar();
+  const [isListVisible, setIsListVisible] = useState(false);
+  const [isFavMenuVisible, setFavMenuVisible] = useState(false);
+
+  const firstList = JSON.parse(
+    lensProfile?.attributes?.find(
+      (attribute: any) => attribute.key === ATTRIBUTES_LIST_KEY
+    )?.value || `[]`
+  );
+
+  const [lists, setLists] = useState<typeList[]>(firstList);
+  const [selectedList, setSelectedList] = useState<typeList[]>(lists);
+  const { disconnect } = useDisconnect();
 
   function createMarkup(innerHtml: string) {
     return { __html: innerHtml };
   }
+
+  const refreshLists = async (profileId: string) => {
+    const readProfile: ProfileQuery['profile'] = await queryProfile({
+      profileId
+    });
+    const parsedLists = JSON.parse(
+      readProfile?.attributes?.find(
+        (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
+      )?.value || `[]`
+    );
+    setLists(parsedLists);
+    setSelectedList(parsedLists); // FIXME: should be only one?
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -64,7 +99,7 @@ export default function PostDetails() {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
-              className="mx-auto w-11/12  pt-60   md:w-4/5"
+              className="md:w-4/5 mx-auto  w-11/12   pt-60"
             >
               <div className="  flex items-center ">
                 <div
@@ -93,7 +128,7 @@ export default function PostDetails() {
             </div>
           </div>
 
-          <div className="mx-auto  w-11/12  py-6 md:w-4/5">
+          <div className="md:w-4/5  mx-auto  w-11/12 py-6">
             <div className="flex  text-sm text-black">
               <footer className="flex items-center  justify-between py-2 text-right text-black">
                 {/* <span className="flex items-center text-xs ">
@@ -124,12 +159,12 @@ export default function PostDetails() {
                   // }}
                   className="flex text-right"
                 >
-                  {lensProfile ? (
+                  {/* {lensProfile ? (
                     // && post.metadata.attributes[0].value === 'post'
 
                     post.hasCollectedByMe ? (
                       <div className=" flex items-end rounded-md bg-amber-100 px-2 py-1 text-xs ">
-                        Collected
+                        COLLECTED
                       </div>
                     ) : (
                       <div className=" flex items-end rounded-md bg-lensGreen px-2 py-1 text-xs ">
@@ -138,14 +173,54 @@ export default function PostDetails() {
                     )
                   ) : (
                     ''
+                  )} */}
+
+                  {lensProfile && post.hasCollectedByMe && (
+                    // && post.metadata.attributes[0].value === 'post'
+                    <div
+                      title="You do own this item!"
+                      className="flex cursor-default items-end rounded-md bg-amber-100 px-2 py-1 text-xs "
+                    >
+                      COLLECTED
+                    </div>
                   )}
+
+                  {/* {lensProfile && !post.hasCollectedByMe && !isPosting ? (
+                    <button
+                      onClick={() => {
+                        refreshLists(lensProfile?.id);
+                        return setFavMenuVisible(!isListVisible);
+                      }}
+                      className="flex text-right"
+                    >
+                      <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
+                        +COLLECT
+                      </div>
+                    </button>
+                  ) : (
+                    isPosting && (
+                      <div className="flex text-right">
+                        <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
+                          Collecting
+                          <div className="relative ml-1 flex items-center">
+                            <div
+                              title={dotTitle}
+                              className={`absolute inset-0 m-auto h-1 w-1 animate-ping
+                                rounded-full border ${dotColor}`}
+                            />
+                            <Spinner h="3" w="3" />
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  )} */}
                 </button>
               </footer>
             </div>
           </div>
 
           {/* contents */}
-          <div className=" mx-auto mb-14  w-11/12 md:w-4/5">
+          <div className=" md:w-4/5 mx-auto  mb-14 w-11/12">
             <div className="mb-4 w-full">
               <div className=" mb-2 flex justify-between ">
                 <p
@@ -229,6 +304,22 @@ export default function PostDetails() {
                 </li>
               )}
             </ul>
+            <div className="ext-ellipsis my-4 text-xs text-gray-400">
+              {post.metadata.attributes[1]?.value && (
+                <>
+                  Source:
+                  <a
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-ellipsis"
+                    href={post.metadata.attributes[1]?.value}
+                  >
+                    {' '}
+                    {post.metadata.attributes[1]?.value}
+                  </a>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </Layout>

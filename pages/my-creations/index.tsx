@@ -8,7 +8,9 @@ import { explore } from '@lib/lens/explore-publications';
 
 const Lists: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
-  const lensProfile = useContext(ProfileContext);
+  // const lensProfile = useContext(ProfileContext);
+  const { profile: lensProfile } = useContext(ProfileContext);
+
   const { tags } = useContext(TagsFilterContext);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ const Lists: NextPage = () => {
   explore({ tags });
   return (
     <Layout title="Lenstags | Explore" pageDescription="Explore" screen={true}>
-      <div className="container mx-auto w-11/12  py-10 md:w-4/5  ">
+      <div className="md:w-4/5 container mx-auto  w-11/12 py-10  ">
         <div className="mb-3">
           <TagsFilter />
         </div>

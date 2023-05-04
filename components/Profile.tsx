@@ -1,12 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-/* eslint-disable @next/next/no-img-element */
 import ImageProxied from './ImageProxied';
-// import { ProfileContext } from 'components/LensAuthenticationProvider';
 import { ProfileContext } from './LensAuthenticationProvider';
 
+/* eslint-disable @next/next/no-img-element */
+// import { ProfileContext } from 'components/LensAuthenticationProvider';
+
 export const Profile = () => {
-  const lensProfile = useContext(ProfileContext);
+  // const lensProfile = useContext(ProfileContext);
+  const { profile: lensProfile } = useContext(ProfileContext);
+
   console.log('lensProfile de perfil:::: ', lensProfile);
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -16,7 +19,7 @@ export const Profile = () => {
       : '/img/profilePic.png';
   return (
     <div className="mb-5">
-      <div className="bg-greenLengs flex flex-col items-start justify-between rounded-t py-4 px-5 shadow sm:flex-row sm:items-center">
+      <div className="bg-greenLengs flex flex-col items-start justify-between rounded-t px-5 py-4 shadow sm:flex-row sm:items-center">
         <div className="flex items-center  sm:mb-0 md:mb-0 lg:mb-0 xl:mb-0">
           <div className="relative h-24 w-24 ">
             <ImageProxied

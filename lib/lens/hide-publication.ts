@@ -18,10 +18,14 @@ const deletePublicationRequest = async (request: HidePublicationRequest) => {
 };
 
 export const hidePublication = async (publicationId: string) => {
-  const address = getAddressFromSigner();
-  console.log('delete publication: address', address);
-
-  await deletePublicationRequest({ publicationId });
-
-  console.log('delete publication: success');
+  return getAddressFromSigner()
+    .then((address) => {
+      console.log('delete publication: address', address);
+    })
+    .then(() => deletePublicationRequest({ publicationId }))
+    .then(() => true)
+    .catch((err) => {
+      console.log("Error removing post: ", err)
+      return false
+     });
 };

@@ -8,37 +8,58 @@ import Link from 'next/link';
 import ListImages from './ListImages';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
+import { Spinner } from './Spinner';
+import { deleteLensLocalStorage } from '@lib/lens/localStorage';
+import { freeCollect } from '@lib/lens/collect';
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { useDisconnect } from 'wagmi';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface Props {
   post: any;
 }
 
 const ExploreCard: FC<Props> = ({ post }) => {
-  // fetch data for current post, get the latest coments
+  // fetch data for current post, get the latest comments
   const isList = post.metadata.attributes[0].value === 'list';
-  const lensProfile = useContext(ProfileContext);
+  // const lensProfile = useContext(ProfileContext);
+  const { profile: lensProfile } = useContext(ProfileContext);
+  const [openReconnect, setOpenReconnect] = useState(false);
   const [isFavMenuVisible, setFavMenuVisible] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
   const [dotColor, setDotColor] = useState('');
   const [dotTitle, setDotTitle] = useState('');
-
+  const snackbar = useSnackbar();
+  const [isDeleted, setIsDeleted] = useState(false);
+  const [opacity, setOpacity] = useState(1);
+  const [pointerEvents, setPointerEvents] = useState<any>('all');
   const [valueListName, setValueListName] = useState('');
   const [isListVisible, setIsListVisible] = useState(false);
   const [isListExistent, setIsListExistent] = useState(false);
+
+  // const profil: ProfileQuery['profile'] = await queryProfile({
+  //   profileId: pro.id
+  // });
 
   const firstList = JSON.parse(
     lensProfile?.attributes?.find(
       (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
     )?.value || `[]`
   );
+  // console.log('firstList ', firstList, lensProfile);
 
   const [lists, setLists] = useState<typeList[]>(firstList);
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
+  const { disconnect } = useDisconnect();
+
+  const handleDisconnect = () => {
+    deleteLensLocalStorage();
+    disconnect();
+  };
 
   //handles debounce
   useEffect(() => {
@@ -80,9 +101,16 @@ const ExploreCard: FC<Props> = ({ post }) => {
     fetchData();
   }, [post]);
 
-  const handleRemove = async (postId: string) => {
-    return await hidePublication(postId);
-  };
+  const handleRemove = (postId: string) =>
+    hidePublication(postId).then((res) => {
+      snackbar.showMessage(
+        '🗑️ Post removed successfully'
+        // 'Undo', () => handleUndo()
+      );
+      setOpacity(0.3);
+      setPointerEvents('none');
+      setIsDeleted(true);
+    });
 
   const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
     setValueListName(event.target.value);
@@ -121,6 +149,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
       // TODO: OPTIMIZE IT
       setDotColor(' border-red-400 bg-black');
       setDotTitle('Creating list');
+      snackbar.showMessage(
+        '🟦 Creating the new list, you can continue exploring.'
+      );
       listId = (await createUserList(lensProfile, name!)).key;
       console.log('List (post) ID returned to the UI: ', listId);
     }
@@ -131,17 +162,36 @@ const ExploreCard: FC<Props> = ({ post }) => {
     //   throw 'Unknown error when cloning';
     // }
 
+    snackbar.showMessage(
+      '🟦 Collecting and minting item, you can continue exploring.'
+    );
+    const collectResult = await freeCollect(selectedPostId);
+    if (collectResult.errors?.length > 0) {
+      setIsPosting(false);
+      if (collectResult.errors[0].extensions.code === 'UNAUTHENTICATED') {
+        snackbar.showMessage(`🟥 Error: ${collectResult.errors[0].message}`);
+        setOpenReconnect(true);
+        return;
+      }
+      setIsPosting(false);
+      snackbar.showMessage(`🟨 Attention: ${collectResult.errors[0].message}`);
+      return;
+    }
+
     // just add the post to the list
     setDotColor(' border-yellow-400 bg-yellow-600 ');
     setDotTitle('Indexing list');
+
     const addResult = await addPostIdtoListId(
       profileId,
-      listId!,
+      listId,
       selectedPostId
     );
 
-    console.log('finished, ', addResult);
-    // TODO: SHOW SOME UI BOX
+    snackbar.showMessage(
+      '🟩 Item added to list! 🗂️'
+      // 'Undo', () => handleUndo()
+    ); // TODO: SHOW SOME UI BOX
     // TODO: update lists in UI!
     setDotColor(' border-blue-400 bg-blue-600 ');
     setDotTitle('Finished');
@@ -154,120 +204,142 @@ const ExploreCard: FC<Props> = ({ post }) => {
     <div
       // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
-      className="my-1 w-full px-1 md:w-1/2 lg:my-4 lg:w-1/4 lg:px-4  "
+      id="CardContainer"
+      className=" md:w-1/2 lg:w-1/4 s my-1 w-full px-1 animate-in fade-in-50  duration-1000 lg:my-4 lg:px-4"
+      style={{ opacity, pointerEvents }}
+      // style={{ opacity: 0.2 }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
-
-      <article className="h-full">
-        {/* favllect content goes here */}
-        {isFavMenuVisible && (
-          <div className=" lens-post mt-3 h-full rounded-lg bg-white px-0">
-            <div className="flex px-2">
-              <button
-                id="btnBack"
-                onClick={() => setFavMenuVisible(false)}
-                className="bg-white text-xl "
-              >
-                ←
-              </button>
-              <h1 className=" w-full items-center truncate text-ellipsis pl-1 pt-1 ">
-                {post.metadata.name || 'untitled'}
-              </h1>
-            </div>
-
-            <div className="m-2">
-              <input
-                type="text"
-                autoComplete="off"
-                value={valueListName}
-                onChange={handleChangeListName}
-                className=" w-full rounded-lg border-2 border-solid border-gray-200 px-2 py-1 text-sm leading-none text-gray-600 outline-none"
-                name="tag-search-input"
-                id="tag-search-input"
-                // onKeyDown={handleKeyDown}
-                placeholder="Enter list name..."
-              />
-            </div>
-
-            <div className="scrollbar-hide z-10 mb-4 h-56 overflow-y-auto border-b-2 border-solid border-gray-100 px-1">
-              {selectedList.map((list: typeList) => {
-                return (
-                  <button
-                    className=" my-1 w-full rounded-lg border-solid 
-                       py-1  text-sm   hover:bg-amber-100"
-                    key={list.key}
-                    style={{
-                      color: '#745f2b',
-                      backgroundColor: '#fffee8',
-                      border: '1px solid #fdf4dc'
-                    }}
-                    value={list.key}
-                    onClick={() =>
-                      handleAddPostToList(
-                        lensProfile?.id,
-                        post.id,
-                        list.key,
-                        undefined
-                      )
-                    }
-                  >
-                    {list.name}
-                  </button>
-                );
-              })}
-            </div>
-
-            <footer className="text-center">
-              <button
-                onClick={() =>
-                  handleAddPostToList(
-                    lensProfile?.id,
-                    post.id,
-                    undefined,
-                    valueListName
-                  )
-                }
-                className={`rounded-lg px-2 py-2 ${
-                  valueListName && !isListExistent
-                    ? 'bg-lensGreen'
-                    : 'disabled cursor-not-allowed bg-gray-100'
-                }`}
-                disabled={!valueListName || isListExistent}
-              >
-                ✦ CREATE AND ADD
-              </button>
-            </footer>
-
-          </div>
-        )}
-
-        {/* main tab contents goes here */}
-        {!isFavMenuVisible && (
-          <div>
+      {openReconnect ? (
+        <div className="mt-14 h-full text-center ">
+          {/* TODO  write status in a context so the app shows a modal */}
+          <p className="my-4 text-2xl">⛔️</p>
+          <p className="my-4 ">You were logged out</p>
+          <button
+            onClick={handleDisconnect}
+            className=" bg-lensGreen px-3 py-2"
+          >
+            Connect!
+          </button>
+        </div>
+      ) : (
+        <article className="h-f ull ">
+          {/* favllect content goes here */}
+          {isFavMenuVisible && (
             <div
-              className={` ${
-                isList ? 'lens-folder-tab' : 'lens-folder-tab-empty'
-              }`}
-            ></div>
-            <div
-              className={`px-2 py-1
-              ${isList ? 'lens-folder' : 'lens-post'}`}
+              style={{ height: '360px' }}
+              className=" lens-post mt-3 h-full rounded-lg bg-white px-0"
             >
-              {/* card contents */}
-              <h1 className="w-full items-center py-2">
-                <div className="flex w-full justify-between text-sm font-light text-black">
-                  {/* profile */}
-                  <Link href={`/profile/${post.profile.id}`}>
-                    <a
-                      target="_blank"
-                      onClick={() => {
-                        window.localStorage.setItem(
-                          'LENS_PROFILE',
-                          JSON.stringify(post.profile)
-                        );
+              <div className="flex px-2">
+                <button
+                  id="btnBack"
+                  onClick={() => setFavMenuVisible(false)}
+                  className="bg-white text-xl "
+                >
+                  ←
+                </button>
+                <h1 className=" w-full items-center truncate text-ellipsis pl-1 pt-1 ">
+                  {post.metadata.name || 'untitled'}
+                </h1>
+              </div>
+
+              <div className="m-2">
+                <input
+                  type="text"
+                  autoComplete="off"
+                  value={valueListName}
+                  onChange={handleChangeListName}
+                  className=" w-full rounded-lg border-2 border-solid border-gray-200 px-2 py-1 text-sm leading-none text-gray-600 outline-none"
+                  name="tag-search-input"
+                  id="tag-search-input"
+                  // onKeyDown={handleKeyDown}
+                  placeholder="Select a list or type one..."
+                />
+              </div>
+
+              <div className="scrollbar-hide z-10 mb-4 h-56 overflow-y-auto border-b-2 border-solid border-gray-100 px-1">
+                {selectedList.map((list: typeList) => {
+                  return (
+                    <button
+                      className=" my-1 w-full rounded-lg border-solid 
+                       py-1  text-sm   hover:bg-amber-100"
+                      key={list.key}
+                      style={{
+                        color: '#745f2b',
+                        backgroundColor: '#fffee8',
+                        border: '1px solid #fdf4dc'
                       }}
+                      value={list.key}
+                      onClick={() =>
+                        handleAddPostToList(
+                          lensProfile?.id,
+                          post.id,
+                          list.key,
+                          undefined
+                        )
+                      }
                     >
-                      <div className="col-span-3  flex justify-between">
+                      {list.name}
+                      {/* {list.key} */}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <footer className="text-center">
+                <button
+                  onClick={() =>
+                    handleAddPostToList(
+                      lensProfile?.id,
+                      post.id,
+                      undefined,
+                      valueListName
+                    )
+                  }
+                  className={`rounded-lg px-2 py-2 ${
+                    valueListName && !isListExistent
+                      ? 'bg-lensGreen'
+                      : 'disabled cursor-not-allowed bg-gray-100'
+                  }`}
+                  disabled={!valueListName || isListExistent}
+                >
+                  ✦ CREATE AND ADD
+                </button>
+              </footer>
+            </div>
+          )}
+
+          {/* main tab contents goes here */}
+          {!isFavMenuVisible && (
+            <div>
+              <div
+                className={` ${
+                  isList ? 'lens-folder-tab' : 'lens-folder-tab-empty'
+                }`}
+              ></div>
+              <div
+                style={{ height: '360px' }}
+                className={`px-2 py-1
+              ${isList ? 'lens-folder' : 'lens-post'}`}
+              >
+                {/* card contents */}
+                <h1 className="w-full items-center py-2">
+                  <div className="flex w-full justify-between text-sm font-light text-black">
+                    {/* profile */}
+                    <a
+                      rel="noreferrer"
+                      href={`/profile/${post.profile.id}`}
+                      target="_blank"
+                    >
+                      <div
+                        onClick={() => {
+                          window.localStorage.setItem(
+                            'LENS_PROFILE',
+                            JSON.stringify(post.profile)
+                          );
+                        }}
+                        className="col-span-3 flex cursor-pointer justify-between"
+                      >
                         <ImageProxied
                           category="profile"
                           title={`Loading from ${post.profile.picture?.original?.url}`}
@@ -288,64 +360,67 @@ const ExploreCard: FC<Props> = ({ post }) => {
                           </p>
                         </div>
                       </div>
+                      {/* </a> */}
                     </a>
-                  </Link>
 
-                  {/* profile menu */}
-                  <div className="dropdown relative inline-block cursor-pointer">
-                    <div className="items-center rounded py-2 font-semibold text-gray-700">
-                      <ImageProxied
-                        category="profile"
-                        src="/assets/icons/dots-vertical.svg"
-                        alt=""
-                        width={20}
-                        height={20}
-                      />
-                    </div>
+                    {/* profile menu */}
+                    <div className="dropdown relative inline-block cursor-pointer">
+                      <div className="items-center rounded py-2 font-semibold text-gray-700">
+                        <ImageProxied
+                          category="profile"
+                          src="/assets/icons/dots-vertical.svg"
+                          alt=""
+                          width={20}
+                          height={20}
+                        />
+                      </div>
 
-                    <ul
-                      className="dropdown-menu absolute  right-1 top-6 z-10 hidden rounded-lg border-2 border-gray-200 
-                      bg-gray-50 text-lensBlack shadow-lg "
-                    >
-                      <li className="">
-                        <a
-                          className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                          href="#"
-                        >
-                          Share
-                        </a>
-                      </li>
-
-                      <li className="">
-                        {lensProfile && post.profile.id === lensProfile.id && (
+                      <div
+                        className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
+                       border-gray-200 
+                      bg-gray-50 text-lensBlack shadow-lg  shadow-gray-400 "
+                      >
+                        <p className="">
                           <span
-                            className="whitespace-no-wrap flex bg-gray-50  px-4 py-2 hover:bg-lensGreen hover:text-black"
-                            onClick={() => handleRemove(post.id)}
+                            className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
+                            // href="#"
                           >
-                            Remove
+                            Share
                           </span>
-                        )}
-                      </li>
+                        </p>
 
-                      <li className="">
-                        <a
-                          className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                          href="#"
-                        >
-                          Report
-                        </a>
-                      </li>
-                    </ul>
+                        <p className="">
+                          <a
+                            className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
+                            href="#"
+                          >
+                            Report
+                          </a>
+                        </p>
+
+                        <p className="">
+                          {lensProfile &&
+                            post.profile.id === lensProfile.id && (
+                              <span
+                                className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
+                                onClick={() => handleRemove(post.id)}
+                              >
+                                Remove
+                              </span>
+                            )}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </h1>
+                </h1>
 
-              <Link href={isList ? `/list/${post.id}` : `/post/${post.id}`}>
+                {/* <Link > */}
                 <a
+                  rel="noreferrer"
                   target="_blank"
+                  href={isList ? `/list/${post.id}` : `/post/${post.id}`}
                   onClick={() => {
                     // TODO: fix this
-                    console.log('POST ', post);
                     window.localStorage.setItem(
                       'LENS_POST',
                       JSON.stringify(post)
@@ -397,7 +472,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         // width={'100%'}
                         // height={'100%'}
                         objectFit="cover"
-                        className=" w-full rounded-md"
+                        className=" w-full rounded-md  animate-in fade-in-50 duration-1000"
                         src={post.metadata.media[0]?.original.url}
                       />
                     </div>
@@ -461,82 +536,66 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     </p>
                   </div>
                 </a>
-              </Link>
+                {/* </Link> */}
 
-              {/* date and collected indicators*/}
+                {/* date and collected indicators*/}
+                <footer className="flex items-center justify-between py-2 text-black">
+                  <p className="mt-1 text-xs font-light text-gray-400">
+                    {moment(post.createdAt).format('MMM Do YY')}
+                  </p>
+                  <div className="flex items-end text-xs font-light">
+                    <ImageProxied
+                      category="profile"
+                      src="/assets/icons/collect.svg"
+                      alt="Collect"
+                      title="Total amount of collects"
+                      width={20}
+                      height={20}
+                    />
+                    {post.stats.totalAmountOfCollects}
+                  </div>
 
-              <footer className="flex items-center justify-between py-2 text-black">
-                <p className="mt-1 text-xs font-light text-gray-400">
-                  {moment(post.createdAt).format('MMM Do YY')}
-                </p>
-                <div className="flex items-end text-xs font-light">
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/collect.svg"
-                    alt="Collect"
-                    title="Total amount of collects"
-                    width={20}
-                    height={20}
-                  />
-                  {post.stats.totalAmountOfCollects}
-                </div>
-
-                <button
-                  onClick={() => {
-                    refreshLists(lensProfile?.id);
-                    return setFavMenuVisible(!isListVisible);
-                  }}
-                  className="flex text-right"
-                >
-                  {lensProfile ? (
+                  {lensProfile && post.hasCollectedByMe && (
                     // && post.metadata.attributes[0].value === 'post'
+                    <div
+                      title="You do own this item!"
+                      className="flex cursor-default items-end rounded-md bg-amber-100 px-2 py-1 text-xs "
+                    >
+                      COLLECTED
+                    </div>
+                  )}
 
-                    post.hasCollectedByMe ? (
-                      <div className=" flex items-end rounded-md bg-amber-100 px-2 py-1 text-xs ">
-                        Collected
-                      </div>
-                    ) : (
+                  {lensProfile && !post.hasCollectedByMe && !isPosting ? (
+                    <button
+                      onClick={() => {
+                        refreshLists(lensProfile?.id);
+                        return setFavMenuVisible(!isListVisible);
+                      }}
+                      className="flex text-right"
+                    >
                       <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                        {/* <div className="absolute inset-0 m-auto mr-1 mt-1 h-2 w-2   animate-spin rounded-full border border-white bg-red-600" /> */}
-                        +ADD TO LIST
-                        {isPosting && (
-                          <div className="relative flex items-center">
+                        +COLLECT
+                      </div>
+                    </button>
+                  ) : (
+                    isPosting && (
+                      <div className="flex text-right">
+                        <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
+                          Collecting
+                          <div className="relative ml-1 flex items-center">
                             <div
                               title={dotTitle}
-                              className={`absolute inset-0 m-auto mr-1 h-1 w-1 animate-ping
+                              className={`absolute inset-0 m-auto h-1 w-1 animate-ping
                                 rounded-full border ${dotColor}`}
                             />
-                            <svg
-                              className="ml-3 h-3 w-3 animate-spin items-center"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                              ></path>
-                            </svg>
+                            <Spinner h="3" w="3" />
                           </div>
-                        )}
+                        </div>
                       </div>
                     )
-                  ) : (
-                    ''
                   )}
-                </button>
-
-                {/* comments */}
-                {/* <div className="flex items-center text-xs ">
+                  {/* comments */}
+                  {/* <div className="flex items-center text-xs ">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     className="icon icon-tabler icon-tabler-messages"
@@ -556,24 +615,25 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
                   {post.profile.stats?.totalComments || '0'}
                 </div> */}
-                {isListVisible && (
-                  <>
-                    <br />
-                    <div className="absolute mt-24 w-44 rounded-lg bg-yellow-200 p-2 text-left">
-                      <button className="bg-white px-3 py-1 text-black">
-                        Set
-                      </button>
-                      <button className=" bg-white px-3 py-1 text-black">
-                        + New list
-                      </button>
-                    </div>
-                  </>
-                )}
-              </footer>
+                  {isListVisible && (
+                    <>
+                      <br />
+                      <div className="absolute mt-24 w-44 rounded-lg bg-yellow-200 p-2 text-left">
+                        <button className="bg-white px-3 py-1 text-black">
+                          Set
+                        </button>
+                        <button className=" bg-white px-3 py-1 text-black">
+                          + New list
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </footer>
+              </div>
             </div>
-          </div>
-        )}
-      </article>
+          )}
+        </article>
+      )}
     </div>
   );
 };

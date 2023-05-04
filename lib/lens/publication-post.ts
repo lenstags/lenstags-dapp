@@ -10,13 +10,13 @@ import {
   splitSignature
 } from './ethers.service';
 
+import { PUBLICATION_METADATA_VERSION } from '@lib/config';
 import { apolloClient } from './graphql/apollo-client';
 import { lensHub } from './lens-hub';
 import { login } from '@lib/lens/login';
 import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 import { uploadIpfs } from './ipfs';
 import { v4 as uuidv4 } from 'uuid';
-import { PUBLICATION_METADATA_VERSION } from '@lib/config';
 
 export const createPostTypedData = async (request: CreatePublicPostRequest) => {
   const result = await apolloClient.mutate({
