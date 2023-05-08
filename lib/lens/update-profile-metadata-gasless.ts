@@ -21,6 +21,8 @@ import { uploadIpfs } from '@lib/lens/ipfs';
 const createSetProfileMetadataViaDispatcherRequest = async (
   profileRequest: CreatePublicSetProfileMetadataUriRequest
 ) => {
+  // try {
+  console.log('apolloClient ', apolloClient);
   const result = await apolloClient.mutate({
     mutation: CreateSetProfileMetadataViaDispatcherDocument,
     variables: {
@@ -28,11 +30,18 @@ const createSetProfileMetadataViaDispatcherRequest = async (
     }
   });
   return result.data!.createSetProfileMetadataViaDispatcher;
+  // } catch (error) {
+  //   console.log('EEEE RR ', error);
+  // }
 };
 
 const setMetadata = async (
   createMetadataRequest: CreatePublicSetProfileMetadataUriRequest
 ) => {
+  // tested but authn't
+  // const address = getAddressFromSigner();
+  // console.log('setMetadata: address', address);
+
   const profileResult = await queryProfile({
     profileId: createMetadataRequest.profileId
   });
