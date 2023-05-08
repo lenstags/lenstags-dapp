@@ -19,6 +19,7 @@ import { AttributeData } from '@lib/lens/interfaces/profile-metadata';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import React from 'react';
 import { getDefaultProfile } from '@lib/lens/default-profile';
+import { getProfiles } from '@lib/lens/get-profiles';
 import jwt from 'jsonwebtoken';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { refresh } from '@lib/lens/refresh';
@@ -34,7 +35,7 @@ export const ProfileContext = createContext<{
   authenticationStatus: string;
 }>({
   profile: null,
-  authenticationStatus: 'unauthenticated' // Establece el valor inicial como 'unauthenticated'
+  authenticationStatus: 'unauthenticated'
 });
 
 export default function LensAuthenticationProvider({
@@ -98,7 +99,7 @@ export default function LensAuthenticationProvider({
     const p: ProfileQuery['profile'] = lensStore.profile;
 
     // @ts-ignore
-    const attt = lensStore.profile.attributes;
+    // const attt = lensStore.profile.attributes;
 
     // TODO LOGGING
     // console.log('pp 1: ', lensStore.profile);
@@ -123,11 +124,6 @@ export default function LensAuthenticationProvider({
     }
 
     setProfile(p);
-    // TODO LOGGING
-    // console.log('--p2 ', p);
-    // console.log('--profile ', profile);
-
-    // console.log('🔴 setProfile: ', p);
   };
 
   useEffect(() => {
@@ -135,7 +131,6 @@ export default function LensAuthenticationProvider({
     if (!lensStore) {
       clearProfile();
       setIsTokenValid(false);
-
       return;
     }
 
@@ -191,7 +186,6 @@ export default function LensAuthenticationProvider({
       const challenge = await generateChallenge({
         address
       });
-
       return challenge.text;
     },
 
@@ -209,10 +203,16 @@ export default function LensAuthenticationProvider({
       }
 
       const authenticatedResult = await authenticate({ address, signature });
-      const pro = await getDefaultProfile(address); // TODO Check when defaultProfilen't
+      let pro = await getDefaultProfile(address);
 
       if (!pro) {
-        throw `Cannot find default profile for ${address} `;
+        const profiles = await getProfiles(address);
+        if (!profiles || profiles.items.length === 0) {
+          console.log('No profiles, ask for a handler! ');
+          return false;
+        }
+        console.log('No default profile, taking first');
+        pro = profiles.items[0];
       }
 
       // profileQuery > profile
@@ -221,22 +221,20 @@ export default function LensAuthenticationProvider({
       });
 
       if (!profil) {
-        return false;
+        console.log('shouldnt be here');
+        return false; // Promise.reject('Unknown error getting profile');
       }
 
       // @ts-ignore
-      const pictureUrl = profil?.picture?.original?.url;
-      let coverUrl;
-
-      if (profil?.coverPicture?.__typename === 'MediaSet') {
-        coverUrl = profil?.coverPicture.original.url;
-      }
-      if (profil?.coverPicture?.__typename === 'NftImage') {
-        coverUrl = profil?.coverPicture.uri as string;
-      }
+      // let coverUrl;
+      // if (profil?.coverPicture?.__typename === 'MediaSet') {
+      //   coverUrl = profil?.coverPicture.original.url;
+      // }
+      // if (profil?.coverPicture?.__typename === 'NftImage') {
+      //   coverUrl = profil?.coverPicture.uri as string;
+      // }
 
       // FIXME Attributes type fixes
-
       const attLocation: AttributeData = {
         displayType: MetadataDisplayType.string,
         // traitType: 'sss',
@@ -294,13 +292,6 @@ export default function LensAuthenticationProvider({
       ];
 
       profil.attributes = attributesFixed;
-
-      // TODO LOGGING
-      console.log(
-        'TOKENS DE LA APP ',
-        authenticatedResult.accessToken,
-        authenticatedResult.refreshToken
-      );
       const lensStore: LensLocalStorage = {
         accessToken: authenticatedResult.accessToken,
         refreshToken: authenticatedResult.refreshToken,
@@ -309,7 +300,6 @@ export default function LensAuthenticationProvider({
 
       setLensLocalStorage(lensStore);
       setAuthenticated(lensStore);
-
       return Boolean(true);
     },
 

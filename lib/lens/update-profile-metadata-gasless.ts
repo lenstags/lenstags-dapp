@@ -21,8 +21,6 @@ import { uploadIpfs } from '@lib/lens/ipfs';
 const createSetProfileMetadataViaDispatcherRequest = async (
   profileRequest: CreatePublicSetProfileMetadataUriRequest
 ) => {
-  // try {
-  console.log('apolloClient ', apolloClient);
   const result = await apolloClient.mutate({
     mutation: CreateSetProfileMetadataViaDispatcherDocument,
     variables: {
@@ -30,18 +28,11 @@ const createSetProfileMetadataViaDispatcherRequest = async (
     }
   });
   return result.data!.createSetProfileMetadataViaDispatcher;
-  // } catch (error) {
-  //   console.log('EEEE RR ', error);
-  // }
 };
 
 const setMetadata = async (
   createMetadataRequest: CreatePublicSetProfileMetadataUriRequest
 ) => {
-  // tested but authn't
-  // const address = getAddressFromSigner();
-  // console.log('setMetadata: address', address);
-
   const profileResult = await queryProfile({
     profileId: createMetadataRequest.profileId
   });
@@ -70,6 +61,7 @@ const setMetadata = async (
 
     return { txHash: dispatcherResult.txHash, txId: dispatcherResult.txId };
   } else {
+    console.log('000 no relayer');
     const signedResult = await signCreateSetProfileMetadataTypedData(
       createMetadataRequest
     );
@@ -77,11 +69,13 @@ const setMetadata = async (
       'create profile metadata via broadcast: signedResult',
       signedResult
     );
+    console.log('2//////////////////////////////////');
 
     const broadcastResult = await broadcastRequest({
       id: signedResult.result.id,
       signature: signedResult.signature
     });
+    console.log('3//////////////////////////////////');
 
     if (broadcastResult.__typename !== 'RelayerResult') {
       console.error(
@@ -111,8 +105,8 @@ export const updateProfileMetadata = async (
   // console.log('create profile: address', address);
 
   const ipfsResult = await uploadIpfs<ProfileMetadata>(profileMetadata);
-  console.log('XXXX ', profileMetadata.cover_picture);
-  console.log('create profile: ipfs result', ipfsResult);
+
+  // console.log('create profile: ipfs result', ipfsResult);
 
   // hard coded to make the code example clear
   const createProfileMetadataRequest = {
@@ -121,18 +115,14 @@ export const updateProfileMetadata = async (
   };
 
   const result = await setMetadata(createProfileMetadataRequest);
-  console.log('update profile gasless', result);
+  // console.log('update profile gasless', result);
 
-  console.log('create profile metadata: poll until indexed');
+  // console.log('<<<<< create profile metadata: poll until indexed');
   //   const indexedResult = await pollUntilIndexed(result.txId);
   const indexedResult = await pollUntilIndexed(result.txHash);
 
-  console.log('create profile metadata: profile has been indexed', result);
-
+  console.log('Profile indexed.', result);
   const logs = indexedResult.txReceipt!.logs;
-
-  console.log('create profile metadata: logs', logs);
-
   return result;
 };
 

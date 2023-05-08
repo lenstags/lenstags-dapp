@@ -6,6 +6,7 @@ export interface MetadataAttribute {
   displayType?: MetadataDisplayType;
   traitType?: string;
   value: string;
+  key: string;
 }
 
 export interface IbuiltPost {
@@ -16,6 +17,7 @@ export interface IbuiltPost {
   link?: string;
   cover?: string;
   tags?: string[];
+  locale: string; // en or undisclosed
   external_url?: string;
   originalPostId?: string;
   // attributes: AttributeData[];

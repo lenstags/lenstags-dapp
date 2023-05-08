@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client/core";
-import { apolloClient } from "./apollo-client";
+import { apolloClient } from './apollo-client';
+import { gql } from '@apollo/client/core';
 
 const HAS_TX_BEEN_INDEXED = `
   query($request: HasTxHashBeenIndexedRequest!) {
@@ -82,10 +82,10 @@ const hasTxBeenIndexed = (txHash: string) => {
     query: gql(HAS_TX_BEEN_INDEXED),
     variables: {
       request: {
-        txHash,
-      },
+        txHash
+      }
     },
-    fetchPolicy: "network-only",
+    fetchPolicy: 'network-only'
   });
 };
 
@@ -96,22 +96,22 @@ const sleep = (milliseconds: number): Promise<void> => {
 export const pollUntilIndexed = async (txHash: string) => {
   while (true) {
     const result = await hasTxBeenIndexed(txHash);
-    console.log("pool until indexed: result", result.data);
+    // console.log('pool until indexed: result', result.data);
 
     const response = result.data.hasTxHashBeenIndexed;
-    if (response.__typename === "TransactionIndexedResult") {
-      console.log("pool until indexed: indexed", response.indexed);
-      console.log(
-        "pool until metadataStatus: metadataStatus",
-        response.metadataStatus
-      );
+    if (response.__typename === 'TransactionIndexedResult') {
+      console.log('Indexing...'); //, response.indexed);
+      // console.log(
+      //   'pool until metadataStatus: metadataStatus',
+      //   response.metadataStatus
+      // );
 
       if (response.metadataStatus) {
-        if (response.metadataStatus.status === "SUCCESS") {
+        if (response.metadataStatus.status === 'SUCCESS') {
           return response;
         }
 
-        if (response.metadataStatus.status === "METADATA_VALIDATION_FAILED") {
+        if (response.metadataStatus.status === 'METADATA_VALIDATION_FAILED') {
           throw new Error(response.metadataStatus.reason);
         }
       } else {
@@ -120,9 +120,9 @@ export const pollUntilIndexed = async (txHash: string) => {
         }
       }
 
-      console.log(
-        "pool until indexed: sleep for 1500 milliseconds then try again"
-      );
+      // console.log(
+      //   'pool until indexed: sleep for 1500 milliseconds then try again'
+      // );
       // sleep for a second before trying again
       await sleep(1500);
     } else {

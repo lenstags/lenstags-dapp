@@ -34,7 +34,7 @@ const OtherProfile: NextPage = () => {
   //   const lensProfile = useContext(ProfileContext);
 
   useEffect(() => {
-    explore({ tags }).then((data) => {
+    explore({ locale: 'en', tags }).then((data) => {
       //   if (contentType === 'collected') {
       //     setPublications(
       //       data.items.filter((r) => r.profile.id !== lensProfile?.id)
@@ -58,7 +58,7 @@ const OtherProfile: NextPage = () => {
       ? lensProfile?.picture.uri
       : '/img/profilePic.png';
 
-  explore({ tags });
+  explore({ locale: 'en', tags });
   return (
     <Layout title="Lenstags | Explore" pageDescription="Profile" screen={true}>
       <div className="w-full">
@@ -163,7 +163,7 @@ const OtherProfile: NextPage = () => {
       </div>
 
       {/* contents */}
-      <div className=" mx-auto w-11/12  md:w-4/5  ">
+      <div className=" md:w-4/5 mx-auto  w-11/12  ">
         <div className="  flex flex-wrap  ">
           {publications
             ? publications.map((post, index) => (

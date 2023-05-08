@@ -14,6 +14,7 @@ import {
 
 import { apolloClient } from '../lens/graphql/apollo-client';
 import { lensHub } from './lens-hub';
+import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 
 export const enableDispatcherWithTypedData = async (
   request: SetDispatcherRequest
@@ -68,7 +69,9 @@ export const enable = async (profileId: any) => {
       deadline: typedData.value.deadline
     }
   });
-  console.log('set dispatcher: tx hash', tx.hash);
+  console.log('set dispatcher: tx hash: ', tx.hash);
+  const indexedResult = await pollUntilIndexed(tx.hash);
+  console.log('indexed! ', indexedResult);
 };
 
 const disableDispatcherWithTypedData = async (

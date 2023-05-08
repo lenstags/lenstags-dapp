@@ -1,17 +1,17 @@
-import { apolloClient } from "./graphql/apollo-client";
+import { apolloClient } from './graphql/apollo-client';
 import {
   DefaultProfileDocument,
-  DefaultProfileRequest,
-} from "./graphql/generated";
+  DefaultProfileRequest
+} from './graphql/generated';
 
 const getDefaultProfileRequest = async (request: DefaultProfileRequest) => {
   const result = await apolloClient.query({
     query: DefaultProfileDocument,
     variables: {
-      request,
-    },
+      request
+    }
   });
-
+  console.log('defaultProfile ', result);
   return result.data.defaultProfile;
 };
 

@@ -1,5 +1,4 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
-import { addPostIdtoListId, cloneAndCollectPost } from '@lib/lens/post';
 import { createUserList, typeList } from '@lib/lens/load-lists';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
@@ -9,6 +8,7 @@ import ListImages from './ListImages';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from './Spinner';
+import { addPostIdtoListId } from '@lib/lens/post';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { freeCollect } from '@lib/lens/collect';
 import { getLastComment } from '@lib/lens/get-publications';
@@ -25,7 +25,10 @@ interface Props {
 
 const ExploreCard: FC<Props> = ({ post }) => {
   // fetch data for current post, get the latest comments
-  const isList = post.metadata.attributes[0].value === 'list';
+  const isList =
+    post.metadata.attributes[0].value === 'list' ||
+    post.metadata.attributes[0].value === 'privateDefaultList';
+  console.log(isList, post.metadata.attributes[0].value);
   // const lensProfile = useContext(ProfileContext);
   const { profile: lensProfile } = useContext(ProfileContext);
   const [openReconnect, setOpenReconnect] = useState(false);
@@ -156,7 +159,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
       console.log('List (post) ID returned to the UI: ', listId);
     }
 
-    // TODO:
+    // TODO: DEPRECATED ATM
     // const clonedId = await cloneAndCollectPost(lensProfile, selectedPostId);
     // if (!clonedId) {
     //   throw 'Unknown error when cloning';
@@ -205,7 +208,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
       // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
       id="CardContainer"
-      className=" md:w-1/2 lg:w-1/4 w- full px-1 py-2 animate-in fade-in-50 duration-1000  lg:px-4"
+      className=" w- full px-1 py-2 animate-in fade-in-50 duration-1000 md:w-1/2 lg:w-1/4  lg:px-4"
       style={{ opacity, pointerEvents }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
@@ -237,7 +240,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 >
                   ←
                 </button>
-                <h1 className=" w-full items-center truncate text-ellipsis pl-1 pt-1 ">
+                <h1 className="w-full items-center truncate text-ellipsis pl-1 pt-1 ">
                   {post.metadata.name || 'untitled'}
                 </h1>
               </div>
@@ -507,6 +510,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       title={post.metadata.name || 'untitled'}
                       className="text-light truncate text-ellipsis"
                     >
+                      {post.metadata.name === 'My private list' ? '🔒 ' : ''}
                       {post.metadata.name || 'untitled'}
                     </p>
                     <p

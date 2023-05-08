@@ -4,8 +4,8 @@ import {
   PublicationsQueryRequest
 } from '@lib/lens/graphql/generated';
 
+import { APP_NAME } from '@lib/config';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
-import { getPublication } from './get-publication';
 
 const getPublicationsRequest = async (request: PublicationsQueryRequest) => {
   const result = await apolloClient.query({
@@ -14,7 +14,6 @@ const getPublicationsRequest = async (request: PublicationsQueryRequest) => {
       request
     }
   });
-  // console.log('RRR ', result);
   return result.data.publications;
 };
 
@@ -41,6 +40,22 @@ export const getLastComment = async (postId: string) => {
 
   // console.log('resulttt: ', result, result.items.length);
   return result.items.length > 0 ? result.items[0] : null;
+};
+
+export const getPublications = async (
+  publicationTypes: PublicationTypes[],
+  profileId?: string,
+  collectedBy?: string
+) => {
+  const req = {
+    sources: [APP_NAME],
+    publicationTypes,
+    profileId,
+    collectedBy
+  };
+  console.log('req: ', req);
+  const result = await getPublicationsRequest(req);
+  return result;
 };
 
 export const getPostsCommentsxxxx = async (postIds: string[]) => {

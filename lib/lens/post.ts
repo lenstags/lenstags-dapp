@@ -24,15 +24,19 @@ export const DEFAULT_METADATA_ATTRIBUTES = [
   {
     traitType: 'string',
     value: 'post',
-    key: 'default_key'
+    key: 'publicationType' // ex default_key
   }
 ];
 
-export const createPost = async (profileId: string, builtPost: IbuiltPost) => {
+export const createPostPaid = async (
+  profileId: string,
+  builtPost: IbuiltPost
+) => {
   if (!profileId) {
     throw new Error('Must define profileId');
   }
 
+  console.log('TU NO DEBERIAS ESTAR ACA!!');
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     image: builtPost.image,
@@ -144,14 +148,14 @@ export const createPost = async (profileId: string, builtPost: IbuiltPost) => {
 };
 
 export const createPostManager = async (
-  lensProfile: any,
+  profileResult: any,
   builtPost: IbuiltPost,
   selfCollect: boolean
 ) => {
   // TODO test with no dispatcher
-  const result = lensProfile?.dispatcher?.canUseRelay
-    ? await createPostGasless(lensProfile?.id, builtPost)
-    : await createPost(lensProfile?.id, builtPost);
+  const result = profileResult?.dispatcher?.canUseRelay
+    ? await createPostGasless(profileResult.id, builtPost)
+    : await createPostPaid(profileResult.id, builtPost);
 
   if (selfCollect) {
     console.log(' Collecting post, minting... ');
@@ -168,16 +172,16 @@ export const addPostIdtoListId = async (
   postId: string
 ) => {
   //const commentList: string[] = []; // FIXME
-  console.log('profile> ', profileId);
-  console.log('listId> ', listId);
-  console.log('postId> ', postId);
+  // console.log('profile> ', profileId);
+  // console.log('listId> ', listId);
+  // console.log('postId> ', postId);
   //   profile>  0x4b87
   //   post.ts?9c1d:175 listId>  0x4b87-0x0134
   //   post.ts?9c1d:176 postId>  0x4b87-0x0150
 
   const commentList = await getLastComment(listId); // all comments
   // @ts-ignore
-  console.log('commentList ', commentList?.metadata.tags);
+  // console.log('commentList ', commentList?.metadata.tags);
 
   let arrPosts: any;
   // // @ts-ignore
@@ -205,11 +209,17 @@ export const addPostIdtoListId = async (
 
     // updates the array and adds to a new comment
     // .push(postId);
-    console.log('arrPOSTS ', arrPosts);
+    // console.log('arrPOSTS ', arrPosts);
 
-    const meta: MetadataAttribute = {
+    const attDate: MetadataAttribute = {
       value: new Date().getTime().toString(),
-      displayType: MetadataDisplayType.date
+      displayType: MetadataDisplayType.date,
+      key: 'date'
+    };
+    const attType: MetadataAttribute = {
+      value: 'listLog', // FIXME
+      displayType: MetadataDisplayType.string,
+      key: 'commentType'
     };
 
     const commentMetadata: Metadata = {
@@ -223,18 +233,24 @@ export const addPostIdtoListId = async (
       // external_url: values.external_url,
       // image: values.image,
       // imageMimeType: values.imageMimeType,
-      attributes: [meta],
+      attributes: [attType, attDate],
       tags: arrPosts, // we will add here the post IDs
       appId: APP_NAME
     };
 
     //TODO: use with no gasless too
     const rrr = await commentGasless(profileId, listId, commentMetadata); /// this is the updated array!!!
-    console.log('comment add result:', rrr);
+    // console.log('comment add result:', rrr);
+
+    // console.log(' Collecting post, minting... ');
+    // await freeCollect(postId);
+    // console.log('Collecting post finished.');
   } else {
     console.log('post already collected: ', postId, 'list: ', arrPosts);
     return false;
   }
+
+  console.log('THIS IS ONLY FOR VERIFICATION: ');
 
   const p = await getLastComment(listId);
   console.log('Post (that in fact it is a list) with new comments: ', p);
@@ -253,37 +269,37 @@ export const addPostIdtoListId = async (
   // const p = await getPostComments(profileId, listId);
 };
 
-export const cloneAndCollectPost = async (lensProfile: any, postId: string) => {
-  const post = await getPublication(postId);
-  if (!post) {
-    throw 'Unknown error when retrieving post data';
-  }
+// export const cloneAndCollectPost = async (lensProfile: any, postId: string) => {
+//   const post = await getPublication(postId);
+//   if (!post) {
+//     throw 'Unknown error when retrieving post data';
+//   }
 
-  const constructedPost: IbuiltPost = {
-    attributes: DEFAULT_METADATA_ATTRIBUTES,
-    name: post.metadata.name || ' ',
-    abstract: post.metadata.description || ' ',
-    content: post.metadata.content || ' ',
-    // TODO: recover the link!!!
-    // link: link,
-    // TODO: RECOVER THIS TOO!!!
-    // cover: cover,
-    originalPostId: postId,
+//   const constructedPost: IbuiltPost = {
+//     attributes: DEFAULT_METADATA_ATTRIBUTES,
+//     name: post.metadata.name || ' ',
+//     abstract: post.metadata.description || ' ',
+//     content: post.metadata.content || ' ',
+//     // TODO: recover the link!!!
+//     // link: link,
+//     // TODO: RECOVER THIS TOO!!!
+//     // cover: cover,
+//     originalPostId: postId,
 
-    // TODO: discuss later the monetization for clones
-    // @ts-ignore
-    tags: post.metadata.tags || []
-    // TODO: GET FILTER ARRAY FROM THE UIwww
-    // title: title,
-    // todo: image?: Buffer[]
-  };
+//     // TODO: discuss later the monetization for clones
+//     // @ts-ignore
+//     tags: post.metadata.tags || []
+//     // TODO: GET FILTER ARRAY FROM THE UIwww
+//     // title: title,
+//     // todo: image?: Buffer[]
+//   };
 
-  try {
-    const newPost = await createPostManager(lensProfile, constructedPost, true);
-    console.log('colecteado y clonado: ', newPost.internalPubId);
-    return newPost.internalPubId;
-  } catch (e) {
-    console.log('error en clonado: ', e);
-    return null;
-  }
-};
+//   try {
+//     const newPost = await createPostManager(lensProfile, constructedPost, true);
+//     console.log('colecteado y clonado: ', newPost.internalPubId);
+//     return newPost.internalPubId;
+//   } catch (e) {
+//     console.log('error en clonado: ', e);
+//     return null;
+//   }
+// };
