@@ -232,6 +232,7 @@ const Create: NextPage = () => {
       abstract: abstract || '',
       content: editorContents || '',
       link: sourceUrl,
+      locale: 'en',
       image: imageBuffer || null,
       imageMimeType: 'image/jpeg',
       tags: selectedOption.map((r) => r['value'])
