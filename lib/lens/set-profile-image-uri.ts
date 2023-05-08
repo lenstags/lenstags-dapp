@@ -69,7 +69,7 @@ const setProfileImageUri = async (profileId: string, urlIPFS: string) => {
   const typedData = signedResult.result.typedData;
 
   if (!signedResult.signature) {
-    throw 'Invalid signature';
+    throw 'Invalid signatureee';
   }
 
   const { v, r, s } = splitSignature(signedResult.signature);

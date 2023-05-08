@@ -29,10 +29,9 @@ const proxyActionFreeCollectRequest = async (request: ProxyActionRequest) => {
       }
     });
 
-    console.log('WWWWWWWW proxyActionFreeCollectRequest result: ', result);
     return result; //.data.proxyAction as string;
   } catch (err) {
-    console.log('EEEE ', err);
+    console.log('Error! ', err);
     return err;
   }
 };
@@ -51,18 +50,15 @@ export const freeCollect = async (postId: string) => {
       const statusResult = await proxyActionStatusRequest(
         result.data.proxyAction
       );
-      console.log(' 💌💌💌 proxy action free collect: status', statusResult);
+      console.log('Minting...', statusResult);
       if (statusResult.__typename === 'ProxyActionStatusResult') {
         if (statusResult.status === ProxyActionStatusTypes.Complete) {
-          console.log(
-            ' 💌💌💌 proxy action free collect: complete',
-            statusResult
-          );
+          console.log('Minting complete.', statusResult);
           break;
         }
       }
       if (statusResult.__typename === 'ProxyActionError') {
-        console.log(' 💌💌💌 proxy action free collect: failed', statusResult);
+        console.log('Minting failed! ', statusResult);
         return statusResult; // TODO verify
       }
       await sleep(1000);

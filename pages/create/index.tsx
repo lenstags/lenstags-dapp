@@ -53,13 +53,8 @@ const Create: NextPage = () => {
   const [abstract, setAbstract] = useState<string | undefined>('');
   const [editorContents, setEditorContents] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
-  const [isSuccessVisible, setIsSuccessVisible] = useState(false);
-  const [isErrorVisible, setIsErrorVisible] = useState(false);
-
   const [toast, setToast] = useState<ToastContent>({});
-
   const [isToastVisible, setToastVisible] = useState(false);
-
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
@@ -89,7 +84,6 @@ const Create: NextPage = () => {
     setActualPanel(selectedPanel);
   };
 
-  // const lensProfile = useContext(ProfileContext);
   const { profile: lensProfile } = useContext(ProfileContext);
 
   if (!lensProfile) {
@@ -118,8 +112,6 @@ const Create: NextPage = () => {
     setLoadingTLDR(true);
     if (plainText) {
       try {
-        console.log('plainText ', plainText);
-
         const dataTLDR = await fetchTLDR(plainText);
         setAbstract(dataTLDR?.choices[0]?.text?.trim());
       } catch (err) {
@@ -169,19 +161,22 @@ const Create: NextPage = () => {
   const handleChangeEditor = (content: string) => setEditorContents(content);
 
   const handlePost = async () => {
-    // upload file to ipfs and get its url
     if (!title) {
       snackbar.showMessage('⚠️ Attention: Title is required!');
       return;
+    }
+
+    setLoading(true);
+    const profileResult = await queryProfile({ profileId: lensProfile.id });
+
+    if (!profileResult) {
+      snackbar.showMessage('❌ You are not connected!');
     }
 
     let imageBuffer: Buffer | null = null;
 
     if (actualPanel === 'panelUpload') {
       if (cover) {
-        // FIXME
-        // imageBuffer = await getBufferFromUpload(cover);
-        // read the file as a Buffer
         const reader = new FileReader();
         reader.readAsArrayBuffer(cover);
         await new Promise((resolve, reject) => {
@@ -205,7 +200,6 @@ const Create: NextPage = () => {
     if (actualPanel === 'panelLink') {
       const imgTarget = imageURL ? imageURL : 'public/img/post.png';
       imageBuffer = await getBufferFromElement(imgTarget);
-      console.log('imgTarget ', imageBuffer);
     }
 
     if (actualPanel === 'panelAI') {
@@ -214,12 +208,31 @@ const Create: NextPage = () => {
         : null;
     }
 
+    //     SI ES UN DEFAULT POST (LIST) DEBERIA TENER OTROS ATRIBUTOS?
+    //      {
+    //     traitType: 'string',
+    //     value: 'post',
+    //     key: 'publicationType' // ex default_key
+    //   }
+    //   const otherAttributes = [ // PORQUE NO ESTA EN EL BUILTPOST ORIGINAL???
+    //   {
+    //     traitType: 'string',
+    //     key: 'userLink',
+    //     value: builtPost.link || 'NO-LINK'
+    //   },
+    //   {
+    //     traitType: 'string',
+    //     key: 'customData',
+    //     value: builtPost.originalPostId || ''
+    //   }
+    // ];
     const constructedPost: IbuiltPost = {
       attributes: DEFAULT_METADATA_ATTRIBUTES,
-      name: title,
+      name: title || ' ',
       abstract: abstract || '',
       content: editorContents || '',
       link: sourceUrl,
+      locale: 'en',
       image: imageBuffer || null,
       imageMimeType: 'image/jpeg',
       tags: selectedOption.map((r) => r['value'])
@@ -228,35 +241,16 @@ const Create: NextPage = () => {
       // todo: image?: Buffer[]
     };
 
-    if (!lensProfile) {
-      snackbar.showMessage('❌ You are not connected!');
-    }
-
-    setLoading(true);
-
     try {
       const result = await createPostManager(
-        lensProfile,
+        profileResult,
         constructedPost,
-        // POST_SELF_COLLECT
-        false
+        false // TODO FIXME POST_SELF_COLLECT
       );
       console.log('POST RESULT: ', result);
-      // FIXME
-      // if (result.isOk) {
-      // setIsSuccessVisible(true);
       snackbar.showMessage('👌🏻 Post created successfully!');
-
-      // toast.message = 'Post created successfully!';
-      // toast.level = 'success';
-      // setToastVisible(true);
-
       await sleep();
       router.push('/app');
-      // } else {
-      //   setIsErrorVisible(true);
-      //   console.error(e);
-      // }
     } catch (e: any) {
       // setIsErrorVisible(true);
       console.error(e);
@@ -370,7 +364,7 @@ const Create: NextPage = () => {
 
   return (
     <Layout title="Lenstags | Create post" pageDescription="Create post">
-      <div className="md:w-1/2 container mx-auto  h-64 w-11/12 px-6 py-6 text-black">
+      <div className="container mx-auto h-64  w-11/12 px-6 py-6 text-black md:w-1/2">
         <div className="text-xl font-semibold">
           <span className="text-left">Create post</span>
           <div

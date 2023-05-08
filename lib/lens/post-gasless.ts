@@ -53,10 +53,10 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
     const dispatcherResult = await createPostViaDispatcherRequest(
       createPostRequest
     );
-    console.log(
-      'create post via dispatcher: createPostViaDispatcherRequest',
-      dispatcherResult
-    );
+    // console.log(
+    //   'create post via dispatcher: createPostViaDispatcherRequest',
+    //   dispatcherResult
+    // );
 
     if (dispatcherResult.__typename !== 'RelayerResult') {
       console.error('create post via dispatcher: failed', dispatcherResult);
@@ -88,9 +88,9 @@ export const createPostGasless = async (
   builtPost: IbuiltPost
 ) => {
   if (!profileId) {
-    throw new Error('Must define PROFILE_ID in the .env to run this');
+    throw new Error('No profileId defined');
   }
-
+  // console.log('🟩🟩 🟩🟩 🟩🟩 CREANDO POST GASLESS ', builtPost);
   const address = await getAddressFromSigner();
 
   let mediaResult = [];
@@ -100,17 +100,17 @@ export const createPostGasless = async (
       item: `${IPFS_PROXY_URL}${imageIpfsResult.path}`,
       type: 'image/jpeg'
     });
-    console.log('🟩🟩🟩🟩🟩🟩 BUILT IMAGEimageIpfsResult: ', imageIpfsResult);
   }
 
-  console.log('create post: address', address);
+  // console.log('create post: address', address);
+  // console.log('🟩🟩 🟩🟩 🟩🟩 OLD ATTRIBUTES ', builtPost.attributes);
 
-  console.log('🟩🟩 BUILT POST: ', builtPost);
   const otherAttributes = [
+    // PORQUE NO ESTA EN EL BUILTPOST ORIGINAL???
     {
       traitType: 'string',
       key: 'userLink',
-      value: builtPost.link || 'NO-LINK'
+      value: builtPost.link || '' //FIXME
     },
     {
       traitType: 'string',
@@ -119,6 +119,8 @@ export const createPostGasless = async (
     }
   ];
   const na = builtPost.attributes.concat(otherAttributes);
+  // console.log('🟩🟩 🟩🟩 🟩🟩 FULL ATTRIBUTES', na);
+
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     name: builtPost.name || '', //the title
@@ -129,7 +131,7 @@ export const createPostGasless = async (
     tags: builtPost.tags,
     // TODO: createdOn: new Date().toISOString(),
     attributes: na || DEFAULT_METADATA_ATTRIBUTES,
-    locale: 'en-us',
+    locale: builtPost.locale || 'en-us',
     mainContentFocus: builtPost.image
       ? PublicationMainFocus.IMAGE
       : PublicationMainFocus.TEXT_ONLY,
@@ -139,12 +141,10 @@ export const createPostGasless = async (
     appId: APP_NAME.toLocaleLowerCase()
   });
 
-  console.log('create post: ipfs result', ipfsResult);
+  // console.log('create post: ipfs result', ipfsResult);
 
-  // hard coded to make the code example clear
   const createPostRequest = {
     profileId,
-    // contentURI: 'https://pastebin.com/uNPgZQub', // must validate its metadata
     contentURI: `ipfs://${ipfsResult.path}`,
     collectModule: {
       // feeCollectModule: {
@@ -175,27 +175,27 @@ export const createPostGasless = async (
   };
 
   const result = await post(createPostRequest);
-  console.log('create post gasless', result);
+  // console.log('create post gasless', result);
 
-  console.log('create post: poll until indexed');
+  // console.log('create post: poll until indexed');
   const indexedResult = await pollUntilIndexed(result.txHash);
 
-  console.log('create post: has been indexed', result);
+  console.log('Indexing finished.', result);
 
   const logs = indexedResult.txReceipt!.logs;
 
-  console.log('create post: logs', logs);
+  // console.log('create post: logs', logs);
 
   const topicId = utils.id(
     'PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)'
   );
-  console.log('topicid we care about', topicId);
+  // console.log('topicid we care about', topicId);
 
   const profileCreatedLog = logs.find((l: any) => l.topics[0] === topicId);
-  console.log('create post: created log', profileCreatedLog);
+  // console.log('create post: created log', profileCreatedLog);
 
   let profileCreatedEventLog = profileCreatedLog!.topics;
-  console.log('create post: created event logs', profileCreatedEventLog);
+  // console.log('create post: created event logs', profileCreatedEventLog);
 
   const publicationId = utils.defaultAbiCoder.decode(
     ['uint256'],
@@ -213,8 +213,5 @@ export const createPostGasless = async (
     internalPubId,
     pubId
   };
-  // console.log('create post: internal publication id', internalPubId);
-  console.log('ACA1 created post result: ', postResult);
-
   return postResult;
 };

@@ -19,19 +19,23 @@ const explorePublications = (request: ExplorePublicationRequest) => {
 };
 
 export interface IExplorePublications {
+  locale: string;
   tags?: string[];
 }
 
 export const explore = async (filter?: IExplorePublications) => {
   const reqQuery: ExplorePublicationRequest = {
     sortCriteria: PublicationSortCriteria.Latest,
+    noRandomize: true,
     sources: [LENSTAGS_SOURCE],
     limit: 50,
     publicationTypes: [PublicationTypes.Post],
     customFilters: [CustomFiltersTypes.Gardeners]
   };
+  // TODO REMOVE TAG PRIVATEPUB
   if (filter?.tags) {
     reqQuery.metadata = {
+      locale: filter.locale,
       tags: { oneOf: filter.tags }
     };
   }

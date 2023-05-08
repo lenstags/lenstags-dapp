@@ -1,4 +1,5 @@
 import { ProfileContext, TagsFilterContext } from 'components';
+import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
 import { useContext, useEffect, useState } from 'react';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
@@ -12,7 +13,6 @@ import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { explore } from '@lib/lens/explore-publications';
-import { queryProfile } from '@lib/lens/dispatcher';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
 const App: NextPage = () => {
@@ -33,31 +33,45 @@ const App: NextPage = () => {
   useEffect(() => {
     const findDefault = async () => {
       const profileResult = await queryProfile({ profileId: lensProfile?.id });
-      console.log('🎇🎇🎇🎇 profileResult ', profileResult);
-      console.log('🎇🎇🎇🎇 ATTRIBUTES_LIST_KEY ', ATTRIBUTES_LIST_KEY);
+
+      // console.log('🎇🎇🎇🎇 profileResult ', profileResult);
+      // console.log('🎇🎇🎇🎇 ATTRIBUTES_LIST_KEY ', ATTRIBUTES_LIST_KEY);
 
       let defaultListId = profileResult?.attributes?.find(
         (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
       )?.value;
-      console.log('🎇🎇🎇 list result: ', defaultListId);
+      // console.log('🎇🎇🎇 hay defaultListId?: ', defaultListId);
 
-      if (!defaultListId) {
+      const enableRelayer =
+        profileResult && !profileResult.dispatcher?.canUseRelay;
+
+      if (enableRelayer || !defaultListId) {
         setShowWelcome(true);
-        createDefaultList(lensProfile).then(() => {
+
+        if (enableRelayer) {
+          snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
+          await enable(profileResult.id);
+          snackbar.showMessage('🟦 Dispatcher enabled successfully.');
+        }
+
+        if (!defaultListId) {
+          snackbar.showMessage('🟦 Creating default list...');
+          await createDefaultList(profileResult);
           snackbar.showMessage('💚 LFGrow ⚜️!');
-          setReady(true);
-        });
+        }
+        setReady(true);
       }
     };
 
+    // FIXME THIS MUST BE STORED ON LOCALSTORAGE
     if (lensProfile?.id) {
-      console.log('🔆 Verifying first connection');
+      // console.log('🔆 Verifying first connection');
       findDefault();
     }
   }, [lensProfile]);
 
   useEffect(() => {
-    explore({ tags }).then((data) => {
+    explore({ locale: 'en', tags }).then((data) => {
       return setPublications(data.items);
     });
   }, [tags]);
@@ -144,7 +158,7 @@ const App: NextPage = () => {
               <p className="py-4">Yours, The LensTags team ⚜️</p>
 
               <p className="pb-4 text-xs">
-                P.S.: Meanwhile, we are been performing some setup tasks in
+                P.S.: Meanwhile, we are performing some setup tasks in
                 background, fasten your seat belts! 🚀
               </p>
 
@@ -165,7 +179,7 @@ const App: NextPage = () => {
             </div>
           </div>
         ) : (
-          <div className="md:w-4/5 container mx-auto h-64 w-11/12 px-6 py-10 ">
+          <div className="container mx-auto h-64 w-11/12 px-6 py-10 md:w-4/5 ">
             {/* <Profile /> */}
             {/* <Tabs /> */}
             <div className="mb-3">

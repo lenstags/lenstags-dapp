@@ -12,7 +12,7 @@ const Lists: NextPage = () => {
   const { tags } = useContext(TagsFilterContext);
 
   useEffect(() => {
-    explore({ tags }).then((data) => {
+    explore({ locale: 'en', tags }).then((data) => {
       const filteredItems = data.items.filter(
         (r) => r.metadata.attributes[0].value === 'list'
       );
@@ -20,7 +20,7 @@ const Lists: NextPage = () => {
     });
   }, [tags]);
 
-  explore({ tags });
+  explore({ locale: 'en', tags });
   return (
     <Layout title="Lenstags | Explore" pageDescription="Explore" screen={true}>
       <div className="container mx-auto w-11/12  py-10 md:w-4/5  ">
