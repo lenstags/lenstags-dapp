@@ -157,11 +157,11 @@ export const createPostManager = async (
     ? await createPostGasless(profileResult.id, builtPost)
     : await createPostPaid(profileResult.id, builtPost);
 
-  if (selfCollect) {
-    console.log(' Collecting post, minting... ');
-    await freeCollect(result.internalPubId);
-    console.log('Collecting post finished.');
-  }
+  // if (selfCollect) {
+  //   console.log(' Collecting post, minting... ');
+  //   await freeCollect(result.internalPubId);
+  //   console.log('Collecting post finished.');
+  // }
 
   return result;
 };
