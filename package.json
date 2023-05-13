@@ -33,6 +33,7 @@
     "react-select": "^5.7.0",
     "suneditor": "^2.44.12",
     "suneditor-react": "^3.5.0",
+    "swiper": "^9.3.1",
     "urql": "^3.0.3",
     "uuid": "^9.0.0",
     "wagmi": "^0.12.7"
