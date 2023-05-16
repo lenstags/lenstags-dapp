@@ -102,7 +102,7 @@ const Home: NextPage = () => {
                 Discover and manage the best resources.
               </p>
               <a href="/app" target="_blank" rel="noreferrer">
-                <button className="mt-8 rounded-full bg-black px-6 py-3 text-white">
+                <button className=" mt-8 rounded-full bg-black px-6 py-3 font-serif text-white">
                   EXPLORE
                 </button>
               </a>
@@ -393,7 +393,10 @@ const Home: NextPage = () => {
             style={{
               background: 'url(/img/landing/back-sponsors.svg)',
               backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat'
+              backgroundRepeat: 'no-repeat',
+              borderTop: 1,
+              borderBottom: 1,
+              borderTopColor: 'red'
             }}
           >
             <div className="mx-4 items-center sm:mx-16 sm:flex sm:flex-row sm:justify-between md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
@@ -405,7 +408,6 @@ const Home: NextPage = () => {
 
               <div className=" flex   items-center justify-center md:flex md:flex-row ">
                 <Image
-                  // style={{ objectFit: 'contain' }}
                   width={100}
                   height={50}
                   className="m-2"
@@ -413,7 +415,6 @@ const Home: NextPage = () => {
                   alt=""
                 />
                 <Image
-                  // style={{ objectFit: 'contain' }}
                   width={100}
                   height={50}
                   className="m-2"
@@ -421,7 +422,6 @@ const Home: NextPage = () => {
                   alt=""
                 />
                 <Image
-                  // style={{ objectFit: 'contain' }}
                   width={100}
                   height={50}
                   className="m-2"
@@ -429,7 +429,6 @@ const Home: NextPage = () => {
                   alt=""
                 />
                 <Image
-                  // style={{ objectFit: 'contain' }}
                   width={100}
                   height={50}
                   className="m-2"
@@ -508,7 +507,7 @@ const Home: NextPage = () => {
                   <a href="#">FAQS</a>
                   <a href="#">CONTACT</a>
                 </div>
-                <div className="flex gap-5">
+                <div className="flex  gap-5">
                   <a
                     href="https://twitter.com/Lenstags"
                     target="_blank"
@@ -525,7 +524,12 @@ const Home: NextPage = () => {
                     <img src="/img/landing/link-discord.svg" alt="" />
                   </a>
 
-                  <a href="mailto:info@nata.social">
+                  <a
+                    id="contact"
+                    href="mailto:info@nata.social"
+                    rel="noreferrer"
+                    style={{ marginTop: '3px' }}
+                  >
                     <img src="/img/landing/link-email.svg" alt="" />
                   </a>
 

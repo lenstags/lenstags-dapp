@@ -34,31 +34,27 @@ export const LayoutLanding: FC<Props> = ({
             'linear-gradient(175.76deg, rgba(255, 255, 255, 0.8) -259.19%, rgba(255, 255, 255, 0.4) 164.4%)',
           backdropFilter: 'blur(10px)'
         }}
-        className="fixed top-0 z-50 flex w-full  justify-between px-4 sm:px-16 md:px-32 lg:px-48 xl:px-64 2xl:px-72"
+        className="fixed top-0 z-50 flex w-full justify-between px-6 py-3 sm:px-16 md:px-32 lg:px-48 xl:px-64 2xl:px-72"
       >
         <div className="hidden sm:contents">
           <Link href={'/'}>
             <img
-              // category="profile"
               src="/img/landing/nata-logo.svg"
               alt=""
-              width={100}
-              height={60}
+              width={140}
+              height={80}
             />
           </Link>
         </div>
-        <div className="  self-center sm:hidden ">
+        <div className="self-center sm:hidden">
           <Link href={'/'}>
-            <img
-              // category="profile"
-              src="/img/landing/isologo.svg"
-              alt=""
-              width={32}
-              height={32}
-            />
+            <img src="/img/landing/isologo.svg" alt="" width={32} height={80} />
           </Link>
         </div>
-        <div className="flex items-center font-serif text-xs">
+        <div
+          style={{ marginTop: '3px' }}
+          className="flex items-center font-serif  text-xs font-medium md:text-base"
+        >
           <div className="mx-2 p-2 ">
             <Link href={'#welcome'}>ABOUT</Link>
           </div>
@@ -72,7 +68,7 @@ export const LayoutLanding: FC<Props> = ({
           </div>
 
           <div className="mx-2 p-2 ">
-            <Link href={'mailto:info@nata.social'}>CONTACT</Link>
+            <Link href={'#contact'}>CONTACT</Link>
           </div>
         </div>
 
@@ -80,7 +76,8 @@ export const LayoutLanding: FC<Props> = ({
           href="/app"
           target="_blank"
           rel="noreferrer"
-          className="my-3 cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 text-xs text-white  "
+          style={{ marginTop: '4px', marginBottom: '4px' }}
+          className="cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 font-serif  text-xs font-bold text-white md:text-sm   "
         >
           OPEN APP
         </a>
