@@ -1,8 +1,9 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
+
+// import ImageProxied from 'components/ImageProxied';
 
 interface Props {
   title: string;
@@ -37,8 +38,8 @@ export const LayoutLanding: FC<Props> = ({
       >
         <div className="hidden sm:contents">
           <Link href={'/'}>
-            <ImageProxied
-              category="profile"
+            <img
+              // category="profile"
               src="/img/landing/nata-logo.svg"
               alt=""
               width={100}
@@ -46,10 +47,10 @@ export const LayoutLanding: FC<Props> = ({
             />
           </Link>
         </div>
-        <div className="  self-center sm:collapse ">
+        <div className="  self-center sm:hidden ">
           <Link href={'/'}>
-            <ImageProxied
-              category="profile"
+            <img
+              // category="profile"
               src="/img/landing/isologo.svg"
               alt=""
               width={32}
@@ -59,25 +60,30 @@ export const LayoutLanding: FC<Props> = ({
         </div>
         <div className="flex items-center font-serif text-xs">
           <div className="mx-2 p-2 ">
-            <Link href={'/app'}>ABOUT</Link>
+            <Link href={'#welcome'}>ABOUT</Link>
           </div>
 
           <div className="mx-2 p-2 ">
-            <Link href={'/app'}>PRODUCTS</Link>
+            <Link href={'#features'}>PRODUCTS</Link>
           </div>
 
           <div className="mx-2 p-2 ">
-            <Link href={'/app'}>DOCS</Link>
+            <Link href={'#'}>DOCS</Link>
           </div>
 
           <div className="mx-2 p-2 ">
-            <Link href={'/app'}>CONTACT</Link>
+            <Link href={'mailto:info@nata.social'}>CONTACT</Link>
           </div>
         </div>
 
-        <button className="my-3  whitespace-nowrap rounded-full bg-black px-4 py-2 text-xs text-white  ">
+        <a
+          href="/app"
+          target="_blank"
+          rel="noreferrer"
+          className="my-3 cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 text-xs text-white  "
+        >
           OPEN APP
-        </button>
+        </a>
       </nav>
 
       <main className={`${!screen ? 'h-screen' : 'h-full'} mt-20 `}>
