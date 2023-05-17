@@ -4,13 +4,13 @@ import {
 } from '@ethersproject/abstract-signer';
 import { ethers, utils } from 'ethers';
 
-import { MUMBAI_RPC_URL } from '../config';
 import { omit } from '../helpers';
+
+// import { MUMBAI_RPC_URL } from '../config';
 
 // getSigner function from injected web3 provider
 export const getSigner = () => {
   if (typeof window === 'undefined') {
-    // // // TODO: server side VERIFY THIS
     // const privateKey: any = process.env.PRIVATE_KEY;
     // const provider = new ethers.providers.JsonRpcProvider(
     //   MUMBAI_RPC_URL
@@ -21,6 +21,9 @@ export const getSigner = () => {
   } else {
     // client side
     const p: any = window.ethereum;
+    if (typeof p === 'undefined') {
+      return undefined; // no-provider;
+    }
     const provider = new ethers.providers.Web3Provider(p);
     return provider.getSigner();
   }
