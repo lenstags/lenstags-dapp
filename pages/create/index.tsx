@@ -363,7 +363,7 @@ const Create: NextPage = () => {
   ];
 
   return (
-    <Layout title="Lenstags | Create post" pageDescription="Create post">
+    <Layout title="Nata Social | Create post" pageDescription="Create post">
       <div className="container mx-auto h-64  w-11/12 px-6 py-6 text-black md:w-1/2">
         <div className="text-xl font-semibold">
           <span className="text-left">Create post</span>

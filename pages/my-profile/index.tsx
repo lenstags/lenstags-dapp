@@ -158,7 +158,7 @@ const MyProfile: NextPage = () => {
 
   return (
     <Layout
-      title="Lenstags | Explore"
+      title="Nata Social | Explore"
       pageDescription="My profile"
       screen={true}
     >

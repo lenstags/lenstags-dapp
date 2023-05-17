@@ -51,6 +51,9 @@ export const Layout: FC<Props> = ({
         <title>{title}</title>
         <meta name="description" content={pageDescription} />
         <meta name="og:title" content={pageDescription} />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        npm
       </Head>
 
       <nav>

@@ -226,7 +226,7 @@ export const addPostIdtoListId = async (
       version: PUBLICATION_METADATA_VERSION,
       mainContentFocus: PublicationMainFocus.TEXT_ONLY,
       metadata_id: uuidv4(),
-      name: 'LensTags Content List™',
+      name: 'Nata Social Content List™',
       description: 'you-are-the-owner',
       content: new Date().getTime().toString(),
       locale: 'en-US',

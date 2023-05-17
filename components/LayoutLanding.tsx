@@ -18,14 +18,14 @@ export const LayoutLanding: FC<Props> = ({
   pageDescription,
   screen
 }) => {
-  const [show, setShow] = useState(false);
-
   return (
     <>
       <Head>
         <title>{title}</title>
         <meta name="description" content={pageDescription} />
         <meta name="og:title" content={pageDescription} />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
 
       <nav

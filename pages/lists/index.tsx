@@ -22,7 +22,11 @@ const Lists: NextPage = () => {
 
   explore({ locale: 'en', tags });
   return (
-    <Layout title="Lenstags | Explore" pageDescription="Explore" screen={true}>
+    <Layout
+      title="Nata Social | Explore"
+      pageDescription="Explore"
+      screen={true}
+    >
       <div className="container mx-auto w-11/12  py-10 md:w-4/5  ">
         <div className="mb-3">
           <TagsFilter />

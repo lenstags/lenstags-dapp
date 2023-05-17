@@ -51,7 +51,7 @@ export default function ListDetails() {
 
   return (
     post && (
-      <Layout title="Lenstags | View list" pageDescription="View list">
+      <Layout title="Nata Social | View list" pageDescription="View list">
         <div
           className="   h-64 w-full  px-6 py-6 pt-64 text-black"
           style={{
