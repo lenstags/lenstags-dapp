@@ -83,7 +83,7 @@ const Home: NextPage = () => {
             }}
           >
             <div
-              className=" mx-6 my-8 mt-16 rounded-3xl border-2 border-gray-100 bg-white bg-opacity-30 
+              className=" mx-6 my-8 mt-16 rounded-3xl border-2 border-gray-100 bg-white bg-opacity-70 
              py-12 text-center align-middle 
              text-black sm:mx-16 sm:px-16 md:mx-32 md:my-20 md:mt-20 
              md:px-32
@@ -398,7 +398,7 @@ const Home: NextPage = () => {
             }}
           >
             <div className="mx-4 items-center sm:mx-16 sm:flex sm:flex-row sm:justify-between md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
-              <div className=" ">
+              <div className="mr-2 ">
                 <p className="whitespace-nowrap py-6 font-serif text-xl font-bold">
                   Supported by
                 </p>
@@ -406,28 +406,28 @@ const Home: NextPage = () => {
 
               <div className=" flex   items-center justify-center md:flex md:flex-row ">
                 <Image
-                  width={100}
+                  width={140}
                   height={50}
                   className="m-2"
                   src="/img/landing/kleros.svg"
                   alt=""
                 />
                 <Image
-                  width={100}
+                  width={140}
                   height={50}
                   className="m-2"
                   src="/img/landing/lens.svg"
                   alt=""
                 />
                 <Image
-                  width={100}
+                  width={140}
                   height={50}
                   className="m-2"
                   src="/img/landing/polygon.svg"
                   alt=""
                 />
                 <Image
-                  width={100}
+                  width={110}
                   height={50}
                   className="m-2"
                   src="/img/landing/kalei.svg"
@@ -447,7 +447,7 @@ const Home: NextPage = () => {
                 className="rounded-full border-2 border-solid border-black
              bg-transparent px-10 py-4 font-serif text-3xl font-bold"
               >
-                <div className="flex  items-center gap-12">
+                <div className="flex items-center  gap-12 px-2 py-1">
                   Join our community
                   <svg
                     width="50"

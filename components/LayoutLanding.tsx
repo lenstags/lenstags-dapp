@@ -55,7 +55,7 @@ export const LayoutLanding: FC<Props> = ({
           style={{ marginTop: '3px' }}
           className="flex items-center font-serif  text-xs font-medium md:text-base"
         >
-          <div className="mx-2 p-2 ">
+          <div className="mx-2 hidden p-2 sm:contents  ">
             <Link href={'#welcome'}>ABOUT</Link>
           </div>
 
