@@ -1,8 +1,7 @@
-import { Navbar, UnauthorizedScreen } from 'components';
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import { useAccount } from 'wagmi';
+import { Navbar } from 'components';
 
 interface Props {
   title: string;
@@ -17,7 +16,6 @@ export const Layout: FC<Props> = ({
   pageDescription,
   screen
 }) => {
-  const { isConnected } = useAccount();
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
     setHydrationLoading(false);
@@ -54,21 +52,13 @@ export const Layout: FC<Props> = ({
         <meta name="description" content={pageDescription} />
         <meta name="og:title" content={pageDescription} />
       </Head>
-      {isConnected ? (
-        <>
-          {' '}
-          <nav>
-            <Navbar />
-          </nav>
-          <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}>
-            {children}
-          </main>
-        </>
-      ) : (
-        <UnauthorizedScreen />
-      )}
-      {/* Replace this line to ONLY use Lens Login */}
-      {/* {profile ? <Nav /> : <UnauthorizedScreen />} */}
+
+      <nav>
+        <Navbar />
+      </nav>
+      <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}>
+        {children}
+      </main>
     </>
   );
 };
