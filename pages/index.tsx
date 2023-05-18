@@ -165,7 +165,7 @@ const Home: NextPage = () => {
       minFilter: gl.LINEAR,
       magFilter: gl.LINEAR
     });
-    const imgSrc = 'img/landing/hero.jpg';
+    const imgSrc = 'img/landing/hero-back.jpg';
     const img = imgRef.current;
     if (img) {
       img.onload = () => {
@@ -309,7 +309,7 @@ const Home: NextPage = () => {
             <img
               className=" hidden "
               ref={imgRef}
-              src="img/landing/hero.jpg"
+              src="img/landing/hero-back.jpg"
               alt="Background"
             />
             <div
