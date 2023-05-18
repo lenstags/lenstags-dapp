@@ -279,7 +279,7 @@ const Home: NextPage = () => {
       window.removeEventListener('touchstart', updateMouse);
       window.removeEventListener('touchmove', updateMouse);
     };
-  }, []);
+  }, [imgSize]);
 
   return (
     <div className="">
@@ -293,18 +293,12 @@ const Home: NextPage = () => {
         <meta name="theme-color" content="#ffffff" />
       </Head>
 
-      {/* <div className="bg-white" ref={canvasRef} /> */}
-
       <LayoutLanding title={'Nata Social | Home'} pageDescription={'Home'}>
         <div>
           <div
+            id="middle"
             ref={canvasRef}
             className="relative -mt-20 w-full py-6 md:pb-28 md:pt-48"
-            // style={{
-            //   background: 'url(/img/landing/nata-back-hero.svg)',
-            //   backgroundSize: 'cover',
-            //   backgroundRepeat: 'no-repeat'
-            // }}
           >
             <img
               className=" hidden "
@@ -323,7 +317,7 @@ const Home: NextPage = () => {
              
             2xl:px-72"
             >
-              <p className="whitespace-nowrap font-serif text-3xl font-bold md:text-4xl ">
+              <p className="whitespace-nowrap font-serif text-2xl font-bold  md:text-4xl ">
                 BROWSE SMARTER
               </p>
               <p className="mt-8 font-serif md:text-xl">
@@ -337,8 +331,55 @@ const Home: NextPage = () => {
             </div>
           </div>
 
+          {/* <div className="relative">
+            <div
+              id="back"
+              className="absolute left-0 top-0 z-0 h-full w-full"
+              style={{
+                background: 'url(/img/landing/hero-back.jpg)',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat'
+              }}
+            ></div>
+            <div
+              id="middle"
+              ref={canvasRef}
+              className="absolute left-0 top-0 z-10 -mt-20 w-full py-6 opacity-50 md:pb-28 md:pt-48"
+            >
+              <img
+                className="hidden"
+                ref={imgRef}
+                src="img/landing/hero-grid.jpg"
+                alt="Background"
+              />
+            </div>
+            <div
+              id="top"
+              className="absolute left-0 top-0 z-20 mx-6 my-8 mt-16 rounded-3xl border-2 border-gray-100 bg-white bg-opacity-70 
+               py-12 text-center align-middle 
+               text-black sm:mx-16 sm:px-16 md:mx-32 md:my-20 md:mt-20 
+               md:px-32
+               md:py-20
+               lg:mx-48 xl:mx-64 xl:px-64
+               2xl:mx-72 
+               2xl:px-72"
+            >
+              <p className="whitespace-nowrap font-serif text-3xl font-bold md:text-4xl">
+                BROWSE SMARTER
+              </p>
+              <p className="mt-8 font-serif md:text-xl">
+                Discover and manage the best resources.
+              </p>
+              <a href="/app" target="_blank" rel="noreferrer">
+                <button className="mt-8 rounded-full bg-black px-6 py-3 font-serif text-white">
+                  EXPLORE
+                </button>
+              </a>
+            </div>
+          </div> */}
+
           {/* Welcome */}
-          <div className="relative -top-6 flex justify-center">
+          <div className="relative -top-6 hidden justify-center sm:flex">
             <a id="anchor" href="#anchor">
               <svg
                 width="54"
@@ -391,7 +432,7 @@ const Home: NextPage = () => {
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat'
           }}
-          className="mt-32 w-full"
+          className="mt:6 w-full md:mt-32"
         >
           <div
             id="welcome"
@@ -482,7 +523,7 @@ const Home: NextPage = () => {
             </div>
 
             {/* Our features */}
-            <div id="features" className="mt-32 pb-8">
+            <div id="features" className="mt-10 pb-8 md:mt-32">
               <span className=" mr-3 text-xs font-bold tracking-widest">
                 OUR FEATURES{' '}
               </span>
@@ -594,7 +635,7 @@ const Home: NextPage = () => {
             </div>
 
             {/* Our browser extension */}
-            <div className="mt-32 pb-8">
+            <div className="mt-14 pb-8 md:mt-32">
               <span className=" mr-3 text-xs font-semibold tracking-widest">
                 OUR BROWSER EXTENSION{' '}
               </span>
@@ -624,7 +665,7 @@ const Home: NextPage = () => {
 
           {/* Sponsors */}
           <div
-            className="mt-32 w-full border-y-2 border-y-gray-100 bg-white py-4 text-center"
+            className="mt-12 w-full border-y-2 border-y-gray-100 bg-white py-4 text-center md:mt-32"
             style={{
               background: 'url(/img/landing/back-sponsors.svg)',
               backgroundSize: 'cover',
@@ -678,10 +719,10 @@ const Home: NextPage = () => {
               rel="noreferrer"
             >
               <button
-                className="rounded-full border-2 border-solid border-black
-             bg-transparent px-10 py-4 font-serif text-3xl font-bold"
+                className="mx-10 rounded-full border-2 border-solid border-black
+             bg-transparent px-10 py-4 font-serif text-xl font-bold md:mx-2 md:text-3xl"
               >
-                <div className="flex items-center  gap-12 px-2 py-1">
+                <div className="flex items-center gap-12 px-2 py-1">
                   Join our community
                   <svg
                     width="50"
