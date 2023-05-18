@@ -336,8 +336,10 @@ const Home: NextPage = () => {
               </a>
             </div>
           </div>
+
+          {/* Welcome */}
           <div className="relative -top-6 flex justify-center">
-            <a href="#welcome">
+            <a id="anchor" href="#anchor">
               <svg
                 width="54"
                 height="53"
@@ -389,13 +391,13 @@ const Home: NextPage = () => {
             backgroundSize: 'cover',
             backgroundRepeat: 'no-repeat'
           }}
-          className="w-full"
+          className="mt-32 w-full"
         >
           <div
             id="welcome"
-            className="mx-6 mt-4 font-serif sm:mx-16 md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72"
+            className="mx-6 font-serif sm:mx-16 md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72"
           >
-            <div className="py-8">
+            <div className="pb-8">
               <span className=" mr-3 text-xs font-bold tracking-widest">
                 WELCOME{' '}
               </span>
@@ -409,8 +411,8 @@ const Home: NextPage = () => {
             <p className="mt-4">
               Backed by the community&apos;s collective knowledge
             </p>
-            <div className="my-8 flex-1 justify-center text-center sm:flex">
-              <div className="mt-4 flex-1 pb-4">
+            <div className="mt-8 flex-1 justify-center text-center sm:flex">
+              <div className="mt-4 flex-1">
                 <div
                   style={{
                     background: 'url(/img/landing/nata-feat-1.svg)',
@@ -478,7 +480,9 @@ const Home: NextPage = () => {
                 </div>
               </div>
             </div>
-            <div id="features" className="py-8">
+
+            {/* Our features */}
+            <div id="features" className="mt-32 pb-8">
               <span className=" mr-3 text-xs font-bold tracking-widest">
                 OUR FEATURES{' '}
               </span>
@@ -522,7 +526,7 @@ const Home: NextPage = () => {
             </div>
 
             {/* carousel */}
-            <div className="  flex flex-row overflow-hidden py-6">
+            <div className=" flex flex-row overflow-hidden pt-6">
               <Swiper
                 autoplay={{ delay: 0, disableOnInteraction: false }}
                 speed={5000}
@@ -589,7 +593,8 @@ const Home: NextPage = () => {
               </Swiper>
             </div>
 
-            <div className="py-8">
+            {/* Our browser extension */}
+            <div className="mt-32 pb-8">
               <span className=" mr-3 text-xs font-semibold tracking-widest">
                 OUR BROWSER EXTENSION{' '}
               </span>
@@ -616,15 +621,14 @@ const Home: NextPage = () => {
               </div>
             </div>
           </div>
+
+          {/* Sponsors */}
           <div
-            className="my-10 w-full py-4 text-center"
+            className="mt-32 w-full border-y-2 border-y-gray-100 bg-white py-4 text-center"
             style={{
               background: 'url(/img/landing/back-sponsors.svg)',
               backgroundSize: 'cover',
-              backgroundRepeat: 'no-repeat',
-              borderTop: 1,
-              borderBottom: 1,
-              borderTopColor: 'red'
+              backgroundRepeat: 'no-repeat'
             }}
           >
             <div className="mx-4 items-center sm:mx-16 sm:flex sm:flex-row sm:justify-between md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
