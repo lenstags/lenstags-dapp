@@ -73,13 +73,13 @@ export const LayoutLanding: FC<Props> = ({
         </div>
 
         <a
-          href="/app"
+          href="https://tally.so/r/mVjz7J"
           target="_blank"
           rel="noreferrer"
           style={{ marginTop: '4px', marginBottom: '4px' }}
           className="cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 font-serif  text-xs font-bold text-white md:text-sm   "
         >
-          OPEN APP
+          JOIN
         </a>
       </nav>
 

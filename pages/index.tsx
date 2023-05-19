@@ -323,9 +323,13 @@ const Home: NextPage = () => {
               <p className="mt-8 font-serif md:text-xl">
                 Discover and manage the best resources.
               </p>
-              <a href="/app" target="_blank" rel="noreferrer">
+              <a
+                href="https://tally.so/r/mVjz7J"
+                target="_blank"
+                rel="noreferrer"
+              >
                 <button className=" mt-8 rounded-full bg-black px-6 py-3 font-serif text-white">
-                  EXPLORE
+                  JOIN THE WAITLIST
                 </button>
               </a>
             </div>
@@ -771,7 +775,7 @@ const Home: NextPage = () => {
                   <a href="#">ABOUT</a>
                   <a href="#features">PRODUCTS</a>
                   <a
-                    href="https://lenstags.gitbook.io/lenstags-docs/"
+                    href="https://natasocial.gitbook.io/nata-social-docs/"
                     target="_blank"
                     rel="noreferrer"
                   >
