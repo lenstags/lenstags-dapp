@@ -771,7 +771,7 @@ const Home: NextPage = () => {
                   alt=""
                 />
                 <div className="my-6 flex gap-5 font-serif text-xs lg:my-0">
-                  <a href="#">ABOUT</a>
+                  <a href="#welcome">ABOUT</a>
                   <a href="#features">PRODUCTS</a>
                   <a
                     href="https://natasocial.gitbook.io/nata-social-docs/"
@@ -780,7 +780,13 @@ const Home: NextPage = () => {
                   >
                     DOCS
                   </a>
-                  <a href="#">FAQS</a>
+                  <a
+                    href="https://natasocial.gitbook.io/nata-social-docs/nata-social-overview/faq"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    FAQS
+                  </a>
                   <a href="mailto:info@nata.social">CONTACT</a>
                 </div>
                 <div className="flex  gap-5">
