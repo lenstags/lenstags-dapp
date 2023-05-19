@@ -234,7 +234,7 @@ const Settings: NextPage = () => {
   };
 
   return (
-    <Layout title="Lenstags | Settings" pageDescription="Settings">
+    <Layout title="Nata Social | Settings" pageDescription="Settings">
       {hydrationLoading ? (
         <div className="flex justify-center">
           <div className="my-8 justify-center">
@@ -242,7 +242,7 @@ const Settings: NextPage = () => {
           </div>
         </div>
       ) : (
-        <div className="md:w-1/2 container mx-auto h-64 w-11/12 px-6 py-10 text-black">
+        <div className="container mx-auto h-64 w-11/12 px-6 py-10 text-black md:w-1/2">
           <h1 className=" text-2xl">Settings</h1>
 
           <p className="px-6 py-4">Dispatcher</p>

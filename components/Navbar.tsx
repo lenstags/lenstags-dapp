@@ -63,7 +63,7 @@ export const Navbar = () => {
               className="absolute h-full w-full bg-gray-800 opacity-50 lg:hidden"
               onClick={() => setShowMobileNav(!showMobileNav)}
             />
-            <div className="absolute z-40 h-full w-64 bg-lensGreen pb-4 shadow  transition duration-150 ease-in-out sm:relative md:w-96 lg:hidden">
+            <div className="absolute z-40 h-full w-64  bg-teal-200 bg-opacity-90  pb-4 shadow  transition duration-150 ease-in-out sm:relative md:w-96 lg:hidden">
               <div className="flex h-full w-full flex-col justify-between">
                 <div>
                   <div className="flex items-center justify-between px-8">
@@ -72,7 +72,7 @@ export const Navbar = () => {
                         <ImageProxied
                           category="profile"
                           priority={true}
-                          src="/img/logo-extended.svg"
+                          src="/img/landing/nata-logo.svg"
                           alt=""
                           width={100}
                           height={60}
@@ -245,9 +245,9 @@ export const Navbar = () => {
           </div>
 
           {/* Desktop sidebar */}
-          <div className="fixed top-0 z-50 w-full border-b-2 border-black">
+          <div className="fixed top-0 z-50 w-full shadow-lg ">
             <nav
-              className={`relative z-10 flex h-16 items-center justify-end bg-lensGreen
+              className={`relative z-10 flex h-16 items-center justify-end  bg-teal-100 bg-opacity-90  
               px-10  text-sm lg:items-stretch lg:justify-between
               ${config.firstRun && ' '}  
               `}
@@ -256,9 +256,9 @@ export const Navbar = () => {
                 <Link href={'/'}>
                   <ImageProxied
                     category="profile"
-                    src="/img/logo-extended.svg"
+                    src="/img/landing/nata-logo.svg"
                     alt=""
-                    width={100}
+                    width={140}
                     height={60}
                   />
                 </Link>
@@ -266,8 +266,8 @@ export const Navbar = () => {
                 <div className="h-full w-1/2 items-center pl-6 pr-24 text-black lg:flex">
                   {/* Here comes the Navbar items */}
                   <div
-                    className={`mx-4 cursor-pointer rounded-md p-2  px-3 ${
-                      router.asPath === '/app' && ' bg-gray-700 text-lensGray'
+                    className={`mx-4 cursor-pointer rounded-full p-2  px-3 ${
+                      router.asPath === '/app' && ' bg-black text-white'
                     } hover:bg-lensBlack hover:text-lensGray `}
                   >
                     <Link href={'/app'}>EXPLORE</Link>
@@ -346,23 +346,9 @@ export const Navbar = () => {
                 {lensProfile ? (
                   <div className="hidden w-1/2 lg:flex">
                     <div className="flex w-full items-center justify-end pl-8">
-                      <div className="flex h-full items-center justify-center  border-black  px-8">
-                        <button className="flex align-middle">
-                          <Link href={'/create'}>
-                            <div className="button_top flex">
-                              <div>
-                                <ImageProxied
-                                  category="profile"
-                                  className="text-lensBlack"
-                                  src="/assets/icons/plus.svg"
-                                  alt=""
-                                  width={20}
-                                  height={20}
-                                />
-                              </div>
-                              <div>CREATE</div>
-                            </div>
-                          </Link>
+                      <div className="flex h-full items-center justify-center px-8  text-white">
+                        <button className="flex rounded-full border-black px-4 py-2 align-middle">
+                          <Link href={'/create'}>+ CREATE</Link>
                         </button>
                       </div>
 
@@ -560,7 +546,7 @@ export const Navbar = () => {
                         onClick={openConnectModal}
                         className="flex align-middle"
                       >
-                        <div className="button_top flex">
+                        <div className=" mx-4 my-2 rounded-full font-serif font-medium tracking-wider text-white">
                           <div>✦ CONNECT</div>
                         </div>
                       </button>
@@ -577,9 +563,9 @@ export const Navbar = () => {
                     {' '}
                     <ImageProxied
                       category="profile"
-                      src="/img/logo-extended.svg"
+                      src="/img/landing/nata-logo.svg"
                       alt=""
-                      width={100}
+                      width={110}
                       height={60}
                     />
                   </div>

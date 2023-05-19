@@ -1,14 +1,12 @@
-
-import { Layout } from "components";
-import { NextPage } from "next";
+import { Layout } from 'components';
+import { NextPage } from 'next';
 
 const Organizations: NextPage = () => {
-return (
-   <Layout title="Lenstags | Organizations" pageDescription="TODO: Descripcion de la pagina">
-    <h1 style={{color: 'red'}}>Organizations</h1>
-   </Layout>
-)
+  return (
+    <Layout title="Nata Social | Organizations" pageDescription="Organizations">
+      <h1 style={{ color: 'red' }}>Organizations</h1>
+    </Layout>
+  );
+};
 
-}
-
-export default Organizations
+export default Organizations;

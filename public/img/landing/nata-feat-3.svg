@@ -1,0 +1,38 @@
+<svg width="518" height="256" viewBox="0 0 518 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g opacity="0.12">
+<line x1="-10" y1="29.29" x2="517.098" y2="29.29" stroke="black" stroke-opacity="0.3"/>
+<line x1="-10" y1="68.8907" x2="517.098" y2="68.8907" stroke="black" stroke-opacity="0.3"/>
+<line x1="-10" y1="108.494" x2="517.098" y2="108.494" stroke="black" stroke-opacity="0.3"/>
+<line x1="-10" y1="148.767" x2="517.098" y2="148.767" stroke="black" stroke-opacity="0.3"/>
+<line x1="-10" y1="188.369" x2="517.098" y2="188.369" stroke="black" stroke-opacity="0.3"/>
+<line x1="-10" y1="227.971" x2="517.098" y2="227.971" stroke="black" stroke-opacity="0.3"/>
+<line x1="186.369" y1="-91.0317" x2="186.369" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="147.977" y1="-91.0317" x2="147.977" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="109.586" y1="-91.0317" x2="109.586" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="71.1921" y1="-91.0317" x2="71.1921" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="32.7983" y1="-91.0317" x2="32.7983" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="377.027" y1="-91.0317" x2="377.027" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="338.635" y1="-91.0317" x2="338.635" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="300.244" y1="-91.0317" x2="300.244" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="261.85" y1="-91.0317" x2="261.85" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="223.457" y1="-91.0317" x2="223.457" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="452.505" y1="-91.0317" x2="452.505" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="414.114" y1="-91.0317" x2="414.113" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="491.041" y1="-91.0317" x2="491.041" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+<line x1="452.65" y1="-91.0317" x2="452.65" y2="347.951" stroke="black" stroke-opacity="0.3"/>
+</g>
+<g opacity="0.9" filter="url(#filter0_f_0_1)">
+<ellipse cx="-33.1009" cy="242.194" rx="90.369" ry="182.641" transform="rotate(-44.8704 -33.1009 242.194)" fill="url(#paint0_linear_0_1)" fill-opacity="0.8"/>
+</g>
+<defs>
+<filter id="filter0_f_0_1" x="-377.026" y="-102.126" width="687.849" height="688.641" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="100" result="effect1_foregroundBlur_0_1"/>
+</filter>
+<linearGradient id="paint0_linear_0_1" x1="-33.1009" y1="59.5533" x2="-33.1009" y2="424.835" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FBDAEC" stopOpacity="0.6"/>
+<stop offset="1" stop-color="#00FABF"/>
+</linearGradient>
+</defs>
+</svg>

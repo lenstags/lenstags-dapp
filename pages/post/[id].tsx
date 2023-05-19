@@ -79,7 +79,7 @@ export default function PostDetails() {
   return (
     post && (
       <Layout
-        title="Lenstags | Explore"
+        title="Nata Social | Explore"
         pageDescription="Profile"
         screen={true}
       >
@@ -99,7 +99,7 @@ export default function PostDetails() {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
               }}
-              className="md:w-4/5 mx-auto  w-11/12   pt-60"
+              className="mx-auto w-11/12  pt-60   md:w-4/5"
             >
               <div className="  flex items-center ">
                 <div
@@ -128,7 +128,7 @@ export default function PostDetails() {
             </div>
           </div>
 
-          <div className="md:w-4/5  mx-auto  w-11/12 py-6">
+          <div className="mx-auto  w-11/12  py-6 md:w-4/5">
             <div className="flex  text-sm text-black">
               <footer className="flex items-center  justify-between py-2 text-right text-black">
                 {/* <span className="flex items-center text-xs ">
@@ -220,7 +220,7 @@ export default function PostDetails() {
           </div>
 
           {/* contents */}
-          <div className=" md:w-4/5 mx-auto  mb-14 w-11/12">
+          <div className=" mx-auto mb-14  w-11/12 md:w-4/5">
             <div className="mb-4 w-full">
               <div className=" mb-2 flex justify-between ">
                 <p
