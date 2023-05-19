@@ -1,17 +1,11 @@
-import {
-  APP_NAME,
-  ATTRIBUTES_LIST_KEY,
-  PROFILE_METADATA_VERSION
-} from '@lib/config';
+import { ATTRIBUTES_LIST_KEY, PROFILE_METADATA_VERSION } from '@lib/config';
 import { AttributeData, ProfileMetadata } from './interfaces/profile-metadata';
-import { IbuiltPost, MetadataAttribute } from './interfaces/publication';
 
+import { IbuiltPost } from './interfaces/publication';
 import { MetadataDisplayType } from './interfaces/generic';
-import { Profile } from './graphql/generated';
 import { ProfileContext } from 'components';
 import { createPostGasless } from './post-gasless';
 import { createPostPaid } from './post';
-import { freeCollect } from './collect';
 import { pickPicture } from '@lib/helpers';
 import { queryProfile } from './dispatcher';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
@@ -29,7 +23,6 @@ export const createDefaultList = async (lensProfile: any) => {
     name: 'My private list', // TODO should it be 'My stuff {private)?
     content: 'All my collected items',
     locale: 'ia', // INTERLINGUA https://www.wikidata.org/wiki/Q22282939
-    // title: 'unnamed',
     attributes: [
       {
         key: 'internalPublicationType', // FIXME this key isn't returned by get-publications!
@@ -38,41 +31,25 @@ export const createDefaultList = async (lensProfile: any) => {
       }
     ]
   };
-  console.log(
-    '🎀🎀🎀🎀tiene dispatcher? ',
-    lensProfile?.dispatcher?.canUseRelay
-  );
+
   // TODO test with no dispatcher
   const result = lensProfile?.dispatcher?.canUseRelay
     ? await createPostGasless(lensProfile?.id, constructedDefaultPost)
     : await createPostPaid(lensProfile?.id, constructedDefaultPost);
 
-  // get the postId!
-  console.log('👉🏻👉🏻👉🏻👉🏻👉🏻 default list: ', result.internalPubId);
-
   ////////////////////
-
   // area de update del perfil metadata
-
   ////////////////////
 
-  // got the postId, and ADD it to the profile.metadata
-  // deprecated
-  // const collectedPubId = await freeCollect(result.internalPubId);
-  const defaultListId = result.internalPubId; // TODO or internalPubId???
-  console.log('CHEQUEO ESTO SI ESTA BIEN BORRAR EL TODO ', defaultListId);
+  const defaultListId = result.internalPubId; // got the postId, and ADD it to the profile.metadata
   // update profile metadata!
-  // hacerlo en otra funcion updateProfileMetadata(profileId, attributes)
+  // TODO: refactor into updateProfileMetadata(profileId, attributes)
 
   // esta funcion envia los attributes y reemplaza los de id que contiene
   // ej mando attributes con lista actualizada, buscar en attributes del perfil la key ATTRIBUTES_LIST_KEY y reemplazar el objeto
 
-  // TODO HACERLO EN OTRA FUNCION LO DE A CONTINUACION
-  //   await updateProfileAttributes(lensProfile.id, attribute);
+  // #region custom attrib setup
 
-  // #region custom attrib setup DEPRECATED
-
-  // TODO CHECK FOR THE FIRST TIME
   const attLocation: AttributeData = {
     displayType: MetadataDisplayType.string,
     traitType: 'string',
@@ -104,7 +81,6 @@ export const createDefaultList = async (lensProfile: any) => {
   };
 
   // #endregion
-  // aca creÉ el primer elemento con array
 
   // set on the first setup OK
   const favIDsArray = [
@@ -132,22 +108,14 @@ export const createDefaultList = async (lensProfile: any) => {
     lensProfile?.id,
     profileMetadata
   );
-  // TODO CHECK AND DELETE
-  console.log('CHECK AND DELETE resUpdate 🟢🏆⚡︎✦: ', resUpdate);
-  const updatedProfile = await queryProfile({ profileId: lensProfile?.id });
-  console.log('updatedProfile check attribs 🟢🏆⚡︎✦: ', updatedProfile);
 
   // - once the profile metadata has the default list, use its postId to add
   // to its metadata
   //   the selected post to be fav'd
 
-  // update postId meta"data (it is a list, not a post)
+  // update postId metadata (it is a list, not a post)
 
-  console.log('FINAL::: ', defaultListId);
-
-  // return `${lensProfile.id}-${defaultListId}`;
   return [{ key: defaultListId, name: constructedDefaultPost.name }];
-  // setIsSuccessVisible(true);
 };
 
 export const createUserList = async (lensProfile: any, name: string) => {
@@ -155,7 +123,6 @@ export const createUserList = async (lensProfile: any, name: string) => {
   const constructedUserPost: IbuiltPost = {
     name,
     content: `Hi there! This is a favList , you can see it in my profile here → <a target="_blank" rel="noopener" href="https://lenstags.xyz/${lensProfile.id}">https://lenstags.xyz/${lensProfile.id}</a>`,
-    //title?
     locale: 'en',
     attributes: [
       {
@@ -175,9 +142,7 @@ export const createUserList = async (lensProfile: any, name: string) => {
   console.log('New list created: ', result.internalPubId);
 
   ////////////////////
-
   // area de update del PROFILE metadata
-
   ////////////////////
 
   // got the postId, and ADD it to the profile.metadata
@@ -291,11 +256,6 @@ export const createUserList = async (lensProfile: any, name: string) => {
     lensProfile?.id,
     profileMetadata
   );
-  console.log('resUpdate 🟢🏆⚡︎✦: ', resUpdate);
-  const profileResult2 = await queryProfile({ profileId: lensProfile?.id });
-  console.log('resUpdate2 check attribs 🟢🏆⚡︎✦: ', profileResult2);
-
-  console.log('FINAL::: ', userListId);
   return newList;
 };
 

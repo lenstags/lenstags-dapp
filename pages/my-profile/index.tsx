@@ -76,9 +76,13 @@ const MyProfile: NextPage = () => {
     };
 
     const fetchMyCollects = async () => {
+      if (!lp) {
+        return;
+      }
+
       const res = await getPublications(
         [PublicationTypes.Post],
-        lp?.id,
+        undefined,
         lp?.ownedBy
       );
       console.log('RES ', res);
@@ -91,7 +95,6 @@ const MyProfile: NextPage = () => {
         [PublicationTypes.Post],
         lensProfile.id
       );
-      console.log('ccc ', res);
       setPublications(
         res.items.filter(
           (r) =>
@@ -144,49 +147,6 @@ const MyProfile: NextPage = () => {
     if (tab === 'all') {
       fetchAll();
     }
-
-    // get my private list first
-
-    // deprecated
-    // explore({ locale: 'ia' });
-
-    // explore({ locale: 'ia', tags }).then((data) => {
-    //   if (tab === 'collected') {
-    //     setPublications(data.items.filter((r) => r.hasCollectedByMe));
-    //     return;
-    //   }
-
-    //   if (tab === 'created') {
-    //     setPublications(
-    //       data.items.filter(
-    //         (r) =>
-    //           r.profile.id === lensProfile?.id &&
-    //           r.metadata.attributes[0].value === 'post'
-    //       )
-    //     );
-    //     return;
-    //   }
-
-    //   if (tab === 'all') {
-    //     setPublications(
-    //       data.items.filter(
-    //         (r) => r.profile.id === lensProfile?.id || r.hasCollectedByMe
-    //       )
-    //     );
-    //     return;
-    //   }
-
-    //   if (tab === 'lists') {
-    //     setPublications(
-    //       data.items.filter(
-    //         (r) =>
-    //           r.profile.id === lensProfile?.id &&
-    //           r.metadata.attributes[0].value === 'list'
-    //       )
-    //     );
-    //     return;
-    //   }
-    // });
   }, [tab, lensProfile?.id, tags]);
 
   const pictureUrl =
@@ -196,18 +156,9 @@ const MyProfile: NextPage = () => {
       ? lensProfile?.picture.uri
       : '/img/profilePic.png';
 
-  // explore({ locale: 'en', tags });
-  // explore({ tags }).then((data) => {
-  //   setPublications(
-  //     data.items.filter(
-  //       (r) => r.profile.id === lensProfile?.id || r.hasCollectedByMe
-  //     )
-  //   );
-  // });
-
   return (
     <Layout
-      title="Lenstags | Explore"
+      title="Nata Social | Explore"
       pageDescription="My profile"
       screen={true}
     >

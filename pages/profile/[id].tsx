@@ -60,7 +60,11 @@ const OtherProfile: NextPage = () => {
 
   explore({ locale: 'en', tags });
   return (
-    <Layout title="Lenstags | Explore" pageDescription="Profile" screen={true}>
+    <Layout
+      title="Nata Social | Explore"
+      pageDescription="Profile"
+      screen={true}
+    >
       <div className="w-full">
         {/* header */}
         <div
@@ -163,7 +167,7 @@ const OtherProfile: NextPage = () => {
       </div>
 
       {/* contents */}
-      <div className=" md:w-4/5 mx-auto  w-11/12  ">
+      <div className=" mx-auto w-11/12  md:w-4/5  ">
         <div className="  flex flex-wrap  ">
           {publications
             ? publications.map((post, index) => (

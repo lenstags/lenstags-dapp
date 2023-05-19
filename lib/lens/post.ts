@@ -157,11 +157,11 @@ export const createPostManager = async (
     ? await createPostGasless(profileResult.id, builtPost)
     : await createPostPaid(profileResult.id, builtPost);
 
-  if (selfCollect) {
-    console.log(' Collecting post, minting... ');
-    await freeCollect(result.internalPubId);
-    console.log('Collecting post finished.');
-  }
+  // if (selfCollect) {
+  //   console.log(' Collecting post, minting... ');
+  //   await freeCollect(result.internalPubId);
+  //   console.log('Collecting post finished.');
+  // }
 
   return result;
 };
@@ -226,7 +226,7 @@ export const addPostIdtoListId = async (
       version: PUBLICATION_METADATA_VERSION,
       mainContentFocus: PublicationMainFocus.TEXT_ONLY,
       metadata_id: uuidv4(),
-      name: 'LensTags Content List™',
+      name: 'Nata Social Content List™',
       description: 'you-are-the-owner',
       content: new Date().getTime().toString(),
       locale: 'en-US',

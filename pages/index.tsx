@@ -1,886 +1,842 @@
-import React, { useEffect, useState } from 'react';
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
-import { APP_NAME } from '@lib/config';
+import {
+  Camera,
+  Flowmap,
+  Geometry,
+  Mesh,
+  Program,
+  Renderer,
+  Texture,
+  Triangle,
+  Vec2,
+  Vec4
+} from 'ogl-typescript';
+import React, { useEffect, useRef } from 'react';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore, { Autoplay } from 'swiper';
+
 import Head from 'next/head';
-import ImageProxied from 'components/ImageProxied';
+import Image from 'next/image';
 import { LayoutLanding } from 'components/LayoutLanding';
-import Link from 'next/link';
 import type { NextPage } from 'next';
 
+SwiperCore.use([Autoplay]);
+
 const Home: NextPage = () => {
-  const content = {
-    badges: `Badges for verified curators can help easily identify trusted sources of information. Users can be more confident in the accuracy and reliability of the information they are reading on social media.`,
-    tags: 'Tag your content for better organization and discovery. Label your content with TAGS for improved organization and visibility. Select from predefined tags or create custom ones',
-    lenstagsPro:
-      'Users will be able to access a number of extra features and customization options. More details soon.',
-    lists:
-      'Organize your collects using Lists and view easily specific groups of content. The lists can be either private  or public. This allows people to create lists that are only relevant to them, as well as lists that can be shared with others.',
-    extension:
-      'Collect articles and links easily through our browser extension. LensTags can be used on your favorite browser, it allows you to easily save the content you find while browsing the web.',
-    mobile:
-      'LensTags mobile application that allows users to discover, organize, and access content on the go.',
-    projects:
-      'A hub of resources for your project plus access to analytics to keep track of engagement.'
-  };
+  const imgSize = [1440, 680];
 
-  const [tabTitle, setTabTitle] = useState('BADGES');
-  const [tabContent, setTabContent] = useState(content.badges);
+  const vertex = `
+					attribute vec2 uv;
+					attribute vec2 position;
+					varying vec2 vUv;
+					void main() {
+							vUv = uv;
+							gl_Position = vec4(position, 0, 1);
+					}
+			`;
+  const fragment = `
+					precision highp float;
+					precision highp int;
+					uniform sampler2D tWater;
+					uniform sampler2D tFlow;
+					uniform float uTime;
+					varying vec2 vUv;
+					uniform vec4 res;
 
-  const setTab = (
-    title: string,
-    content: string
-    //  TODO: icon: string
-  ) => {
-    setTabTitle(title);
-    setTabContent(content);
-  };
+					void main() {
+
+							// R and G values are velocity in the x and y direction
+							// B value is the velocity length
+							vec3 flow = texture2D(tFlow, vUv).rgb;
+
+							vec2 uv = .5 * gl_FragCoord.xy / res.xy ;
+							vec2 myUV = (uv - vec2(0.5))*res.zw + vec2(0.5);
+							myUV -= flow.xy * (0.15 * 0.7);
+
+							vec3 tex = texture2D(tWater, myUV).rgb;
+
+							gl_FragColor = vec4(tex.r, tex.g, tex.b, 1.0);
+					}
+			`;
+
+  const items = [
+    {
+      name: 'TAGS',
+      icon: '/img/landing/icon-tags.svg',
+      description: 'Labeled content for better management and discovery.',
+      soon: false
+    },
+    {
+      name: 'LISTS',
+      icon: '/img/landing/icon-lists.svg',
+      description: 'Organize your findings through Lists. Private or public.',
+      soon: false
+    },
+    {
+      name: 'PROJECTS',
+      icon: '/img/landing/icon-projects.svg',
+      description: 'All-in-one hub of resources. Effortlessly onboard users.',
+      soon: false
+    },
+    {
+      name: 'BADGES',
+      icon: '/img/landing/icon-badges.svg',
+      description:
+        'Easily identify trusted and reliable sources of information.',
+      soon: false
+    },
+    {
+      name: 'PRO',
+      icon: '/img/landing/icon-pro.svg',
+      description: 'Unlock extra features and customization options.',
+      soon: true
+    },
+    {
+      name: 'MOBILE APP',
+      icon: '/img/landing/icon-mobile.svg',
+      description: 'Grab content anytime, anywhere. Forever.',
+      soon: true
+    },
+    {
+      name: 'BROWSER PLUGIN',
+      icon: '/img/landing/icon-extension.svg',
+      description: 'Seamless integration on every browser.',
+      soon: true
+    }
+  ];
+
+  const canvasRef = useRef<HTMLDivElement | null>(null); // used to avoid Property 'appendChild' does not exist on type 'never'
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const renderer = new Renderer({ dpr: 2 });
+    const gl = renderer.gl;
+    const camera = new Camera(gl);
+    let canvas = gl.canvas;
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.zIndex = '-10';
+    canvasRef.current.appendChild(canvas);
+
+    let aspect = 1;
+    const mouse = new Vec2(-1);
+    const velocity = new Vec2();
+
+    function resize() {
+      let a1, a2;
+      var imageAspect = imgSize[1] / imgSize[0];
+      if (window.innerHeight / window.innerWidth < imageAspect) {
+        a1 = 1;
+        a2 = window.innerHeight / window.innerWidth / imageAspect;
+      } else {
+        a1 = (window.innerWidth / window.innerHeight) * imageAspect;
+        a2 = 1;
+      }
+      mesh.program.uniforms.res.value = new Vec4(
+        window.innerWidth,
+        window.innerHeight,
+        a1,
+        a2
+      );
+
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      aspect = window.innerWidth / window.innerHeight;
+    }
+
+    const flowmap = new Flowmap(gl);
+    // Triangle that includes -1 to 1 range for 'position', and 0 to 1 range for 'uv'.
+    const geometry = new Geometry(gl, {
+      position: {
+        size: 2,
+        data: new Float32Array([-1, -1, 3, -1, -1, 3])
+      },
+      uv: { size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }
+    });
+    const texture = new Texture(gl, {
+      minFilter: gl.LINEAR,
+      magFilter: gl.LINEAR
+    });
+    const imgSrc = 'img/landing/hero-back.jpg';
+    const img = imgRef.current;
+    if (img) {
+      img.onload = () => {
+        texture.image = img;
+      };
+      img.src = imgSrc;
+    }
+
+    let a1, a2;
+    var imageAspect = imgSize[1] / imgSize[0];
+    if (window.innerHeight / window.innerWidth < imageAspect) {
+      a1 = 1;
+      a2 = window.innerHeight / window.innerWidth / imageAspect;
+    } else {
+      a1 = (window.innerWidth / window.innerHeight) * imageAspect;
+      a2 = 1;
+    }
+
+    const program = new Program(gl, {
+      vertex,
+      fragment,
+      uniforms: {
+        uTime: { value: 0 },
+        tWater: { value: texture },
+        res: {
+          value: new Vec4(window.innerWidth, window.innerHeight, a1, a2)
+        },
+        img: { value: new Vec2(imgSize[0], imgSize[1]) },
+        // Note that the uniform is applied without using an object and value property
+        // This is because the class alternates this texture between two render targets
+        // and updates the value property after each render.
+        tFlow: flowmap.uniform
+      }
+    });
+    const mesh = new Mesh(gl, { geometry, program });
+
+    window.addEventListener('resize', resize, false);
+    resize();
+
+    // Create handlers to get mouse position and velocity
+    const isTouchCapable = 'ontouchstart' in window;
+    if (isTouchCapable) {
+      window.addEventListener('touchstart', updateMouse, false);
+      window.addEventListener('touchmove', updateMouse, { passive: false });
+    } else {
+      window.addEventListener('mousemove', updateMouse, false);
+    }
+    let lastTime: any;
+    const lastMouse = new Vec2();
+
+    let velocityNeedsUpdate = false;
+
+    function updateMouse(e: any) {
+      e.preventDefault();
+      if (e.changedTouches && e.changedTouches.length) {
+        e.x = e.changedTouches[0].pageX;
+        e.y = e.changedTouches[0].pageY;
+      }
+      if (e.x === undefined) {
+        e.x = e.pageX;
+        e.y = e.pageY;
+      }
+      // Get mouse value in 0 to 1 range, with y flipped
+      mouse.set(e.x / gl.renderer.width, 1.0 - e.y / gl.renderer.height);
+      // Calculate velocity
+      if (!lastTime) {
+        // First frame
+        lastTime = performance.now();
+        lastMouse.set(e.x, e.y);
+      }
+
+      const deltaX = e.x - lastMouse.x;
+      const deltaY = e.y - lastMouse.y;
+
+      lastMouse.set(e.x, e.y);
+
+      let time = performance.now();
+
+      // Avoid dividing by 0
+      let delta = Math.max(10.4, time - lastTime);
+      lastTime = time;
+      velocity.x = deltaX / delta;
+      velocity.y = deltaY / delta;
+      // Flag update to prevent hanging velocity values when not moving
+      velocityNeedsUpdate = true;
+    }
+
+    requestAnimationFrame(update);
+
+    function update(t: any) {
+      requestAnimationFrame(update);
+      // Reset velocity when mouse not moving
+      if (!velocityNeedsUpdate) {
+        mouse.set(-1);
+        velocity.set(0);
+      }
+      velocityNeedsUpdate = false;
+      // Update flowmap inputs
+      flowmap.aspect = aspect;
+      flowmap.mouse.copy(mouse);
+      // Ease velocity input, slower when fading out
+      flowmap.velocity.lerp(velocity, velocity.len() ? 0.15 : 0.1);
+      flowmap.update();
+      program.uniforms.uTime.value = t * 0.01;
+      renderer.render({ scene: mesh });
+    }
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', updateMouse);
+      window.removeEventListener('touchstart', updateMouse);
+      window.removeEventListener('touchmove', updateMouse);
+    };
+  }, [imgSize]);
 
   return (
-    <div className="bg-black">
+    <div className="">
       <Head>
-        <title>Lenstags</title>
-        <meta name="description" content="Generated by Lenstags" />
-        <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="favicon/apple-touch-icon.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="favicon/favicon-32x32.png"
-        />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="favicon/favicon-16x16.png"
-        />
+        <title>Nata Social</title>
+        <meta name="description" content="Generated by Nata Social" />
+
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <LayoutLanding title={'Lenstags | Home'} pageDescription={'Home'}>
-        <div
-          style={{
-            backgroundImage: "url('/img/landing/hero_background.png')",
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-            display: 'flex',
-            alignItems: 'center',
-            backgroundColor: '#DEF702'
-            // justifyContent: 'center'
-          }}
-          className="h-screen w-full"
-        >
-          <div className="mx-auto max-w-[90vw] text-white  md:ml-32">
-            <p className=" font-['NeutralFaceText-Book'] text-[3em] text-[#E2F81C] sm:text-[2rem] md:text-[64px] ">
-              BROWSE SMARTER.
-            </p>
-            <p className=" font-['NeutralFaceText-Book'] text-[2em] leading-[3rem] md:w-[500px] md:text-[44px]">
-              Discover and manage the best resources.
-            </p>
 
-            <div className="mt-10 ">
-              <Link href={`/app`}>
-                <a
-                  target="_blank"
-                  className="rounded-lg bg-lensGreen px-[14px] py-[8px] text-[16px] text-black"
-                >
-                  Explore
-                </a>
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/*     <div
-          className="w-full border-2 border-x-0 border-solid border-lensGreen bg-black
-         py-4 font-serif text-lg font-light text-white shadow-md shadow-black animate-in
-          slide-in-from-left-0 repeat-infinite 
-         "
-        >
-          <div className="marquee">
-          <p>
-          #Content organization #Collective knowledge #Data curation #Incentives
-          program #Tags
-          </p>
-          </div>
-          
-        </div> */}
-
-        <div
-          style={{
-            display: 'flex',
-            paddingTop: '20px',
-            paddingBottom: '80px'
-            /* alignItems: 'center' */
-            // justifyContent: 'center'
-          }}
-          className=" max-h-[639px] w-full bg-lensGreen
-        "
-        >
-          <div className="mx-auto max-w-[90vw]   text-black md:mx-28">
-            <p className="  leading-15 font-['NeutralFace'] text-3xl uppercase  md:text-6xl ">
-              Join the first social
-            </p>
-            <p className="mt-4 font-['NeutralFace']  text-xl uppercase  md:text-6xl ">
-              bookmarking platform
-            </p>
-            <hr className="my-4 max-w-[1058px] border-2 border-solid border-purple-600 bg-purple-600 shadow-md  shadow-lensBlack md:my-14" />
-            <p className=" mt-6  max-w-[1058px]  font-['NeutralFaceText-Light'] text-xl md:text-4xl">
-              A platform for collecting, organizing and sharing, backed by the
-              community&apos;s collective knowledge.
-            </p>
-            <div className="mt-14  ">
-              {/* 
-              <div className="mx-4 flex rounded-lg border-2 border-solid border-black bg-lime-100 pt-6 pl-6 text-4xl">
-                  <span className="text-left">
-                  Efficient
-                  <br />
-                  Tool
-                </span>
-                <ImageProxied
-                  category="post"
-                  src="/img/efficientTool.png"
-                  alt=""
-                  width={150}
-                  height={150}
-
-                />
-              </div> */}
-              {/* 
-              <div className="mx-4  flex rounded-lg border-2 border-solid border-black bg-purple-200 pt-6 pl-6 text-4xl">
-                <span className="text-left">
-                Manage your bookmarks
-                </span>
-                <ImageProxied
-                  category="post"
-                  src="/img/program.png"
-                  alt=""
-                  width={150}
-                  height={150}
-                />
-              </div> */}
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="w-[100vw] justify-center text-center"
-          style={{
-            backgroundImage: "url('/img/backPurple.svg')",
-            backgroundSize: 'contain',
-            backgroundRepeat: 'no-repeat',
-            alignItems: 'center'
-          }}
-        >
-          <div>
-            <div className="cards  relative -top-12  mx-auto max-w-[90vw] list-none bg-none pt-8 md:pt-0 ">
-              <div className="">
-                {' '}
-                <li className="hover:h-[278px]">
-                  <a href="" className="card rounded-lg border bg-[#E9DBFA]">
-                    <div className=" h-32"></div>
-                    <div className="card__overlay ">
-                      <div className="card__header ">
-                        <div className="font-[NeutralFaceText-Book]">
-                          Save time. Be efficient
-                        </div>
-                        <div>
-                          <ImageProxied
-                            category="post"
-                            src="/img/landing/content.png"
-                            alt=""
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                      </div>
-
-                      <p className="card__description font-[NeutralFaceText-Light] ">
-                        Unleash the <strong>best content across the web</strong>{' '}
-                        with LensTags - the ultimate platform for organized and
-                        social discovery of resources.
-                      </p>
-                    </div>
-                  </a>
-                </li>
-              </div>
-              <div>
-                {' '}
-                <li className="hover:h-[278px]">
-                  <a href="" className="card rounded-lg border bg-[#FAFED7]">
-                    <div className=" h-32"></div>
-                    <div className="card__overlay">
-                      <div className="card__header ">
-                        <div className="font-[NeutralFaceText-Book]">
-                          Manage your bookmarks
-                        </div>
-                        <div>
-                          <ImageProxied
-                            category="post"
-                            src="/img/landing/manage.png"
-                            alt=""
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                      </div>
-
-                      <p className="card__description font-[NeutralFaceText-Light] ">
-                        Say goodbye to cluttered bookmarks and hello to{' '}
-                        <strong> curated reading lists with LensTags </strong>-
-                        the go-to option for finding accurate and quality
-                        information.
-                      </p>
-                    </div>
-                  </a>
-                </li>
-              </div>
-              <div>
-                {' '}
-                <li className="hover:h-[228px]">
-                  <a href="" className="card rounded-lg border bg-[#E9DBFA]">
-                    <div className=" h-32 "></div>
-                    <div className="flex ">
-                      <div className="card__overlay">
-                        <div className="card__header">
-                          <div className="pr-8 font-[NeutralFaceText-Book]">
-                            Curated Feed
-                          </div>
-                          <div>
-                            <ImageProxied
-                              category="post"
-                              src="/img/landing/curatedfeed.png"
-                              alt=""
-                              width={144}
-                              height={103}
-                            />
-                          </div>
-                        </div>
-
-                        <p className="card__description font-[NeutralFaceText-Light] ">
-                          A <strong>community-driven curation</strong> system.
-                          The preferred option for social discovery of resources
-                          across the web.
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-              </div>
-              <div>
-                {' '}
-                <li className="hover:h-[218px]">
-                  <a href="" className="card rounded-lg border bg-[#FAFED7]">
-                    <div className=" h-32 "></div>
-                    <div className="card__overlay">
-                      <div className="card__header ">
-                        <div className="font-[NeutralFaceText-Book]">
-                          Projects
-                        </div>
-                        <div>
-                          <ImageProxied
-                            category="post"
-                            src="/img/landing/projects.png"
-                            alt=""
-                            width={100}
-                            height={100}
-                          />
-                        </div>
-                      </div>
-
-                      <p className="card__description font-[NeutralFaceText-Light]">
-                        Locate the best content about your favorites projects
-                      </p>
-                    </div>
-                  </a>
-                </li>
-              </div>
-            </div>
-
-            <ImageProxied
-              category="post"
-              src="/img/logo-extended.svg"
-              alt=""
-              width={300}
-              height={300}
+      <LayoutLanding title={'Nata Social | Home'} pageDescription={'Home'}>
+        <div>
+          <div
+            id="middle"
+            ref={canvasRef}
+            className="relative -mt-20 w-full py-6 md:pb-28 md:pt-48"
+          >
+            <img
+              className=" hidden "
+              ref={imgRef}
+              src="img/landing/hero-back.jpg"
+              alt="Background"
             />
-            <div className="">
-              <div>
-                <div
-                  className="pr-30 max-w[90vw] mx-auto flex justify-between pb-20 md:max-w-[1058px] "
-                  style={{
-                    alignItems: 'center'
-                  }}
-                >
-                  <p
-                    className="   -rotate-90  justify-between border-2
-             border-solid border-black bg-purple-600 p-10 text-center  align-top
-             text-base  text-white md:text-2xl "
-                  >
-                    PRODUCTS
-                  </p>
-                  {/* <ImageProxied
-              category="post"
-              src="/img/products.svg"
-              alt=""
-              width={300}
-              height={300}
-            /> */}
+            <div
+              className=" mx-6 my-8 mt-16 rounded-3xl border-2 border-gray-100 bg-white bg-opacity-70 
+             py-12 text-center align-middle 
+             text-black sm:mx-16 sm:px-16 md:mx-32 md:my-20 md:mt-20 
+             md:px-32
+             md:py-20
+             lg:mx-48 xl:mx-64     xl:px-64
+             2xl:mx-72 
+             
+            2xl:px-72"
+            >
+              <p className="whitespace-nowrap font-serif text-2xl font-bold  md:text-4xl ">
+                BROWSE SMARTER
+              </p>
+              <p className="mt-8 font-serif md:text-xl">
+                Discover and manage the best resources.
+              </p>
+              <a
+                href="https://tally.so/r/mVjz7J"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <button className=" mt-8 rounded-full bg-black px-6 py-3 font-serif text-white">
+                  JOIN THE WAITLIST
+                </button>
+              </a>
+            </div>
+          </div>
 
-                  <p className="max-w-[90vw] text-left font-[NeutralFace] text-[1.4rem] uppercase text-black md:max-w-[820px] md:text-6xl md:leading-[5rem]">
-                    Get the most out of the web with our features
+          {/* <div className="relative">
+            <div
+              id="back"
+              className="absolute left-0 top-0 z-0 h-full w-full"
+              style={{
+                background: 'url(/img/landing/hero-back.jpg)',
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat'
+              }}
+            ></div>
+            <div
+              id="middle"
+              ref={canvasRef}
+              className="absolute left-0 top-0 z-10 -mt-20 w-full py-6 opacity-50 md:pb-28 md:pt-48"
+            >
+              <img
+                className="hidden"
+                ref={imgRef}
+                src="img/landing/hero-grid.jpg"
+                alt="Background"
+              />
+            </div>
+            <div
+              id="top"
+              className="absolute left-0 top-0 z-20 mx-6 my-8 mt-16 rounded-3xl border-2 border-gray-100 bg-white bg-opacity-70 
+               py-12 text-center align-middle 
+               text-black sm:mx-16 sm:px-16 md:mx-32 md:my-20 md:mt-20 
+               md:px-32
+               md:py-20
+               lg:mx-48 xl:mx-64 xl:px-64
+               2xl:mx-72 
+               2xl:px-72"
+            >
+              <p className="whitespace-nowrap font-serif text-3xl font-bold md:text-4xl">
+                BROWSE SMARTER
+              </p>
+              <p className="mt-8 font-serif md:text-xl">
+                Discover and manage the best resources.
+              </p>
+              <a href="/app" target="_blank" rel="noreferrer">
+                <button className="mt-8 rounded-full bg-black px-6 py-3 font-serif text-white">
+                  EXPLORE
+                </button>
+              </a>
+            </div>
+          </div> */}
+
+          {/* Welcome */}
+          <div className="relative -top-6 hidden justify-center sm:flex">
+            <a id="anchor" href="#anchor">
+              <svg
+                width="54"
+                height="53"
+                viewBox="0 0 54 53"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="53"
+                  y="1"
+                  width="51"
+                  height="52"
+                  rx="25.5"
+                  transform="rotate(90 53 1)"
+                  fill="white"
+                />
+                <path
+                  d="M33.3456 26.9043L27 33.2499L20.6543 26.9043"
+                  stroke="#121212"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <path
+                  d="M27 33.2499L27 19.75"
+                  stroke="#121212"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                <rect
+                  x="53"
+                  y="1"
+                  width="51"
+                  height="52"
+                  rx="25.5"
+                  transform="rotate(90 53 1)"
+                  stroke="#121212"
+                  strokeWidth="2"
+                />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <div
+          style={{
+            background: 'url(/img/landing/nata-back-products.svg)',
+            backgroundSize: 'cover',
+            backgroundRepeat: 'no-repeat'
+          }}
+          className="mt:6 w-full md:mt-32"
+        >
+          <div
+            id="welcome"
+            className="mx-6 font-serif sm:mx-16 md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72"
+          >
+            <div className="pb-8">
+              <span className=" mr-3 text-xs font-bold tracking-widest">
+                WELCOME{' '}
+              </span>
+              ⎯⎯⎯⎯⎯
+            </div>
+            <p className=" text-3xl font-bold">
+              Join the first social
+              <br />
+              bookmarking platform.
+            </p>
+            <p className="mt-4">
+              Backed by the community&apos;s collective knowledge
+            </p>
+            <div className="mt-8 flex-1 justify-center text-center sm:flex">
+              <div className="mt-4 flex-1">
+                <div
+                  style={{
+                    background: 'url(/img/landing/nata-feat-1.svg)',
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                  className="mb-6 rounded-xl border-2 border-gray-100 px-12 py-10 sm:mr-3 "
+                >
+                  <p className="text-xl font-semibold">
+                    Save time. Be efficient.
+                  </p>
+                  <p className="mt-4 font-sans text-sm ">
+                    Get the <b>best content</b> across the web
+                    <br /> <b>aggregated</b> into a single, easy to use dApp.
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    background: 'url(/img/landing/nata-feat-3.svg)',
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                  className="rounded-xl border-2 border-gray-100 px-12 py-10 sm:mr-3 "
+                >
+                  <p className="text-xl font-semibold">Curated feed.</p>
+                  <p className="mt-4 font-sans  text-sm ">
+                    A <b>community-driven curation</b> system.
+                    <br /> Social discovery of resources across the web.
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex-1 pb-4">
+                <div
+                  style={{
+                    background: 'url(/img/landing/nata-feat-2.svg)',
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                  className="mb-6 rounded-xl border-2 border-gray-100 px-12 py-10 sm:ml-3 "
+                >
+                  <p className="text-xl font-semibold">
+                    Manage your bookmarks.
+                  </p>
+                  <p className="mt-4 font-sans  text-sm ">
+                    Say goodbye to cluttering, and say hello to <br />
+                    organized <b>custom reading lists</b>.
+                  </p>
+                </div>
+
+                <div
+                  style={{
+                    background: 'url(/img/landing/nata-feat-4.svg)',
+                    backgroundSize: 'cover',
+                    backgroundRepeat: 'no-repeat'
+                  }}
+                  className="rounded-xl border-2 border-gray-100 px-12 py-10 sm:ml-3 "
+                >
+                  <p className="text-xl font-semibold">Projects.</p>
+                  <p className="mt-4 font-sans text-sm ">
+                    <b>Keep track </b>of the most relevant articles about
+                    <br /> your favourite projects.
                   </p>
                 </div>
               </div>
             </div>
+
+            {/* Our features */}
+            <div id="features" className="mt-10 pb-8 md:mt-32">
+              <span className=" mr-3 text-xs font-bold tracking-widest">
+                OUR FEATURES{' '}
+              </span>
+              ⎯⎯⎯⎯⎯
+            </div>
+            <div className="flex py-6">
+              <p className="z-1 text-3xl font-bold">
+                Get the most out of the web.
+              </p>
+              <svg
+                className=" -z-10 -ml-40 -mt-2"
+                width="184"
+                height="58"
+                viewBox="0 0 184 58"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M183.123 29.0001C183.123 45.0163 170.063 58 153.953 58L29.1696 57.9997C13.0597 57.9997 -7.04187e-07 45.0161 0 28.9999C7.04187e-07 12.9837 13.0597 4.54463e-07 29.1696 0L153.953 0.000256066C170.063 0.000256766 183.123 12.9839 183.123 29.0001Z"
+                  fill="url(#paint0_linear_1_899)"
+                />
+                <defs>
+                  <linearGradient
+                    id="paint0_linear_1_899"
+                    x1="5.5"
+                    y1="29"
+                    x2="190.108"
+                    y2="28.9613"
+                    gradientUnits="userSpaceOnUse"
+                  >
+                    <stop
+                      offset="0.236641"
+                      stopColor="#C7FFF2"
+                      stopOpacity="0"
+                    />
+                    <stop offset="0.424509" stopColor="#C7FFF2" />
+                    <stop offset="1" stopColor="#00FABF" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+
+            {/* carousel */}
+            <div className=" flex flex-row overflow-hidden pt-6">
+              <Swiper
+                autoplay={{ delay: 0, disableOnInteraction: false }}
+                speed={5000}
+                slidesPerView={1}
+                spaceBetween={10}
+                breakpoints={{
+                  640: {
+                    slidesPerView: 2,
+                    spaceBetween: 20
+                  },
+                  768: {
+                    slidesPerView: 2,
+                    spaceBetween: 40
+                  },
+                  1024: {
+                    slidesPerView: 3,
+                    spaceBetween: 50
+                  }
+                }}
+                loop={true}
+              >
+                {items.map((card) => {
+                  return (
+                    <SwiperSlide className="mt-4" key={card.name}>
+                      {card.soon ? (
+                        <button
+                          style={{
+                            backgroundColor: '#09fabf',
+                            marginLeft: '27%'
+                          }}
+                          className="absolute -top-4 justify-center rounded-full px-4 py-1 text-xs font-medium tracking-widest"
+                        >
+                          COMING SOON
+                        </button>
+                      ) : (
+                        ''
+                      )}
+
+                      <div
+                        style={{
+                          borderWidth: '1px'
+                          // width: '200px',
+                          // height: '200px'
+                        }}
+                        key={card.name}
+                        className="  mx-2 rounded-xl border-solid border-black bg-transparent px-6 py-6"
+                      >
+                        <div
+                          style={{ flex: '0 0 33.33%' }}
+                          className="flex align-baseline"
+                        >
+                          <img src={card.icon} alt="" width={28} height={28} />
+                          <span className="ml-2 text-xl font-bold ">
+                            {card.name}
+                          </span>
+                        </div>
+                        <div className="mt-4 font-sans  text-sm">
+                          {card.description}
+                        </div>
+                      </div>
+                    </SwiperSlide>
+                  );
+                })}
+              </Swiper>
+            </div>
+
+            {/* Our browser extension */}
+            <div className="mt-14 pb-8 md:mt-32">
+              <span className=" mr-3 text-xs font-semibold tracking-widest">
+                OUR BROWSER EXTENSION{' '}
+              </span>
+              ⎯⎯⎯⎯⎯
+            </div>
+
+            <div className="flex-1 items-center sm:flex">
+              <Image
+                // style={{ objectFit: 'contain' }}
+                width={500}
+                height={300}
+                className="mb-10"
+                src="/img/landing/extension.svg"
+                alt=""
+              />
+
+              <div className="ml-10  ">
+                <p className="z-1 mb-6 text-3xl font-bold">
+                  Save content on the fly.
+                </p>
+                <p>
+                  Collect articles and links easily on your favorite browser.
+                </p>
+              </div>
+            </div>
           </div>
 
+          {/* Sponsors */}
           <div
-            className="justify-center  text-center"
+            className="mt-12 w-full border-y-2 border-y-gray-100 bg-white py-4 text-center md:mt-32"
             style={{
-              backgroundImage: "url('/img/backBricks.svg')",
+              background: 'url(/img/landing/back-sponsors.svg)',
               backgroundSize: 'cover',
-              alignItems: 'center'
+              backgroundRepeat: 'no-repeat'
             }}
           >
-            {/* products */}
-            <div className="  mx-auto justify-center md:mt-10">
-              <div
-                id="products"
-                className="flex  flex-wrap items-center  border-r-8 font-[neutralFace] text-xs drop-shadow-2xl md:mx-auto md:max-h-[176px] 
-                md:max-w-[960px] md:justify-center md:border-4 md:border-b-8 md:border-solid md:border-black md:bg-[#F5F5F5] md:text-center"
-              >
-                <div
-                  className="m-4  flex  cursor-pointer items-center rounded-xl border-[0.15rem] border-solid border-black px-6 py-2 hover:bg-yellow-100"
-                  onClick={() => setTab('Badges', content.badges)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="#6D1EDC"
-                    className="mr-2 h-6 w-6"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M8.603 3.799A4.49 4.49 0 0112 2.25c1.357 0 2.573.6 3.397 1.549a4.49 4.49 0 013.498 1.307 4.491 4.491 0 011.307 3.497A4.49 4.49 0 0121.75 12a4.49 4.49 0 01-1.549 3.397 4.491 4.491 0 01-1.307 3.497 4.491 4.491 0 01-3.497 1.307A4.49 4.49 0 0112 21.75a4.49 4.49 0 01-3.397-1.549 4.49 4.49 0 01-3.498-1.306 4.491 4.491 0 01-1.307-3.498A4.49 4.49 0 012.25 12c0-1.357.6-2.573 1.549-3.397a4.49 4.49 0 011.307-3.497 4.49 4.49 0 013.497-1.307zm7.007 6.387a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <strong>BADGES</strong>
-                </div>
+            <div className="mx-4 items-center sm:mx-16 sm:flex sm:flex-row sm:justify-between md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
+              <div className="mr-2 ">
+                <p className="whitespace-nowrap py-6 font-serif text-xl font-bold">
+                  Supported by
+                </p>
+              </div>
 
-                <div
-                  className="m-4 flex cursor-pointer items-center rounded-xl border-[0.15rem] border-solid border-black px-6 py-2 hover:bg-yellow-100 "
-                  onClick={() => setTab('Tags', content.tags)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="#6D1EDC"
-                    className="mr-2 h-6 w-6"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.25 2.25a3 3 0 00-3 3v4.318a3 3 0 00.879 2.121l9.58 9.581c.92.92 2.39 1.186 3.548.428a18.849 18.849 0 005.441-5.44c.758-1.16.492-2.629-.428-3.548l-9.58-9.581a3 3 0 00-2.122-.879H5.25zM6.375 7.5a1.125 1.125 0 100-2.25 1.125 1.125 0 000 2.25z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <strong>TAGS</strong>
-                </div>
-
-                <div
-                  className="m-4 flex cursor-pointer items-center rounded-xl border-[0.15rem] border-solid border-black px-6 py-2 hover:bg-yellow-100"
-                  onClick={() => setTab('Projects', content.projects)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="#6D1EDC"
-                    className="mr-2 h-6 w-6"
-                  >
-                    <path d="M4.5 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM14.25 8.625a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0zM1.5 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM17.25 19.128l-.001.144a2.25 2.25 0 01-.233.96 10.088 10.088 0 005.06-1.01.75.75 0 00.42-.643 4.875 4.875 0 00-6.957-4.611 8.586 8.586 0 011.71 5.157v.003z" />
-                  </svg>
-                  <strong>PROJECTS</strong>
-                </div>
-
-                <div
-                  className="m-4 flex cursor-pointer items-center rounded-xl border-[0.15rem] border-solid border-black px-6 py-2 hover:bg-yellow-100"
-                  onClick={() => setTab('LensTags Pro', content.lenstagsPro)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="#6D1EDC"
-                    className="mr-2 h-6 w-6"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M11.097 1.515a.75.75 0 01.589.882L10.666 7.5h4.47l1.079-5.397a.75.75 0 111.47.294L16.665 7.5h3.585a.75.75 0 010 1.5h-3.885l-1.2 6h3.585a.75.75 0 010 1.5h-3.885l-1.08 5.397a.75.75 0 11-1.47-.294l1.02-5.103h-4.47l-1.08 5.397a.75.75 0 01-1.47-.294l1.02-5.103H3.75a.75.75 0 110-1.5h3.885l1.2-6H5.25a.75.75 0 010-1.5h3.885l1.08-5.397a.75.75 0 01.882-.588zM10.365 9l-1.2 6h4.47l1.2-6h-4.47z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <strong>LENSTAGS PRO</strong>
-                </div>
-
-                <div
-                  className="m-4 flex cursor-pointer items-center rounded-xl border-[0.15rem] border-solid border-black px-6 py-2 hover:bg-yellow-100"
-                  onClick={() => setTab('Lists', content.lists)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    strokeWidth="3"
-                    fill="#6D1EDC"
-                    className="mr-2 h-6 w-6"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M2.625 6.75a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875 0A.75.75 0 018.25 6h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75zM2.625 12a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zM7.5 12a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12A.75.75 0 017.5 12zm-4.875 5.25a1.125 1.125 0 112.25 0 1.125 1.125 0 01-2.25 0zm4.875 0a.75.75 0 01.75-.75h12a.75.75 0 010 1.5h-12a.75.75 0 01-.75-.75z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <strong>LISTS</strong>
-                </div>
-
-                <div
-                  className="m-4 flex cursor-pointer items-center rounded-xl border-[0.15rem] border-solid border-black px-6 py-2 hover:bg-yellow-100"
-                  onClick={() => setTab('Extension', content.extension)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="#6D1EDC"
-                    className="mr-2 h-6 w-6"
-                  >
-                    <path d="M11.25 5.337c0-.355-.186-.676-.401-.959a1.647 1.647 0 01-.349-1.003c0-1.036 1.007-1.875 2.25-1.875S15 2.34 15 3.375c0 .369-.128.713-.349 1.003-.215.283-.401.604-.401.959 0 .332.278.598.61.578 1.91-.114 3.79-.342 5.632-.676a.75.75 0 01.878.645 49.17 49.17 0 01.376 5.452.657.657 0 01-.66.664c-.354 0-.675-.186-.958-.401a1.647 1.647 0 00-1.003-.349c-1.035 0-1.875 1.007-1.875 2.25s.84 2.25 1.875 2.25c.369 0 .713-.128 1.003-.349.283-.215.604-.401.959-.401.31 0 .557.262.534.571a48.774 48.774 0 01-.595 4.845.75.75 0 01-.61.61c-1.82.317-3.673.533-5.555.642a.58.58 0 01-.611-.581c0-.355.186-.676.401-.959.221-.29.349-.634.349-1.003 0-1.035-1.007-1.875-2.25-1.875s-2.25.84-2.25 1.875c0 .369.128.713.349 1.003.215.283.401.604.401.959a.641.641 0 01-.658.643 49.118 49.118 0 01-4.708-.36.75.75 0 01-.645-.878c.293-1.614.504-3.257.629-4.924A.53.53 0 005.337 15c-.355 0-.676.186-.959.401-.29.221-.634.349-1.003.349-1.036 0-1.875-1.007-1.875-2.25s.84-2.25 1.875-2.25c.369 0 .713.128 1.003.349.283.215.604.401.959.401a.656.656 0 00.659-.663 47.703 47.703 0 00-.31-4.82.75.75 0 01.83-.832c1.343.155 2.703.254 4.077.294a.64.64 0 00.657-.642z" />
-                  </svg>
-                  <strong>EXTENSION</strong>
-                </div>
-
-                <div
-                  className="m-4 flex cursor-pointer items-center rounded-xl border-[0.15rem] border-solid border-black px-6 py-2 hover:bg-yellow-100"
-                  onClick={() => setTab('Mobile', content.mobile)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="#6D1EDC"
-                    className=" mr-2 h-6 w-6"
-                  >
-                    <path d="M10.5 18.75a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" />
-                    <path
-                      fillRule="evenodd"
-                      d="M8.625.75A3.375 3.375 0 005.25 4.125v15.75a3.375 3.375 0 003.375 3.375h6.75a3.375 3.375 0 003.375-3.375V4.125A3.375 3.375 0 0015.375.75h-6.75zM7.5 4.125C7.5 3.504 8.004 3 8.625 3H9.75v.375c0 .621.504 1.125 1.125 1.125h2.25c.621 0 1.125-.504 1.125-1.125V3h1.125c.621 0 1.125.504 1.125 1.125v15.75c0 .621-.504 1.125-1.125 1.125h-6.75A1.125 1.125 0 017.5 19.875V4.125z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                  <strong>MOBILE APP</strong>
-                </div>
+              <div className=" flex   items-center justify-center md:flex md:flex-row ">
+                <Image
+                  width={140}
+                  height={50}
+                  className="m-2"
+                  src="/img/landing/kleros.svg"
+                  alt=""
+                />
+                <Image
+                  width={140}
+                  height={50}
+                  className="m-2"
+                  src="/img/landing/lens.svg"
+                  alt=""
+                />
+                <Image
+                  width={140}
+                  height={50}
+                  className="m-2"
+                  src="/img/landing/polygon.svg"
+                  alt=""
+                />
+                <Image
+                  width={110}
+                  height={50}
+                  className="m-2"
+                  src="/img/landing/kalei.svg"
+                  alt=""
+                />
               </div>
             </div>
+          </div>
 
-            <div className="justify-center text-4xl md:mt-28"></div>
-            <div className="flex justify-center">
+          <div className="my-10 py-10 text-center">
+            <a
+              href="https://discord.gg/6wunUd6Ws4"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <button
+                className="mx-10 rounded-full border-2 border-solid border-black
+             bg-transparent px-10 py-4 font-serif text-xl font-bold md:mx-2 md:text-3xl"
+              >
+                <div className="flex items-center gap-12 px-2 py-1">
+                  Join our community
+                  <svg
+                    width="50"
+                    height="50"
+                    viewBox="0 0 80 81"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <circle cx="40" cy="40.249" r="40" fill="#121212" />
+                    <path
+                      d="M40.4019 28.0978L51.4019 38.7159L40.4019 49.3339"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <path
+                      d="M51.4017 38.7159L28 38.7159"
+                      stroke="white"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+              </button>
+            </a>
+          </div>
+
+          <div className="my-10 bg-black py-10 text-center text-white">
+            <div className=" mx-6 mt-4 font-serif sm:mx-16 md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
               <div
                 style={{
-                  backgroundSize: 'cover',
-                  backgroundRepeat: 'no-repeat',
-                  display: 'flex',
-                  maxWidth: '90vw',
-                  /* maxHeight: '1000px', */
-                  alignItems: 'center'
-                  // justifyContent: 'center'
+                  borderBottom: 1,
+                  borderStyle: 'solid',
+                  borderBottomColor: 'lightgray'
                 }}
-                className="  z-0 rounded-xl border-2 border-black bg-yellow-50 p-10 text-justify font-[NeutralFace] text-2xl text-black"
+                className="items-center justify-between pb-10 lg:flex"
               >
-                {/* <div
-                style={{
-                  backgroundImage: "url('/img/landing/bg-tabs.png')",
-                  backgroundSize: 'cover',
-                 
-                  maxWidth: '1028px',
-                  maxHeight: '391px',
-                  alignItems: 'center'
-                  // justifyContent: 'center'
-                }}
-                className=" md:flex md:visible invisible  z-0 rounded-xl   bg-yellow-50 pb-20 pt-20 pl-10 pr-20 text-justify text-2xl text-black hidden"
-              > */}
+                <img
+                  className="mb-4 lg:mb-0"
+                  src="/img/landing/nata-logo-white.svg"
+                  alt=""
+                />
+                <div className="my-6 flex gap-5 font-serif text-xs lg:my-0">
+                  <a href="#">ABOUT</a>
+                  <a href="#features">PRODUCTS</a>
+                  <a
+                    href="https://natasocial.gitbook.io/nata-social-docs/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    DOCS
+                  </a>
+                  <a href="#">FAQS</a>
+                  <a href="mailto:info@nata.social">CONTACT</a>
+                </div>
+                <div className="flex  gap-5">
+                  <a
+                    href="https://lenster.xyz/u/natasocial"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img
+                      height={18}
+                      width={18}
+                      src="/img/landing/link-lenster.svg"
+                      alt=""
+                    />
+                  </a>
 
-                <div className=" max-w-[880px] ">
-                  <h1>{tabTitle.toUpperCase()}</h1>
-                  <br />
-                  <p className="font-[NeutralFaceText-Book]">{tabContent}</p>
+                  <a
+                    href="https://twitter.com/Nata_Social"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img src="/img/landing/link-twitter.svg" alt="" />
+                  </a>
+
+                  <a
+                    href="https://discord.gg/6wunUd6Ws4"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img src="/img/landing/link-discord.svg" alt="" />
+                  </a>
+
+                  <a
+                    id="contact"
+                    href="mailto:info@nata.social"
+                    rel="noreferrer"
+                    style={{ marginTop: '3px' }}
+                  >
+                    <img src="/img/landing/link-email.svg" alt="" />
+                  </a>
+
+                  <a
+                    href="http://linkedin.com/company/lenstags"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img src="/img/landing/link-linkedin.svg" alt="" />
+                  </a>
                 </div>
               </div>
-              {/*   </div> */}
-            </div>
-
-            {/* <div
-            id="products"
-            className="mx-14  flex flex-wrap  justify-center border-4 border-solid border-black bg-white p-10 text-center 
-           shadow-2xl shadow-lensBlack drop-shadow-2xl"
-          > */}
-
-            {/* support */}
-
-            {/*  <hr className="m-28  border-2 border-solid border-lensGreen bg-lensGreen  shadow-md shadow-lensBlack" /> */}
-
-            <div className="mt-48 justify-center">
-              <p className="font-[Neutralface] text-4xl">SUPPORTED BY</p>
-
-              <div className="mx-auto mt-10 flex max-w-[639px] justify-between">
-                <Link href="https://kleros.io/">
-                  <a
-                    target="_blank"
-                    className="rounded-md   p-4 text-2xl text-black"
-                  >
-                    <ImageProxied
-                      category="post"
-                      src="/img/landing/kleros.png"
-                      alt="Kleros"
-                      width={215}
-                      height={77}
-                    />
-                  </a>
-                </Link>
-
-                <Link href="https://www.lens.xyz/">
-                  <a
-                    target="_blank"
-                    className="rounded-md   p-4 text-2xl text-black"
-                  >
-                    <ImageProxied
-                      category="post"
-                      src="/img/landing/lens.png"
-                      alt="Lens Protocol"
-                      width={94}
-                      height={76}
-                    />
-                  </a>
-                </Link>
-
-                <Link href="https://polygon.technology/">
-                  <a
-                    target="_blank"
-                    className="rounded-md   p-4 text-2xl text-black"
-                  >
-                    <ImageProxied
-                      category="post"
-                      src="/img/landing/polygon.png"
-                      alt="Polygon Blockchain"
-                      width={214}
-                      height={76}
-                    />
-                  </a>
-                </Link>
-              </div>
-            </div>
-
-            {/*     <hr className="m-28  border-2 border-solid border-lensGreen bg-lensGreen  shadow-md shadow-lensBlack" /> */}
-
-            {/* networks */}
-            <div className=" flex justify-center gap-4 pt-14 text-center">
-              <Link href="https://twitter.com/lenstags">
-                <a
-                  target="_blank"
-                  className="rounded-md   p-4 text-2xl text-black"
-                >
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/github.svg"
-                    alt=""
-                    width={100}
-                    height={36}
-                  />
-                </a>
-              </Link>
-
-              <Link href="https://linkedin.com/in/lenstags">
-                <a
-                  target="_blank"
-                  className="rounded-md   p-4 text-2xl text-black"
-                >
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/twitter.svg"
-                    alt=""
-                    width={100}
-                    height={36}
-                  />
-                </a>
-              </Link>
-
-              <Link href="mailto://lenstags@gmail.com">
-                <a
-                  target="_blank"
-                  className="rounded-md  p-4 text-2xl text-black"
-                >
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/email.svg"
-                    alt=""
-                    width={100}
-                    height={36}
-                  />
-                </a>
-              </Link>
-
-              <Link href="https://t.me/lenstags">
-                <a
-                  target="_blank"
-                  className="rounded-md  p-4 text-2xl  text-black"
-                >
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/telegram.svg"
-                    alt=""
-                    width={100}
-                    height={36}
-                  />
-                </a>
-              </Link>
-            </div>
-
-            {/* team */}
-            {/* <div className="  mx-auto mt-12 flex max-w-[90vw] flex-wrap justify-center gap-8 rounded-lg border-4 border-solid border-lensGreen p-8  md:max-w-[880px]">
-                <div>
-                  <p className="  ">
-                    {' '}
-                    <ImageProxied
-                      category="profile"
-                      src="/img/landing/team/fei.jpg"
-                      alt=""
-                      objectFit="cover"
-                      className="rounded-2xl"
-                      width={110}
-                      height={120}
-                    />
-                  </p>
-                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
-                    @0xfeiwian
-                  </div>
-                  <p className="mt-2 font-bold">CEO</p>
-                  <div className="flex justify-center">
-                    <div>
-                      <Link href="https://twitter.com/0xfeiwian">
-                        <a
-                          target="_blank"
-                          className="rounded-md p-1 text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/twitter.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                    <div>
-                      <Link href="https://www.linkedin.com/in/franciscofab/">
-                        <a
-                          target="_blank"
-                          className="rounded-md p-1   text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/linkedin.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="  ">
-                    {' '}
-                    <ImageProxied
-                      category="profile"
-                      src="/img/landing/team/leo.png"
-                      alt=""
-                      objectFit="cover"
-                      className="rounded-2xl"
-                      width={110}
-                      height={120}
-                    />
-                  </p>
-                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
-                    @EthSagan
-                  </div>
-                  <p className="mt-2 font-bold">CTO</p>
-                  <div className="flex justify-center">
-                    <div>
-                      <Link href="https://twitter.com/EthSagan">
-                        <a
-                          target="_blank"
-                          className="rounded-md  p-1 text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/twitter.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                    <div>
-                      <Link href="https://www.linkedin.com/in/blockls/">
-                        <a
-                          target="_blank"
-                          className="rounded-md p-1  text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/linkedin.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="  ">
-                    {' '}
-                    <ImageProxied
-                      category="profile"
-                      src="/img/landing/team/cande.png"
-                      alt=""
-                      objectFit="cover"
-                      className="rounded-2xl"
-                      width={110}
-                      height={120}
-                    />
-                  </p>
-                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#FAFED7] p-2   px-2 font-[NeutralFace] text-xs  ">
-                    @Candufaz
-                  </div>
-                  <p className="mt-2 font-bold">CMO</p>
-                  <div className="flex justify-center">
-                    <div>
-                      <Link href="https://twitter.com/candufaz">
-                        <a
-                          target="_blank"
-                          className="rounded-md  p-1  text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/twitter.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                    <div>
-                      <Link href="https://www.linkedin.com/in/candela-fazzano-b04551158/">
-                        <a
-                          target="_blank"
-                          className="rounded-md  p-1   text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/linkedin.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="  ">
-                    {' '}
-                    <ImageProxied
-                      category="profile"
-                      src="/img/landing/team/nahue.png"
-                      alt=""
-                      objectFit="cover"
-                      className="rounded-2xl"
-                      width={110}
-                      height={120}
-                    />
-                  </p>
-                  <div className=" border-b-4 border-l-2 border-r-4 border-t-2 border-solid border-black bg-[#E9DBFA] p-2   px-2 font-[NeutralFace] text-xs  ">
-                    @Crypto_nahue
-                  </div>
-                  <p className="mt-2 font-bold">COO</p>
-                  <div className="flex justify-center">
-                    <div>
-                      <Link href="https://twitter.com/crypto_nahue">
-                        <a
-                          target="_blank"
-                          className="rounded-md   p-1 text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/twitter.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                    <div>
-                      <Link href="www.linkedin.com/in/lucas-nahuel-gonzalez">
-                        <a
-                          target="_blank"
-                          className="rounded-md   p-1 text-2xl text-black"
-                        >
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/linkedin.svg"
-                            alt=""
-                            width={24}
-                            height={24}
-                          />
-                        </a>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div> */}
-
-            {/* team */}
-
-            <div className="flex justify-center p-8  md:mx-28">
-              <div className="gap-20 text-left font-[NeutralFace] text-2xl leading-loose -tracking-tighter text-[#868585] md:flex">
-                <div className="">
-                  <h1 className="text-base  md:text-[16px]">
-                    <a href="#">TERMS OF SERVICE</a>
-                  </h1>
-                </div>
-
-                <div>
-                  <h1 className="mt-3  font-[NeutralFace] text-base text-[#868585] md:mt-0 md:text-[16px]">
-                    <a href="#">PRIVACY POLICY</a>
-                  </h1>
-                </div>
-
-                <div>
-                  <h1 className="mt-3  font-[NeutralFace] text-base text-[#868585] md:mt-0 md:text-[16px]">
-                    <a href="#">{APP_NAME}</a>
-                  </h1>
+              <div className="mt-6 flex justify-between text-xs text-white">
+                <span>Copyright (C) 2023 | All rights reserved. </span>
+                <div className="flex">
+                  <a href="#">Terms and Conditions</a>
+                  <span className="mx-2">|</span>
+                  <a href="#">Privacy Policy</a>
                 </div>
               </div>
             </div>

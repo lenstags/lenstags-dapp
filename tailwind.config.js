@@ -1,31 +1,5 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  daisyui: {
-    themes: [
-      {
-        mytheme: {
-          primary: '#DEF702',
-
-          secondary: '#D926A9',
-
-          accent: '#1FB2A6',
-
-          neutral: '#191D24',
-
-          'base-100': '#2A303C',
-
-          info: '#3ABFF8',
-
-          success: '#36D399',
-
-          warning: '#FBBD23',
-
-          error: '#F87272'
-        }
-      }
-    ]
-  },
-
   content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}'
@@ -33,6 +7,15 @@ module.exports = {
   presets: [],
   darkMode: 'media', // or 'class'
   theme: {
+    extend: {
+      scrollBehavior: ['smooth']
+    },
+    variants: {
+      extend: {
+        scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce']
+      }
+    },
+
     accentColor: ({ theme }) => ({
       ...theme('colors'),
       auto: 'auto'
@@ -345,11 +328,10 @@ module.exports = {
     fontFamily: {
       sans: [
         'Inter',
-        'NeutralFace',
-        'NeutrafaceText-Light',
-        'NeutrafaceText-Bold',
-        'NeutrafaceText-Demi',
-        'NeutrafaceText-Book',
+        'Inter-Regular',
+        'Inter-Semibold',
+        'Inter-Medium',
+        'Inter-Black',
         'ui-sans-serif',
         'system-ui',
         '-apple-system',
@@ -365,14 +347,7 @@ module.exports = {
         '"Segoe UI Symbol"',
         '"Noto Color Emoji"'
       ],
-      serif: [
-        'ui-serif',
-        'Georgia',
-        'Cambria',
-        '"Times New Roman"',
-        'Times',
-        'serif'
-      ],
+      serif: ['SpaceGrotesk', '"Times New Roman"'],
       mono: [
         'ui-monospace',
         'SFMono-Regular',
@@ -800,6 +775,7 @@ module.exports = {
       150: '1.5'
     },
     screens: {
+      xs: '480',
       sm: '640px',
       md: '768px',
       lg: '1024px',

@@ -53,7 +53,6 @@ export const getPublications = async (
     profileId,
     collectedBy
   };
-  console.log('req: ', req);
   const result = await getPublicationsRequest(req);
   return result;
 };

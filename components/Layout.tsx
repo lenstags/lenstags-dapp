@@ -1,8 +1,8 @@
-import { Navbar, UnauthorizedScreen } from 'components';
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import { useAccount } from 'wagmi';
+import { Navbar } from 'components';
+import Script from 'next/script';
 
 interface Props {
   title: string;
@@ -17,7 +17,6 @@ export const Layout: FC<Props> = ({
   pageDescription,
   screen
 }) => {
-  const { isConnected } = useAccount();
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
     setHydrationLoading(false);
@@ -53,22 +52,21 @@ export const Layout: FC<Props> = ({
         <title>{title}</title>
         <meta name="description" content={pageDescription} />
         <meta name="og:title" content={pageDescription} />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      {isConnected ? (
-        <>
-          {' '}
-          <nav>
-            <Navbar />
-          </nav>
-          <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}>
-            {children}
-          </main>
-        </>
-      ) : (
-        <UnauthorizedScreen />
-      )}
-      {/* Replace this line to ONLY use Lens Login */}
-      {/* {profile ? <Nav /> : <UnauthorizedScreen />} */}
+      <Script
+        async
+        defer
+        data-website-id="d4364aba-a937-4eb1-ad86-085febbeb986"
+        src="https://umami-natasocial.up.railway.app/umami.js"
+      />
+      <nav>
+        <Navbar />
+      </nav>
+      <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}>
+        {children}
+      </main>
     </>
   );
 };
