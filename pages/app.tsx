@@ -126,93 +126,100 @@ const App: NextPage = () => {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
-        {showWelcome ? (
-          <div
-            className="h-full w-full"
-            style={{
-              backgroundImage: 'linear-gradient(to bottom, gray, lightsalmon)',
-              backgroundSize: '400% 400%',
-              animation: 'gradient 10s ease infinite'
-            }}
-          >
-            <style jsx>{`
-              @keyframes gradient {
-                0% {
-                  background-position: 0% 0%;
-                }
-                50% {
-                  background-position: 100% 100%;
-                }
-                100% {
-                  background-position: 0% 0%;
-                }
-              }
-            `}</style>
-            <div className=" mx-auto h-full w-1/3 items-center justify-center py-20 text-center font-mono">
-              <ImageProxied
-                category="profile"
-                src="/img/logo-extended.svg"
-                alt=""
-                width={200}
-                height={120}
-              />
-              <p className=" text-justify font-mono text-lg">
-                This platform is an <b>Alpha</b> release
-                <i> (fresh out of the oven)</i>, meaning that some unexpected
-                behaviour may occur. We appreciate your understanding and
-                encourage you to report any issues you encounter.
-              </p>
+      <div className="mt-6 h-full w-full items-center text-center">
+        Coming soon™️{' '}
+      </div>
 
-              <p className="py-4">Yours, The Nata Social team ⚜️</p>
+      {false && (
+        <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
+          {showWelcome ? (
+            <div
+              className="h-full w-full"
+              style={{
+                backgroundImage:
+                  'linear-gradient(to bottom, gray, lightsalmon)',
+                backgroundSize: '400% 400%',
+                animation: 'gradient 10s ease infinite'
+              }}
+            >
+              <style jsx>{`
+                @keyframes gradient {
+                  0% {
+                    background-position: 0% 0%;
+                  }
+                  50% {
+                    background-position: 100% 100%;
+                  }
+                  100% {
+                    background-position: 0% 0%;
+                  }
+                }
+              `}</style>
+              <div className=" mx-auto h-full w-1/3 items-center justify-center py-20 text-center font-mono">
+                <ImageProxied
+                  category="profile"
+                  src="/img/logo-extended.svg"
+                  alt=""
+                  width={200}
+                  height={120}
+                />
+                <p className=" text-justify font-mono text-lg">
+                  This platform is an <b>Alpha</b> release
+                  <i> (fresh out of the oven)</i>, meaning that some unexpected
+                  behaviour may occur. We appreciate your understanding and
+                  encourage you to report any issues you encounter.
+                </p>
 
-              <p className="pb-4 text-xs">
-                P.S.: Meanwhile, we are performing some setup tasks in
-                background, fasten your seat belts! 🚀
-              </p>
+                <p className="py-4">Yours, The Nata Social team ⚜️</p>
 
-              {ready ? (
-                <div>
-                  <button
-                    className=" bg-lensPurple px-3 py-2 font-sans text-white hover:bg-purple-500"
-                    onClick={handleWelcomeClick}
-                  >
-                    Close
-                  </button>
-                </div>
-              ) : (
-                <div className="flex justify-center">
-                  <Spinner h="10" w="10" />
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          <div className="container mx-auto h-64 w-11/12 px-6 py-10 md:w-4/5 ">
-            {/* <Profile /> */}
-            {/* <Tabs /> */}
-            <div className="mb-3">
-              <TagsFilter />
-            </div>
-            <div className="container mx-auto ">
-              <div className="-mx-1 flex flex-wrap justify-center lg:-mx-4">
-                {publications.length > 0 ? (
-                  publications.map((post, index) => (
-                    <ExplorerCard post={post} key={index} />
-                  ))
+                <p className="pb-4 text-xs">
+                  P.S.: Meanwhile, we are performing some setup tasks in
+                  background, fasten your seat belts! 🚀
+                </p>
+
+                {ready ? (
+                  <div>
+                    <button
+                      className=" bg-lensPurple px-3 py-2 font-sans text-white hover:bg-purple-500"
+                      onClick={handleWelcomeClick}
+                    >
+                      Close
+                    </button>
+                  </div>
                 ) : (
-                  <div className="my-8">
+                  <div className="flex justify-center">
                     <Spinner h="10" w="10" />
                   </div>
                 )}
               </div>
             </div>
-            <div className="h-auto w-full">
-              <Pagination />
+          ) : (
+            <div className="container mx-auto h-64 w-11/12 px-6 py-10 md:w-4/5 ">
+              {/* <Profile /> */}
+              {/* <Tabs /> */}
+              <div className="mb-3">
+                <TagsFilter />
+              </div>
+              <div className="container mx-auto ">
+                <div className="-mx-1 flex flex-wrap justify-center lg:-mx-4">
+                  {publications.length > 0 ? (
+                    publications.map((post, index) => (
+                      <ExplorerCard post={post} key={index} />
+                    ))
+                  ) : (
+                    <div className="my-8">
+                      <Spinner h="10" w="10" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="h-auto w-full">
+                <Pagination />
+              </div>
             </div>
-          </div>
-        )}
-      </Layout>
+          )}
+        </Layout>
+      )}
     </>
   );
 };

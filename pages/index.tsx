@@ -91,8 +91,7 @@ const Home: NextPage = () => {
     {
       name: 'PRO',
       icon: '/img/landing/icon-pro.svg',
-      description:
-        'Unlock a world of extra features and customization options.',
+      description: 'Unlock extra features and customization options.',
       soon: true
     },
     {
@@ -786,7 +785,20 @@ const Home: NextPage = () => {
                 </div>
                 <div className="flex  gap-5">
                   <a
-                    href="https://twitter.com/Lenstags"
+                    href="https://lenster.xyz/u/natasocial"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img
+                      height={18}
+                      width={18}
+                      src="/img/landing/link-lenster.svg"
+                      alt=""
+                    />
+                  </a>
+
+                  <a
+                    href="https://twitter.com/Nata_Social"
                     target="_blank"
                     rel="noreferrer"
                   >
