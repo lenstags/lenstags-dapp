@@ -2,6 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
 import Link from 'next/link';
+import Script from 'next/script';
 
 // import ImageProxied from 'components/ImageProxied';
 
@@ -27,7 +28,12 @@ export const LayoutLanding: FC<Props> = ({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-
+      <Script
+        async
+        defer
+        data-website-id="d4364aba-a937-4eb1-ad86-085febbeb986"
+        src="https://umami-natasocial.up.railway.app/umami.js"
+      />
       <nav
         style={{
           background:
