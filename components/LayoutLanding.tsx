@@ -57,23 +57,41 @@ export const LayoutLanding: FC<Props> = ({
             <img
               src="/img/landing/nata-logo.svg"
               alt=""
-              width={140}
+              width={120}
               height={80}
             />
           </Link>
         </div>
-        <div className="self-center sm:hidden">
+        <div
+          style={{
+            width: '120px',
+            height: '32px',
+            textAlign: 'left'
+          }}
+          className="self-center sm:hidden"
+        >
           <Link href={'/'}>
-            <img src="/img/landing/isologo.svg" alt="" width={32} height={80} />
+            <img
+              src="/img/landing/isologo.svg"
+              alt=""
+              width={32}
+              height={32}
+              // style={{
+              //   width: '120px',
+              //   height: '80px',
+              //   textAlign: 'left',
+              //   alignSelf: 'self-end'
+              // }}
+            />
           </Link>
         </div>
         <div
           style={{ marginTop: '3px' }}
           className="flex items-center font-serif  text-xs font-medium md:text-base"
         >
-          <div className="mx-2 hidden p-2 sm:contents  ">
+          {/* <div className="mx-2 hidden p-2 sm:contents  ">
             <Link href={'#welcome'}>ABOUT</Link>
-          </div>
+          </div> */}
 
           <div className="mx-2 p-2 ">
             <Link href={'#features'}>PRODUCTS</Link>
@@ -87,7 +105,7 @@ export const LayoutLanding: FC<Props> = ({
             >
               DOCS
             </a>
-
+ 
           </div>
 
           <div className="mx-2 p-2 ">
@@ -95,15 +113,24 @@ export const LayoutLanding: FC<Props> = ({
           </div>
         </div>
 
-        <a
-          href="https://tally.so/r/mVjz7J"
-          target="_blank"
-          rel="noreferrer"
-          style={{ marginTop: '4px', marginBottom: '4px' }}
-          className="cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 font-serif  text-xs font-bold text-white md:text-sm   "
+        <div
+          className="my-2 "
+          style={{
+            width: '120px',
+            textAlign: 'right',
+            alignSelf: 'self-end'
+          }}
         >
-          JOIN
-        </a>
+          <a
+            href="https://tally.so/r/mVjz7J"
+            target="_blank"
+            rel="noreferrer"
+            className="cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 font-serif
+             text-xs font-bold text-white md:text-sm   "
+          >
+            JOIN
+          </a>
+        </div>
       </nav>
 
       <main className={`${!screen ? 'h-screen' : 'h-full'} mt-20 `}>
