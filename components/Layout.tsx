@@ -57,7 +57,7 @@ export const Layout: FC<Props> = ({
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-        <meta property="og:image" content="/banner.png" />
+        <meta property="og:image" content="banner.png" />
 
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />

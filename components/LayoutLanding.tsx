@@ -29,7 +29,7 @@ export const LayoutLanding: FC<Props> = ({
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-        <meta property="og:image" content="/img/flyer.svg" />
+        <meta property="og:image" content="banner.png" />
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
