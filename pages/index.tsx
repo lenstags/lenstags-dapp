@@ -284,7 +284,7 @@ const Home: NextPage = () => {
     <div className="">
       <Head>
         <title>Nata Social</title>
-        <meta property="og:title" content="We are Nata Social" />
+        {/* <meta property="og:title" content="We are Nata Social" />
 
         <meta
           property="og:description"
@@ -295,7 +295,7 @@ const Home: NextPage = () => {
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
-        <meta property="og:locale" content="en_US" />
+        <meta property="og:locale" content="en_US" /> */}
 
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
