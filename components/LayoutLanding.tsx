@@ -23,7 +23,8 @@ export const LayoutLanding: FC<Props> = ({
     <>
       <Head>
         <title>{title}</title>
-         <meta property="og:title" content="We are Nata.Social" />
+         <meta property="og:title" content="We are Nata Social" />
+ 
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
