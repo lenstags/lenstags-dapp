@@ -284,19 +284,19 @@ const Home: NextPage = () => {
     <div className="">
       <Head>
         <title>Nata Social</title>
-         <meta property="og:title" content="We are Nata Social" />
- 
+        {/* <meta property="og:title" content="We are Nata Social" />
+
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-         <meta property="og:image" content="banner.svg" />
- 
+        <meta property="og:image" content="banner.png" />
+
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
-        <meta property="og:locale" content="en_US" />
- 
+        <meta property="og:locale" content="en_US" /> */}
+
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
@@ -746,7 +746,7 @@ const Home: NextPage = () => {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <circle cx="40" cy="40.249" r="40" fill="#121212" />
-                     <path
+                    <path
                       d="M40.4019 28.0978L51.4019 38.7159L40.4019 49.3339"
                       stroke="white"
                       strokeWidth="2"
@@ -754,7 +754,6 @@ const Home: NextPage = () => {
                       strokeLinejoin="round"
                     />
                     <path
- 
                       d="M51.4017 38.7159L28 38.7159"
                       stroke="white"
                       strokeWidth="2"
@@ -784,7 +783,7 @@ const Home: NextPage = () => {
                 />
                 <div className="my-6 flex gap-5 font-serif text-xs lg:my-0">
                   <a href="#welcome">ABOUT</a>
-                   <a href="#features">PRODUCTS</a>
+                  <a href="#features">PRODUCTS</a>
                   <a
                     href="https://natasocial.gitbook.io/nata-social-docs/"
                     target="_blank"
@@ -827,7 +826,7 @@ const Home: NextPage = () => {
                     href="https://discord.gg/6wunUd6Ws4"
                     target="_blank"
                     rel="noreferrer"
-                  > 
+                  >
                     <img src="/img/landing/link-discord.svg" alt="" />
                   </a>
 
