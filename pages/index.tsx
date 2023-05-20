@@ -287,13 +287,13 @@ const Home: NextPage = () => {
     <div className="">
       <Head>
         <title>Nata Social</title>
- 
+  
         <meta property="og:title" content="We are Nata Social" />
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-         <meta
+          <meta
           property="og:image"
           content="https://www.nata.social/banner.png"
         />
@@ -319,6 +319,7 @@ const Home: NextPage = () => {
           name="twitter:image"
           content="https://www.nata.social/banner.png"
         />
+ 
 
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
