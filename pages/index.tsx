@@ -122,7 +122,7 @@ const Home: NextPage = () => {
     canvas.style.top = '0';
     canvas.style.left = '0';
     canvas.style.width = '100%';
-    canvas.style.height = '100%';
+    canvas.style.height = '1000%';
     canvas.style.zIndex = '-10';
     canvasRef.current.appendChild(canvas);
 
@@ -205,13 +205,16 @@ const Home: NextPage = () => {
     resize();
 
     // Create handlers to get mouse position and velocity
-    const isTouchCapable = 'ontouchstart' in window;
-    if (isTouchCapable) {
-      window.addEventListener('touchstart', updateMouse, false);
-      window.addEventListener('touchmove', updateMouse, { passive: false });
-    } else {
-      window.addEventListener('mousemove', updateMouse, false);
-    }
+    // const isTouchCapable = 'ontouchstart' in window;
+    // if (isTouchCapable) {
+    //   window.addEventListener('touchstart', updateMouse, false);
+    //   window.addEventListener('touchmove', updateMouse, { passive: false });
+    // } else {
+    //   window.addEventListener('mousemove', updateMouse, false);
+    // }
+
+    window.addEventListener('mousemove', updateMouse, false);
+
     let lastTime: any;
     const lastMouse = new Vec2();
 
@@ -275,8 +278,8 @@ const Home: NextPage = () => {
     return () => {
       window.removeEventListener('resize', resize);
       window.removeEventListener('mousemove', updateMouse);
-      window.removeEventListener('touchstart', updateMouse);
-      window.removeEventListener('touchmove', updateMouse);
+      // window.removeEventListener('touchstart', updateMouse);
+      // window.removeEventListener('touchmove', updateMouse);
     };
   }, [imgSize]);
 
@@ -284,18 +287,38 @@ const Home: NextPage = () => {
     <div className="">
       <Head>
         <title>Nata Social</title>
-        {/* <meta property="og:title" content="We are Nata Social" />
-
+ 
+        <meta property="og:title" content="We are Nata Social" />
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-        <meta property="og:image" content="banner.png" />
-
+         <meta
+          property="og:image"
+          content="https://www.nata.social/banner.png"
+        />
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
-        <meta property="og:locale" content="en_US" /> */}
+         <meta property="og:locale" content="en_US" />
+        <meta
+          name="twitter:card"
+          content="https://www.nata.social/banner.png"
+        />
+        <meta property="twitter:domain" content="nata.social" />
+        <meta property="twitter:url" content="nata.social" />
+        <meta
+          name="twitter:title"
+          content="Nata Social | The home of your bookmarks"
+        />
+        <meta
+          name="twitter:description"
+          content="The first social bookmarking platform, backed by the community`s collective knowledge."
+        />
+        <meta
+          name="twitter:image"
+          content="https://www.nata.social/banner.png"
+        />
 
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
@@ -754,7 +777,6 @@ const Home: NextPage = () => {
                       strokeLinejoin="round"
                     />
                     <path
-
                       d="M51.4017 38.7159L28 38.7159"
                       stroke="white"
                       strokeWidth="2"
@@ -784,7 +806,6 @@ const Home: NextPage = () => {
                 />
                 <div className="my-6 flex gap-5 font-serif text-xs lg:my-0">
                   <a href="#welcome">ABOUT</a>
-
                   <a href="#features">PRODUCTS</a>
                   <a
                     href="https://natasocial.gitbook.io/nata-social-docs/"
