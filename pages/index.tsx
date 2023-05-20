@@ -287,22 +287,20 @@ const Home: NextPage = () => {
     <div className="">
       <Head>
         <title>Nata Social</title>
+ 
         <meta property="og:title" content="We are Nata Social" />
-
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-        <meta
+         <meta
           property="og:image"
           content="https://www.nata.social/banner.png"
         />
-
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
-        <meta property="og:locale" content="en_US" />
-
+         <meta property="og:locale" content="en_US" />
         <meta
           name="twitter:card"
           content="https://www.nata.social/banner.png"
@@ -823,6 +821,7 @@ const Home: NextPage = () => {
                   >
                     FAQS
                   </a>
+
                   <a href="mailto:info@nata.social">CONTACT</a>
                 </div>
                 <div className="flex  gap-5">
