@@ -23,7 +23,8 @@ export const LayoutLanding: FC<Props> = ({
     <>
       <Head>
         <title>{title}</title>
-        <meta property="og:title" content="We are Nata.Social" />
+         <meta property="og:title" content="We are Nata Social" />
+ 
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
@@ -33,6 +34,7 @@ export const LayoutLanding: FC<Props> = ({
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
         <meta property="og:locale" content="en_US" />
+ 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
@@ -76,7 +78,7 @@ export const LayoutLanding: FC<Props> = ({
           <div className="mx-2 p-2 ">
             <Link href={'#features'}>PRODUCTS</Link>
           </div>
-
+ 
           <div className="mx-2 p-2 ">
             <a
               href="https://natasocial.gitbook.io"
@@ -85,6 +87,7 @@ export const LayoutLanding: FC<Props> = ({
             >
               DOCS
             </a>
+ 
           </div>
 
           <div className="mx-2 p-2 ">
