@@ -87,6 +87,7 @@ export const LayoutLanding: FC<Props> = ({
             >
               DOCS
             </a>
+
           </div>
 
           <div className="mx-2 p-2 ">
