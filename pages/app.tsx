@@ -95,7 +95,7 @@ const App: NextPage = () => {
       <Head>
         <title>Nata Social</title>
         <meta property="og:title" content="We are Nata Social" />
-
+        {/* 
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
@@ -105,7 +105,7 @@ const App: NextPage = () => {
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
-        <meta property="og:locale" content="en_US" />
+        <meta property="og:locale" content="en_US" /> */}
 
         <script
           async
