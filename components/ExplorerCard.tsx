@@ -205,10 +205,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
   return (
     <div
-      // TODO: decide which height shall we use style={{ height: '360px' }}
       key={post.id}
       id="CardContainer"
-      className=" w- full px-1 py-2 animate-in fade-in-50 duration-1000 md:w-1/2 lg:w-1/4  lg:px-4"
+      className="px-1 py-1 animate-in fade-in-50 duration-1000 md:w-1/2  lg:w-1/3"
       style={{ opacity, pointerEvents }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
@@ -259,7 +258,11 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 />
               </div>
 
-              <div className="scrollbar-hide z-10 mb-4 h-56 overflow-y-auto border-b-2 border-solid border-gray-100 px-1">
+              <div
+                className="scrollbar-hide z-10 mb-4
+               h-56 overflow-y-auto border-b-2 border-solid
+              border-gray-100 px-1"
+              >
                 {selectedList.map((list: typeList) => {
                   return (
                     <button
@@ -313,209 +316,234 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
           {/* main tab contents goes here */}
           {!isFavMenuVisible && (
-            <div>
+            <div className=" ">
               <div
                 className={` ${
                   isList ? 'lens-folder-tab' : 'lens-folder-tab-empty'
                 }`}
               ></div>
               <div
-                style={{ position: 'relative', height: '360px' }}
-                className={`px-2 py-1
+                style={{
+                  position: 'relative'
+                  // height: '312px'
+                }}
+                className={`p-4
               ${isList ? 'lens-folder' : 'lens-post'}`}
               >
                 {/* card contents */}
-                <h1 className="w-full items-center py-2">
-                  <div className="flex w-full justify-between text-sm font-light text-black">
-                    {/* profile */}
-                    <a
-                      rel="noreferrer"
-                      href={`/profile/${post.profile.id}`}
-                      target="_blank"
-                    >
-                      <div
-                        onClick={() => {
-                          window.localStorage.setItem(
-                            'LENS_PROFILE',
-                            JSON.stringify(post.profile)
-                          );
-                        }}
-                        className="col-span-3 flex cursor-pointer justify-between"
-                      >
-                        <ImageProxied
-                          category="profile"
-                          title={`Loading from ${post.profile.picture?.original?.url}`}
-                          alt="Profile"
-                          height={40}
-                          width={40}
-                          objectFit="cover"
-                          className="h-12 w-12 cursor-pointer rounded-full"
-                          src={post.profile.picture?.original?.url}
-                        />
+                <div className="flex justify-between pb-3 text-sm text-black">
+                  {/* profile */}
+                  <a
+                    rel="noreferrer"
+                    href={`/profile/${post.profile.id}`}
+                    target="_blank"
+                  >
+                    <div className="flex justify-between">
+                      <ImageProxied
+                        category="profile"
+                        title={`Loading from ${post.profile.picture?.original?.url}`}
+                        alt="Profile"
+                        height={40}
+                        width={40}
+                        objectFit="cover"
+                        className="h-12 w-12 cursor-pointer rounded-full"
+                        src={post.profile.picture?.original?.url}
+                      />
 
-                        <div className="col-span-1 cursor-pointer pl-2">
-                          <p className=" ">
-                            {post.profile.name || post.profile.id}
-                          </p>
-                          <p className="font-light text-gray-400">
-                            @{post.profile.handle}
+                      <div className="pl-2 align-baseline text-xs">
+                        <div className="flex">
+                          {(post.profile.name || post.profile.id).trim() || '-'}
+                          <p
+                            style={{ fontSize: 10 }}
+                            className="pl-1   text-gray-500"
+                          >
+                            • {moment(post.createdAt).fromNow()}
                           </p>
                         </div>
-                      </div>
-                      {/* </a> */}
-                    </a>
-
-                    {/* profile menu */}
-                    <div className="dropdown relative inline-block cursor-pointer">
-                      <div className="items-center rounded py-2 font-semibold text-gray-700">
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/dots-vertical.svg"
-                          alt=""
-                          width={20}
-                          height={20}
-                        />
-                      </div>
-
-                      <div
-                        className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
-                       border-gray-200 
-                      bg-gray-50 text-lensBlack shadow-lg  shadow-gray-400 "
-                      >
-                        <p className="">
-                          <span
-                            className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                            // href="#"
-                          >
-                            Share
-                          </span>
-                        </p>
-
-                        <p className="">
-                          <a
-                            className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
-                            href="#"
-                          >
-                            Report
-                          </a>
-                        </p>
-
-                        <p className="">
-                          {lensProfile &&
-                            post.profile.id === lensProfile.id && (
-                              <span
-                                className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
-                                onClick={() => handleRemove(post.id)}
-                              >
-                                Remove
-                              </span>
-                            )}
+                        <p className="font-light text-gray-400">
+                          @{post.profile.handle}
                         </p>
                       </div>
                     </div>
+                  </a>
+
+                  {/* profile menu */}
+                  <div className="dropdown relative inline-block cursor-pointer">
+                    <div className="items-center rounded py-2 font-semibold text-gray-700">
+                      <ImageProxied
+                        category="profile"
+                        src="/assets/icons/dots-vertical.svg"
+                        alt=""
+                        width={20}
+                        height={20}
+                      />
+                    </div>
+
+                    <div
+                      className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
+                       border-gray-200 
+                      bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 "
+                    >
+                      <p className="">
+                        <span
+                          className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
+                          // href="#"
+                        >
+                          Share
+                        </span>
+                      </p>
+
+                      <p className="">
+                        <a
+                          className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
+                          href="#"
+                        >
+                          Report
+                        </a>
+                      </p>
+
+                      <p className="">
+                        {lensProfile && post.profile.id === lensProfile.id && (
+                          <span
+                            className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
+                            onClick={() => handleRemove(post.id)}
+                          >
+                            Remove
+                          </span>
+                        )}
+                      </p>
+                    </div>
                   </div>
-                </h1>
+                </div>
 
                 {/* <Link > */}
                 <a
                   rel="noreferrer"
                   target="_blank"
                   href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-                  onClick={() => {
-                    // TODO: fix this
-                    window.localStorage.setItem(
-                      'LENS_POST',
-                      JSON.stringify(post)
-                    );
-                  }}
                 >
                   {isList ? (
                     <ListImages postId={post.id} />
                   ) : (
-                    <div className="relative ">
-                      {/* link provided by the user */}
-                      {post.metadata.attributes[1]?.value && (
-                        <div
-                          style={{
-                            bottom: '5%'
-                          }}
-                          className="-top-30 absolute z-10  text-xs 
-                            text-white mix-blend-difference hover:text-lensGreen hover:mix-blend-difference"
-                          title="Jump straight to the original post 🌐"
-                        >
-                          <a
-                            target="_blank"
-                            rel="noreferrer"
-                            className=" justify-end"
-                            href={post.metadata.attributes[1]?.value}
+                    <ImageProxied
+                      category="post"
+                      height={'100px'}
+                      width={'250px'}
+                      objectFit="cover"
+                      className=" rounded-t-lg animate-in fade-in-50 duration-1000"
+                      src={post.metadata.media[0]?.original.url}
+                    />
+                  )}
+
+                  {/* subimage area  */}
+                  <div
+                    className={`
+                  
+                  ${!isList ? '-mt-2 ' : ''}
+                  
+                  flex items-center gap-1 rounded-b-lg bg-stone-100 p-2`}
+                  >
+                    {/* tags */}
+                    <div className="my-1">
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M8.3842 0.5H13.6449C14.6694 0.5 15.5 1.33056 15.5 2.35511V7.6158C15.5 8.1078 15.3046 8.57965 14.9567 8.92756L8.92755 14.9567C8.20309 15.6811 7.0285 15.6811 6.30404 14.9567L1.04335 9.69596C0.318884 8.9715 0.318884 7.79691 1.04335 7.07245L7.07245 1.04335C7.42035 0.695448 7.8922 0.5 8.3842 0.5Z"
+                          fill="#F8F8F8"
+                        />
+                        <path
+                          d="M12.7173 4.21021C12.7173 4.72249 12.3021 5.13777 11.7898 5.13777C11.2775 5.13777 10.8622 4.72249 10.8622 4.21021C10.8622 3.69794 11.2775 3.28266 11.7898 3.28266C12.3021 3.28266 12.7173 3.69794 12.7173 4.21021Z"
+                          fill="#F8F8F8"
+                        />
+                        <path
+                          d="M11.4417 3.86233H12.1374M11.4417 4.55799H12.1374M13.6449 0.5H8.38421C7.8922 0.5 7.42035 0.695448 7.07245 1.04335L1.04335 7.07245C0.318884 7.79691 0.318884 8.9715 1.04335 9.69596L6.30404 14.9567C7.0285 15.6811 8.20309 15.6811 8.92755 14.9567L14.9567 8.92755C15.3046 8.57965 15.5 8.1078 15.5 7.6158V2.35511C15.5 1.33056 14.6694 0.5 13.6449 0.5ZM12.7173 4.21021C12.7173 4.72249 12.3021 5.13777 11.7898 5.13777C11.2775 5.13777 10.8622 4.72249 10.8622 4.21021C10.8622 3.69794 11.2775 3.28266 11.7898 3.28266C12.3021 3.28266 12.7173 3.69794 12.7173 4.21021Z"
+                          stroke="black"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <div
+                      className=" scrollbar-hide scrollbar-thin scrollbar-lightgray-transparent flex items-center
+                      gap-1 overflow-auto
+                      text-right text-xs"
+                    >
+                      {[
+                        'product management',
+                        'unified modelling language',
+                        'deep algebraic neperian integration'
+                      ].map((tag: string) => {
+                        const tagValue = `${post.id}${tag}`;
+                        return (
+                          <div
+                            key={tagValue}
+                            style={{
+                              fontSize: '8px',
+                              lineHeight: '12px',
+                              paddingTop: '3px',
+                              paddingBottom: '3px'
+                            }}
+                            className="whitespace-nowrap
+                             rounded-full border border-black bg-white px-2 font-serif font-bold tracking-wider"
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                              strokeWidth="1.5"
-                              stroke="currentColor"
-                              className="h-6 w-6"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                d="M6.115 5.19l.319 1.913A6 6 0 008.11 10.36L9.75 12l-.387.775c-.217.433-.132.956.21 1.298l1.348 1.348c.21.21.329.497.329.795v1.089c0 .426.24.815.622 1.006l.153.076c.433.217.956.132 1.298-.21l.723-.723a8.7 8.7 0 002.288-4.042 1.087 1.087 0 00-.358-1.099l-1.33-1.108c-.251-.21-.582-.299-.905-.245l-1.17.195a1.125 1.125 0 01-.98-.314l-.295-.295a1.125 1.125 0 010-1.591l.13-.132a1.125 1.125 0 011.3-.21l.603.302a.809.809 0 001.086-1.086L14.25 7.5l1.256-.837a4.5 4.5 0 001.528-1.732l.146-.292M6.115 5.19A9 9 0 1017.18 4.64M6.115 5.19A8.965 8.965 0 0112 3c1.929 0 3.716.607 5.18 1.64"
-                              />
-                            </svg>
-                          </a>
+                            {tag.replace('-', ' ').toUpperCase()}
+                          </div>
+                        );
+                      })}
+
+                      {(!post.metadata.tags ||
+                        post.metadata.tags.length === 0) && (
+                        // !isList &&
+                        <div
+                          key={`${post.id}untagged`}
+                          className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
+                        >
+                          {/* untagged */}{' '}
                         </div>
                       )}
 
-                      <ImageProxied
-                        category="post"
-                        height={'400px'}
-                        width={'600px'}
-                        // width={'100%'}
-                        // height={'100%'}
-                        objectFit="cover"
-                        className=" w-full rounded-md  animate-in fade-in-50 duration-1000"
-                        src={post.metadata.media[0]?.original.url}
-                      />
+                      {/* <style>{`
+                      ::-webkit-scrollbar {
+                        width: 3px;
+                      }
+                      ::-webkit-scrollbar-thumb {
+                        background-color: rgba(0, 0, 0, 0.07);
+                        border-radius: 5px;
+                      }
+                      ::-webkit-scrollbar-thumb:hover {
+                        background-color: rgba(0, 0, 0, 0.5);
+                      }
+                      ::-webkit-scrollbar-track {
+                        background-color: transparent;
+                      }
+                    `}</style> */}
                     </div>
-                  )}
+                  </div>
 
-                  <ul className=" flex flex-wrap justify-end gap-1 pb-2 text-right text-xs">
-                    {post.metadata.tags.map((tag: string) => {
-                      const tagValue = `${post.id}${tag}`;
-                      return (
-                        <li
-                          key={tagValue}
-                          className=" rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
-                        >
-                          {tag.replace('-', ' ').toUpperCase()}
-                        </li>
-                      );
-                    })}
-
-                    {(!post.metadata.tags ||
-                      post.metadata.tags.length === 0) && (
-                      // !isList &&
-                      <li
-                        key={`${post.id}untagged`}
-                        className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
-                      >
-                        {/* untagged */}{' '}
-                      </li>
-                    )}
-                  </ul>
-
-                  <div className="mb-1">
-                    <p
+                  {/* titles  */}
+                  <div
+                    style={{
+                      height: '70px'
+                    }}
+                    className="mt-1"
+                  >
+                    <div
                       title={post.metadata.name || 'untitled'}
-                      className="text-light truncate text-ellipsis"
+                      className="truncate text-ellipsis font-serif
+                       text-sm"
                     >
                       {post.metadata.name === 'My private list' ? '🔒 ' : ''}
                       {post.metadata.name || 'untitled'}
-                    </p>
+                    </div>
                     <p
-                      className="my-1 overflow-auto text-xs font-thin text-gray-500"
+                      className="overflow-au to my-1 mb-3
+                       font-sans font-thin text-gray-700"
                       style={{
+                        fontSize: '10px',
                         height: '32px',
                         overflowY: 'scroll'
                       }}
@@ -523,7 +551,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       {!isList ? post.metadata.description || ' ' : <br />}
                       <style>{`
                       ::-webkit-scrollbar {
-                        width: 5px;
+                        width: 3px;
                       }
                       ::-webkit-scrollbar-thumb {
                         background-color: rgba(0, 0, 0, 0.07);
@@ -539,37 +567,38 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     </p>
                   </div>
                 </a>
-                {/* </Link> */}
 
                 {/* date and collected indicators*/}
-                <footer
-                  style={{ position: 'absolute', bottom: 0 }}
-                  className="grid grid-cols-3   items-center    py-2 text-xs text-black"
+                <div
+                  className="pb- flex
+                   w-full
+                   items-center justify-between 
+                  text-xs
+                   "
                 >
-                  <p className="mt-1 font-light text-gray-400">
-                    {moment(post.createdAt).format('MMM Do YY')}
-                  </p>
-                  <div className="flex items-end  font-light">
+                  <div className="flex">
                     <ImageProxied
                       category="profile"
                       src="/assets/icons/collect.svg"
                       alt="Collect"
                       title="Total amount of collects"
-                      width={20}
-                      height={20}
+                      width={15}
+                      height={15}
                     />
-                    {post.stats.totalAmountOfCollects}
-                  </div>
-
-                  {lensProfile && post.hasCollectedByMe && (
-                    // && post.metadata.attributes[0].value === 'post'
-                    <div
-                      title="You do own this item!"
-                      className="flex   cursor-default items-end rounded-md bg-amber-100 px-1 py-1 text-right text-xs "
-                    >
-                      COLLECTED
+                    <div className="font-serif font-black">
+                      {post.stats.totalAmountOfCollects}
                     </div>
-                  )}
+
+                    {lensProfile && post.hasCollectedByMe && (
+                      // && post.metadata.attributes[0].value === 'post'
+                      <div
+                        title="You do own this item!"
+                        className="flex   cursor-default items-end rounded-md bg-amber-100 px-1 py-1 text-right text-xs "
+                      >
+                        COLLECTED
+                      </div>
+                    )}
+                  </div>
 
                   {lensProfile && !post.hasCollectedByMe && !isPosting ? (
                     <button
@@ -577,10 +606,25 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         refreshLists(lensProfile?.id);
                         return setFavMenuVisible(!isListVisible);
                       }}
-                      className="flex text-right"
+                      className=" rounded-lg  bg-black  font-sans font-bold"
                     >
-                      <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                        +COLLECT
+                      <div
+                        className="flex items-center px-2 py-1
+                       text-xs "
+                      >
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.5 1C7.5 0.723858 7.27614 0.5 7 0.5C6.72386 0.5 6.5 0.723858 6.5 1L7.5 1ZM6.5 8.33333C6.5 8.60948 6.72386 8.83333 7 8.83333C7.27614 8.83333 7.5 8.60948 7.5 8.33333H6.5ZM10.0202 7.35355C10.2155 7.15829 10.2155 6.84171 10.0202 6.64645C9.82496 6.45118 9.50838 6.45118 9.31311 6.64645L10.0202 7.35355ZM7.4714 9.19526L7.11785 8.84171L7.4714 9.19526ZM6.5286 9.19526L6.88215 8.84171L6.5286 9.19526ZM4.68689 6.64645C4.49162 6.45118 4.17504 6.45118 3.97978 6.64645C3.78452 6.84171 3.78452 7.15829 3.97978 7.35355L4.68689 6.64645ZM1.5 9.66667C1.5 9.39052 1.27614 9.16667 1 9.16667C0.723858 9.16667 0.5 9.39052 0.5 9.66667H1.5ZM13.5 9.66667C13.5 9.39052 13.2761 9.16667 13 9.16667C12.7239 9.16667 12.5 9.39052 12.5 9.66667H13.5ZM11.908 12.782L11.681 12.3365H11.681L11.908 12.782ZM12.782 11.908L13.2275 12.135L12.782 11.908ZM1.21799 11.908L0.772484 12.135L1.21799 11.908ZM2.09202 12.782L1.86502 13.2275H1.86502L2.09202 12.782ZM6.5 1L6.5 8.33333H7.5L7.5 1L6.5 1ZM9.31311 6.64645L7.11785 8.84171L7.82496 9.54882L10.0202 7.35355L9.31311 6.64645ZM6.88215 8.84171L4.68689 6.64645L3.97978 7.35355L6.17504 9.54882L6.88215 8.84171ZM7.11785 8.84171C7.05276 8.9068 6.94724 8.9068 6.88215 8.84171L6.17504 9.54882C6.63065 10.0044 7.36935 10.0044 7.82496 9.54882L7.11785 8.84171ZM0.5 9.66667V9.8H1.5V9.66667H0.5ZM4.2 13.5H9.8V12.5H4.2V13.5ZM13.5 9.8V9.66667H12.5V9.8H13.5ZM9.8 13.5C10.3518 13.5 10.7957 13.5004 11.1543 13.4711C11.5187 13.4413 11.8388 13.3784 12.135 13.2275L11.681 12.3365C11.5493 12.4036 11.3755 12.4497 11.0729 12.4744C10.7645 12.4996 10.3683 12.5 9.8 12.5V13.5ZM12.5 9.8C12.5 10.3683 12.4996 10.7645 12.4744 11.0729C12.4497 11.3755 12.4036 11.5493 12.3365 11.681L13.2275 12.135C13.3784 11.8388 13.4413 11.5187 13.4711 11.1543C13.5004 10.7957 13.5 10.3518 13.5 9.8H12.5ZM12.135 13.2275C12.6054 12.9878 12.9878 12.6054 13.2275 12.135L12.3365 11.681C12.1927 11.9632 11.9632 12.1927 11.681 12.3365L12.135 13.2275ZM0.5 9.8C0.5 10.3518 0.499611 10.7957 0.528909 11.1543C0.558684 11.5187 0.62159 11.8388 0.772484 12.135L1.66349 11.681C1.5964 11.5493 1.55031 11.3755 1.52559 11.0729C1.50039 10.7645 1.5 10.3683 1.5 9.8H0.5ZM4.2 12.5C3.6317 12.5 3.23554 12.4996 2.92712 12.4744C2.62454 12.4497 2.45069 12.4036 2.31901 12.3365L1.86502 13.2275C2.16117 13.3784 2.48126 13.4413 2.84569 13.4711C3.20428 13.5004 3.6482 13.5 4.2 13.5V12.5ZM0.772484 12.135C1.01217 12.6054 1.39462 12.9878 1.86502 13.2275L2.31901 12.3365C2.03677 12.1927 1.8073 11.9632 1.66349 11.681L0.772484 12.135Z"
+                            fill="white"
+                          />
+                        </svg>
+                        <span className="mx-2 text-white ">Collect</span>
                       </div>
                     </button>
                   ) : (
@@ -634,7 +678,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       </div>
                     </>
                   )}
-                </footer>
+                </div>
               </div>
             </div>
           )}

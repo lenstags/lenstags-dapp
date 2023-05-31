@@ -18,14 +18,15 @@ export const TagsFilter = () => {
   };
 
   return (
-    <div className="lens-input z-20 my-4 flex ">
-      <span className="ml-4 font-semibold">Tags</span>
+    <div className=" relative  z-10 mb-4 flex h-auto w-full items-baseline rounded-lg bg-stone-100  py-2 ">
+      <span className="ml-4 font-serif">Tags</span>
       <div className="w-full border-0 pl-4 ">
         <CreatableSelect
           styles={{
             control: (baseStyles, state) => ({
               ...baseStyles,
               boxShadow: 'none',
+              backgroundColor: 'transparent',
               borderColor: 'transparent',
               '&:hover': {
                 borderColor: 'transparent'

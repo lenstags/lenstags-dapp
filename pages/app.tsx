@@ -94,19 +94,19 @@ const App: NextPage = () => {
     <>
       <Head>
         <title>Nata Social</title>
-         <meta property="og:title" content="We are Nata Social" />
- 
+        <meta property="og:title" content="We are Nata Social" />
+
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-         <meta property="og:image" content="banner.svg" />
- 
+        <meta property="og:image" content="banner.svg" />
+
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
         <meta property="og:locale" content="en_US" />
- 
+
         <script
           async
           defer
@@ -138,11 +138,11 @@ const App: NextPage = () => {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <div className="mt-6 h-full w-full items-center text-center">
+      {/* <div className="mt-6 h-full w-full items-center text-center">
         Coming soon™️{' '}
-      </div>
+      </div> */}
 
-      {false && (
+      {true && (
         <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
           {showWelcome ? (
             <div
@@ -206,14 +206,136 @@ const App: NextPage = () => {
               </div>
             </div>
           ) : (
-            <div className="container mx-auto h-64 w-11/12 px-6 py-10 md:w-4/5 ">
-              {/* <Profile /> */}
-              {/* <Tabs /> */}
-              <div className="mb-3">
-                <TagsFilter />
+            <>
+              {/* search bar */}
+              {/* <div className=" w-7/12"> */}
+              <div
+                className="fixed z-10
+                 bg-white px-4  pt-6"
+                style={{ width: '59%' }}
+              >
+                <div className="flex justify-end ">
+                  <input
+                    type="text"
+                    style={{ height: '40px' }}
+                    autoComplete="off"
+                    // value={valueListName}
+                    // onChange={handleChangeListName}
+                    className=" rounded-lg border border-stone-300 
+          bg-stone-100  px-3 py-1 
+          leading-none
+                      outline-none  md:w-1/3"
+                    name="tag-search-input"
+                    id="tag-search-input"
+                    // onKeyDown={handleKeyDown}
+                    placeholder="🔍 Search..."
+                  />
+                  <button
+                    style={{ height: '40px' }}
+                    className="ml-3 hidden rounded-lg  border border-solid border-stone-500 bg-stone-100 p-3  "
+                  >
+                    <svg
+                      width="20"
+                      height="18"
+                      viewBox="0 0 20 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M14 3L19 3M1 3L10 3M1 15L10 15M1 9H6M10 9H19M14 15H19M14 1V5M6 7V11M14 13V17"
+                        stroke="#4D4D4D"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </button>
+                </div>
+
+                <div className="mt-6 ">
+                  <TagsFilter />
+                </div>
+
+                {/* view options */}
+                <div className="  flex justify-between  rounded-t-lg bg-stone-100 p-4">
+                  <div className="flex gap-1  font-sans font-medium tracking-wide">
+                    <button
+                      // onClick={openConnectModal}
+                      className="rounded border border-solid
+                  border-black px-4 py-2 align-middle 
+                  text-white"
+                    >
+                      All
+                    </button>
+
+                    <button
+                      // onClick={openConnectModal}
+                      className="rounded border border-solid
+                  border-black bg-white px-4 py-2 
+                  align-middle text-black"
+                    >
+                      Lists
+                    </button>
+
+                    <button
+                      // onClick={openConnectModal}
+                      className="rounded border border-solid
+                  border-black bg-white px-4 py-2 
+                  align-middle text-black"
+                    >
+                      Posts
+                    </button>
+                  </div>
+
+                  <div className="flex gap-1  font-sans font-medium tracking-wide">
+                    <button
+                      // onClick={openConnectModal}
+                      className="rounded border border-solid
+                  border-black px-3 py-2 align-middle 
+                  text-white"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 16 16"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M7.68599 7.69005H8.31099M7.68599 8.31505H8.31099M7.68599 1.85672H8.31099M7.68599 2.48172H8.31099M7.68599 13.5234H8.31099M7.68599 14.1484H8.31099M1.85266 7.69005H2.47766M1.85266 8.31505H2.47766M1.85266 1.85672H2.47766M1.85266 2.48172H2.47766M1.85266 13.5234H2.47766M1.85266 14.1484H2.47766M13.5193 7.69005H14.1443M13.5193 8.31505H14.1443M13.5193 1.85672H14.1443M13.5193 2.48172H14.1443M13.5193 13.5234H14.1443M13.5193 14.1484H14.1443M8.83203 8.0026C8.83203 8.46284 8.45894 8.83594 7.9987 8.83594C7.53846 8.83594 7.16536 8.46284 7.16536 8.0026C7.16536 7.54237 7.53846 7.16927 7.9987 7.16927C8.45894 7.16927 8.83203 7.54237 8.83203 8.0026ZM8.83203 2.16927C8.83203 2.62951 8.45894 3.0026 7.9987 3.0026C7.53846 3.0026 7.16536 2.62951 7.16536 2.16927C7.16536 1.70903 7.53846 1.33594 7.9987 1.33594C8.45894 1.33594 8.83203 1.70903 8.83203 2.16927ZM8.83203 13.8359C8.83203 14.2962 8.45894 14.6693 7.9987 14.6693C7.53846 14.6693 7.16536 14.2962 7.16536 13.8359C7.16536 13.3757 7.53846 13.0026 7.9987 13.0026C8.45894 13.0026 8.83203 13.3757 8.83203 13.8359ZM2.9987 8.0026C2.9987 8.46284 2.6256 8.83594 2.16536 8.83594C1.70513 8.83594 1.33203 8.46284 1.33203 8.0026C1.33203 7.54237 1.70513 7.16927 2.16536 7.16927C2.6256 7.16927 2.9987 7.54237 2.9987 8.0026ZM2.9987 2.16927C2.9987 2.62951 2.6256 3.0026 2.16536 3.0026C1.70513 3.0026 1.33203 2.62951 1.33203 2.16927C1.33203 1.70903 1.70513 1.33594 2.16536 1.33594C2.6256 1.33594 2.9987 1.70903 2.9987 2.16927ZM2.9987 13.8359C2.9987 14.2962 2.6256 14.6693 2.16536 14.6693C1.70513 14.6693 1.33203 14.2962 1.33203 13.8359C1.33203 13.3757 1.70513 13.0026 2.16536 13.0026C2.6256 13.0026 2.9987 13.3757 2.9987 13.8359ZM14.6654 8.0026C14.6654 8.46284 14.2923 8.83594 13.832 8.83594C13.3718 8.83594 12.9987 8.46284 12.9987 8.0026C12.9987 7.54237 13.3718 7.16927 13.832 7.16927C14.2923 7.16927 14.6654 7.54237 14.6654 8.0026ZM14.6654 2.16927C14.6654 2.62951 14.2923 3.0026 13.832 3.0026C13.3718 3.0026 12.9987 2.62951 12.9987 2.16927C12.9987 1.70903 13.3718 1.33594 13.832 1.33594C14.2923 1.33594 14.6654 1.70903 14.6654 2.16927ZM14.6654 13.8359C14.6654 14.2962 14.2923 14.6693 13.832 14.6693C13.3718 14.6693 12.9987 14.2962 12.9987 13.8359C12.9987 13.3757 13.3718 13.0026 13.832 13.0026C14.2923 13.0026 14.6654 13.3757 14.6654 13.8359Z"
+                          stroke="white"
+                          stroke-width="1.5"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+
+                    <button
+                      // onClick={openConnectModal}
+                      className="rounded border border-solid
+                  border-black bg-white px-3 py-2 
+                  align-middle text-black"
+                    >
+                      <svg
+                        width="16"
+                        height="12"
+                        viewBox="0 0 16 12"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M4.66536 1H14.6654M4.66536 6H14.6654M4.66536 11H14.6654M1.33203 1H1.33286M1.33203 6H1.33286M1.33203 11H1.33286"
+                          stroke="#121212"
+                          stroke-width="2"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
-              <div className="container mx-auto ">
-                <div className="-mx-1 flex flex-wrap justify-center lg:-mx-4">
+
+              <div className="mt-48 bg-white  px-4 pt-8 ">
+                <div className="flex flex-wrap justify-center bg-stone-100 px-3 ">
                   {publications.length > 0 ? (
                     publications.map((post, index) => (
                       <ExplorerCard post={post} key={index} />
@@ -225,10 +347,11 @@ const App: NextPage = () => {
                   )}
                 </div>
               </div>
-              <div className="h-auto w-full">
+              <div className="relative h-auto  w-full bg-white px-4">
                 <Pagination />
               </div>
-            </div>
+              {/* </div> */}
+            </>
           )}
         </Layout>
       )}
