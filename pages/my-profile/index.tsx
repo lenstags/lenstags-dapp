@@ -162,9 +162,8 @@ const MyProfile: NextPage = () => {
       pageDescription="My profile"
       screen={true}
     >
-      <div className="w-full">
+      <div className=" w-full">
         {/* header */}
-
         <div
           style={{
             backgroundImage: `linear-gradient(to bottom, transparent, white), url('${lensProfile?.coverPicture?.original?.url}')`,
@@ -173,9 +172,9 @@ const MyProfile: NextPage = () => {
           }}
           className="pt-40"
         >
-          <div className="xs:mx-4 flex items-center sm:mx-4 md:mx-20 lg:mx-44 xl:mx-44">
+          <div className="mx-4 flex items-center sm:mx-6 ">
             <div
-              className="relative   items-center  rounded-full bg-white pt-1 text-center"
+              className="relative items-center  rounded-full bg-white pt-1 text-center"
               style={{ height: 130, width: 130 }}
             >
               <ImageProxied
@@ -203,7 +202,7 @@ const MyProfile: NextPage = () => {
           </div>
         </div>
 
-        <div className=" py-6 sm:mx-4 md:mx-20 lg:mx-44  xl:mx-44">
+        <div className=" mx-4  py-6 sm:mx-6 ">
           <div className="flex space-x-2 text-sm text-black">
             <button
               onClick={() => setTab('all')}
@@ -241,7 +240,7 @@ const MyProfile: NextPage = () => {
       </div>
 
       {/* contents */}
-      <div className=" mx-auto w-11/12 md:w-4/5  ">
+      <div className="mx-4 w-full sm:mx-6 ">
         <div className="  flex flex-wrap  ">
           {publications
             ? publications.map((post, index) => (

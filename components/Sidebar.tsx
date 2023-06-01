@@ -57,99 +57,108 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
           </div>
           {/* menu items */}
           <div className="font-serif text-base">
-            <div
-              className="flex h-12 items-center gap-1 border-l-4 border-l-teal-400
-             bg-white px-6 font-bold
+            <Link href={'/app'}>
+              <div
+                className="flex h-12 cursor-pointer items-center gap-1 border-l-4 border-l-teal-400 bg-white
+             px-6 font-bold hover:bg-teal-50
              
              "
-            >
-              <svg
-                width="22"
-                height="21"
-                viewBox="0 0 22 21"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
               >
-                <path
-                  d="M1.25 11.0028L10.2045 2.04826C10.6438 1.60892 11.3562 1.60891 11.7955 2.04825L20.75 11.0028M3.5 8.75276V18.8778C3.5 19.4991 4.00368 20.0028 4.625 20.0028H8.75V15.1278C8.75 14.5064 9.25368 14.0028 9.875 14.0028H12.125C12.7463 14.0028 13.25 14.5064 13.25 15.1278V20.0028H17.375C17.9963 20.0028 18.5 19.4991 18.5 18.8778V8.75276M7.25 20.0028H15.5"
-                  stroke="#121212"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="ml-2">Home</span>
-            </div>
+                <svg
+                  width="22"
+                  height="21"
+                  viewBox="0 0 22 21"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M1.25 11.0028L10.2045 2.04826C10.6438 1.60892 11.3562 1.60891 11.7955 2.04825L20.75 11.0028M3.5 8.75276V18.8778C3.5 19.4991 4.00368 20.0028 4.625 20.0028H8.75V15.1278C8.75 14.5064 9.25368 14.0028 9.875 14.0028H12.125C12.7463 14.0028 13.25 14.5064 13.25 15.1278V20.0028H17.375C17.9963 20.0028 18.5 19.4991 18.5 18.8778V8.75276M7.25 20.0028H15.5"
+                    stroke="#121212"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
 
-            <div
-              className="flex h-12 items-center  gap-1  border-l-4 border-l-stone-100
-             px-6"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+                <span className="ml-2">Home</span>
+              </div>
+            </Link>
+
+            <Link href={'/app'}>
+              <div
+                className="flex h-12 cursor-pointer items-center gap-1 border-l-4  border-l-stone-100 px-6
+             hover:bg-teal-50"
               >
-                <path
-                  d="M10 19C14.1926 19 17.7156 16.1332 18.7157 12.2529M10 19C5.80742 19 2.28442 16.1332 1.2843 12.2529M10 19C12.4853 19 14.5 14.9706 14.5 10C14.5 5.02944 12.4853 1 10 1M10 19C7.51472 19 5.5 14.9706 5.5 10C5.5 5.02944 7.51472 1 10 1M10 1C13.3652 1 16.299 2.84694 17.8431 5.58245M10 1C6.63481 1 3.70099 2.84694 2.15692 5.58245M17.8431 5.58245C15.7397 7.40039 12.9983 8.5 10 8.5C7.00172 8.5 4.26027 7.40039 2.15692 5.58245M17.8431 5.58245C18.5797 6.88743 19 8.39463 19 10C19 10.778 18.9013 11.5329 18.7157 12.2529M18.7157 12.2529C16.1334 13.6847 13.1619 14.5 10 14.5C6.8381 14.5 3.86662 13.6847 1.2843 12.2529M1.2843 12.2529C1.09871 11.5329 1 10.778 1 10C1 8.39463 1.42032 6.88743 2.15692 5.58245"
-                  stroke="#121212"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-              <span className="ml-2">Explore</span>
-            </div>
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M10 19C14.1926 19 17.7156 16.1332 18.7157 12.2529M10 19C5.80742 19 2.28442 16.1332 1.2843 12.2529M10 19C12.4853 19 14.5 14.9706 14.5 10C14.5 5.02944 12.4853 1 10 1M10 19C7.51472 19 5.5 14.9706 5.5 10C5.5 5.02944 7.51472 1 10 1M10 1C13.3652 1 16.299 2.84694 17.8431 5.58245M10 1C6.63481 1 3.70099 2.84694 2.15692 5.58245M17.8431 5.58245C15.7397 7.40039 12.9983 8.5 10 8.5C7.00172 8.5 4.26027 7.40039 2.15692 5.58245M17.8431 5.58245C18.5797 6.88743 19 8.39463 19 10C19 10.778 18.9013 11.5329 18.7157 12.2529M18.7157 12.2529C16.1334 13.6847 13.1619 14.5 10 14.5C6.8381 14.5 3.86662 13.6847 1.2843 12.2529M1.2843 12.2529C1.09871 11.5329 1 10.778 1 10C1 8.39463 1.42032 6.88743 2.15692 5.58245"
+                    stroke="#121212"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <span className="ml-2">Explore</span>
+              </div>
+            </Link>
 
-            {!lensProfile && (
+            {lensProfile && (
               <div className=" animate-in fade-in-50 duration-1000 ">
-                <div
-                  className="flex  h-12 items-center   gap-1 border-l-4
-              border-l-stone-100 px-6"
-                >
-                  <svg
-                    width="20"
-                    height="18"
-                    viewBox="0 0 20 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                <Link href={'/my-profile'}>
+                  <div
+                    className="flex  h-12 cursor-pointer   items-center gap-1
+              border-l-4 border-l-stone-100 px-6 hover:bg-teal-50"
                   >
-                    <path
-                      d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
-                      stroke="#121212"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                    <svg
+                      width="20"
+                      height="18"
+                      viewBox="0 0 20 18"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
+                        stroke="#121212"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
 
-                  <span className="ml-2">My inventory</span>
-                </div>
+                    <span className="ml-2">My inventory</span>
+                  </div>
+                </Link>
 
-                <div
-                  className="flex h-12 items-center gap-1 border-l-4
-              border-l-stone-100 px-6"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
+                <Link href={'/app'}>
+                  <div
+                    className="flex h-12 cursor-pointer items-center gap-1
+              border-l-4 border-l-stone-100  px-6 hover:bg-teal-50"
                   >
-                    <path
-                      d="M12.8574 15.0817C14.752 14.857 16.5789 14.4116 18.3117 13.7719C16.8749 12.177 16.0004 10.0656 16.0004 7.75V7.04919C16.0005 7.03281 16.0006 7.01641 16.0006 7C16.0006 3.68629 13.3143 1 10.0006 1C6.68685 1 4.00056 3.68629 4.00056 7L4.00036 7.75C4.00036 10.0656 3.12584 12.177 1.68904 13.7719C3.42197 14.4116 5.249 14.857 7.1437 15.0818M12.8574 15.0817C11.9205 15.1928 10.9671 15.25 10.0004 15.25C9.03373 15.25 8.08044 15.1929 7.1437 15.0818M12.8574 15.0817C12.9504 15.3711 13.0006 15.6797 13.0006 16C13.0006 17.6569 11.6574 19 10.0006 19C8.34371 19 7.00056 17.6569 7.00056 16C7.00056 15.6797 7.05075 15.3712 7.1437 15.0818M1.125 5.5C1.41228 3.78764 2.18309 2.23924 3.29224 1M16.7089 1C17.818 2.23924 18.5888 3.78764 18.8761 5.5"
-                      stroke="#121212"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12.8574 15.0817C14.752 14.857 16.5789 14.4116 18.3117 13.7719C16.8749 12.177 16.0004 10.0656 16.0004 7.75V7.04919C16.0005 7.03281 16.0006 7.01641 16.0006 7C16.0006 3.68629 13.3143 1 10.0006 1C6.68685 1 4.00056 3.68629 4.00056 7L4.00036 7.75C4.00036 10.0656 3.12584 12.177 1.68904 13.7719C3.42197 14.4116 5.249 14.857 7.1437 15.0818M12.8574 15.0817C11.9205 15.1928 10.9671 15.25 10.0004 15.25C9.03373 15.25 8.08044 15.1929 7.1437 15.0818M12.8574 15.0817C12.9504 15.3711 13.0006 15.6797 13.0006 16C13.0006 17.6569 11.6574 19 10.0006 19C8.34371 19 7.00056 17.6569 7.00056 16C7.00056 15.6797 7.05075 15.3712 7.1437 15.0818M1.125 5.5C1.41228 3.78764 2.18309 2.23924 3.29224 1M16.7089 1C17.818 2.23924 18.5888 3.78764 18.8761 5.5"
+                        stroke="#121212"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
 
-                  <span className="ml-2">Notifications</span>
-                </div>
+                    <span className="ml-2">Notifications</span>
+                  </div>
+                </Link>
 
                 <div className="   flex px-6 py-4  ">
                   <button className="w-full  rounded-lg px-4 py-2 align-middle text-white">

@@ -88,7 +88,7 @@ const ListImages: React.FC<listImageProps> = (props) => {
                       height: '95px'
                     }}
                     key={index}
-                    className="rounded-xl bg-red-400 "
+                    className="b g-red-400 rounded-xl "
                   >
                     <Image
                       className="
@@ -125,9 +125,9 @@ const ListImages: React.FC<listImageProps> = (props) => {
         <div
           style={{
             width: '100%',
-            height: '95px'
+            height: '94px'
           }}
-          className="rounded-xl bg-red-400 "
+          className="bg- red-400 rounded-xl "
         >
           <Image
             className="

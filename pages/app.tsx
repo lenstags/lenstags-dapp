@@ -207,13 +207,13 @@ const App: NextPage = () => {
           </div>
         ) : (
           <>
-            {/* search bar */}
-            {/* <div className=" w-7/12"> */}
+            {/* top bar */}
             <div
-              className="fixed  z-10
+              className="z- 10 fixed
                  bg-white px-4  pt-6"
               style={{ width: '59%' }}
             >
+              {/* search bar */}
               <div className="flex justify-end ">
                 <input
                   type="text"
@@ -251,12 +251,10 @@ const App: NextPage = () => {
                 </button>
               </div>
 
-              <div className="mt-6 ">
-                <TagsFilter />
-              </div>
+              <TagsFilter />
 
               {/* view options */}
-              <div className="  flex justify-between  rounded-t-lg bg-stone-100 p-4">
+              <div className="flex justify-between rounded-t-lg bg-stone-100 p-4">
                 <div className="flex gap-1  font-sans font-medium tracking-wide">
                   <button
                     // onClick={openConnectModal}
@@ -334,8 +332,9 @@ const App: NextPage = () => {
               </div>
             </div>
 
-            <div className="mt-48 bg-white  px-4 pt-8 ">
-              <div className="flex flex-wrap justify-center bg-stone-100 px-3 ">
+            {/* publications */}
+            <div className="relative -z-10 mt-48 bg-white  p-4 ">
+              <div className="flex flex-wrap justify-center rounded-b-lg bg-stone-100 px-3 pb-6 ">
                 {publications.length > 0 ? (
                   publications.map((post, index) => (
                     <ExplorerCard post={post} key={index} />
@@ -347,10 +346,11 @@ const App: NextPage = () => {
                 )}
               </div>
             </div>
-            <div className="relative h-auto  w-full bg-white px-4">
+
+            {/* pagination */}
+            <div className="h-a uto  w-full  bg-white px-4 align-bottom">
               <Pagination />
             </div>
-            {/* </div> */}
           </>
         )}
       </Layout>

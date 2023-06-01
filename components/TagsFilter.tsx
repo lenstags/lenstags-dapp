@@ -18,8 +18,8 @@ export const TagsFilter = () => {
   };
 
   return (
-    <div className=" relative  z-10 mb-4 flex h-auto w-full items-baseline rounded-lg bg-stone-100  py-2 ">
-      <span className="ml-4 font-serif">Tags</span>
+    <div className="my-6 mb-4 flex h-auto w-full items-baseline rounded-lg bg-stone-100  py-1 ">
+      <span className="ml-4 font-serif">Tagss</span>
       <div className="w-full border-0 pl-4 ">
         <CreatableSelect
           styles={{
