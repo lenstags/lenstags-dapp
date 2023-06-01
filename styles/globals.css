@@ -265,7 +265,7 @@ figcaption {
 
 .scrollbar-thin::-webkit-scrollbar {
   /* width: 10px; */
-  height: 2px;
+  height: 4px;
  
 }
 
@@ -282,10 +282,6 @@ figcaption {
   --scrollbar-track-color: transparent;
 }
 
-
-
-
-
 @media screen and (-webkit-min-device-pixel-ratio: 0) {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
@@ -294,7 +290,7 @@ figcaption {
     display: block;
   }
   .scrollbar-hide::-webkit-scrollbar-thumb {
-    background-color:rgb(45 212 191);
+    background-color:lightgray;
     border-radius: 4px;
   }
   .scrollbar-hide::-webkit-scrollbar-track {

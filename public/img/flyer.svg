@@ -40,7 +40,7 @@
 <line x1="1097.58" y1="-23" x2="1097.58" y2="575" stroke="black" stroke-opacity="0.3"/>
 </g>
 <g opacity="0.14">
-<line x1="-31.2567" y1="574.549" x2="1572.55" y2="574.549" stroke="#868585" stroke-opacity="0.4" stroke-width="0.902081"/>
+<line x1="-31.2567" y1="574.549" x2="1572.55" y2="574.549" stroke="#868585" stroke-opacity="0.4" strokeWidth="0.902081"/>
 <line x1="241.727" y1="575" x2="241.727" y2="1173" stroke="black" stroke-opacity="0.3"/>
 <line x1="187.779" y1="575" x2="187.779" y2="1173" stroke="black" stroke-opacity="0.3"/>
 <line x1="133.83" y1="575" x2="133.83" y2="1173" stroke="black" stroke-opacity="0.3"/>
