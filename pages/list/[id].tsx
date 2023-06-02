@@ -89,28 +89,25 @@ export default function ListDetails() {
                       height={20}
                     />
                   </div>
-                  <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
-                    <li className="">
-                      <a
-                        className="whitespace-no-wrap block rounded-t-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                        href="#"
-                      >
-                        Share
-                      </a>
-                    </li>
-                    <li className="">
-                      <a
-                        className="whitespace-no-wrap block rounded-b-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                        href="#"
-                      >
-                        Report
-                      </a>
-                    </li>
-                  </ul>
+                  <div className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
+                    <a
+                      className="whitespace-no-wrap block rounded-t-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
+                      href="#"
+                    >
+                      Share
+                    </a>
+                    <a
+                      className="whitespace-no-wrap block rounded-b-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
+                      href="#"
+                    >
+                      Report
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </header>
+
           {/* body */}
           <div className="relative -top-20 flex">
             <div className="w-2/3 px-14 pt-4">
@@ -306,7 +303,7 @@ export default function ListDetails() {
                   </svg>
                   {post.metadata.name} tags
                 </p>
-                <p className="mt-2 text-xs">
+                <div className="mt-2 text-xs">
                   <span className=" text-xs ">
                     <ul className="flex origin-center flex-wrap place-items-center content-center items-center justify-center gap-1  self-center py-2 text-xs">
                       {tagsList.map((tag: string) => (
@@ -319,7 +316,7 @@ export default function ListDetails() {
                       ))}
                     </ul>
                   </span>
-                </p>
+                </div>
               </div>
             </div>
           </div>
