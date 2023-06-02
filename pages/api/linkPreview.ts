@@ -13,6 +13,11 @@ export default async function handler(
   res: NextApiResponse<Data>
 ) {
   const { AUTH_LINKPREVIEW_KEY } = envConfig;
+
+  if (!AUTH_LINKPREVIEW_KEY) {
+    console.warn('Missing AUTH_LINKPREVIEW_KEY ', AUTH_LINKPREVIEW_KEY);
+  }
+
   const { url } = req.query;
   const fetchUrl = `https://api.linkpreview.net/?key=${AUTH_LINKPREVIEW_KEY}&q=${url}`;
 

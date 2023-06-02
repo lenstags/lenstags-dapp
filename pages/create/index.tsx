@@ -15,6 +15,7 @@ import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { DotWave } from '@uiball/loaders';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -65,6 +66,7 @@ const Create: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [loadingTLDR, setLoadingTLDR] = useState(false);
   const [loadingIA, setLoadingIA] = useState(false);
+  const [loadingLP, setLoadingLP] = useState(false);
   const [selectedOption, setSelectedOption] = useState([]);
   const [plainText, setPlainText] = useState('');
 
@@ -91,8 +93,10 @@ const Create: NextPage = () => {
   }
 
   const fetchLinkPreview = async (url: string) => {
+    setLoadingLP(true);
     const response = await fetch(`/api/linkPreview?url=${url}`);
     const jsonResponse = await response.json();
+    setLoadingLP(false);
     return jsonResponse.data;
   };
 
@@ -137,10 +141,16 @@ const Create: NextPage = () => {
       }
 
       const data = await fetchLinkPreview(event.target.value);
+
       setSourceUrl(event.target.value);
-      setTitle(data.title as string);
-      setImageURL(data.image as string);
-      setEditorContents(data.description as string);
+
+      if (data) {
+        setTitle(data.title as string);
+        setImageURL(data.image as string);
+        setEditorContents(data.description as string);
+      } else {
+        console.log('No link preview');
+      }
     },
     2000
   );
@@ -272,30 +282,13 @@ const Create: NextPage = () => {
 
             <button
               onClick={handleIAImage}
-              className="flex w-1/6 items-center justify-center rounded-md bg-black px-1 py-2 text-center text-xs text-white"
+              className="flex w-1/6 items-center justify-center rounded-md bg-black px-1 py-2 text-center font-serif text-xs text-white"
             >
-              Generate
+              GENERATE
               {loadingIA && (
-                <svg
-                  className="ml-2 h-5 w-5 animate-spin items-center"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
+                <div className="ml-2">
+                  <DotWave size={22} color="#FFFFFF" />
+                </div>
               )}
             </button>
           </div>
@@ -372,7 +365,7 @@ const Create: NextPage = () => {
           <div className="w-10/12">
             <input
               autoComplete="false"
-              className="lens-input w-full"
+              className="lens-input outl ine-none w-full"
               type="text"
               name="link"
               id="link"
@@ -380,6 +373,11 @@ const Create: NextPage = () => {
               onChange={handleInputChange}
             />
           </div>
+          {loadingLP && (
+            <div className="ml-2">
+              <DotWave size={22} color="#231F20" />
+            </div>
+          )}
         </div>
 
         <div className="mb-4 flex items-center">
@@ -413,31 +411,35 @@ const Create: NextPage = () => {
           </div>
 
           <button
-            className="ml-2 flex w-2/12 items-center rounded-md bg-gray-100 p-2 text-center text-xs text-black"
+            className="ml-2 flex w-2/12 items-center justify-center whitespace-nowrap rounded-md
+             bg-black p-2 text-center font-serif text-xs text-white"
             onClick={generateTLDR}
           >
-            Make TLDR
+            GENERATE TLDR
             {loadingTLDR && (
-              <svg
-                className="ml-2 h-5 w-5 animate-spin items-center"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
+              // <svg
+              //   className="ml-2 h-5 w-5 animate-spin items-center"
+              //   xmlns="http://www.w3.org/2000/svg"
+              //   fill="none"
+              //   viewBox="0 0 24 24"
+              // >
+              //   <circle
+              //     className="opacity-25"
+              //     cx="12"
+              //     cy="12"
+              //     r="10"
+              //     stroke="currentColor"
+              //     strokeWidth="4"
+              //   ></circle>
+              //   <path
+              //     className="opacity-75"
+              //     fill="currentColor"
+              //     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              //   ></path>
+              // </svg>
+              <div className="ml-2">
+                <DotWave size={22} color="#FFFFFF" />
+              </div>
             )}
           </button>
         </div>
@@ -510,32 +512,12 @@ const Create: NextPage = () => {
                   </div>
                 </button>
               ) : (
-                <button
-                  // disabled={loading}
-                  className="flex cursor-default align-middle"
-                >
-                  <div className=" flex items-center rounded-lg border-2 bg-white text-gray-400">
-                    <svg
-                      className="ml-4 h-5 w-5 animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    <div className="py-2 pl-2 pr-4 text-xl">Posting </div>
+                <button className="flex cursor-default align-middle">
+                  <div className=" flex items-center rounded-lg border-2 bg-black font-serif text-white">
+                    <div className="py-2 pl-4 pr-4 ">Posting</div>
+                    <div className="mr-2">
+                      <DotWave size={22} color="#FFFFFF" />
+                    </div>
                   </div>
                 </button>
               )}

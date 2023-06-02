@@ -65,7 +65,7 @@ const OtherProfile: NextPage = () => {
       pageDescription="Profile"
       screen={true}
     >
-      <div className="w-full">
+      <div className="w-full px-6">
         {/* header */}
         <div
           style={{
@@ -75,7 +75,7 @@ const OtherProfile: NextPage = () => {
           }}
           className="pt-40"
         >
-          <div className="xs:mx-4 flex items-center sm:mx-4 md:mx-20 lg:mx-44 xl:mx-44">
+          <div className="flex items-center px-6">
             <div
               className="relative   items-center  rounded-full bg-white pt-1 text-center"
               style={{ height: 130, width: 130 }}
@@ -167,7 +167,7 @@ const OtherProfile: NextPage = () => {
       </div>
 
       {/* contents */}
-      <div className=" mx-auto w-11/12  md:w-4/5  ">
+      <div className="px-6">
         <div className="  flex flex-wrap  ">
           {publications
             ? publications.map((post, index) => (

@@ -472,28 +472,32 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       gap-1 overflow-auto
                       text-right text-xs"
                     >
-                      {[
-                        'product management',
-                        'unified modelling language',
-                        'deep algebraic neperian integration'
-                      ].map((tag: string) => {
-                        const tagValue = `${post.id}${tag}`;
-                        return (
-                          <div
-                            key={tagValue}
-                            style={{
-                              fontSize: '8px',
-                              lineHeight: '12px',
-                              paddingTop: '3px',
-                              paddingBottom: '3px'
-                            }}
-                            className="whitespace-nowrap
+                      {
+                        // [
+                        //   'product management',
+                        //   'unified modelling language',
+                        //   'deep algebraic neperian integration'
+                        // ].
+
+                        post.metadata.tags.map((tag: string) => {
+                          const tagValue = `${post.id}${tag}`;
+                          return (
+                            <div
+                              key={tagValue}
+                              style={{
+                                fontSize: '8px',
+                                lineHeight: '12px',
+                                paddingTop: '3px',
+                                paddingBottom: '3px'
+                              }}
+                              className="whitespace-nowrap
                              rounded-full border border-black bg-white px-2 font-serif font-bold tracking-wider"
-                          >
-                            {tag.replace('-', ' ').toUpperCase()}
-                          </div>
-                        );
-                      })}
+                            >
+                              {tag.replace('-', ' ').toUpperCase()}
+                            </div>
+                          );
+                        })
+                      }
 
                       {(!post.metadata.tags ||
                         post.metadata.tags.length === 0) && (
@@ -588,17 +592,17 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     <div className="font-serif font-black">
                       {post.stats.totalAmountOfCollects}
                     </div>
-
-                    {lensProfile && post.hasCollectedByMe && (
-                      // && post.metadata.attributes[0].value === 'post'
-                      <div
-                        title="You do own this item!"
-                        className="flex   cursor-default items-end rounded-md bg-amber-100 px-1 py-1 text-right text-xs "
-                      >
-                        COLLECTED
-                      </div>
-                    )}
                   </div>
+
+                  {lensProfile && post.hasCollectedByMe && (
+                    // && post.metadata.attributes[0].value === 'post'
+                    <div
+                      title="You do own this item!"
+                      className="flex   cursor-default items-end rounded-md bg-teal-100 px-2 py-1 text-right text-xs "
+                    >
+                      COLLECTED
+                    </div>
+                  )}
 
                   {lensProfile && !post.hasCollectedByMe && !isPosting ? (
                     <button
@@ -606,7 +610,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                         refreshLists(lensProfile?.id);
                         return setFavMenuVisible(!isListVisible);
                       }}
-                      className=" rounded-lg  bg-black  font-sans font-bold"
+                      className="  rounded-lg bg-black font-sans font-bold"
                     >
                       <div
                         className="flex items-center px-2 py-1

@@ -162,7 +162,7 @@ const MyProfile: NextPage = () => {
       pageDescription="My profile"
       screen={true}
     >
-      <div className=" w-full">
+      <div className="w-full px-6">
         {/* header */}
         <div
           style={{
@@ -240,7 +240,7 @@ const MyProfile: NextPage = () => {
       </div>
 
       {/* contents */}
-      <div className="mx-4 w-full sm:mx-6 ">
+      <div className="  w-full px-6">
         <div className="  flex flex-wrap  ">
           {publications
             ? publications.map((post, index) => (
