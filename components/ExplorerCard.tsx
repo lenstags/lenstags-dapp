@@ -427,106 +427,61 @@ const ExploreCard: FC<Props> = ({ post }) => {
                   ) : (
                     <ImageProxied
                       category="post"
-                      height={'100px'}
-                      width={'250px'}
                       objectFit="cover"
-                      className=" rounded-t-lg animate-in fade-in-50 duration-1000"
+                      width={'400px'}
+                      height={'200px'}
+                      className="rounded-lg animate-in fade-in-50 duration-1000"
                       src={post.metadata.media[0]?.original.url}
                     />
                   )}
 
-                  {/* subimage area  */}
-                  <div
+                  {/* subimage & tags area  */}
+                  {/* <div
                     className={`
-                  
                   ${!isList ? '-mt-2 ' : ''}
-                  
                   flex items-center gap-1 rounded-b-lg bg-stone-100 p-2`}
                   >
-                    {/* tags */}
                     <div className="my-1">
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M8.3842 0.5H13.6449C14.6694 0.5 15.5 1.33056 15.5 2.35511V7.6158C15.5 8.1078 15.3046 8.57965 14.9567 8.92756L8.92755 14.9567C8.20309 15.6811 7.0285 15.6811 6.30404 14.9567L1.04335 9.69596C0.318884 8.9715 0.318884 7.79691 1.04335 7.07245L7.07245 1.04335C7.42035 0.695448 7.8922 0.5 8.3842 0.5Z"
-                          fill="#F8F8F8"
-                        />
-                        <path
-                          d="M12.7173 4.21021C12.7173 4.72249 12.3021 5.13777 11.7898 5.13777C11.2775 5.13777 10.8622 4.72249 10.8622 4.21021C10.8622 3.69794 11.2775 3.28266 11.7898 3.28266C12.3021 3.28266 12.7173 3.69794 12.7173 4.21021Z"
-                          fill="#F8F8F8"
-                        />
-                        <path
-                          d="M11.4417 3.86233H12.1374M11.4417 4.55799H12.1374M13.6449 0.5H8.38421C7.8922 0.5 7.42035 0.695448 7.07245 1.04335L1.04335 7.07245C0.318884 7.79691 0.318884 8.9715 1.04335 9.69596L6.30404 14.9567C7.0285 15.6811 8.20309 15.6811 8.92755 14.9567L14.9567 8.92755C15.3046 8.57965 15.5 8.1078 15.5 7.6158V2.35511C15.5 1.33056 14.6694 0.5 13.6449 0.5ZM12.7173 4.21021C12.7173 4.72249 12.3021 5.13777 11.7898 5.13777C11.2775 5.13777 10.8622 4.72249 10.8622 4.21021C10.8622 3.69794 11.2775 3.28266 11.7898 3.28266C12.3021 3.28266 12.7173 3.69794 12.7173 4.21021Z"
-                          stroke="black"
-                          strokeLinecap="round"
-                        />
-                      </svg>
+                      <ImageProxied
+                        src="/assets/icons/tag.svg"
+                        category="post"
+                        width={16}
+                        height={16}
+                      />
                     </div>
                     <div
                       className=" scrollbar-hide scrollbar-thin scrollbar-lightgray-transparent flex items-center
                       gap-1 overflow-auto
                       text-right text-xs"
                     >
-                      {
-                        // [
-                        //   'product management',
-                        //   'unified modelling language',
-                        //   'deep algebraic neperian integration'
-                        // ].
-
-                        post.metadata.tags.map((tag: string) => {
-                          const tagValue = `${post.id}${tag}`;
-                          return (
-                            <div
-                              key={tagValue}
-                              style={{
-                                fontSize: '8px',
-                                lineHeight: '12px',
-                                paddingTop: '3px',
-                                paddingBottom: '3px'
-                              }}
-                              className="whitespace-nowrap
+                      {post.metadata.tags.map((tag: string) => {
+                        const tagValue = `${post.id}${tag}`;
+                        return (
+                          <div
+                            key={tagValue}
+                            style={{
+                              fontSize: '8px',
+                              lineHeight: '12px',
+                              paddingTop: '3px',
+                              paddingBottom: '3px'
+                            }}
+                            className="whitespace-nowrap
                              rounded-full border border-black bg-white px-2 font-serif font-bold tracking-wider"
-                            >
-                              {tag.replace('-', ' ').toUpperCase()}
-                            </div>
-                          );
-                        })
-                      }
+                          >
+                            {tag.replace('-', ' ').toUpperCase()}
+                          </div>
+                        );
+                      })}
 
                       {(!post.metadata.tags ||
                         post.metadata.tags.length === 0) && (
-                        // !isList &&
                         <div
                           key={`${post.id}untagged`}
                           className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
-                        >
-                          {/* untagged */}{' '}
-                        </div>
+                        ></div>
                       )}
-
-                      {/* <style>{`
-                      ::-webkit-scrollbar {
-                        width: 3px;
-                      }
-                      ::-webkit-scrollbar-thumb {
-                        background-color: rgba(0, 0, 0, 0.07);
-                        border-radius: 5px;
-                      }
-                      ::-webkit-scrollbar-thumb:hover {
-                        background-color: rgba(0, 0, 0, 0.5);
-                      }
-                      ::-webkit-scrollbar-track {
-                        background-color: transparent;
-                      }
-                    `}</style> */}
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* titles  */}
                   <div
@@ -580,7 +535,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                   text-xs
                    "
                 >
-                  <div className="flex">
+                  <div className="flex rounded-md bg-stone-100 px-3 py-1">
                     <ImageProxied
                       category="profile"
                       src="/assets/icons/collect.svg"
@@ -589,8 +544,20 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       width={15}
                       height={15}
                     />
-                    <div className="font-serif font-black">
+                    <div className="ml-1 mr-3 font-serif font-black">
                       {post.stats.totalAmountOfCollects}
+                    </div>
+
+                    <ImageProxied
+                      category="profile"
+                      src="/assets/icons/comments.svg"
+                      alt="Comments"
+                      title="Comments"
+                      width={15}
+                      height={15}
+                    />
+                    <div className="ml-1 font-serif font-black">
+                      {post.stats.totalComments || 0}
                     </div>
                   </div>
 
@@ -598,7 +565,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     // && post.metadata.attributes[0].value === 'post'
                     <div
                       title="You do own this item!"
-                      className="flex   cursor-default items-end rounded-md bg-teal-100 px-2 py-1 text-right text-xs "
+                      className="flex cursor-default items-end  rounded-md bg-teal-300 px-2 py-1 text-right font-serif text-xs font-bold "
                     >
                       COLLECTED
                     </div>
@@ -628,7 +595,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
                             fill="white"
                           />
                         </svg>
-                        <span className="mx-2 text-white ">Collect</span>
+                        <span className="ml-2 mr-1 font-serif font-bold text-white ">
+                          COLLECT
+                        </span>
                       </div>
                     </button>
                   ) : (

@@ -82,27 +82,14 @@ const ListImages: React.FC<listImageProps> = (props) => {
             {URLImages.map((urlImage: string, index: number) => {
               return (
                 <SwiperSlide key={index}>
-                  <div
-                    style={{
-                      width: '100%',
-                      height: '95px'
-                    }}
-                    key={index}
-                    className="b g-red-400 rounded-xl "
-                  >
+                  <div key={index} className="rounded-lg">
                     <Image
-                      className="
-                        rounded-t-xl
-                        "
-                      // border-l-4 border-r-4 border-t-4
-                      // border-l-stone-100
-                      // border-r-stone-100
-                      // border-t-stone-100
+                      className="rounded-lg"
                       src={urlImage}
                       alt=""
                       objectFit="cover"
-                      width={'250px'}
-                      height={'100px'}
+                      width={'400px'}
+                      height={'200px'}
                     />
                   </div>
                 </SwiperSlide>
@@ -122,28 +109,14 @@ const ListImages: React.FC<listImageProps> = (props) => {
         // />
         // )
 
-        <div
-          style={{
-            width: '100%',
-            height: '94px'
-          }}
-          className="bg- red-400 rounded-xl "
-        >
-          <Image
-            className="
-          rounded-t-xl
-          "
-            // border-l-4 border-r-4 border-t-4
-            // border-l-stone-100
-            // border-r-stone-100
-            // border-t-stone-100
-            src={DEFAULT_IMAGE_POST}
-            alt=""
-            objectFit="cover"
-            width={'250px'}
-            height={'100px'}
-          />
-        </div>
+        <Image
+          className="rounded-lg"
+          src={DEFAULT_IMAGE_POST}
+          alt=""
+          objectFit="cover"
+          width={'400px'}
+          height={'200px'}
+        />
       )}
     </>
   );

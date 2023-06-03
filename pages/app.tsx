@@ -207,32 +207,30 @@ const App: NextPage = () => {
           </div>
         ) : (
           <>
-            {/* top bar */}
+            {/* top bar container*/}
             <div
-              className="z- 10 fixed
-                 bg-white px-4  pt-6"
+              className="h-50 fixed top-0 z-10 w-full
+                 bg-white px-4 pt-4"
               style={{ width: '59%' }}
             >
               {/* search bar */}
               <div className="flex justify-end ">
                 <input
                   type="text"
-                  style={{ height: '40px' }}
                   autoComplete="off"
                   // value={valueListName}
                   // onChange={handleChangeListName}
-                  className=" rounded-lg border border-stone-300 
-          bg-stone-100  px-3 py-1 
-          leading-none
-                      outline-none  md:w-1/3"
+                  className="rounded-lg border
+                  border-black  bg-stone-100 px-3 py-1
+                  leading-none outline-none  md:w-1/3"
                   name="tag-search-input"
                   id="tag-search-input"
                   // onKeyDown={handleKeyDown}
                   placeholder="🔍 Search..."
                 />
                 <button
-                  style={{ height: '40px' }}
-                  className="ml-3 hidden rounded-lg  border border-solid border-stone-500 bg-stone-100 p-3  "
+                  className="hid den ml-2 rounded-lg border  border-solid border-black bg-stone-100
+                   p-2"
                 >
                   <svg
                     width="20"
@@ -254,12 +252,12 @@ const App: NextPage = () => {
               <TagsFilter />
 
               {/* view options */}
-              <div className="flex justify-between rounded-t-lg bg-stone-100 p-4">
+              <div className="mt-2 flex justify-between rounded-t-lg bg-stone-100 p-4">
                 <div className="flex gap-1  font-sans font-medium tracking-wide">
                   <button
                     // onClick={openConnectModal}
-                    className="rounded border border-solid
-                  border-black px-4 py-2 align-middle 
+                    className="rounded border
+                  border-solid border-black px-4 py-1 align-middle 
                   text-white"
                   >
                     All
@@ -267,8 +265,8 @@ const App: NextPage = () => {
 
                   <button
                     // onClick={openConnectModal}
-                    className="rounded border border-solid
-                  border-black bg-white px-4 py-2 
+                    className="py -2 rounded
+                  border border-solid border-black bg-white px-4 
                   align-middle text-black"
                   >
                     Lists
@@ -276,8 +274,8 @@ const App: NextPage = () => {
 
                   <button
                     // onClick={openConnectModal}
-                    className="rounded border border-solid
-                  border-black bg-white px-4 py-2 
+                    className="py -2 rounded
+                  border border-solid border-black bg-white px-4 
                   align-middle text-black"
                   >
                     Posts
@@ -287,8 +285,8 @@ const App: NextPage = () => {
                 <div className="flex gap-1  font-sans font-medium tracking-wide">
                   <button
                     // onClick={openConnectModal}
-                    className="rounded border border-solid
-                  border-black px-3 py-2 align-middle 
+                    className="py -2 rounded
+                  border border-solid border-black px-3 align-middle 
                   text-white"
                   >
                     <svg
@@ -309,8 +307,8 @@ const App: NextPage = () => {
 
                   <button
                     // onClick={openConnectModal}
-                    className="rounded border border-solid
-                  border-black bg-white px-3 py-2 
+                    className="py -2 rounded
+                  border border-solid border-black bg-white px-3 
                   align-middle text-black"
                   >
                     <svg
@@ -333,7 +331,7 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="relative -z-10 mt-48 bg-white  p-4 ">
+            <div className=" h-screen px-4 pt-48">
               <div className="flex flex-wrap justify-center rounded-b-lg bg-stone-100 px-3 pb-6 ">
                 {publications.length > 0 ? (
                   publications.map((post, index) => (
@@ -345,11 +343,11 @@ const App: NextPage = () => {
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* pagination */}
-            <div className="h-a uto  w-full  bg-white px-4 align-bottom">
-              <Pagination />
+              {/* pagination */}
+              <div className="   h-auto w-full  bg-white px-4 ">
+                <Pagination />
+              </div>
             </div>
           </>
         )}
