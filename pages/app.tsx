@@ -14,7 +14,6 @@ import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { explore } from '@lib/lens/explore-publications';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import Sidebar from 'components/Sidebar';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -90,6 +89,64 @@ const App: NextPage = () => {
   const handleWelcomeClick = () => {
     setShowWelcome(false);
   };
+
+  // content filtering
+  // const fetchMyCollects = async () => {
+  //   if (!lp) {
+  //     return;
+  //   }
+
+  //   const res = await getPublications(
+  //     [PublicationTypes.Post],
+  //     undefined,
+  //     lp?.ownedBy
+  //   );
+  //   console.log('RES ', res);
+  //   // TODO LENS ISSUE: APPID MISMATCHES SOURCES PARAM
+  //   setPublications(res.items.filter((i) => i.appId === APP_NAME)); // TODO PAGINATION CURSOR
+  // };
+
+  // const fetchContentLists = async () => {
+  //   const res = await getPublications(
+  //     [PublicationTypes.Post],
+  //     lensProfile.id
+  //   );
+  //   setPublications(
+  //     res.items.filter(
+  //       (r) =>
+  //         (r.profile.id === lensProfile?.id &&
+  //           r.metadata.attributes[0].value === 'list') ||
+  //         r.metadata.attributes[0].value === 'privateDefaultList' // FIXME internalPublicationType
+  //       //     .attributes?.find((attribute) => attribute.key === 'internalPublicationType')?.value || '',
+  //     )
+  //   ); // TODO PAGINATION CURSOR
+  // };
+
+  // const fetchAll = async () => {
+  //   // my pubs+lists
+  //   const myPublications = await getPublications(
+  //     [PublicationTypes.Post],
+  //     lensProfile.id
+  //   );
+  //   // my collects
+  //   const myCollects = await getPublications(
+  //     [PublicationTypes.Post],
+  //     undefined,
+  //     lp?.ownedBy
+  //   );
+  //   const filteredCollects = myCollects.items.filter(
+  //     (i) => i.appId === APP_NAME
+  //   ); // TODO this is because sources!=appId
+
+  //   const array1 = myPublications.items;
+  //   const array2 = filteredCollects;
+  //   const mergedArray = [...array1, ...array2].reduce(
+  //     (a: any, b: any) => (a.some((o: any) => o.id === b.id) ? a : [...a, b]),
+  //     []
+  //   );
+
+  //   setPublications(mergedArray); // TODO PAGINATION CURSOR
+  // };
 
   return (
     <>
@@ -255,7 +312,7 @@ const App: NextPage = () => {
               <div className="mt-2 flex justify-between rounded-t-lg bg-stone-100 p-4">
                 <div className="flex gap-1  font-sans font-medium tracking-wide">
                   <button
-                    // onClick={openConnectModal}
+                    // onClick={fetchContentAll}
                     className="rounded border
                   border-solid border-black px-4 py-1 align-middle 
                   text-white"

@@ -38,16 +38,15 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
         ...(position === 'right' ? { width: '24.3333%' } : {})
       }}
       className={`fixed h-screen ${
-        position === 'left' ? 'left-0 w-2/12 bg-stone-100 py-6 ' : 'right-0'
+        position === 'left' ? 'left-0 w-2/12 bg-stone-100 py-4 ' : 'right-0'
       } `}
     >
       {position === 'left' ? (
         <>
-          <div className="px-6 pb-4">
+          <div className="px-6 pb-2">
             <Link href={'/'}>
               <Image
                 className=" cursor-pointer  "
-                // category="profile"
                 src="/img/landing/nata-logo.svg"
                 alt=""
                 width="150px"
@@ -170,8 +169,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
           </div>
         </>
       ) : (
-        <div className="mr-4 py-6">
-          <div className="  bg-white pb-6 text-right ">
+        <div className="mr-4 py-4">
+          <div className="  bg-white pb-3 text-right ">
             {lensProfile ? (
               <>
                 <button
