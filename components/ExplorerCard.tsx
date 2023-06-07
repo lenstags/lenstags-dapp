@@ -205,10 +205,12 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
   return (
     <div
+      // lens-post should be here
       key={post.id}
-      id="CardContainer"
-      className="px-1 py-1 animate-in fade-in-50 duration-1000 md:w-1/2  lg:w-1/3"
-      style={{ opacity, pointerEvents }}
+      className="  mt-4 px-2
+      animate-in fade-in-50 duration-1000
+      md:w-1/2 lg:w-1/3"
+      style={{ opacity, pointerEvents, height: '310px' }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
       {openReconnect ? (
@@ -227,11 +229,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
         <article>
           {/* favllect content goes here */}
           {isFavMenuVisible && (
-            <div
-              style={{ height: '360px' }}
-              className=" lens-post mt-3 h-full rounded-lg bg-white px-0"
-            >
-              <div className="flex px-2">
+            <div className=" lens-post h -96 mt-4">
+              <div className="flex p-2">
                 <button
                   id="btnBack"
                   onClick={() => setFavMenuVisible(false)}
@@ -239,9 +238,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 >
                   ←
                 </button>
-                <h1 className="w-full items-center truncate text-ellipsis pl-1 pt-1 ">
+                <span className="w-full items-center truncate text-ellipsis pl-1 pt-2 text-sm ">
                   {post.metadata.name || 'untitled'}
-                </h1>
+                </span>
               </div>
 
               <div className="m-2">
@@ -259,8 +258,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
               </div>
 
               <div
-                className="scrollbar-hide z-10 mb-4
-               h-56 overflow-y-auto border-b-2 border-solid
+                className="scrollbar-hide z-10 
+               overflow-y-auto border-b-2 border-solid
               border-gray-100 px-1"
               >
                 {selectedList.map((list: typeList) => {
@@ -291,7 +290,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 })}
               </div>
 
-              <footer className="text-center">
+              <footer className="py-4 text-center">
                 <button
                   onClick={() =>
                     handleAddPostToList(
@@ -321,11 +320,10 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 className={` ${
                   isList ? 'lens-folder-tab' : 'lens-folder-tab-empty'
                 }`}
-              ></div>
+              />
               <div
                 style={{
                   position: 'relative'
-                  // height: '312px'
                 }}
                 className={`p-4
               ${isList ? 'lens-folder' : 'lens-post'}`}
