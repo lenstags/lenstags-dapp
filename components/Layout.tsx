@@ -53,17 +53,36 @@ export const Layout: FC<Props> = ({
         <title>{title}</title>
         <meta name="description" content={pageDescription} />
         <meta property="og:title" content="We are Nata Social" />
-
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-        <meta property="og:image" content="banner.svg" />
-
+        <meta
+          property="og:image"
+          content="https://www.nata.social/banner.png"
+        />
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
         <meta property="og:locale" content="en_US" />
+        <meta
+          name="twitter:card"
+          content="https://www.nata.social/banner.png"
+        />
+        <meta property="twitter:domain" content="nata.social" />
+        <meta property="twitter:url" content="nata.social" />
+        <meta
+          name="twitter:title"
+          content="Nata Social | The home of your bookmarks"
+        />
+        <meta
+          name="twitter:description"
+          content="The first social bookmarking platform, backed by the community`s collective knowledge."
+        />
+        <meta
+          name="twitter:image"
+          content="https://www.nata.social/banner.png"
+        />
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />

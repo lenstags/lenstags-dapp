@@ -23,7 +23,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'NeutralfaceText-Bold';
     src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Bold.woff')
       format('woff');
@@ -32,7 +32,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'NeutralfaceText-Demi';
     src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Demi.woff')
       format('woff');
@@ -42,7 +42,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'Inter-Regular';
     src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
   }
@@ -50,7 +50,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'Inter-Black';
     src: url('/assets/fonts/Inter/Inter-Black.woff') format('woff');
   }
@@ -58,7 +58,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'Inter-Medium';
     src: url('/assets/fonts/Inter/Inter-Medium.woff') format('woff');
   }
@@ -66,7 +66,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'Inter-SemiBold';
     src: url('/assets/fonts/Inter/Inter-SemiBold.woff') format('woff');
   }
@@ -75,7 +75,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'SpaceGrotesk';
     font-weight: 300;
     src: url('/assets/fonts/SpaceGrotesk/SpaceGrotesk-Light.ttf')  
@@ -84,7 +84,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'SpaceGrotesk';
     font-weight: 400;
     src: url('/assets/fonts/SpaceGrotesk/SpaceGrotesk-Regular.ttf') 
@@ -93,7 +93,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'SpaceGrotesk';
     font-weight: 500;
     src: url('/assets/fonts/SpaceGrotesk/SpaceGrotesk-Medium.ttf')  
@@ -102,7 +102,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'SpaceGrotesk';
     font-weight: 600;
     src: url('/assets/fonts/SpaceGrotesk/SpaceGrotesk-SemiBold.ttf') 
@@ -111,7 +111,7 @@
 
 @layer base {
   @font-face {
-    font-display: swap;
+    /* font-display: swap; */
     font-family: 'SpaceGrotesk';
     font-weight: 700;
     src: url('/assets/fonts/SpaceGrotesk/SpaceGrotesk-Bold.ttf') 
