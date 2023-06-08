@@ -260,19 +260,14 @@ const ExploreCard: FC<Props> = ({ post }) => {
               <div
                 className="scrollbar-hide z-10 
                overflow-y-auto border-b-2 border-solid
-              border-gray-100 px-1"
+              border-gray-100 px-2"
               >
                 {selectedList.map((list: typeList) => {
                   return (
                     <button
-                      className=" my-1 w-full rounded-lg border-solid 
-                       py-1  text-sm   hover:bg-amber-100"
+                      className=" my-1 w-full rounded-lg  
+                        bg-gray-100 py-1 text-sm hover:bg-black hover:text-white"
                       key={list.key}
-                      style={{
-                        color: '#745f2b',
-                        backgroundColor: '#fffee8',
-                        border: '1px solid #fdf4dc'
-                      }}
                       value={list.key}
                       onClick={() =>
                         handleAddPostToList(
@@ -300,9 +295,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       valueListName
                     )
                   }
-                  className={`rounded-lg px-2 py-2 ${
+                  className={`rounded-lg px-2 py-2 font-serif font-bold ${
                     valueListName && !isListExistent
-                      ? 'bg-lensGreen'
+                      ? 'bg-black text-white'
                       : 'disabled cursor-not-allowed bg-gray-100'
                   }`}
                   disabled={!valueListName || isListExistent}
