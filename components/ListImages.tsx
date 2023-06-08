@@ -98,17 +98,6 @@ const ListImages: React.FC<listImageProps> = (props) => {
           </Swiper>
         </div>
       ) : (
-        // <img
-        //   className="rounded-t-lg"
-        //   height={'100px'}
-        //   width={'250px'}
-        //   // objectFit={'cover'}
-        //   key={DEFAULT_IMAGE_POST}
-        //   alt={'Default text'}
-        //   src={DEFAULT_IMAGE_POST}
-        // />
-        // )
-
         <Image
           className="rounded-lg"
           src={DEFAULT_IMAGE_POST}
