@@ -15,6 +15,7 @@ import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { DotWave } from '@uiball/loaders';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -65,6 +66,7 @@ const Create: NextPage = () => {
   const [loading, setLoading] = useState(false);
   const [loadingTLDR, setLoadingTLDR] = useState(false);
   const [loadingIA, setLoadingIA] = useState(false);
+  const [loadingLP, setLoadingLP] = useState(false);
   const [selectedOption, setSelectedOption] = useState([]);
   const [plainText, setPlainText] = useState('');
 
@@ -91,8 +93,10 @@ const Create: NextPage = () => {
   }
 
   const fetchLinkPreview = async (url: string) => {
+    setLoadingLP(true);
     const response = await fetch(`/api/linkPreview?url=${url}`);
     const jsonResponse = await response.json();
+    setLoadingLP(false);
     return jsonResponse.data;
   };
 
@@ -137,10 +141,16 @@ const Create: NextPage = () => {
       }
 
       const data = await fetchLinkPreview(event.target.value);
+
       setSourceUrl(event.target.value);
-      setTitle(data.title as string);
-      setImageURL(data.image as string);
-      setEditorContents(data.description as string);
+
+      if (data) {
+        setTitle(data.title as string);
+        setImageURL(data.image as string);
+        setEditorContents(data.description as string);
+      } else {
+        console.log('No link preview');
+      }
     },
     2000
   );
@@ -272,30 +282,13 @@ const Create: NextPage = () => {
 
             <button
               onClick={handleIAImage}
-              className="flex w-1/6 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
+              className="flex w-1/6 items-center justify-center rounded-md bg-black px-1 py-2 text-center font-serif text-xs text-white"
             >
-              Generate
+              GENERATE
               {loadingIA && (
-                <svg
-                  className="ml-2 h-5 w-5 animate-spin items-center"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  ></circle>
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  ></path>
-                </svg>
+                <div className="ml-2">
+                  <DotWave size={22} color="#FFFFFF" />
+                </div>
               )}
             </button>
           </div>
@@ -364,144 +357,135 @@ const Create: NextPage = () => {
 
   return (
     <Layout title="Nata Social | Create post" pageDescription="Create post">
-      <div className="container mx-auto h-64  w-11/12 px-6 py-6 text-black md:w-1/2">
-        <div className="text-xl font-semibold">
-          <span className="text-left">Create post</span>
-          <div
-            className="tooltip tooltip-bottom z-10 float-right"
-            data-tip="By enabling gasless transactions you will able to sign once and post
-          for free!"
-          >
-            <button
-              data-tooltip-target="tooltip-default"
-              className={
-                dispatcherStatus === undefined
-                  ? 'rounded-lg bg-stone-200 px-2 py-2 text-xs'
-                  : dispatcherStatus
-                  ? 'rounded-lg bg-green-300 px-2 py-1 text-xs'
-                  : 'rounded-lg bg-red-300 px-2 py-1  text-xs'
-              }
-            >
-              Gasless tx{' '}
-              {dispatcherStatus === undefined
-                ? 'loading...'
-                : dispatcherStatus
-                ? 'enabled'
-                : 'disabled'}
-            </button>
+      <div className="w-full px-6 pt-6 font-sans text-sm ">
+        <h1 className="py-2 font-serif font-bold">Create post</h1>
+
+        <div className="mb-4 flex items-center">
+          <div className="w-2/12">Link</div>
+          <div className="w-10/12">
+            <input
+              autoComplete="false"
+              className="lens-input outl ine-none w-full"
+              type="text"
+              name="link"
+              id="link"
+              placeholder="Insert the link starting with 'https://'"
+              onChange={handleInputChange}
+            />
+          </div>
+          {loadingLP && (
+            <div className="ml-2">
+              <DotWave size={22} color="#231F20" />
+            </div>
+          )}
+        </div>
+
+        <div className="mb-4 flex items-center">
+          <div className="w-2/12">Title</div>
+          <div className="w-10/12">
+            <input
+              className="lens-input w-full"
+              type="text"
+              name="title"
+              id="title"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.target.value);
+              }}
+            />
           </div>
         </div>
 
-        <div className="lens-input flex">
-          <span className="ml-4 font-semibold">Link</span>
-          <input
-            autoComplete="false"
-            className=" w-full bg-white px-4 py-2  outline-none"
-            type="text"
-            name="link"
-            id="link"
-            placeholder="Insert the link starting with 'https://'"
-            onChange={handleInputChange}
-          />
-        </div>
-
-        <div className="lens-input flex">
-          <span className="ml-4 font-semibold">Title</span>
-          <input
-            className="w-full bg-white px-4 py-2 outline-none"
-            type="text"
-            name="title"
-            id="title"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.target.value);
-            }}
-          />
-        </div>
-
         {/* abstract */}
-        <div className="lens-input flex place-items-center items-center">
-          <span className="ml-4 font-semibold">Abstract</span>
-          <input
-            className=" mx-4 w-4/5 bg-white py-2 pl-3 text-xs font-semibold text-black outline-none"
-            type="text"
-            name="abstract"
-            value={abstract}
-            id="abstract"
-            onChange={(e) => setAbstract(e.target.value)}
-          />
+        <div className="mb-4 flex items-center">
+          <div className="w-2/12">Abstract</div>
+          <div className="w-8/12">
+            <input
+              className="lens-input w-full"
+              type="text"
+              name="abstract"
+              value={abstract}
+              id="abstract"
+              onChange={(e) => setAbstract(e.target.value)}
+            />
+          </div>
 
           <button
+            className="ml-2 flex w-2/12 items-center justify-center whitespace-nowrap rounded-md
+             bg-black p-2 text-center font-serif text-xs text-white"
             onClick={generateTLDR}
-            className="flex w-1/5 items-center justify-center rounded-md bg-gray-100 px-1 py-2 text-center text-xs text-black"
           >
-            Make TLDR
+            GENERATE TLDR
             {loadingTLDR && (
-              <svg
-                className="ml-2 h-5 w-5 animate-spin items-center"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
+              // <svg
+              //   className="ml-2 h-5 w-5 animate-spin items-center"
+              //   xmlns="http://www.w3.org/2000/svg"
+              //   fill="none"
+              //   viewBox="0 0 24 24"
+              // >
+              //   <circle
+              //     className="opacity-25"
+              //     cx="12"
+              //     cy="12"
+              //     r="10"
+              //     stroke="currentColor"
+              //     strokeWidth="4"
+              //   ></circle>
+              //   <path
+              //     className="opacity-75"
+              //     fill="currentColor"
+              //     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              //   ></path>
+              // </svg>
+              <div className="ml-2">
+                <DotWave size={22} color="#FFFFFF" />
+              </div>
             )}
           </button>
         </div>
 
-        <div className="lens-input">
-          <p className="my-2 ml-4">Image source</p>
-          <div className="px-4">
-            <CollapsiblePanels
-              panels={panels}
-              onActivePanelChange={handleActivePanelChange}
-            />
-          </div>
+        <div className="mb-2 flex items-center">Image source</div>
+
+        <div className="mb-4 w-full">
+          <CollapsiblePanels
+            panels={panels}
+            onActivePanelChange={handleActivePanelChange}
+          />
         </div>
 
-        <div className="lens-input -z-30">
-          <div className="w-full">
-            <Editor
-              initialContent={editorContents}
-              onChange={handleChangeEditor}
-            />
-          </div>
+        <div className="mb-2 flex items-center">Contents</div>
+
+        <div className="mb-4 w-full rounded-lg border border-black p-2">
+          <Editor
+            initialContent={editorContents}
+            onChange={handleChangeEditor}
+          />
         </div>
 
-        <div className="lens-input z-20 my-6 flex ">
-          <span className="ml-4 font-semibold">Tags</span>
-          <div className="w-full border-0 pl-4 ">
-            <CreatableSelect
-              styles={{
-                control: (baseStyles, state) => ({
-                  ...baseStyles,
-                  boxShadow: 'none',
-                  borderColor: 'transparent',
-                  '&:hover': {
-                    borderColor: 'transparent'
-                  }
-                })
-              }}
-              menuPortalTarget={document.querySelector('body')}
-              isMulti
-              onChange={handleChange}
-              options={TAGS}
-            />
+        <div className="mb-4 flex items-center">
+          <div className="w-2/12">Tags</div>
+          <div className="w-10/12">
+            <div className="w-full rounded-lg border border-black bg-stone-100 ">
+              <CreatableSelect
+                styles={{
+                  control: (baseStyles, state) => ({
+                    ...baseStyles,
+                    boxShadow: 'none',
+                    margin: '2px',
+                    borderColor: 'transparent',
+                    '&:hover': {
+                      borderColor: 'transparent'
+                    }
+                  })
+                }}
+                menuPortalTarget={document.querySelector('body')}
+                isMulti
+                onChange={handleChange}
+                options={TAGS}
+              />
+            </div>
           </div>
         </div>
-
         <div className="text-right">
           {/* {isSuccessVisible && (
             <Toast text="Post created successfully!" level="success" />
@@ -523,37 +507,17 @@ const Create: NextPage = () => {
                   }
                   className="flex align-middle"
                 >
-                  <div className="button_Nobg flex items-center bg-lensPurple text-lensGray">
-                    <div className="px-4 py-2 text-xl">Create post</div>
+                  <div className=" flex items-center rounded-lg bg-black px-4 py-2 font-serif font-bold text-white">
+                    CREATE POST
                   </div>
                 </button>
               ) : (
-                <button
-                  // disabled={loading}
-                  className="flex cursor-default align-middle"
-                >
-                  <div className=" flex items-center rounded-lg border-2 bg-white text-gray-400">
-                    <svg
-                      className="ml-4 h-5 w-5 animate-spin"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                    >
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      ></circle>
-                      <path
-                        className="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    <div className="py-2 pl-2 pr-4 text-xl">Posting </div>
+                <button className="flex cursor-default align-middle">
+                  <div className=" flex items-center rounded-lg border-2 bg-black font-serif text-white">
+                    <div className="py-2 pl-4 pr-4 ">Posting</div>
+                    <div className="mr-2">
+                      <DotWave size={22} color="#FFFFFF" />
+                    </div>
                   </div>
                 </button>
               )}

@@ -1,5 +1,11 @@
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
 import { DEFAULT_IMAGE_POST, DEFAULT_IMAGE_PROFILE } from '@lib/config';
 import Image, { ImageProps } from 'next/image';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import SwiperCore, { Autoplay } from 'swiper';
 import { useEffect, useState } from 'react';
 
 import { getLastComment } from '@lib/lens/get-publications';
@@ -7,6 +13,8 @@ import { getPublication } from '@lib/lens/get-publication';
 
 // import { Comment } from '@lib/lens/graphql/generated';
 // import { getIPFSImage } from '@lib/helpers';
+
+SwiperCore.use([Autoplay]);
 
 interface listImageProps {
   postId: string;
@@ -45,48 +53,61 @@ const ListImages: React.FC<listImageProps> = (props) => {
   }, [props.postId]);
 
   return (
-    <div
-      style={{
-        height: '170px'
-      }}
-      className="flex w-full"
-    >
+    <>
       {URLImages.length > 0 ? (
-        URLImages.map((urlImage: string, index: number) => {
-          const marginLeft = index === 0 ? 0 : '-100px';
-
-          return (
-            <div
-              key={`${props.postId}${urlImage}`}
-              className=" "
-              style={{
-                marginLeft
-              }}
-            >
-              <Image
-                height={'170px'}
-                width={'158px'}
-                style={{ maxHeight: '170px' }}
-                className="rounded-md bg-stone-100 p-2  "
-                alt={'Default text'}
-                src={urlImage}
-                objectFit="cover"
-              />
-            </div>
-          );
-        })
-      ) : (
-        <div className="rounded-md">
-          <Image
-            height={'400px'}
-            width={'600px'}
-            key={DEFAULT_IMAGE_POST}
-            alt={'Default text'}
-            src={DEFAULT_IMAGE_POST}
-          />
+        <div
+        // className=" flex flex-row overflow-hidden pt-6"
+        >
+          <Swiper
+            autoplay={{ delay: 0, disableOnInteraction: false }}
+            speed={1000}
+            slidesPerView={1}
+            spaceBetween={5}
+            breakpoints={{
+              200: {
+                slidesPerView: 1,
+                spaceBetween: 5
+              }
+              // 768: {
+              //   slidesPerView: 2,
+              //   spaceBetween: 40
+              // },
+              // 1024: {
+              //   slidesPerView: 3,
+              //   spaceBetween: 50
+              // }
+            }}
+            loop={true}
+          >
+            {URLImages.map((urlImage: string, index: number) => {
+              return (
+                <SwiperSlide key={index}>
+                  <div key={index} className="rounded-lg">
+                    <Image
+                      className="rounded-lg"
+                      src={urlImage}
+                      alt=""
+                      objectFit="cover"
+                      width={'400px'}
+                      height={'200px'}
+                    />
+                  </div>
+                </SwiperSlide>
+              );
+            })}
+          </Swiper>
         </div>
+      ) : (
+        <Image
+          className="rounded-lg"
+          src={DEFAULT_IMAGE_POST}
+          alt=""
+          objectFit="cover"
+          width={'400px'}
+          height={'200px'}
+        />
       )}
-    </div>
+    </>
   );
 };
 export default ListImages;

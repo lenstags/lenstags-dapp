@@ -18,21 +18,22 @@ export const TagsFilter = () => {
   };
 
   return (
-    <div className="lens-input z-20 my-4 flex ">
-      <span className="ml-4 font-semibold">Tags</span>
-      <div className="w-full border-0 pl-4 ">
+    <div className="my-4 flex w-full items-baseline rounded-lg bg-stone-100 py-1 ">
+      <span className="ml-4 font-serif">Tags</span>
+      <div className="w-full  border-0 pl-4 ">
         <CreatableSelect
           styles={{
             control: (baseStyles, state) => ({
               ...baseStyles,
+              zIndex: 9999,
               boxShadow: 'none',
+              backgroundColor: 'transparent',
               borderColor: 'transparent',
               '&:hover': {
                 borderColor: 'transparent'
               }
             })
           }}
-          menuPortalTarget={document.querySelector('body')}
           isMulti
           onChange={handleChange}
           options={TAGS}

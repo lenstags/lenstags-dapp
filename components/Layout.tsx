@@ -3,6 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import Head from 'next/head';
 import { Navbar } from 'components';
 import Script from 'next/script';
+import Sidebar from './Sidebar';
 
 interface Props {
   title: string;
@@ -85,19 +86,47 @@ export const Layout: FC<Props> = ({
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>
+      </Head>{' '}
       <Script
         async
         defer
         data-website-id="d4364aba-a937-4eb1-ad86-085febbeb986"
         src="https://umami-natasocial.up.railway.app/umami.js"
       />
-      <nav>
-        <Navbar />
-      </nav>
-      <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}>
-        {children}
-      </main>
+      {/* <div style="
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+  
+  background-image: url('ruta/de/la/imagen.jpg'); background-repeat: no-repeat; background-size: cover; z-index: -1;"></div> */}
+      {/* <div
+      // style={{
+      //   backgroundImage: 'url(/img/app-background.svg)',
+      //   backgroundSize: 'cover',
+      //   backgroundRepeat: 'no-repeat',
+      //   backgroundPosition: 'center'
+      // }}
+      > */}
+      {/* <div className="flex"> */}
+      {/* <nav>
+            <Navbar />
+          </nav> */}
+      <div className=" flex h-screen w-full  ">
+        <Sidebar position="left" />
+        <main
+          style={{ left: '16.666667%', width: '59%' }}
+          className=" absolute h-screen 
+               
+               overflow-x-clip
+               "
+        >
+          {children}
+        </main>
+        <Sidebar position="right" />
+      </div>
+      {/* </div> */}
+      {/* </div> */}
+      {/* <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}> */}
+      {/* <main className="mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
+      {/* <main className="z-0 mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
     </>
   );
 };

@@ -242,14 +242,11 @@ const Settings: NextPage = () => {
           </div>
         </div>
       ) : (
-        <div className="container mx-auto h-64 w-11/12 px-6 py-10 text-black md:w-1/2">
-          <h1 className=" text-2xl">Settings</h1>
+        <div className=" w-full px-6 pt-6 ">
+          <h1 className="py-2 font-serif font-bold">Settings</h1>
 
-          <p className="px-6 py-4">Dispatcher</p>
-          <div
-            style={{ borderWidth: '0.5px', borderColor: '#949494' }}
-            className="rounded-md font-extralight shadow-md"
-          >
+          <p className="px-6 py-4 font-serif">Dispatcher</p>
+          <div className="lens-post font-sans text-sm">
             <div className="flex items-center justify-between px-6 py-4">
               <div className="items-center">
                 The transaction Dispatcher is{' '}
@@ -297,19 +294,14 @@ const Settings: NextPage = () => {
             </div>
           </div>
 
-          <p className="px-6 py-4">Profile</p>
-          <div
-            style={{ borderWidth: '0.5px', borderColor: '#949494' }}
-            className="rounded-md font-extralight shadow-md"
-          >
+          <p className="px-6 py-4 font-serif">Profile</p>
+
+          <div className="lens-post font-sans text-sm">
             <div className="mx-6 my-4">
               <div className="mb-4 grid grid-cols-12 items-center gap-4">
                 <div className="col-span-2">Handle</div>
-                <div className="col-span-4 rounded-sm bg-gray-100 px-3 py-2 text-center font-mono text-xs text-gray-400">
-                  {profileValues.handle}
-                </div>
-                <div className="col-span-3 rounded-sm bg-gray-100 px-3 py-2 text-center font-mono text-xs text-gray-400">
-                  Id {profileValues.id}
+                <div className="col-span-4 rounded-sm  px-3 py-2 font-mono text-xs text-gray-400">
+                  {profileValues.handle} (Id {profileValues.id})
                 </div>
               </div>
 
@@ -317,7 +309,8 @@ const Settings: NextPage = () => {
                 <div className="col-span-2">Name</div>
                 <div className="col-span-10">
                   <input
-                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 outline-none"
+                    // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 outline-none"
+                    className="lens-input"
                     type="text"
                     name="name"
                     id="name"
@@ -339,7 +332,8 @@ const Settings: NextPage = () => {
                 </div>
                 <div className="col-span-10">
                   <input
-                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    className="lens-input"
                     type="text"
                     name="bio"
                     id="bio"
@@ -361,7 +355,8 @@ const Settings: NextPage = () => {
                 </div>
                 <div className="col-span-10">
                   <input
-                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    className="lens-input"
                     type="text"
                     name="location"
                     id="location"
@@ -388,7 +383,8 @@ const Settings: NextPage = () => {
                 </div>
                 <div className="col-span-10">
                   <input
-                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    className="lens-input"
                     type="text"
                     name="website"
                     defaultValue={
@@ -414,7 +410,8 @@ const Settings: NextPage = () => {
                 </div>
                 <div className="col-span-10">
                   <input
-                    className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
+                    className="lens-input"
                     type="text"
                     name="twitter"
                     id="twitter"
@@ -480,12 +477,16 @@ const Settings: NextPage = () => {
 
           <div className="flex justify-end py-4">
             {!saving ? (
+              // <button
+              //   onClick={handleClickSave}
+              //   className="flex items-center  rounded-lg border-2 border-solid
+              //    border-black bg-lensPurple px-4 py-2 text-xl text-white"
+              // >
               <button
                 onClick={handleClickSave}
-                className="flex items-center  rounded-lg border-2 border-solid
-                 border-black bg-lensPurple px-4 py-2 text-xl text-white"
+                className="rounded-lg px-4  py-2 align-middle font-serif font-bold text-white"
               >
-                Save
+                SAVE
               </button>
             ) : (
               <span

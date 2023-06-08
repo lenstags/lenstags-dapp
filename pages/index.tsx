@@ -10,7 +10,6 @@ import {
   Program,
   Renderer,
   Texture,
-  Triangle,
   Vec2,
   Vec4
 } from 'ogl-typescript';

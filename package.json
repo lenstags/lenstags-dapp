@@ -13,6 +13,7 @@
     "@emotion/styled": "^11.10.8",
     "@heroicons/react": "^2.0.12",
     "@rainbow-me/rainbowkit": "^0.12.4",
+    "@uiball/loaders": "^1.2.6",
     "cheerio": "^1.0.0-rc.12",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",

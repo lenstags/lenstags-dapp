@@ -122,7 +122,7 @@ export const LayoutLanding: FC<Props> = ({
           <div className="mx-2 p-2 ">
             <Link href={'#features'}>PRODUCTS</Link>
           </div>
-
+ 
           <div className="mx-2 p-2 ">
             <a
               href="https://natasocial.gitbook.io"

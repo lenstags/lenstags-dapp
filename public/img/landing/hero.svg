@@ -35,7 +35,7 @@
 </g>
 <g opacity="0.1">
 <line x1="-171.1" y1="82.0686" x2="1598.99" y2="82.0686" stroke="black" stroke-opacity="0.3"/>
-<line x1="-168.072" y1="19.549" x2="1602.02" y2="19.549" stroke="#868585" stroke-opacity="0.4" stroke-width="0.902081"/>
+<line x1="-168.072" y1="19.549" x2="1602.02" y2="19.549" stroke="#868585" stroke-opacity="0.4" strokeWidth="0.902081"/>
 <line x1="-171.1" y1="141.61" x2="1598.99" y2="141.61" stroke="black" stroke-opacity="0.3"/>
 <line x1="-171.1" y1="201.152" x2="1598.99" y2="201.152" stroke="black" stroke-opacity="0.3"/>
 <line x1="-171.1" y1="260.692" x2="1598.99" y2="260.692" stroke="black" stroke-opacity="0.3"/>

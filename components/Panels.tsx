@@ -24,19 +24,19 @@ const CollapsiblePanels = ({
   };
 
   return (
-    <div className="my-4">
+    <div className="rounded-lg border border-black ">
       {panels.map(({ id, title, content }) => (
         <div key={id}>
           <div
-            className={` mx-4 flex items-center justify-between rounded-lg border-t px-3  py-3 
+            className={` flex items-center justify-between rounded-lg px-3  py-3 
               ${
                 id === activePanel
-                  ? 'bg-white '
+                  ? 'bg-stone-100 '
                   : 'cursor-pointer text-gray-300 hover:bg-gray-50 hover:text-gray-600 '
               }`}
             onClick={() => handleClick(id)}
           >
-            <h2 className="text-sm font-semibold">{title}</h2>
+            <h2 className="text-sm ">{title}</h2>
             {id === activePanel ? (
               ''
             ) : (
@@ -44,7 +44,7 @@ const CollapsiblePanels = ({
             )}
           </div>
           {id === activePanel && (
-            <div className="p-4 animate-in fade-in-5  duration-1000 ">
+            <div className="bg-stone-100 p-3 animate-in fade-in-5 duration-1000 ">
               {content}
             </div>
           )}
