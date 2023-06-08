@@ -3,7 +3,6 @@ import { createUserList, typeList } from '@lib/lens/load-lists';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import ImageProxied from './ImageProxied';
-import Link from 'next/link';
 import ListImages from './ListImages';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
@@ -28,7 +27,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
   const isList =
     post.metadata.attributes[0].value === 'list' ||
     post.metadata.attributes[0].value === 'privateDefaultList';
-  console.log(isList, post.metadata.attributes[0].value);
+  // console.log(isList, post.metadata.attributes[0].value);
   // const lensProfile = useContext(ProfileContext);
   const { profile: lensProfile } = useContext(ProfileContext);
   const [openReconnect, setOpenReconnect] = useState(false);
@@ -422,6 +421,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       category="post"
                       objectFit="cover"
                       width={'400px'}
+                      priority={true}
                       height={'200px'}
                       className="rounded-lg animate-in fade-in-50 duration-1000"
                       src={post.metadata.media[0]?.original.url}

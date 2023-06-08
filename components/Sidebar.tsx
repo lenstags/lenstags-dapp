@@ -1,13 +1,13 @@
 import { useContext, useState } from 'react';
 
 import Image from 'next/image';
+import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
-import ImageProxied from './ImageProxied';
 
 interface SidebarProps {
   position: 'left' | 'right';
@@ -203,6 +203,7 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                             className="mx-1 h-7 w-7 rounded-full"
                             src={pictureUrl}
                             alt="avatar"
+                            objectFit="cover"
                             width={24}
                             height={24}
                           />
@@ -213,7 +214,7 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                           </div>
                         </div>
 
-                        <div className="my-3 ml-1 flex items-center">
+                        <div className="flex items-center py-2 pl-1 hover:bg-teal-100">
                           <svg
                             width="16"
                             height="16"
@@ -230,16 +231,11 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                             />
                           </svg>
                           <div className="pl-3">
-                            <Link
-                              href={'/my-profile'}
-                              className="hover:font-bold "
-                            >
-                              My Profile
-                            </Link>
+                            <Link href={'/my-profile'}>My Profile</Link>
                           </div>
                         </div>
 
-                        <div className="my-3 ml-1 flex items-center">
+                        <div className="flex items-center py-2 pl-1 hover:bg-teal-100">
                           <svg
                             width="16"
                             height="16"
@@ -273,7 +269,7 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                           </div>
                         </div>
 
-                        <div className="my-3 ml-1 flex items-center">
+                        <div className=" flex items-center py-2 pl-1 hover:bg-teal-100">
                           <svg
                             width="16"
                             height="16"
@@ -290,7 +286,7 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                           <div className="pl-3">Help</div>
                         </div>
 
-                        <div className="my-2 ml-1 flex items-center">
+                        <div className=" flex items-center py-2 pl-1 hover:bg-teal-100">
                           <svg
                             width="16"
                             height="16"
