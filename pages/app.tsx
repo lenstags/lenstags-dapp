@@ -168,8 +168,8 @@ const App: NextPage = () => {
         <script
           async
           defer
-          data-website-id="d4364aba-a937-4eb1-ad86-085febbeb986"
-          src="https://umami-natasocial.up.railway.app/umami.js"
+          src="https://analytics.umami.is/script.js"
+          data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
         ></script>
         {/* <link
           rel="apple-touch-icon"
