@@ -86,13 +86,14 @@ export const Layout: FC<Props> = ({
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
-      </Head>{' '}
-      <Script
+      </Head>
+      <script
         async
         defer
-        data-website-id="d4364aba-a937-4eb1-ad86-085febbeb986"
-        src="https://umami-natasocial.up.railway.app/umami.js"
-      />
+        src="https://analytics.umami.is/script.js"
+        data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
+      ></script>
+
       {/* <div style="
   position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
   
