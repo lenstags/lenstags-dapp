@@ -88,8 +88,8 @@ const ListImages: React.FC<listImageProps> = (props) => {
                       src={urlImage}
                       alt=""
                       objectFit="cover"
-                      width={'400px'}
-                      height={'200px'}
+                      width={400}
+                      height={200}
                     />
                   </div>
                 </SwiperSlide>
@@ -103,8 +103,8 @@ const ListImages: React.FC<listImageProps> = (props) => {
           src={DEFAULT_IMAGE_POST}
           alt=""
           objectFit="cover"
-          width={'400px'}
-          height={'200px'}
+          width={400}
+          height={200}
         />
       )}
     </>

@@ -84,13 +84,12 @@ const Home: NextPage = () => {
             </p>
 
             <div className="mt-10 ">
-              <Link href={`/app`}>
-                <a
-                  target="_blank"
-                  className="rounded-lg bg-lensGreen px-[14px] py-[8px] text-[16px] text-black"
-                >
-                  Explore
-                </a>
+              <Link
+                target="_blank"
+                className="rounded-lg bg-lensGreen px-[14px] py-[8px] text-[16px] text-black"
+                href={`/app`}
+              >
+                Explore
               </Link>
             </div>
           </div>

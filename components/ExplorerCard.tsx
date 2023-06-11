@@ -420,9 +420,9 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     <ImageProxied
                       category="post"
                       objectFit="cover"
-                      width={'400px'}
+                      width={400}
+                      height={200}
                       priority={true}
-                      height={'200px'}
                       className="rounded-lg animate-in fade-in-50 duration-1000"
                       src={post.metadata.media[0]?.original.url}
                     />

@@ -49,8 +49,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                 className=" cursor-pointer  "
                 src="/img/landing/nata-logo.svg"
                 alt=""
-                width="150px"
-                height="40px"
+                width={150}
+                height={40}
               />
             </Link>
           </div>
