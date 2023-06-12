@@ -325,7 +325,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       alt="Profile"
                       height={40}
                       width={40}
-                      className="h-12 w-12 cursor-pointer  rounded-full object-cover"
+                      className="h-8 w-8 cursor-pointer  rounded-full object-cover"
                       src={post.profile.picture?.original?.url}
                     />
 

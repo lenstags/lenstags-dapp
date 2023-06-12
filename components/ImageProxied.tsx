@@ -25,10 +25,6 @@ const ImageProxied: React.FC<imageProxiedProps> = (props) => {
     alt: props.alt === '' ? 'No contents' : props.alt
   };
 
-  return (
-    <>
-      <Image {...newProps} />
-    </>
-  );
+  return <Image {...newProps} />;
 };
 export default ImageProxied;
