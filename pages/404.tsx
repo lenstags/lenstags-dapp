@@ -95,10 +95,11 @@ const App: NextPage = () => {
         <p className="mb-8 mt-4 font-serif text-2xl">
           Lo sentimos, la página que buscas no existe.
         </p>
-        <Link href="/">
-          <a className="rounded-full bg-white px-6 py-2 font-sans text-2xl text-green-500">
-            Volver al inicio
-          </a>
+        <Link
+          className="rounded-full bg-white px-6 py-2 font-sans text-2xl text-green-500"
+          href="/"
+        >
+          Volver al inicio
         </Link>
       </div>
     </>

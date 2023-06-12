@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
       style={{
         ...(position === 'right' ? { width: '24.3333%' } : {})
       }}
-      className={`fixed h-screen ${
+      className={`fixed hidden h-screen sm:inline ${
         position === 'left' ? 'left-0 w-2/12 bg-stone-100 py-4 ' : 'right-0'
       } `}
     >
@@ -49,8 +49,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                 className=" cursor-pointer  "
                 src="/img/landing/nata-logo.svg"
                 alt=""
-                width="150px"
-                height="40px"
+                width={150}
+                height={40}
               />
             </Link>
           </div>
@@ -181,11 +181,10 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                   <div className="flex items-center">
                     <ImageProxied
                       category="profile"
-                      className="mx-1 h-7 w-7 rounded-full"
+                      className="mx-1 h-7 w-7 rounded-full object-cover"
                       src={pictureUrl}
                       alt="avatar"
                       width={32}
-                      objectFit="cover"
                       height={32}
                     />
                     <div className="pl-2">@{lensProfile?.handle}</div>
@@ -200,10 +199,9 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                         <div className="my-3 flex items-center">
                           <ImageProxied
                             category="profile"
-                            className="mx-1 h-7 w-7 rounded-full"
+                            className="mx-1 h-7 w-7 rounded-full object-cover"
                             src={pictureUrl}
                             alt="avatar"
-                            objectFit="cover"
                             width={24}
                             height={24}
                           />

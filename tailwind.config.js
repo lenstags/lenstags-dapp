@@ -8,7 +8,11 @@ module.exports = {
   darkMode: 'media', // or 'class'
   theme: {
     extend: {
-      scrollBehavior: ['smooth']
+      scrollBehavior: ['smooth'],
+      screens: {
+        '3xl': '2000px',
+        '4xl': '3200px'
+      }
     },
     variants: {
       extend: {

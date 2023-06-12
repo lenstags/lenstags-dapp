@@ -76,20 +76,14 @@ const OtherProfile: NextPage = () => {
           className="pt-40"
         >
           <div className="flex items-center px-6">
-            <div
-              className="relative   items-center  rounded-full bg-white pt-1 text-center"
-              style={{ height: 130, width: 130 }}
-            >
-              <ImageProxied
-                className="absolute rounded-full"
-                category="profile"
-                height={120}
-                width={120}
-                objectFit="cover"
-                src={pictureUrl}
-                alt="avatar"
-              />
-            </div>
+            <ImageProxied
+              className="h-32 w-32 rounded-full border-2 border-white object-cover"
+              category="profile"
+              height={144}
+              width={144}
+              src={pictureUrl}
+              alt="avatar"
+            />
             <div className="ml-6">
               <p className="mb-1 text-2xl font-semibold">{lensProfile?.name}</p>
               <p className="mb-2 text-sm font-light">@{lensProfile?.handle}</p>

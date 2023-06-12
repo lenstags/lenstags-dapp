@@ -439,12 +439,11 @@ const Settings: NextPage = () => {
                   <div className="px-6 py-4">
                     <ImageProxied
                       category="profile"
-                      className="ml-6 rounded-full"
+                      className="ml-6 rounded-full object-cover"
                       src={pictureUrl}
                       alt="User profile picture"
                       width={70}
                       height={70}
-                      objectFit="cover"
                     />
                   </div>
                 </div>

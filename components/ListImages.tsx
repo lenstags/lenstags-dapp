@@ -84,12 +84,11 @@ const ListImages: React.FC<listImageProps> = (props) => {
                 <SwiperSlide key={index}>
                   <div key={index} className="rounded-lg">
                     <Image
-                      className="rounded-lg"
+                      className=" h-28 w-full rounded-lg object-cover"
                       src={urlImage}
                       alt=""
-                      objectFit="cover"
-                      width={'400px'}
-                      height={'200px'}
+                      width={400}
+                      height={200}
                     />
                   </div>
                 </SwiperSlide>
@@ -99,12 +98,11 @@ const ListImages: React.FC<listImageProps> = (props) => {
         </div>
       ) : (
         <Image
-          className="rounded-lg"
+          className=" h-28 w-full rounded-lg object-cover "
           src={DEFAULT_IMAGE_POST}
           alt=""
-          objectFit="cover"
-          width={'400px'}
-          height={'200px'}
+          width={400}
+          height={200}
         />
       )}
     </>
