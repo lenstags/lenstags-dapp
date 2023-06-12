@@ -1,8 +1,9 @@
-import { apolloClient } from './graphql/apollo-client';
 import {
   DefaultProfileDocument,
   DefaultProfileRequest
 } from './graphql/generated';
+
+import { apolloClient } from './graphql/apollo-client';
 
 const getDefaultProfileRequest = async (request: DefaultProfileRequest) => {
   const result = await apolloClient.query({
@@ -11,6 +12,7 @@ const getDefaultProfileRequest = async (request: DefaultProfileRequest) => {
       request
     }
   });
+
   console.log('defaultProfile ', result);
   return result.data.defaultProfile;
 };

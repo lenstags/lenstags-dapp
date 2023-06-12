@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
       style={{
         ...(position === 'right' ? { width: '24.3333%' } : {})
       }}
-      className={`fixed h-screen ${
+      className={`fixed hidden h-screen sm:inline ${
         position === 'left' ? 'left-0 w-2/12 bg-stone-100 py-4 ' : 'right-0'
       } `}
     >

@@ -206,9 +206,16 @@ const ExploreCard: FC<Props> = ({ post }) => {
     <div
       // lens-post should be here
       key={post.id}
-      className="  mt-4 px-2
-      animate-in fade-in-50 duration-1000
-      md:w-1/2 lg:w-1/3"
+      className="w-11/12 px-2 animate-in fade-in-50
+      duration-1000
+      xs:w-10/12
+      sm:w-8/12
+      md:w-6/12
+      lg:w-5/12
+      xl:w-4/12
+      2xl:w-3/12
+      3xl:w-2/12
+      4xl:w-1/12"
       style={{ opacity, pointerEvents, height: '310px' }}
     >
       {/* animate-in slide-in-from-bottom duration-1000 */}
@@ -410,7 +417,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     height={200}
                     priority={true}
                     alt=""
-                    className="rounded-lg object-cover animate-in fade-in-50 duration-1000"
+                    className=" h-28 w-full rounded-lg object-cover animate-in fade-in-50 duration-1000"
                     src={post.metadata.media[0]?.original.url}
                   />
                 )}

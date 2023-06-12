@@ -309,7 +309,7 @@ const App: NextPage = () => {
               <TagsFilter />
 
               {/* view options */}
-              <div className="mt-2 flex justify-between rounded-t-lg bg-stone-100 p-4">
+              <div className="mt-2 flex justify-between rounded-t-lg  p-4">
                 <div className="flex gap-1  font-sans font-medium tracking-wide">
                   <button
                     // onClick={fetchContentAll}
@@ -388,8 +388,8 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className=" h-screen px-4 pt-48">
-              <div className="flex flex-wrap justify-center rounded-b-lg bg-stone-100 px-3 pb-6 ">
+            <div className=" mt-2 h-screen px-4 pt-48">
+              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
                 {publications.length > 0 ? (
                   publications.map((post, index) => (
                     <ExplorerCard post={post} key={index} />
