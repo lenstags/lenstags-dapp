@@ -107,11 +107,10 @@ export default function PostDetails() {
                   style={{ height: 66, width: 66 }}
                 >
                   <ImageProxied
-                    className="absolute rounded-full"
+                    className="absolute rounded-full object-cover"
                     category="profile"
                     height={60}
                     width={60}
-                    objectFit="cover"
                     src={pictureUrl}
                     alt="avatar"
                   />

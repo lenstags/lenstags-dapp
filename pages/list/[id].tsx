@@ -164,8 +164,8 @@ export default function ListDetails() {
                       category="post"
                       height={104}
                       width={104}
-                      objectFit="cover"
-                      className="block h-auto rounded-md "
+                      alt=""
+                      className="block h-auto rounded-md object-cover "
                       src={p.metadata.media[0]?.original.url}
                     />
 

@@ -85,7 +85,6 @@ const OtherProfile: NextPage = () => {
                 category="profile"
                 height={120}
                 width={120}
-                objectFit="cover"
                 src={pictureUrl}
                 alt="avatar"
               />

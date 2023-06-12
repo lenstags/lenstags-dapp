@@ -178,11 +178,10 @@ const MyProfile: NextPage = () => {
               style={{ height: 130, width: 130 }}
             >
               <ImageProxied
-                className="absolute rounded-full"
+                className="absolute rounded-full object-cover"
                 category="profile"
                 height={120}
                 width={120}
-                objectFit="cover"
                 src={pictureUrl}
                 alt="avatar"
               />

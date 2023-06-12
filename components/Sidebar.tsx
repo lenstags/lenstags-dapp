@@ -181,11 +181,10 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                   <div className="flex items-center">
                     <ImageProxied
                       category="profile"
-                      className="mx-1 h-7 w-7 rounded-full"
+                      className="mx-1 h-7 w-7 rounded-full object-cover"
                       src={pictureUrl}
                       alt="avatar"
                       width={32}
-                      objectFit="cover"
                       height={32}
                     />
                     <div className="pl-2">@{lensProfile?.handle}</div>
@@ -200,10 +199,9 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                         <div className="my-3 flex items-center">
                           <ImageProxied
                             category="profile"
-                            className="mx-1 h-7 w-7 rounded-full"
+                            className="mx-1 h-7 w-7 rounded-full object-cover"
                             src={pictureUrl}
                             alt="avatar"
-                            objectFit="cover"
                             width={24}
                             height={24}
                           />
