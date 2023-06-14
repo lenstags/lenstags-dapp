@@ -55,48 +55,53 @@ const ListImages: React.FC<listImageProps> = (props) => {
   return (
     <>
       {URLImages.length > 0 ? (
-        <div
+        // <div
         // className=" flex flex-row overflow-hidden pt-6"
+        // >
+        <Swiper
+          className="rounded-lg"
+          style={{
+            // position: 'absolute',
+            zIndex: 0
+          }}
+          autoplay={{ delay: 0, disableOnInteraction: false }}
+          speed={1000}
+          slidesPerView={1}
+          spaceBetween={5}
+          breakpoints={{
+            200: {
+              slidesPerView: 1,
+              spaceBetween: 5
+            }
+            // 768: {
+            //   slidesPerView: 2,
+            //   spaceBetween: 40
+            // },
+            // 1024: {
+            //   slidesPerView: 3,
+            //   spaceBetween: 50
+            // }
+          }}
+          loop={true}
         >
-          <Swiper
-            autoplay={{ delay: 0, disableOnInteraction: false }}
-            speed={1000}
-            slidesPerView={1}
-            spaceBetween={5}
-            breakpoints={{
-              200: {
-                slidesPerView: 1,
-                spaceBetween: 5
-              }
-              // 768: {
-              //   slidesPerView: 2,
-              //   spaceBetween: 40
-              // },
-              // 1024: {
-              //   slidesPerView: 3,
-              //   spaceBetween: 50
-              // }
-            }}
-            loop={true}
-          >
-            {URLImages.map((urlImage: string, index: number) => {
-              return (
-                <SwiperSlide key={index}>
-                  <div key={index} className="rounded-lg">
-                    <Image
-                      className=" h-28 w-full rounded-lg object-cover"
-                      src={urlImage}
-                      alt=""
-                      width={400}
-                      height={200}
-                    />
-                  </div>
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
-        </div>
+          {URLImages.map((urlImage: string, index: number) => {
+            return (
+              <SwiperSlide key={index}>
+                <div key={index} className="rounded-lg">
+                  <Image
+                    className=" h-28 w-full rounded-lg object-cover"
+                    src={urlImage}
+                    alt=""
+                    width={400}
+                    height={200}
+                  />
+                </div>
+              </SwiperSlide>
+            );
+          })}
+        </Swiper>
       ) : (
+        // </div>
         <Image
           className=" h-28 w-full rounded-lg object-cover "
           src={DEFAULT_IMAGE_POST}

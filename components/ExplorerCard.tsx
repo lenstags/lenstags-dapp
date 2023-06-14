@@ -29,6 +29,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
     post.metadata.attributes[0].value === 'privateDefaultList';
   // console.log(isList, post.metadata.attributes[0].value);
   // const lensProfile = useContext(ProfileContext);
+
+  // console.log(post.id, post.stats.total);
   const { profile: lensProfile } = useContext(ProfileContext);
   const [openReconnect, setOpenReconnect] = useState(false);
   const [isFavMenuVisible, setFavMenuVisible] = useState(false);
@@ -206,7 +208,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
     <div
       // lens-post should be here
       key={post.id}
-      className="w-11/12 px-2 animate-in fade-in-50
+      className="xp-1 w-11/12 px-1 animate-in fade-in-50
       duration-1000
       xs:w-10/12
       sm:w-8/12
@@ -235,7 +237,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
         <article>
           {/* favllect content goes here */}
           {isFavMenuVisible && (
-            <div className=" lens-post h -96 mt-4">
+            <div className=" lens-post h -96 mt -4">
               <div className="flex p-2">
                 <button
                   id="btnBack"
@@ -301,14 +303,14 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       valueListName
                     )
                   }
-                  className={`rounded-lg px-2 py-2 font-serif font-bold ${
+                  className={`rounded-lg px-2 py-2 font-bold ${
                     valueListName && !isListExistent
                       ? 'bg-black text-white'
                       : 'disabled cursor-not-allowed bg-gray-100'
                   }`}
                   disabled={!valueListName || isListExistent}
                 >
-                  ✦ CREATE AND ADD
+                  ✦ Create and add
                 </button>
               </footer>
             </div>
@@ -409,7 +411,40 @@ const ExploreCard: FC<Props> = ({ post }) => {
                 href={isList ? `/list/${post.id}` : `/post/${post.id}`}
               >
                 {isList ? (
-                  <ListImages postId={post.id} />
+                  <div>
+                    <div className="relative">
+                      <ListImages postId={post.id} />
+                      <div
+                        className="absolute bottom-0 z-0 flex w-full items-center p-2"
+                        style={{
+                          background: 'rgba(248, 248, 248, 0.7)',
+                          backdropFilter: 'blur(7px)',
+                          borderRadius: '0px 0px 8px 8px'
+                        }}
+                      >
+                        <svg
+                          width="14"
+                          height="10"
+                          viewBox="0 0 14 10"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M4.33366 1H12.3337M4.33366 5H12.3337M4.33366 9H12.3337M1.66699 1H1.66766M1.66699 5H1.66766M1.66699 9H1.66766"
+                            stroke="black"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        <span className="ml-1 font-serif text-xs">
+                          {post.stats.totalAmountOfComments}{' '}
+                          {post.stats.totalAmountOfComments === 1
+                            ? 'Element'
+                            : 'Elements'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 ) : (
                   <ImageProxied
                     category="post"
@@ -515,23 +550,20 @@ const ExploreCard: FC<Props> = ({ post }) => {
               </a>
 
               {/* date and collected indicators*/}
-              <div
-                className="pb- flex
-                   w-full
-                   items-center justify-between 
-                  text-xs
-                   "
-              >
-                <div className="flex rounded-md bg-stone-100 px-3 py-1">
+              <div className=" flex w-full items-center justify-between text-xs">
+                <div
+                  style={{ fontSize: '10px' }}
+                  className="flex rounded-md bg-stone-100 px-3 py-1 font-serif"
+                >
                   <ImageProxied
                     category="profile"
                     src="/assets/icons/collect.svg"
                     alt="Collect"
                     title="Total amount of collects"
-                    width={15}
-                    height={15}
+                    width={12}
+                    height={12}
                   />
-                  <div className="ml-1 mr-3 font-serif font-black">
+                  <div className="ml-1 mr-3">
                     {post.stats.totalAmountOfCollects}
                   </div>
 
@@ -541,20 +573,18 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     alt="Comments"
                     title="Comments"
                     width={15}
-                    height={15}
+                    height={12}
                   />
-                  <div className="ml-1 font-serif font-black">
-                    {post.stats.totalComments || 0}
-                  </div>
+                  <div className="ml-1 ">{post.stats.totalComments || 0}</div>
                 </div>
 
                 {lensProfile && post.hasCollectedByMe && (
                   // && post.metadata.attributes[0].value === 'post'
                   <div
                     title="You do own this item!"
-                    className="flex cursor-default items-end  rounded-md bg-teal-300 px-2 py-1 text-right font-serif text-xs font-bold "
+                    className="flex cursor-default items-end  rounded-md bg-teal-300 px-2 py-1 text-right text-xs font-bold "
                   >
-                    COLLECTED
+                    Collected
                   </div>
                 )}
 
@@ -564,7 +594,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       refreshLists(lensProfile?.id);
                       return setFavMenuVisible(!isListVisible);
                     }}
-                    className="  rounded-lg bg-black font-sans font-bold"
+                    className="  rounded-lg bg-black  "
                   >
                     <div
                       className="flex items-center px-2 py-1
@@ -582,8 +612,8 @@ const ExploreCard: FC<Props> = ({ post }) => {
                           fill="white"
                         />
                       </svg>
-                      <span className="ml-2 mr-1 font-serif font-bold text-white ">
-                        COLLECT
+                      <span className="ml-2 mr-1 font-bold text-white ">
+                        Collect
                       </span>
                     </div>
                   </button>

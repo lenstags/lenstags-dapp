@@ -267,18 +267,18 @@ const App: NextPage = () => {
             {/* top bar container*/}
             <div
               className="h-50 fixed top-0 z-10 w-full
-                 bg-white px-4 pt-4"
+                 bg-white px-8 pt-4"
               style={{ width: '59%' }}
             >
               {/* search bar */}
-              <div className="flex justify-end ">
+              <div className="flex justify-start ">
                 <input
                   type="text"
                   autoComplete="off"
                   // value={valueListName}
                   // onChange={handleChangeListName}
-                  className="rounded-lg border
-                  border-black  bg-stone-100 px-3 py-1
+                  className="rounded-full
+                   bg-stone-100 p-3
                   leading-none outline-none  md:w-1/3"
                   name="tag-search-input"
                   id="tag-search-input"
@@ -286,7 +286,7 @@ const App: NextPage = () => {
                   placeholder="🔍 Search..."
                 />
                 <button
-                  className="hid den ml-2 rounded-lg border  border-solid border-black bg-stone-100
+                  className="ml-2 hidden rounded-lg border  border-solid border-black bg-stone-100
                    p-2"
                 >
                   <svg
@@ -309,7 +309,7 @@ const App: NextPage = () => {
               <TagsFilter />
 
               {/* view options */}
-              <div className="mt-2 flex justify-between rounded-t-lg  p-4">
+              <div className="mt-2 flex justify-between rounded-t-lg  py-2">
                 <div className="flex gap-1  font-sans font-medium tracking-wide">
                   <button
                     // onClick={fetchContentAll}
@@ -388,7 +388,7 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className=" mt-2 h-screen px-4 pt-48">
+            <div className="h-screen px-4 pt-48">
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
                 {publications.length > 0 ? (
                   publications.map((post, index) => (
