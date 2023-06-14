@@ -159,9 +159,9 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                   </div>
                 </Link>
 
-                <div className="   flex px-6 py-4  ">
-                  <button className="w-full  rounded-lg px-4 py-2 align-middle text-white">
-                    <Link href={'/create'}>+ CREATE</Link>
+                <div className="flex px-6 py-4  ">
+                  <button className="w-full rounded-lg px-4 py-2 align-middle font-sans text-white">
+                    <Link href={'/create'}>+ Create</Link>
                   </button>
                 </div>
               </div>
@@ -184,8 +184,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                       className="mx-1 h-7 w-7 rounded-full object-cover"
                       src={pictureUrl}
                       alt="avatar"
-                      width={32}
-                      height={32}
+                      width={40}
+                      height={40}
                     />
                     <div className="pl-2">@{lensProfile?.handle}</div>
                   </div>
@@ -202,8 +202,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                             className="mx-1 h-7 w-7 rounded-full object-cover"
                             src={pictureUrl}
                             alt="avatar"
-                            width={24}
-                            height={24}
+                            width={40}
+                            height={40}
                           />
                           <div className="pl-2">
                             <p className="w-48 truncate text-ellipsis font-serif font-bold">
