@@ -2,6 +2,7 @@ import React, { FC, useContext, useEffect, useState } from 'react';
 import { createUserList, typeList } from '@lib/lens/load-lists';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import ListImages from './ListImages';
 import { ProfileContext } from './LensAuthenticationProvider';
@@ -9,11 +10,14 @@ import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from './Spinner';
 import { addPostIdtoListId } from '@lib/lens/post';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
+import { doesFollow } from '@lib/lens/does-follow';
 import { freeCollect } from '@lib/lens/collect';
+import { freeUnfollow } from '@lib/lens/free-unfollow';
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
+import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useDisconnect } from 'wagmi';
 import { useSnackbar } from 'material-ui-snackbar-provider';
@@ -44,7 +48,11 @@ const ExploreCard: FC<Props> = ({ post }) => {
   const [valueListName, setValueListName] = useState('');
   const [isListVisible, setIsListVisible] = useState(false);
   const [isListExistent, setIsListExistent] = useState(false);
-
+  const [isFollowing, setIsFollowing] = useState(post.profile.isFollowedByMe);
+  const [isDotFollowing, setIsDotFollowing] = useState(false);
+  const [showCard, setShowCard] = useState(false);
+  const [showUnfollow, setShowUnfollow] = useState('Following');
+  const [data, setData] = useState(null);
   // const profil: ProfileQuery['profile'] = await queryProfile({
   //   profileId: pro.id
   // });
@@ -204,11 +212,43 @@ const ExploreCard: FC<Props> = ({ post }) => {
     return;
   };
 
+  const handleFollow = async (profileId: string) => {
+    setIsDotFollowing(true);
+    console.log('unfollow? ', showUnfollow);
+    if (showUnfollow === 'Unfollow') {
+      return freeUnfollow(profileId).then((r) => {
+        console.log('unfollowresult ', r);
+        setIsFollowing(false);
+        setIsDotFollowing(false);
+      });
+    } else {
+      return proxyActionFreeFollow(profileId).then((r) => {
+        console.log('RRR ', r);
+        setIsFollowing(true);
+        setIsDotFollowing(false);
+      });
+    }
+  };
+
+  useEffect(() => {
+    const fetchProfileFollow = () => {
+      console.log(' profi ', lensProfile?.id);
+      return doesFollow(post.profile.id, lensProfile?.ownedBy);
+    };
+
+    if (showCard) {
+      fetchProfileFollow().then((r) => {
+        console.log('lo sigue? ', r.follows);
+        setIsFollowing(r.follows);
+      });
+    }
+  }, [showCard]);
+
   return (
     <div
       // lens-post should be here
       key={post.id}
-      className="xp-1 w-11/12 px-1 animate-in fade-in-50
+      className=" w-11/12 px-1 animate-in fade-in-50
       duration-1000
       xs:w-10/12
       sm:w-8/12
@@ -287,7 +327,6 @@ const ExploreCard: FC<Props> = ({ post }) => {
                       }
                     >
                       {list.name}
-                      {/* {list.key} */}
                     </button>
                   );
                 })}
@@ -322,38 +361,154 @@ const ExploreCard: FC<Props> = ({ post }) => {
               {/* card contents */}
               <div className="flex justify-between pb-3 text-sm text-black">
                 {/* profile */}
-                <a
-                  rel="noreferrer"
-                  href={`/profile/${post.profile.id}`}
-                  target="_blank"
+                <div
+                  onMouseEnter={() => setShowCard(true)}
+                  onMouseLeave={() => setShowCard(false)}
+                  className="dropd own relative  flex"
                 >
-                  <div className="flex justify-between">
-                    <ImageProxied
-                      category="profile"
-                      title={`Loading from ${post.profile.picture?.original?.url}`}
-                      alt="Profile"
-                      height={40}
-                      width={40}
-                      className="h-8 w-8 cursor-pointer  rounded-full object-cover"
-                      src={post.profile.picture?.original?.url}
-                    />
-
-                    <div className="pl-2 align-baseline text-xs">
-                      <div className="flex">
-                        {(post.profile.name || post.profile.id).trim() || '-'}
-                        <p
-                          style={{ fontSize: 10 }}
-                          className="pl-1   text-gray-500"
-                        >
-                          • {moment(post.createdAt).fromNow()}
-                        </p>
-                      </div>
-                      <p className="font-light text-gray-400">
-                        @{post.profile.handle}
-                      </p>
+                  {/* profile hover */}
+                  <div className="inline-block cursor-pointer">
+                    <div className="items-center rounded font-semibold text-gray-700">
+                      <ImageProxied
+                        category="profile"
+                        alt={`Pic from ${post.profile.picture?.original?.url}`}
+                        height={40}
+                        width={40}
+                        className="h-8 w-8 cursor-pointer rounded-full object-cover"
+                        src={post.profile.picture?.original?.url}
+                      />
                     </div>
                   </div>
-                </a>
+
+                  <a
+                    rel="noreferrer"
+                    href={`/profile/${post.profile.id}`}
+                    target="_blank"
+                  >
+                    <div className="flex justify-between">
+                      <div className="pl-2 align-baseline text-xs">
+                        <div className="flex">
+                          {(post.profile.name || post.profile.id).trim() || '-'}
+                          <p
+                            style={{ fontSize: 10 }}
+                            className="pl-1   text-gray-500"
+                          >
+                            • {moment(post.createdAt).fromNow()}
+                          </p>
+                        </div>
+                        <p className="font-light text-gray-400">
+                          @{post.profile.handle}
+                        </p>
+                      </div>
+                    </div>
+                  </a>
+
+                  {/* profile hover */}
+                  {showCard && (
+                    <div
+                      className="dro pdown-menu lens-post  
+                     hi dden absolute top-5 z-10 w-64 shadow-xl shadow-black animate-in fade-in-50
+                         duration-500 "
+                    >
+                      <div className="items-center rounded p-4 font-semibold text-gray-700">
+                        <div className="flex justify-between bg-white">
+                          <ImageProxied
+                            category="profile"
+                            alt={`Loading from ${post.profile.picture?.original?.url}`}
+                            height={80}
+                            width={80}
+                            className="h-14 w-14 cursor-pointer rounded-full object-cover"
+                            src={post.profile.picture?.original?.url}
+                          />
+
+                          {isFollowing ? (
+                            <button
+                              onMouseEnter={() => setShowUnfollow('Unfollow')}
+                              onMouseLeave={() => setShowUnfollow('Following')}
+                              onClick={() => handleFollow(post.profile.id)}
+                              className=" m-2 flex items-center rounded-lg border border-solid
+                               border-black bg-transparent px-2 py-1 font-bold"
+                            >
+                              {isDotFollowing ? (
+                                <div className="mx-2">
+                                  <DotWave size={22} color="#000000" />
+                                </div>
+                              ) : (
+                                showUnfollow
+                              )}
+                            </button>
+                          ) : (
+                            ''
+                          )}
+
+                          {!isFollowing ? (
+                            <button
+                              onClick={() => handleFollow(post.profile.id)}
+                              className=" m-2 flex items-center rounded-lg border border-solid
+                               border-black bg-transparent px-2 py-1 font-bold"
+                            >
+                              {isDotFollowing ? (
+                                <div className="mx-2">
+                                  <DotWave size={22} color="#000000" />
+                                </div>
+                              ) : (
+                                'Follow'
+                              )}
+                            </button>
+                          ) : (
+                            ''
+                          )}
+
+                          {/* backup  */}
+                          {/* <button
+                            onMouseEnter={() => setShowUnfollow(true)}
+                            onMouseLeave={() => setShowUnfollow(false)}
+                            onClick={() => handleFollow(post.profile.id)}
+                            className="te xt-xs m-2 flex items-center rounded-lg border border-solid
+                                 border-black bg-transparent px-2 py-1 font-bold"
+                          >
+                            {isDotFollowing ? (
+                              <div className="mx-2">
+                                <DotWave size={22} color="#000000" />
+                              </div>
+                            ) : isFollowing ? (
+                              showUnfollow ? (
+                                'Unfollow'
+                              ) : (
+                                'Following'
+                              )
+                            ) : (
+                              'Follow'
+                            )}
+                          </button> */}
+                        </div>
+                        <p className="text-base font-bold">
+                          {post.profile.name}
+                        </p>
+                        <p className="text-xs text-stone-500">
+                          @{post.profile.handle}
+                        </p>
+                        <p className="my-2 truncate text-ellipsis text-xs text-stone-500">
+                          {post.profile.bio}
+                        </p>
+                        <div className="mt-3 flex justify-between rounded-lg bg-stone-100 px-3 py-2 font-serif">
+                          <div className="flex">
+                            <span>
+                              {post.profile.stats.totalFollowing || 0}
+                            </span>
+                            <span className="ml-1 text-sm"> Following</span>
+                          </div>
+                          <div className="flex items-baseline">
+                            <span>
+                              {post.profile.stats.totalFollowers || 0}
+                            </span>
+                            <span className="ml-1 text-sm">Followers</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* profile menu */}
                 <div className="dropdown relative inline-block cursor-pointer">
@@ -513,7 +668,7 @@ const ExploreCard: FC<Props> = ({ post }) => {
                   className="mt-1"
                 >
                   <div
-                    title={post.metadata.name || 'untitled'}
+                    // title={post.metadata.name || 'untitled'}
                     className="truncate text-ellipsis font-serif
                        text-sm"
                   >

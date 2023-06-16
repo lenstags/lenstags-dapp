@@ -72,6 +72,7 @@ const App: NextPage = () => {
 
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
+      console.log(data);
       return setPublications(data.items);
     });
   }, [tags]);
@@ -190,15 +191,11 @@ const App: NextPage = () => {
         /> */}
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
-
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      {/* <div className="mt-6 h-full w-full items-center text-center">
-        Coming soon™️{' '}
-      </div> */}
 
       <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
         {showWelcome ? (

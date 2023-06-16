@@ -1,10 +1,23 @@
-import { useEffect, useState } from 'react';
+import {
+  APP_NAME,
+  ATTRIBUTES_LIST_KEY,
+  PUBLICATION_METADATA_VERSION
+} from '@lib/config';
+import { Layout, ProfileContext } from 'components';
+import {
+  MetadataAttribute,
+  PublicationMainFocus
+} from '@lib/lens/interfaces/publication';
+import { useContext, useEffect, useState } from 'react';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import DotWave from '@uiball/loaders/dist/components/DotWave';
 import ImageProxied from 'components/ImageProxied';
-import { Layout } from 'components';
+import { Metadata } from '@lib/lens/interfaces/publication';
+import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from 'components/Spinner';
+import { commentGasless } from '@lib/lens/comment-gasless';
+import { getComments } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
@@ -12,18 +25,23 @@ import { typeList } from '@lib/lens/load-lists';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function PostDetails() {
   const router = useRouter();
   const { id } = router.query;
+  const { profile: loggedProfile } = useContext(ProfileContext);
+  const ii: string = id as string;
+
   const [post, setPost] = useState<any>();
   const [lensProfile, setProfile] = useState<any>();
-  const [isPosting, setIsPosting] = useState(false);
-  const [dotColor, setDotColor] = useState('');
-  const [dotTitle, setDotTitle] = useState('');
+
   const snackbar = useSnackbar();
   const [isListVisible, setIsListVisible] = useState(false);
   const [isFavMenuVisible, setFavMenuVisible] = useState(false);
+  const [isSpinnerVisible, setIsSpinnerVisible] = useState(false);
+  const [comment, setComment] = useState<string>();
+  const [allComments, setAllComments] = useState<any>();
 
   const firstList = JSON.parse(
     lensProfile?.attributes?.find(
@@ -52,6 +70,14 @@ export default function PostDetails() {
     setSelectedList(parsedLists); // FIXME: should be only one?
   };
 
+  const refreshComments = async () => {
+    const comments = await getComments(ii);
+    setAllComments(comments);
+    console.log('refreshed all! ', comments);
+    setIsSpinnerVisible(false);
+    setComment('');
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const postObject = await getPublication(id as string);
@@ -61,6 +87,8 @@ export default function PostDetails() {
       if (!profileResult) {
         return;
       }
+
+      await refreshComments();
       setProfile(profileResult);
       setPost(postObject);
       console.log('ooo ', postObject);
@@ -68,6 +96,36 @@ export default function PostDetails() {
 
     fetchData().catch(console.error);
   }, [id]);
+
+  const handleComment = (comment: any) => {
+    if (!comment) {
+      return;
+    }
+
+    setIsSpinnerVisible(true);
+    const attType: MetadataAttribute = {
+      value: 'listLog', // FIXME
+      displayType: MetadataDisplayType.string,
+      key: 'commentType'
+    };
+
+    const commentMetadata: Metadata = {
+      version: PUBLICATION_METADATA_VERSION,
+      mainContentFocus: PublicationMainFocus.TEXT_ONLY,
+      metadata_id: uuidv4(),
+      name: 'Nata Social Comment™',
+      description: 'you-are-the-owner',
+      content: comment, // new Date().getTime().toString(),
+      locale: 'en-US',
+      attributes: [attType], // , attDate],
+      appId: APP_NAME
+    };
+
+    //TODO: use with no gasless too
+    return commentGasless(loggedProfile?.id, ii, commentMetadata).then(() =>
+      refreshComments()
+    );
+  };
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -83,7 +141,7 @@ export default function PostDetails() {
         pageDescription="Profile"
         screen={true}
       >
-        <div className="w-full">
+        <div className="w-full px-6  pb-4">
           {/* header */}
           <div
             style={{
@@ -102,19 +160,14 @@ export default function PostDetails() {
               className="mx-auto w-11/12  pt-60   md:w-4/5"
             >
               <div className="  flex items-center ">
-                <div
-                  className="relative   items-center  rounded-full bg-white pt-1 text-center"
-                  style={{ height: 66, width: 66 }}
-                >
-                  <ImageProxied
-                    className="absolute rounded-full object-cover"
-                    category="profile"
-                    height={60}
-                    width={60}
-                    src={pictureUrl}
-                    alt="avatar"
-                  />
-                </div>
+                <ImageProxied
+                  className=" rounded-full border-2 border-white object-cover"
+                  category="profile"
+                  height={64}
+                  width={64}
+                  src={pictureUrl}
+                  alt="avatar"
+                />
                 <div className="ml-6">
                   <p className="mb-1 text-2xl font-semibold">
                     {lensProfile?.name}
@@ -126,7 +179,6 @@ export default function PostDetails() {
               </div>
             </div>
           </div>
-
           <div className="mx-auto  w-11/12  py-6 md:w-4/5">
             <div className="flex  text-sm text-black">
               <footer className="flex items-center  justify-between py-2 text-right text-black">
@@ -217,9 +269,8 @@ export default function PostDetails() {
               </footer>
             </div>
           </div>
-
           {/* contents */}
-          <div className=" mx-auto mb-14  w-11/12 md:w-4/5">
+          <div className=" mx-auto mb-8  w-11/12 md:w-4/5">
             <div className="mb-4 w-full">
               <div className=" mb-2 flex justify-between ">
                 <p
@@ -274,13 +325,14 @@ export default function PostDetails() {
               </p>
 
               <div
-                className="m-8 "
+                className="my-8 "
                 dangerouslySetInnerHTML={createMarkup(
                   post.metadata.content || 'no-contents'
                 )}
               ></div>
             </div>
 
+            {/* tag list  */}
             <ul className=" flex flex-wrap justify-start text-xs">
               {post.metadata.tags.map((tag: string) => {
                 const tagValue = `${post.id}${tag}`;
@@ -304,6 +356,8 @@ export default function PostDetails() {
                 </li>
               )}
             </ul>
+
+            {/* source  */}
             <div className="ext-ellipsis my-4 text-xs text-gray-400">
               {post.metadata.attributes[1]?.value && (
                 <>
@@ -319,6 +373,95 @@ export default function PostDetails() {
                   </a>
                 </>
               )}
+            </div>
+          </div>
+
+          {/* comments section  */}
+          <div className="mx-auto w-11/12 md:w-4/5">
+            <p>Comments</p>
+
+            <div className="">
+              <div className=" flex bg-white py-4 ">
+                <input
+                  type="text"
+                  autoComplete="off"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full rounded-lg border border-stone-300 
+                   bg-stone-100  px-3 py-1 
+                      leading-none  outline-none"
+                  name="tag-search-input"
+                  id="tag-search-input"
+                  placeholder="Add your comment..."
+                />
+
+                {isSpinnerVisible ? (
+                  <button className="ml-3 rounded-lg  bg-stone-400 px-3 py-2 text-white">
+                    <div className="flex items-center">
+                      <span className="mr-1">Sending</span>
+                      <DotWave size={22} color="#FFFFFF" />
+                    </div>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleComment(comment)}
+                    className="ml-3 rounded-lg  bg-black px-3 py-2 text-white"
+                  >
+                    <div className="flex items-center">
+                      <span className="mr-1">Send</span>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 18 18"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M5.00038 9.00013H9.00038M4.73057 8.51449L1.57019 2.82579C1.09271 1.96633 2.01216 1.00602 2.89156 1.44572L16.2115 8.1057C16.9486 8.47423 16.9486 9.52603 16.2115 9.89456L2.89156 16.5545C2.01216 16.9942 1.09271 16.0339 1.57019 15.1745L4.73057 9.48577C4.89836 9.18375 4.89836 8.81651 4.73057 8.51449Z"
+                          stroke="white"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </div>
+                  </button>
+                )}
+              </div>
+              {/* other comments */}
+              {allComments &&
+                allComments.map((c: any) => {
+                  return (
+                    <div
+                      key={c.id}
+                      className=" mb-2 rounded-xl bg-stone-100 px-4 py-2"
+                    >
+                      <div className=" flex items-center">
+                        <ImageProxied
+                          category="profile"
+                          title={`Loading from ${c.profile.picture?.original?.url}`}
+                          alt="Profile"
+                          height={40}
+                          width={40}
+                          className="mr-2 h-8 w-8 cursor-pointer  rounded-full object-cover"
+                          src={c.profile.picture?.original?.url}
+                        />
+                        <div className="">
+                          <div className="text-sm">{c.profile.name}</div>
+                          <div className="flex text-gray-400">
+                            <div className="text-xs">{c.profile.handle}</div>
+                            <div className="text-xs">
+                              &nbsp;• {moment(c.createdAt).fromNow()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="ml-10 mt-2 text-sm">
+                        {c.metadata.content}
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
