@@ -2,6 +2,8 @@ import 'suneditor/dist/css/suneditor.min.css';
 
 import dynamic from 'next/dynamic';
 
+// import '/styles/suneditor/suneditor.css';
+
 const SunEditor = dynamic(() => import('suneditor-react'), {
   ssr: false
 });
@@ -17,21 +19,13 @@ const Editor = ({ initialContent = '', onChange }: Props) => (
     onChange={onChange}
     height="30vh"
     width="100%"
+    setDefaultStyle="font-family: Inter; font-size: 12px;"
     setOptions={{
+      mode: 'balloon',
       buttonList: [
-        ['undo', 'redo'],
-        [
-          'font',
-          'fontSize',
-          'fontColor',
-          'align',
-          'paragraphStyle',
-          'blockquote'
-        ],
-        ['bold', 'underline', 'italic'],
-        ['removeFormat']
-        // ['table', 'list', 'codeView'],
-        // ['preview', 'save']
+        ['undo', 'redo', 'formatBlock'],
+        ['bold', 'underline', 'italic', 'removeFormat'],
+        ['outdent', 'indent', 'align', 'horizontalRule', 'list']
       ]
     }}
   />

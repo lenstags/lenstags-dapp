@@ -214,16 +214,13 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
   const handleFollow = async (profileId: string) => {
     setIsDotFollowing(true);
-    console.log('unfollow? ', showUnfollow);
     if (showUnfollow === 'Unfollow') {
       return freeUnfollow(profileId).then((r) => {
-        console.log('unfollowresult ', r);
         setIsFollowing(false);
         setIsDotFollowing(false);
       });
     } else {
       return proxyActionFreeFollow(profileId).then((r) => {
-        console.log('RRR ', r);
         setIsFollowing(true);
         setIsDotFollowing(false);
       });
@@ -231,14 +228,11 @@ const ExploreCard: FC<Props> = ({ post }) => {
   };
 
   useEffect(() => {
-    const fetchProfileFollow = () => {
-      console.log(' profi ', lensProfile?.id);
-      return doesFollow(post.profile.id, lensProfile?.ownedBy);
-    };
+    const fetchProfileFollow = () =>
+      doesFollow(post.profile.id, lensProfile?.ownedBy);
 
     if (showCard) {
       fetchProfileFollow().then((r) => {
-        console.log('lo sigue? ', r.follows);
         setIsFollowing(r.follows);
       });
     }

@@ -3,6 +3,7 @@ import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 import CollapsiblePanels from 'components/Panels';
 import CreatableSelect from 'react-select/creatable';
 import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
+import { DotWave } from '@uiball/loaders';
 import Editor from 'components/Editor';
 import { IbuiltPost } from '@lib/lens/interfaces/publication';
 import { Layout } from 'components';
@@ -15,7 +16,6 @@ import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import { DotWave } from '@uiball/loaders';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -168,7 +168,10 @@ const Create: NextPage = () => {
     setLoadingIA(false);
   };
 
-  const handleChangeEditor = (content: string) => setEditorContents(content);
+  const handleChangeEditor = (content: string) => {
+    console.log('rr ', content);
+    return setEditorContents(content);
+  };
 
   const handlePost = async () => {
     if (!title) {
@@ -453,7 +456,12 @@ const Create: NextPage = () => {
           />
         </div>
 
-        <div className="mb-2 flex items-center">Contents</div>
+        <div className="mb-2 flex items-center">
+          Contents
+          <i className="ml-6 text-xs text-gray-300">
+            Double click on any word to stylize
+          </i>
+        </div>
 
         <div className="mb-4 w-full rounded-lg border border-black p-2">
           <Editor
