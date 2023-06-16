@@ -3,12 +3,11 @@ import {
   ATTRIBUTES_LIST_KEY,
   PUBLICATION_METADATA_VERSION
 } from '@lib/config';
+import { Layout, ProfileContext } from 'components';
 import {
-  IbuiltPost,
   MetadataAttribute,
   PublicationMainFocus
 } from '@lib/lens/interfaces/publication';
-import { Layout, ProfileContext } from 'components';
 import { useContext, useEffect, useState } from 'react';
 
 import DotWave from '@uiball/loaders/dist/components/DotWave';
