@@ -294,7 +294,7 @@ const Settings: NextPage = () => {
             </div>
           </div>
 
-          <p className="px-6 py-4 font-serif">Follow setup</p>
+          {/* <p className="px-6 py-4 font-serif">Follow setup</p>
           <div className="lens-post font-sans text-sm">
             <div className="flex items-center justify-between px-6 py-4">
               <div className="items-center">
@@ -341,7 +341,7 @@ const Settings: NextPage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <p className="px-6 py-4 font-serif">Profile</p>
 

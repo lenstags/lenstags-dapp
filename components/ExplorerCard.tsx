@@ -214,16 +214,13 @@ const ExploreCard: FC<Props> = ({ post }) => {
 
   const handleFollow = async (profileId: string) => {
     setIsDotFollowing(true);
-    console.log('unfollow? ', showUnfollow);
     if (showUnfollow === 'Unfollow') {
       return freeUnfollow(profileId).then((r) => {
-        console.log('unfollowresult ', r);
         setIsFollowing(false);
         setIsDotFollowing(false);
       });
     } else {
       return proxyActionFreeFollow(profileId).then((r) => {
-        console.log('RRR ', r);
         setIsFollowing(true);
         setIsDotFollowing(false);
       });
@@ -231,14 +228,11 @@ const ExploreCard: FC<Props> = ({ post }) => {
   };
 
   useEffect(() => {
-    const fetchProfileFollow = () => {
-      console.log(' profi ', lensProfile?.id);
-      return doesFollow(post.profile.id, lensProfile?.ownedBy);
-    };
+    const fetchProfileFollow = () =>
+      doesFollow(post.profile.id, lensProfile?.ownedBy);
 
     if (showCard) {
       fetchProfileFollow().then((r) => {
-        console.log('lo sigue? ', r.follows);
         setIsFollowing(r.follows);
       });
     }
@@ -412,15 +406,20 @@ const ExploreCard: FC<Props> = ({ post }) => {
                     >
                       <div className="items-center rounded p-4 font-semibold text-gray-700">
                         <div className="flex justify-between bg-white">
-                          <ImageProxied
-                            category="profile"
-                            alt={`Loading from ${post.profile.picture?.original?.url}`}
-                            height={80}
-                            width={80}
-                            className="h-14 w-14 cursor-pointer rounded-full object-cover"
-                            src={post.profile.picture?.original?.url}
-                          />
-
+                          <a
+                            rel="noreferrer"
+                            href={`/profile/${post.profile.id}`}
+                            target="_blank"
+                          >
+                            <ImageProxied
+                              category="profile"
+                              alt={`Loading from ${post.profile.picture?.original?.url}`}
+                              height={80}
+                              width={80}
+                              className="h-14 w-14 cursor-pointer rounded-full object-cover"
+                              src={post.profile.picture?.original?.url}
+                            />
+                          </a>
                           {isFollowing ? (
                             <button
                               onMouseEnter={() => setShowUnfollow('Unfollow')}
@@ -482,15 +481,21 @@ const ExploreCard: FC<Props> = ({ post }) => {
                             )}
                           </button> */}
                         </div>
-                        <p className="text-base font-bold">
-                          {post.profile.name}
-                        </p>
-                        <p className="text-xs text-stone-500">
-                          @{post.profile.handle}
-                        </p>
-                        <p className="my-2 truncate text-ellipsis text-xs text-stone-500">
-                          {post.profile.bio}
-                        </p>
+                        <a
+                          rel="noreferrer"
+                          href={`/profile/${post.profile.id}`}
+                          target="_blank"
+                        >
+                          <p className="text-base font-bold">
+                            {post.profile.name}
+                          </p>
+                          <p className="text-xs text-stone-500">
+                            @{post.profile.handle}
+                          </p>
+                          <p className="my-2 truncate text-ellipsis text-xs text-stone-500">
+                            {post.profile.bio}
+                          </p>
+                        </a>
                         <div className="mt-3 flex justify-between rounded-lg bg-stone-100 px-3 py-2 font-serif">
                           <div className="flex">
                             <span>
