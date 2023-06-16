@@ -10,7 +10,6 @@ import {
 
 import { apolloClient } from './graphql/apollo-client';
 import { lensHub } from './lens-hub';
-import { login } from '@lib/lens/login';
 
 export const createFollowTypedData = async (request: FollowRequest) => {
   const result = await apolloClient.mutate({
