@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import * as React from 'react';
 
 import { DEFAULT_IMAGE_POST, DEFAULT_IMAGE_PROFILE } from '@lib/config';
@@ -20,13 +21,10 @@ const ImageProxied: React.FC<imageProxiedProps> = (props) => {
 
   const newProps = {
     ...props,
-    src: newSrc
+    src: newSrc,
+    alt: props.alt === '' ? 'No contents' : props.alt
   };
 
-  return (
-    <>
-      <Image alt={!props.alt ? 'No contents' : props.alt} {...newProps} />
-    </>
-  );
+  return <Image {...newProps} />;
 };
 export default ImageProxied;

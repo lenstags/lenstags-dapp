@@ -17,7 +17,11 @@ export type LensLocalStorage = {
 };
 
 export const getFromLocalStorage = (): LensLocalStorage | null => {
-  const lsLensStoreStr = window.localStorage.getItem(LS_LENS_STORE);
+  if (typeof window === 'undefined') {
+    return null;
+  }
+
+  const lsLensStoreStr = window?.localStorage.getItem(LS_LENS_STORE);
   if (!lsLensStoreStr) {
     return null;
   }
