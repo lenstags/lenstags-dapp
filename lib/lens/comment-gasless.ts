@@ -8,12 +8,11 @@ import {
 } from '@lib/lens/interfaces/publication';
 import { pollAndIndexComment, signCreateCommentTypedData } from './comment';
 
-import { APP_NAME } from '@lib/config';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { broadcastRequest } from './broadcast';
 import { profile } from './get-profile';
+import { sleep } from '../helpers';
 import { uploadIpfs } from '@lib/lens/ipfs';
-import { v4 as uuidv4 } from 'uuid';
 
 const prefix = 'create comment gasless';
 
@@ -96,7 +95,9 @@ export const commentGasless = async (
       console.error('create comment via dispatcher: failed', dispatcherResult);
       throw new Error('create comment via dispatcher: failed');
     }
+    await pollAndIndexComment(dispatcherResult.txHash, profileId, prefix);
 
+    //   await pollAndIndexComment(result.txHash, profileId, prefix);
     return { txHash: dispatcherResult.txHash, txId: dispatcherResult.txId };
   } else {
     const signedResult = await signCreateCommentTypedData(createCommentRequest);
