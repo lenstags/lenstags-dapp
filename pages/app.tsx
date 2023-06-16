@@ -306,8 +306,8 @@ const App: NextPage = () => {
               <TagsFilter />
 
               {/* view options */}
-              <div className="mt-2 flex justify-between rounded-t-lg  py-2">
-                <div className="flex gap-1  font-sans font-medium tracking-wide">
+              {/* <div className="mt-2 flex justify-between rounded-t-lg  py-2">
+                <div className="flex  gap-1  font-sans font-medium tracking-wide">
                   <button
                     // onClick={fetchContentAll}
                     className="rounded border
@@ -381,11 +381,11 @@ const App: NextPage = () => {
                     </svg>
                   </button>
                 </div>
-              </div>
+              </div> */}
             </div>
 
             {/* publications */}
-            <div className="h-screen px-4 pt-48">
+            <div className="h-screen px-4 pt-40">
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
                 {publications.length > 0 ? (
                   publications.map((post, index) => (
