@@ -229,7 +229,6 @@ button:active .button_cards {
 
 @import url('./suneditor/suneditor.css');
 @import url('./inputs/inputs.css');
-@import url('./Cards/Cards.css');
 @import url('/ticker/ticker.css');
 
 figure {
