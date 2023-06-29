@@ -122,7 +122,8 @@ export const createUserList = async (lensProfile: any, name: string) => {
   // the setup of the user list
   const constructedUserPost: IbuiltPost = {
     name,
-    content: `Hi there! This is a favList , you can see it in my profile here → <a target="_blank" rel="noopener" href="https://lenstags.xyz/${lensProfile.id}">https://lenstags.xyz/${lensProfile.id}</a>`,
+    content: `Hi there! This is a favList , you can see it in my profile here → <a target="_blank" rel="noopener"
+    href="https://www.nata.social/profile/${lensProfile.id}">https://www.nata.social/profile/${lensProfile.id}</a>`,
     locale: 'en',
     attributes: [
       {
