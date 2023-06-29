@@ -286,20 +286,20 @@ const Home: NextPage = () => {
     <div className="">
       <Head>
         <title>Nata Social</title>
-  
+
         <meta property="og:title" content="We are Nata Social" />
         <meta
           property="og:description"
           content="The first social bookmarking platform, backed by the community`s collective knowledge."
         />
-          <meta
+        <meta
           property="og:image"
           content="https://www.nata.social/banner.png"
         />
         <meta property="og:url" content="https://www.nata.social" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Nata Social" />
-         <meta property="og:locale" content="en_US" />
+        <meta property="og:locale" content="en_US" />
         <meta
           name="twitter:card"
           content="https://www.nata.social/banner.png"
@@ -318,7 +318,6 @@ const Home: NextPage = () => {
           name="twitter:image"
           content="https://www.nata.social/banner.png"
         />
- 
 
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
@@ -864,7 +863,7 @@ const Home: NextPage = () => {
                   </a>
 
                   <a
-                    href="http://linkedin.com/company/lenstags"
+                    href="http://linkedin.com/company/natasocial"
                     target="_blank"
                     rel="noreferrer"
                   >
