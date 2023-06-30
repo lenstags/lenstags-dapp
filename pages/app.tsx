@@ -1,6 +1,6 @@
 import { ProfileContext, TagsFilterContext } from 'components';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import ExplorerCard from 'components/ExplorerCard';
@@ -12,8 +12,10 @@ import Pagination from 'components/Pagination';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
-import { explore } from '@lib/lens/explore-publications';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { useQuery } from '@apollo/client';
+import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -25,6 +27,7 @@ const App: NextPage = () => {
   const { tags } = useContext(TagsFilterContext);
   const [showWelcome, setShowWelcome] = useState(false);
   const [ready, setReady] = useState(false);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
 
   const snackbar = useSnackbar();
   // const lensProfile = useContext(ProfileContext);
@@ -68,14 +71,64 @@ const App: NextPage = () => {
       // console.log('🔆 Verifying first connection');
       findDefault();
     }
-  }, [lensProfile]);
+  }, [lensProfile, snackbar]);
+
+  const query = useMemo(() => {
+    if (!tags) return reqQuery;
+    reqQuery.metadata = {
+      locale: 'en',
+      tags: { oneOf: tags }
+    };
+    return reqQuery;
+  }, [tags]);
+
+  const { fetchMore, refetch } = useQuery(ExplorePublicationsDocument, {
+    variables: {
+      request: query
+    },
+    onCompleted: (data) => {
+      if (cursor === undefined)
+        setCursor(data.explorePublications.pageInfo.next);
+    }
+  });
+
+  const handleLoadMore = () => {
+    if (!cursor) return console.log('no more results');
+    fetchMore({
+      variables: {
+        request: {
+          ...query,
+          cursor
+        }
+      },
+      updateQuery: (prev, { fetchMoreResult }): any => {
+        if (!fetchMoreResult) return 'no more results';
+        return {
+          explorePublications: {
+            ...fetchMoreResult.explorePublications
+          }
+        };
+      }
+    }).then((res) => {
+      if (res.data.explorePublications.items.length > 0) {
+        setCursor(res.data.explorePublications.pageInfo.next);
+        setPublications((prev) => [
+          ...prev,
+          ...res.data.explorePublications.items
+        ]);
+      } else {
+        return console.log('no more results');
+      }
+    });
+  };
 
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
       console.log(data);
       return setPublications(data.items);
     });
-  }, [tags]);
+    refetch();
+  }, [tags, refetch]);
 
   if (hydrationLoading) {
     return (
@@ -400,6 +453,12 @@ const App: NextPage = () => {
 
               {/* pagination */}
               <div className="   h-auto w-full  bg-white px-4 ">
+                <button
+                  className="rounded-lg bg-white px-4 py-2 text-black"
+                  onClick={handleLoadMore}
+                >
+                  Load More
+                </button>
                 <Pagination />
               </div>
             </div>
