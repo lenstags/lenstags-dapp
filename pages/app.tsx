@@ -1,6 +1,13 @@
 import { ProfileContext, TagsFilterContext } from 'components';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
-import { useContext, useEffect, useMemo, useState } from 'react';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import ExplorerCard from 'components/ExplorerCard';
@@ -73,6 +80,9 @@ const App: NextPage = () => {
     }
   }, [lensProfile, snackbar]);
 
+  /**
+   * Infinite scroll
+   */
   const query = useMemo(() => {
     if (!tags) return reqQuery;
     reqQuery.metadata = {
@@ -82,15 +92,18 @@ const App: NextPage = () => {
     return reqQuery;
   }, [tags]);
 
-  const { fetchMore, refetch } = useQuery(ExplorePublicationsDocument, {
-    variables: {
-      request: query
-    },
-    onCompleted: (data) => {
-      if (cursor === undefined)
-        setCursor(data.explorePublications.pageInfo.next);
+  const { fetchMore, refetch, loading } = useQuery(
+    ExplorePublicationsDocument,
+    {
+      variables: {
+        request: query
+      },
+      onCompleted: (data) => {
+        if (cursor === undefined)
+          setCursor(data.explorePublications.pageInfo.next);
+      }
     }
-  });
+  );
 
   const handleLoadMore = () => {
     if (!cursor) return console.log('no more results');
@@ -121,6 +134,21 @@ const App: NextPage = () => {
       }
     });
   };
+
+  const observer = useRef<IntersectionObserver>();
+  const lastPublicationRef = useCallback(
+    (node: HTMLDivElement | null | undefined) => {
+      if (publications.length === 0) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && cursor) {
+          handleLoadMore();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [cursor, publications.length]
+  );
 
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
@@ -441,9 +469,21 @@ const App: NextPage = () => {
             <div className="h-screen px-4 pt-40">
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
                 {publications.length > 0 ? (
-                  publications.map((post, index) => (
-                    <ExplorerCard post={post} key={index} />
-                  ))
+                  publications.map((post, index) => {
+                    if (publications.length === index + 1) {
+                      return (
+                        <ExplorerCard
+                          post={post}
+                          key={index}
+                          refProp={lastPublicationRef}
+                        />
+                      );
+                    } else {
+                      return (
+                        <ExplorerCard post={post} key={index} refProp={null} />
+                      );
+                    }
+                  })
                 ) : (
                   <div className="my-8">
                     <Spinner h="10" w="10" />
@@ -452,15 +492,9 @@ const App: NextPage = () => {
               </div>
 
               {/* pagination */}
-              <div className="   h-auto w-full  bg-white px-4 ">
-                <button
-                  className="rounded-lg bg-white px-4 py-2 text-black"
-                  onClick={handleLoadMore}
-                >
-                  Load More
-                </button>
+              {/* <div className="   h-auto w-full  bg-white px-4 ">
                 <Pagination />
-              </div>
+              </div> */}
             </div>
           </>
         )}
