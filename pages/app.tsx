@@ -1,5 +1,6 @@
 import { ProfileContext, TagsFilterContext } from 'components';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
   useContext,
@@ -10,19 +11,17 @@ import {
 } from 'react';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
-import Pagination from 'components/Pagination';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
-import { explore, reqQuery } from '@lib/lens/explore-publications';
-import { useSnackbar } from 'material-ui-snackbar-provider';
 import { useQuery } from '@apollo/client';
-import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -490,11 +489,6 @@ const App: NextPage = () => {
                   </div>
                 )}
               </div>
-
-              {/* pagination */}
-              {/* <div className="   h-auto w-full  bg-white px-4 ">
-                <Pagination />
-              </div> */}
             </div>
           </>
         )}

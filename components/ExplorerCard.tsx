@@ -31,10 +31,9 @@ const ExploreCard: FC<Props> = (props) => {
   const { post } = props;
   // fetch data for current post, get the latest comments
   const isList =
-    post.metadata.attributes[0].value === 'list' ||
-    post.metadata.attributes[0].value === 'privateDefaultList';
-  // console.log(isList, post.metadata.attributes[0].value);
-  // const lensProfile = useContext(ProfileContext);
+    post.metadata.attributes.length > 0 &&
+    (post.metadata.attributes[0].value === 'list' ||
+      post.metadata.attributes[0].value === 'privateDefaultList');
 
   // console.log(post.id, post.stats.total);
   const { profile: lensProfile } = useContext(ProfileContext);
