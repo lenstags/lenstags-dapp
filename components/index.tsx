@@ -3,7 +3,6 @@ export * from './TagsSection';
 export * from './TagsFilter';
 export * from './TagsFilterProvider';
 export * from './Tabs';
-export * from './Pagination';
 export * from './LensAuthenticationProvider';
 export * from './Layout';
 export * from './explore';

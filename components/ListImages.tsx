@@ -84,21 +84,23 @@ const ListImages: React.FC<listImageProps> = (props) => {
           }}
           loop={true}
         >
-          {URLImages.map((urlImage: string, index: number) => {
-            return (
-              <SwiperSlide key={index}>
-                <div key={index} className="rounded-lg">
-                  <Image
-                    className=" h-28 w-full rounded-lg object-cover"
-                    src={urlImage}
-                    alt=""
-                    width={400}
-                    height={200}
-                  />
-                </div>
-              </SwiperSlide>
-            );
-          })}
+          {URLImages.map(
+            (urlImage: string = '/img/list.png', index: number) => {
+              return (
+                <SwiperSlide key={index}>
+                  <div key={index} className="rounded-lg">
+                    <Image
+                      className=" h-28 w-full rounded-lg object-cover"
+                      src={urlImage}
+                      alt=""
+                      width={400}
+                      height={200}
+                    />
+                  </div>
+                </SwiperSlide>
+              );
+            }
+          )}
         </Swiper>
       ) : (
         // </div>
