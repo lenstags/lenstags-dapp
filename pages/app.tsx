@@ -1,18 +1,26 @@
 import { ProfileContext, TagsFilterContext } from 'components';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
-import { useContext, useEffect, useState } from 'react';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
+import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
-import Pagination from 'components/Pagination';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
-import { explore } from '@lib/lens/explore-publications';
+import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
 const App: NextPage = () => {
@@ -25,6 +33,7 @@ const App: NextPage = () => {
   const { tags } = useContext(TagsFilterContext);
   const [showWelcome, setShowWelcome] = useState(false);
   const [ready, setReady] = useState(false);
+  const [cursor, setCursor] = useState<string | undefined>(undefined);
 
   const snackbar = useSnackbar();
   // const lensProfile = useContext(ProfileContext);
@@ -68,14 +77,85 @@ const App: NextPage = () => {
       // console.log('🔆 Verifying first connection');
       findDefault();
     }
-  }, [lensProfile]);
+  }, [lensProfile, snackbar]);
+
+  /**
+   * Infinite scroll
+   */
+  const query = useMemo(() => {
+    if (!tags) return reqQuery;
+    reqQuery.metadata = {
+      locale: 'en',
+      tags: { oneOf: tags }
+    };
+    return reqQuery;
+  }, [tags]);
+
+  const { fetchMore, refetch, loading } = useQuery(
+    ExplorePublicationsDocument,
+    {
+      variables: {
+        request: query
+      },
+      onCompleted: (data) => {
+        if (cursor === undefined)
+          setCursor(data.explorePublications.pageInfo.next);
+      }
+    }
+  );
+
+  const handleLoadMore = () => {
+    if (!cursor) return console.log('no more results');
+    fetchMore({
+      variables: {
+        request: {
+          ...query,
+          cursor
+        }
+      },
+      updateQuery: (prev, { fetchMoreResult }): any => {
+        if (!fetchMoreResult) return 'no more results';
+        return {
+          explorePublications: {
+            ...fetchMoreResult.explorePublications
+          }
+        };
+      }
+    }).then((res) => {
+      if (res.data.explorePublications.items.length > 0) {
+        setCursor(res.data.explorePublications.pageInfo.next);
+        setPublications((prev) => [
+          ...prev,
+          ...res.data.explorePublications.items
+        ]);
+      } else {
+        return console.log('no more results');
+      }
+    });
+  };
+
+  const observer = useRef<IntersectionObserver>();
+  const lastPublicationRef = useCallback(
+    (node: HTMLDivElement | null | undefined) => {
+      if (publications.length === 0) return;
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && cursor) {
+          handleLoadMore();
+        }
+      });
+      if (node) observer.current.observe(node);
+    },
+    [cursor, publications.length]
+  );
 
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
       console.log(data);
       return setPublications(data.items);
     });
-  }, [tags]);
+    refetch();
+  }, [tags, refetch]);
 
   if (hydrationLoading) {
     return (
@@ -388,19 +468,26 @@ const App: NextPage = () => {
             <div className="h-screen px-4 pt-40">
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
                 {publications.length > 0 ? (
-                  publications.map((post, index) => (
-                    <ExplorerCard post={post} key={index} />
-                  ))
+                  publications.map((post, index) => {
+                    if (publications.length === index + 1) {
+                      return (
+                        <ExplorerCard
+                          post={post}
+                          key={index}
+                          refProp={lastPublicationRef}
+                        />
+                      );
+                    } else {
+                      return (
+                        <ExplorerCard post={post} key={index} refProp={null} />
+                      );
+                    }
+                  })
                 ) : (
                   <div className="my-8">
                     <Spinner h="10" w="10" />
                   </div>
                 )}
-              </div>
-
-              {/* pagination */}
-              <div className="   h-auto w-full  bg-white px-4 ">
-                <Pagination />
               </div>
             </div>
           </>

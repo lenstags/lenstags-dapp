@@ -12,6 +12,8 @@ import LensAuthenticationProvider from 'components/LensAuthenticationProvider';
 import { SnackbarProvider } from 'material-ui-snackbar-provider';
 import TagsFilterProvider from 'components/TagsFilterProvider';
 import { publicProvider } from 'wagmi/providers/public';
+import { ApolloProvider } from '@apollo/client';
+import { apolloClient } from '@lib/lens/graphql/apollo-client';
 
 const { chains, provider } = configureChains(
   [polygonMumbai],
@@ -34,13 +36,15 @@ function MyApp({ Component, pageProps }: AppProps) {
     <WagmiConfig client={wagmiClient}>
       <SnackbarProvider SnackbarProps={{ autoHideDuration: 3000 }}>
         <LensAuthenticationProvider>
-          <AppProvider>
-            <RainbowKitProvider chains={chains}>
-              <TagsFilterProvider>
-                <Component {...pageProps} />
-              </TagsFilterProvider>
-            </RainbowKitProvider>
-          </AppProvider>
+          <ApolloProvider client={apolloClient}>
+            <AppProvider>
+              <RainbowKitProvider chains={chains}>
+                <TagsFilterProvider>
+                  <Component {...pageProps} />
+                </TagsFilterProvider>
+              </RainbowKitProvider>
+            </AppProvider>
+          </ApolloProvider>
         </LensAuthenticationProvider>
       </SnackbarProvider>
     </WagmiConfig>
