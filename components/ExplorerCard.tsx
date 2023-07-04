@@ -598,7 +598,7 @@ const ExploreCard: FC<Props> = (props) => {
                             strokeLinecap="round"
                           />
                         </svg>
-                        <span className="ml-1 font-serif text-xs">
+                        <span className="ml-1  font-serif text-xs">
                           {post.stats.totalAmountOfComments}{' '}
                           {post.stats.totalAmountOfComments === 1
                             ? 'Element'
@@ -737,7 +737,9 @@ const ExploreCard: FC<Props> = (props) => {
                     width={15}
                     height={12}
                   />
-                  <div className="ml-1 ">{post.stats.totalComments || 0}</div>
+                  <div className="ml-1 ">
+                    {post.stats.totalAmountOfComments || 0}
+                  </div>
                 </div>
 
                 {lensProfile && post.hasCollectedByMe && (
