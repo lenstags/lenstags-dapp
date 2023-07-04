@@ -243,16 +243,16 @@ const ExploreCard: FC<Props> = (props) => {
     <div
       // lens-post should be here
       key={post.id}
-      className=" w-11/12 px-1 animate-in fade-in-50
+      className=" w-full px-1 animate-in fade-in-50
       duration-1000
-      xs:w-10/12
-      sm:w-8/12
+      xs:w-11/12
+      sm:w-11/12
       md:w-6/12
-      lg:w-5/12
-      xl:w-4/12
-      2xl:w-3/12
-      3xl:w-2/12
-      4xl:w-1/12"
+      lg:w-6/12
+      xl:w-6/12
+      2xl:w-4/12
+      3xl:w-3/12
+      4xl:w-2/12"
       style={{ opacity, pointerEvents, height: '310px' }}
       ref={props?.refProp}
     >
@@ -670,12 +670,11 @@ const ExploreCard: FC<Props> = (props) => {
                 {/* titles  */}
                 <div
                   style={{
-                    height: '70px'
+                    height: '75px'
                   }}
                   className="mt-1"
                 >
                   <div
-                    // title={post.metadata.name || 'untitled'}
                     className="truncate text-ellipsis font-serif
                        text-sm"
                   >
@@ -683,15 +682,16 @@ const ExploreCard: FC<Props> = (props) => {
                     {post.metadata.name || 'untitled'}
                   </div>
                   <p
-                    className="overflow-au to my-1 mb-3
+                    className=" mt-1
                        font-sans font-thin text-gray-700"
                     style={{
                       fontSize: '10px',
+                      lineHeight: 1.5,
                       height: '32px',
                       overflowY: 'scroll'
                     }}
                   >
-                    {!isList ? post.metadata.description || ' ' : <br />}
+                    {isList ? <br /> : post.metadata.description || ' '}
                     <style>{`
                       ::-webkit-scrollbar {
                         width: 3px;
