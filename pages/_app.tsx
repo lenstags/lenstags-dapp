@@ -22,6 +22,7 @@ const { chains, provider } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: APP_NAME,
+  projectId: '10d787130bde51dbbd27e855ad584ae0',
   chains
 });
 

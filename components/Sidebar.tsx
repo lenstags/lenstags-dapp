@@ -1,13 +1,36 @@
 import { useContext, useState } from 'react';
 
-import Image from 'next/image';
-import ImageProxied from './ImageProxied';
-import Link from 'next/link';
-import { ProfileContext } from './LensAuthenticationProvider';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
+import { getPublications } from '@lib/lens/get-publications';
+import { PublicationTypes } from '@lib/lens/graphql/generated';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useDisconnect } from 'wagmi';
+import { deleteLensLocalStorage } from 'lib/lens/localStorage';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useDisconnect } from 'wagmi';
+import ImageProxied from './ImageProxied';
+import { ProfileContext } from './LensAuthenticationProvider';
+import SidePanel from './SidePanel';
+import { PublicRoutes } from '@/models';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from './ui/Dropdown';
+import {
+  ChevronRightIcon,
+  DotsHorizontalIcon,
+  LockClosedIcon,
+  TextAlignBottomIcon
+} from '@radix-ui/react-icons';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from './ui/Accordion';
 
 interface SidebarProps {
   position: 'left' | 'right';
@@ -17,6 +40,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
   const { openConnectModal } = useConnectModal();
   const { profile: lensProfile } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
+  const router = useRouter();
+  const [publications, setPublications] = useState<any[]>([]);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
@@ -31,6 +56,20 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
       : lensProfile?.picture?.__typename === 'NftImage'
       ? lensProfile?.picture.uri
       : '/img/profilePic.png';
+
+  const fetchMyLists = async () => {
+    if (!lensProfile) return;
+    if (publications.length !== 0) return;
+    const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
+    setPublications(
+      res.items.filter(
+        (r) =>
+          (r.profile.id === lensProfile?.id &&
+            r.metadata.attributes[0].value === 'list') ||
+          r.metadata.attributes[0].value === 'privateDefaultList'
+      )
+    );
+  };
 
   return (
     <div
@@ -58,10 +97,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
           <div className="font-serif text-base">
             <Link href={'/app'}>
               <div
-                className="flex h-12 cursor-pointer items-center gap-1 border-l-4 border-l-teal-400 bg-white
-             px-6 font-bold hover:bg-teal-50
-             
-             "
+                className="flex h-12 cursor-pointer items-center gap-1 border-l-4 bg-white px-6
+             hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold"
               >
                 <svg
                   width="22"
@@ -85,8 +122,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
 
             <Link href={'/app'}>
               <div
-                className="flex h-12 cursor-pointer items-center gap-1 border-l-4  border-l-stone-100 px-6
-             hover:bg-teal-50"
+                className="flex h-12 cursor-pointer items-center gap-1 border-l-4 
+                px-6 hover:border-l-teal-100 hover:bg-teal-50 active:font-bold"
               >
                 <svg
                   width="20"
@@ -109,31 +146,109 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
 
             {lensProfile && (
               <div className=" animate-in fade-in-50 duration-1000 ">
-                <Link href={'/my-profile'}>
-                  <div
-                    className="flex  h-12 cursor-pointer   items-center gap-1
-              border-l-4 border-l-stone-100 px-6 hover:bg-teal-50"
-                  >
-                    <svg
-                      width="20"
-                      height="18"
-                      viewBox="0 0 20 18"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
-                        stroke="#121212"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-
-                    <span className="ml-2">My inventory</span>
-                  </div>
-                </Link>
-
+                {router.pathname !== PublicRoutes.MYPROFILE ? (
+                  <SidePanel
+                    fetchMyLists={fetchMyLists}
+                    publications={publications}
+                  />
+                ) : (
+                  <Accordion type="single">
+                    <AccordionItem value="my-investory" className="border-0">
+                      <AccordionTrigger
+                        onClick={() => {
+                          fetchMyLists();
+                        }}
+                      >
+                        <svg
+                          width="20"
+                          height="18"
+                          viewBox="0 0 20 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
+                            stroke="#121212"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                        <span className="text-md ml-2">My inventory</span>
+                      </AccordionTrigger>
+                      <AccordionContent className="flex h-full flex-col border-0 outline-none">
+                        <div className="mb-2 flex w-full justify-between gap-2 px-6">
+                          <span className="font-serif font-bold">LISTS</span>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger className="outline-none">
+                              <TextAlignBottomIcon className="h-4 w-4 text-lensBlack" />
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              className="flex w-40 flex-col gap-1 border-lensBlack px-2"
+                              align="start"
+                            >
+                              <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
+                                SORT BY
+                              </DropdownMenuLabel>
+                              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
+                                Recents
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
+                                Alphabetical
+                              </DropdownMenuItem>
+                              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
+                                Most collected
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                          {publications?.map((list: any) => (
+                            <div
+                              key={list.id}
+                              className="group flex h-11 w-full cursor-pointer items-center justify-between border-l-4 border-transparent px-6 hover:border-l-teal-400 hover:bg-teal-50"
+                            >
+                              <div className="flex items-center gap-2">
+                                <ChevronRightIcon className="h-5 w-5 text-lensBlack" />
+                                <span className="text-md ml-2 group-hover:font-bold">
+                                  {list.metadata.name}
+                                </span>
+                              </div>
+                              <div className="flex gap-2">
+                                <LockClosedIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger className="outline-none data-[state=open]:bg-teal-400">
+                                    <DotsHorizontalIcon className="h-4 w-4 text-lensBlack opacity-0 group-open:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100" />
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent
+                                    className="flex w-40 flex-col gap-2 border-lensBlack p-4"
+                                    align="start"
+                                  >
+                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
+                                      Go to list
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
+                                      Copy link
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
+                                      Duplicate
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
+                                      Rename
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
+                                      Delete
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                )}
                 <Link href={'/app'}>
                   <div
                     className="flex h-12 cursor-pointer items-center gap-1
