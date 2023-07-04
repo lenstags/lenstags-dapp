@@ -15,7 +15,6 @@ import ImageProxied from 'components/ImageProxied';
 import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
-import { Spinner } from 'components/Spinner';
 import { commentGasless } from '@lib/lens/comment-gasless';
 import { getComments } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
@@ -35,13 +34,14 @@ export default function PostDetails() {
 
   const [post, setPost] = useState<any>();
   const [lensProfile, setProfile] = useState<any>();
-
-  const snackbar = useSnackbar();
-  const [isListVisible, setIsListVisible] = useState(false);
-  const [isFavMenuVisible, setFavMenuVisible] = useState(false);
   const [isSpinnerVisible, setIsSpinnerVisible] = useState(false);
   const [comment, setComment] = useState<string>();
   const [allComments, setAllComments] = useState<any>();
+
+  // Code to be used for collecting later
+  const snackbar = useSnackbar();
+  const [isListVisible, setIsListVisible] = useState(false);
+  const [isFavMenuVisible, setFavMenuVisible] = useState(false);
 
   const firstList = JSON.parse(
     lensProfile?.attributes?.find(
@@ -52,10 +52,6 @@ export default function PostDetails() {
   const [lists, setLists] = useState<typeList[]>(firstList);
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
   const { disconnect } = useDisconnect();
-
-  function createMarkup(innerHtml: string) {
-    return { __html: innerHtml };
-  }
 
   const refreshLists = async (profileId: string) => {
     const readProfile: ProfileQuery['profile'] = await queryProfile({
@@ -69,11 +65,15 @@ export default function PostDetails() {
     setLists(parsedLists);
     setSelectedList(parsedLists); // FIXME: should be only one?
   };
+  ////
+
+  function createMarkup(innerHtml: string) {
+    return { __html: innerHtml };
+  }
 
   const refreshComments = async () => {
     const comments = await getComments(ii);
     setAllComments(comments);
-    console.log('refreshed all! ', comments);
     setIsSpinnerVisible(false);
     setComment('');
   };
@@ -96,6 +96,13 @@ export default function PostDetails() {
 
     fetchData().catch(console.error);
   }, [id]);
+
+  const pictureUrl =
+    lensProfile?.picture?.__typename === 'MediaSet'
+      ? lensProfile?.picture.original.url
+      : lensProfile?.picture?.__typename === 'NftImage'
+      ? lensProfile?.picture.uri
+      : '/img/profilePic.png';
 
   const handleComment = (comment: any) => {
     if (!comment) {
@@ -122,17 +129,31 @@ export default function PostDetails() {
     };
 
     //TODO: use with no gasless too
-    return commentGasless(loggedProfile?.id, ii, commentMetadata).then(() =>
-      refreshComments()
-    );
-  };
+    return commentGasless(loggedProfile?.id, ii, commentMetadata).then(() => {
+      const currentDate = new Date();
+      const formattedDate = currentDate.toISOString();
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
+      const draftComment = {
+        id: uuidv4(),
+        profile: {
+          picture: {
+            // @ts-ignore
+            original: { url: pictureUrl }
+          },
+          name: loggedProfile?.name,
+          handle: loggedProfile?.handle
+        },
+        createdAt: formattedDate,
+        metadata: {
+          content: comment
+        }
+      };
+      const newAll = [draftComment, ...allComments];
+      setAllComments(newAll);
+      setIsSpinnerVisible(false);
+      setComment('');
+    });
+  };
 
   return (
     post && (
@@ -438,7 +459,7 @@ export default function PostDetails() {
                       <div className=" flex items-center">
                         <ImageProxied
                           category="profile"
-                          title={`Loading from ${c.profile.picture?.original?.url}`}
+                          // title={`Loading from ${c.profile.picture?.original?.url}`}
                           alt="Profile"
                           height={40}
                           width={40}
