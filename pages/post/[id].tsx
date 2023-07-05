@@ -99,7 +99,7 @@ export default function PostDetails() {
     fetchData().catch(console.error);
   }, [id]);
 
-  const coverURL = post.metadata.media[0]?.original.url;
+  const coverURL = post?.metadata?.media[0]?.original.url;
   const profileUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
       ? lensProfile?.picture.original.url
@@ -227,12 +227,12 @@ export default function PostDetails() {
                       className="text-ellipsis"
                       href={post.metadata.attributes[1]?.value}
                     >
-                       {/* <Image
-                       src='/icons/url.svg' 
-                       alt='Url'
-                       height: {14}
-                       width: {14} */}
-                       />
+                      <Image
+                        src="/icons/url.svg"
+                        alt="Url"
+                        height={14}
+                        width={14}
+                      />
                     </a>
                   </>
                 )}
