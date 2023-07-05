@@ -20,6 +20,7 @@ import TagStrip from 'components/TagStrip';
 import { commentGasless } from '@lib/lens/comment-gasless';
 import { getComments } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
+import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { typeList } from '@lib/lens/load-lists';
@@ -39,6 +40,8 @@ export default function PostDetails() {
   const [isSpinnerVisible, setIsSpinnerVisible] = useState(false);
   const [comment, setComment] = useState<string>();
   const [allComments, setAllComments] = useState<any>();
+  const [coverURL, setCoverURL] = useState<any>();
+  const [domainURL, setDomainURL] = useState<any>();
 
   // Code to be used for collecting later
   const snackbar = useSnackbar();
@@ -93,13 +96,25 @@ export default function PostDetails() {
       await refreshComments();
       setProfile(profileResult);
       setPost(postObject);
+
+      if (postObject) {
+        setCoverURL(postObject?.metadata?.media[0]?.original.url);
+        if (
+          postObject.metadata.attributes[1] &&
+          postObject.metadata.attributes[1].value
+        ) {
+          setDomainURL(
+            new URL(postObject.metadata.attributes[1].value).hostname
+          );
+        }
+      }
+
       console.log('ooo ', postObject);
     };
 
     fetchData().catch(console.error);
   }, [id]);
 
-  const coverURL = post?.metadata?.media[0]?.original.url;
   const profileUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
       ? lensProfile?.picture.original.url
@@ -158,6 +173,14 @@ export default function PostDetails() {
     });
   };
 
+  const handleRemove = (postId: string) =>
+    hidePublication(postId).then((res) => {
+      snackbar.showMessage(
+        '🗑️ Post removed successfully'
+        // 'Undo', () => handleUndo()
+      );
+    });
+
   return (
     post && (
       <LayoutReading
@@ -178,195 +201,133 @@ export default function PostDetails() {
           {/****/}
           {/* body */}
           <div className="mx-auto mt-5 w-10/12 md:w-4/5">
-            <div className="flex  font-serif text-4xl font-bold">
+            <div className="flex justify-between font-serif text-4xl font-bold">
               <div>{post.metadata.name || 'untitled'}</div>
-              <div className="">sss</div>
-            </div>
 
-            {/* subtitle */}
-            <div className="mt-4 flex items-center">
-              {/* <ImageProxied
-                className=" rounded-full  object-covers"
-                category="profile"
-                height={154}
-                width={154}
-                src={profileUrl}
-                alt="avatar"
-              /> */}
-
-              <div className="items-center rounded font-semibold text-gray-700">
-                <ImageProxied
-                  category="profile"
-                  alt={`Pic from ${post.profile.picture?.original?.url}`}
-                  height={24}
-                  width={24}
-                  className="h-8 w-8 cursor-pointer rounded-full object-cover"
-                  src={post.profile.picture?.original?.url}
-                />
-              </div>
-
-              <p className="ml-2 text-base font-semibold">
-                {lensProfile?.name}
-              </p>
-
-              <p className="ml-2 text-base text-gray-500">
-                @{lensProfile?.handle}
-              </p>
-
-              <p className="ml-2 text-base text-gray-500">
-                ∙ {moment(post.createdAt).format('MMM Do YY')}
-              </p>
-
-              <p className="ml-2 text-base text-gray-500">
-                {post.metadata.attributes[1]?.value && (
-                  <>
-                    ∙ Published in
-                    <a
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-ellipsis"
-                      href={post.metadata.attributes[1]?.value}
-                    >
-                      <Image
-                        src="/icons/url.svg"
-                        alt="Url"
-                        height={14}
-                        width={14}
-                      />
-                    </a>
-                  </>
-                )}
-              </p>
-            </div>
-            <div className="mx-auto w-11/12  py-6 md:w-4/5">
-              <div className="flex text-sm text-black">
-                <footer className="flex items-center  justify-between py-2 text-right text-black">
-                  <button
-                    // onClick={() => {
-                    //   refreshLists(lensProfile?.id);
-                    //   return setFavMenuVisible(!isListVisible);
-                    // }}
-                    className="flex text-right"
-                  >
-                    {/* {lensProfile ? (
-                    // && post.metadata.attributes[0].value === 'post'
-
-                    post.hasCollectedByMe ? (
-                      <div className=" flex items-end rounded-md bg-amber-100 px-2 py-1 text-xs ">
-                        COLLECTED
-                      </div>
-                    ) : (
-                      <div className=" flex items-end rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                        +COLLECT
-                      </div>
-                    )
-                  ) : (
-                    ''
-                  )} */}
-
-                    {lensProfile && post.hasCollectedByMe && (
-                      // && post.metadata.attributes[0].value === 'post'
-                      <div
-                        title="You do own this item!"
-                        className="flex cursor-default items-end rounded-md bg-amber-100 px-2 py-1 text-xs "
-                      >
-                        COLLECTED
-                      </div>
-                    )}
-
-                    {/* {lensProfile && !post.hasCollectedByMe && !isPosting ? (
-                    <button
-                      onClick={() => {
-                        refreshLists(lensProfile?.id);
-                        return setFavMenuVisible(!isListVisible);
-                      }}
-                      className="flex text-right"
-                    >
-                      <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                        +COLLECT
-                      </div>
-                    </button>
-                  ) : (
-                    isPosting && (
-                      <div className="flex text-right">
-                        <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                          Collecting
-                          <div className="relative ml-1 flex items-center">
-                            <div
-                              title={dotTitle}
-                              className={`absolute inset-0 m-auto h-1 w-1 animate-ping
-                                rounded-full border ${dotColor}`}
-                            />
-                            <Spinner h="3" w="3" />
-                          </div>
-                        </div>
-                      </div>
-                    )
-                  )} */}
-                  </button>
-                </footer>
-              </div>
-            </div>
-
-            {/* contents */}
-            <div className=" mx-auto mb-8  w-11/12 md:w-4/5">
-              <div className="mb-4 w-full">
-                <div className=" mb-2 flex justify-between ">
-                  <div className="flex content-baseline  ">
-                    <p className="mt-2 text-xs font-light text-gray-400">
-                      {moment(post.createdAt).format('MMM Do YY')}
-                    </p>
-
-                    {/* menu */}
-                    <div className="dropdown relative inline-block">
-                      <div className=" ml-4 items-center   rounded pt-1 font-semibold  text-gray-700">
-                        <span className="">
-                          <ImageProxied
-                            category="profile"
-                            src="/assets/icons/dots-vertical.svg"
-                            alt=""
-                            width={20}
-                            height={20}
-                          />
-                        </span>
-                      </div>
-                      <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
-                        <li className="">
-                          <a
-                            className="whitespace-no-wrap block rounded-t-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                            href="#"
-                          >
-                            Share
-                          </a>
-                        </li>
-                        <li className="">
-                          <a
-                            className="whitespace-no-wrap block rounded-b-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                            href="#"
-                          >
-                            Report
-                          </a>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
+              {/* card menu */}
+              <div className="dropdown relative inline-block cursor-pointer">
+                <div className="items-center rounded py-2 font-semibold text-gray-700">
+                  <ImageProxied
+                    category="profile"
+                    src="/assets/icons/dots-vertical.svg"
+                    alt=""
+                    width={20}
+                    height={20}
+                  />
                 </div>
 
-                <p className=" text-sm font-thin text-gray-500">
-                  {post.metadata.description || ' '}
+                <div
+                  className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
+                       border-gray-200 
+                      bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 "
+                >
+                  <p className="">
+                    <span
+                      className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
+                      // href="#"
+                    >
+                      Share
+                    </span>
+                  </p>
+
+                  <p className="">
+                    <a
+                      className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
+                      href="#"
+                    >
+                      Report
+                    </a>
+                  </p>
+
+                  <p className="">
+                    {lensProfile && post.profile.id === lensProfile.id && (
+                      <span
+                        className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
+                        onClick={() => handleRemove(post.id)}
+                      >
+                        Remove
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* subtitle row*/}
+            <div className="mt-4 flex items-center justify-between">
+              {/* info */}
+              <div className="flex items-center">
+                <div className="items-center rounded font-semibold text-gray-700">
+                  <ImageProxied
+                    category="profile"
+                    alt={`Pic from ${post.profile.picture?.original?.url}`}
+                    height={24}
+                    width={24}
+                    className="h-8 w-8 cursor-pointer rounded-full object-cover"
+                    src={post.profile.picture?.original?.url}
+                  />
+                </div>
+
+                <p className="ml-2 text-base font-semibold">
+                  {lensProfile?.name}
                 </p>
 
-                <div
-                  className=" my-8 py-8 "
-                  dangerouslySetInnerHTML={createMarkup(
-                    post.metadata.content || 'no-contents'
+                <p className="ml-2 text-base text-gray-500">
+                  @{lensProfile?.handle}
+                </p>
+
+                <p className="ml-2 text-sm text-gray-500">
+                  ∙ {moment(post.createdAt).format('MMM Do YY')}
+                </p>
+
+                <p className="ml-2 text-sm text-gray-400">
+                  {post.metadata.attributes[1]?.value && (
+                    <div className="flex items-center">
+                      ∙ Published in
+                      <a
+                        target="_blank"
+                        rel="noreferrer"
+                        className="ml-1  flex items-center"
+                        href={post.metadata.attributes[1]?.value}
+                      >
+                        {domainURL}&nbsp;
+                        <Image
+                          src="/icons/url.svg"
+                          alt="Url"
+                          height={14}
+                          width={14}
+                        />
+                      </a>
+                    </div>
                   )}
-                ></div>
+                </p>
               </div>
+
+              {/* collect zone */}
+              <div className="flex items-center">collect</div>
+            </div>
+
+            {/* contents area*/}
+            <div className="mb-6">
+              {/* abstract */}
+              {post.metadata.description ? (
+                <p className=" mt-6 border-l-4 border-double py-3 pl-8 font-mono text-gray-500">
+                  {post.metadata.description}
+                </p>
+              ) : (
+                ''
+              )}
+
+              <div
+                className=" mb-8 py-8 "
+                dangerouslySetInnerHTML={createMarkup(
+                  post.metadata.content || 'no-contents'
+                )}
+              ></div>
             </div>
 
             {/* comments section  */}
-            <div className="mx-auto w-11/12 md:w-4/5">
+            <div className=" ">
               <p>Comments</p>
 
               <div className="">

@@ -470,29 +470,6 @@ const ExploreCard: FC<Props> = (props) => {
                           ) : (
                             ''
                           )}
-
-                          {/* backup  */}
-                          {/* <button
-                            onMouseEnter={() => setShowUnfollow(true)}
-                            onMouseLeave={() => setShowUnfollow(false)}
-                            onClick={() => handleFollow(post.profile.id)}
-                            className="te xt-xs m-2 flex items-center rounded-lg border border-solid
-                                 border-black bg-transparent px-2 py-1 font-bold"
-                          >
-                            {isDotFollowing ? (
-                              <div className="mx-2">
-                                <DotWave size={22} color="#000000" />
-                              </div>
-                            ) : isFollowing ? (
-                              showUnfollow ? (
-                                'Unfollow'
-                              ) : (
-                                'Following'
-                              )
-                            ) : (
-                              'Follow'
-                            )}
-                          </button> */}
                         </div>
                         <a
                           rel="noreferrer"
@@ -528,8 +505,11 @@ const ExploreCard: FC<Props> = (props) => {
                   )}
                 </div>
 
-                {/* profile menu */}
-                <div className="dropdown relative inline-block cursor-pointer">
+                {/* card menu */}
+                <div
+                  id="cardMenu"
+                  className="dropdown relative inline-block cursor-pointer"
+                >
                   <div className="items-center rounded py-2 font-semibold text-gray-700">
                     <ImageProxied
                       category="profile"
@@ -630,54 +610,6 @@ const ExploreCard: FC<Props> = (props) => {
                   />
                 )}
 
-                {/* subimage & tags area  */}
-                {/* <div
-                    className={`
-                  ${!isList ? '-mt-2 ' : ''}
-                  flex items-center gap-1 rounded-b-lg bg-stone-100 p-2`}
-                  >
-                    <div className="my-1">
-                      <ImageProxied
-                        src="/assets/icons/tag.svg"
-                        category="post"
-                        width={16}
-                        height={16}
-                      />
-                    </div>
-                    <div
-                      className=" scrollbar-hide scrollbar-thin scrollbar-lightgray-transparent flex items-center
-                      gap-1 overflow-auto
-                      text-right text-xs"
-                    >
-                      {post.metadata.tags.map((tag: string) => {
-                        const tagValue = `${post.id}${tag}`;
-                        return (
-                          <div
-                            key={tagValue}
-                            style={{
-                              fontSize: '8px',
-                              lineHeight: '12px',
-                              paddingTop: '3px',
-                              paddingBottom: '3px'
-                            }}
-                            className="whitespace-nowrap
-                             rounded-full border border-black bg-white px-2 font-serif font-bold tracking-wider"
-                          >
-                            {tag.replace('-', ' ').toUpperCase()}
-                          </div>
-                        );
-                      })}
-
-                      {(!post.metadata.tags ||
-                        post.metadata.tags.length === 0) && (
-                        <div
-                          key={`${post.id}untagged`}
-                          className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
-                        ></div>
-                      )}
-                    </div>
-                  </div> */}
-
                 {/* titles  */}
                 <div
                   style={{
@@ -730,8 +662,11 @@ const ExploreCard: FC<Props> = (props) => {
                 </div>
               </a>
 
-              {/* date and collected indicators*/}
-              <div className=" flex w-full items-center justify-between text-xs">
+              {/* comments and collect indicators */}
+              <div
+                id="indicators"
+                className=" flex w-full items-center justify-between text-xs"
+              >
                 <div
                   style={{ fontSize: '10px' }}
                   className="flex rounded-md bg-stone-100 px-3 py-1 font-serif"
@@ -817,41 +752,8 @@ const ExploreCard: FC<Props> = (props) => {
                     </div>
                   )
                 )}
-                {/* comments */}
-                {/* <div className="flex items-center text-xs ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-messages"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                    strokeWidth={1}
-                    stroke="#718096"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" />
-                    <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                    <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                  </svg>
-
-                  {post.profile.stats?.totalComments || '0'}
-                </div> */}
-                {isListVisible && (
-                  <>
-                    <br />
-                    <div className="absolute mt-24 w-44 rounded-lg bg-yellow-200 p-2 text-left">
-                      <button className="bg-white px-3 py-1 text-black">
-                        Set
-                      </button>
-                      <button className=" bg-white px-3 py-1 text-black">
-                        + New list
-                      </button>
-                    </div>
-                  </>
-                )}
               </div>
+              {/* comments and collect indicators */}
             </div>
           )}
         </article>
