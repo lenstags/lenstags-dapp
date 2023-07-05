@@ -3,7 +3,7 @@ import {
   ATTRIBUTES_LIST_KEY,
   PUBLICATION_METADATA_VERSION
 } from '@lib/config';
-import { Layout, ProfileContext } from 'components';
+import { LayoutReading, ProfileContext } from 'components';
 import {
   MetadataAttribute,
   PublicationMainFocus
@@ -11,10 +11,12 @@ import {
 import { useContext, useEffect, useState } from 'react';
 
 import DotWave from '@uiball/loaders/dist/components/DotWave';
+import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
+import TagStrip from 'components/TagStrip';
 import { commentGasless } from '@lib/lens/comment-gasless';
 import { getComments } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
@@ -97,7 +99,8 @@ export default function PostDetails() {
     fetchData().catch(console.error);
   }, [id]);
 
-  const pictureUrl =
+  const coverURL = post.metadata.media[0]?.original.url;
+  const profileUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
       ? lensProfile?.picture.original.url
       : lensProfile?.picture?.__typename === 'NftImage'
@@ -138,7 +141,7 @@ export default function PostDetails() {
         profile: {
           picture: {
             // @ts-ignore
-            original: { url: pictureUrl }
+            original: { url: profileUrl }
           },
           name: loggedProfile?.name,
           handle: loggedProfile?.handle
@@ -157,81 +160,95 @@ export default function PostDetails() {
 
   return (
     post && (
-      <Layout
-        title="Nata Social | Explore"
-        pageDescription="Profile"
+      <LayoutReading
+        title={`${post.metadata.description} Nata Social | Post from ${lensProfile.name}`}
+        pageDescription="Post"
         screen={true}
       >
-        <div className="w-full px-6  pb-4">
-          {/* header */}
+        <div className="w-full px-6 pb-4">
+          {/* cover */}
           <div
             style={{
-              backgroundImage: `linear-gradient(to bottom, transparent, white), url(${post.metadata.media[0]?.original.url})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center'
+              backgroundImage: `url(${coverURL})`
             }}
-            className="  "
+            className="mx-auto w-10/12 rounded-xl bg-cover bg-center pt-60 md:w-4/5"
           >
-            <div
-              style={{
-                backgroundImage: `linear-gradient(to bottom, transparent, white), url(${post.metadata.media[0]?.original.url})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-              className="mx-auto w-11/12  pt-60   md:w-4/5"
-            >
-              <div className="  flex items-center ">
-                <ImageProxied
-                  className=" rounded-full border-2 border-white object-cover"
-                  category="profile"
-                  height={64}
-                  width={64}
-                  src={pictureUrl}
-                  alt="avatar"
-                />
-                <div className="ml-6">
-                  <p className="mb-1 text-2xl font-semibold">
-                    {lensProfile?.name}
-                  </p>
-                  <p className="mb-2 text-sm font-light">
-                    @{lensProfile?.handle}
-                  </p>
-                </div>
-              </div>
-            </div>
+            <TagStrip tags={post.metadata.tags} postId={post.id} />
           </div>
-          <div className="mx-auto  w-11/12  py-6 md:w-4/5">
-            <div className="flex  text-sm text-black">
-              <footer className="flex items-center  justify-between py-2 text-right text-black">
-                {/* <span className="flex items-center text-xs ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-messages"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                    strokeWidth={1}
-                    stroke="#718096"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+          {/****/}
+          {/* body */}
+          <div className="mx-auto mt-5 w-10/12 md:w-4/5">
+            <div className="flex  font-serif text-4xl font-bold">
+              <div>{post.metadata.name || 'untitled'}</div>
+              <div className="">sss</div>
+            </div>
+
+            {/* subtitle */}
+            <div className="mt-4 flex items-center">
+              {/* <ImageProxied
+                className=" rounded-full  object-covers"
+                category="profile"
+                height={154}
+                width={154}
+                src={profileUrl}
+                alt="avatar"
+              /> */}
+
+              <div className="items-center rounded font-semibold text-gray-700">
+                <ImageProxied
+                  category="profile"
+                  alt={`Pic from ${post.profile.picture?.original?.url}`}
+                  height={24}
+                  width={24}
+                  className="h-8 w-8 cursor-pointer rounded-full object-cover"
+                  src={post.profile.picture?.original?.url}
+                />
+              </div>
+
+              <p className="ml-2 text-base font-semibold">
+                {lensProfile?.name}
+              </p>
+
+              <p className="ml-2 text-base text-gray-500">
+                @{lensProfile?.handle}
+              </p>
+
+              <p className="ml-2 text-base text-gray-500">
+                ∙ {moment(post.createdAt).format('MMM Do YY')}
+              </p>
+
+              <p className="ml-2 text-base text-gray-500">
+                {post.metadata.attributes[1]?.value && (
+                  <>
+                    ∙ Published in
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-ellipsis"
+                      href={post.metadata.attributes[1]?.value}
+                    >
+                       {/* <Image
+                       src='/icons/url.svg' 
+                       alt='Url'
+                       height: {14}
+                       width: {14} */}
+                       />
+                    </a>
+                  </>
+                )}
+              </p>
+            </div>
+            <div className="mx-auto w-11/12  py-6 md:w-4/5">
+              <div className="flex text-sm text-black">
+                <footer className="flex items-center  justify-between py-2 text-right text-black">
+                  <button
+                    // onClick={() => {
+                    //   refreshLists(lensProfile?.id);
+                    //   return setFavMenuVisible(!isListVisible);
+                    // }}
+                    className="flex text-right"
                   >
-                    <path stroke="none" d="M0 0h24v24H0z" />
-                    <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                    <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                  </svg>
-
-                  {post.profile.stats?.totalComments || '0'}
-                </span> */}
-
-                <button
-                  // onClick={() => {
-                  //   refreshLists(lensProfile?.id);
-                  //   return setFavMenuVisible(!isListVisible);
-                  // }}
-                  className="flex text-right"
-                >
-                  {/* {lensProfile ? (
+                    {/* {lensProfile ? (
                     // && post.metadata.attributes[0].value === 'post'
 
                     post.hasCollectedByMe ? (
@@ -247,17 +264,17 @@ export default function PostDetails() {
                     ''
                   )} */}
 
-                  {lensProfile && post.hasCollectedByMe && (
-                    // && post.metadata.attributes[0].value === 'post'
-                    <div
-                      title="You do own this item!"
-                      className="flex cursor-default items-end rounded-md bg-amber-100 px-2 py-1 text-xs "
-                    >
-                      COLLECTED
-                    </div>
-                  )}
+                    {lensProfile && post.hasCollectedByMe && (
+                      // && post.metadata.attributes[0].value === 'post'
+                      <div
+                        title="You do own this item!"
+                        className="flex cursor-default items-end rounded-md bg-amber-100 px-2 py-1 text-xs "
+                      >
+                        COLLECTED
+                      </div>
+                    )}
 
-                  {/* {lensProfile && !post.hasCollectedByMe && !isPosting ? (
+                    {/* {lensProfile && !post.hasCollectedByMe && !isPosting ? (
                     <button
                       onClick={() => {
                         refreshLists(lensProfile?.id);
@@ -286,207 +303,159 @@ export default function PostDetails() {
                       </div>
                     )
                   )} */}
-                </button>
-              </footer>
+                  </button>
+                </footer>
+              </div>
             </div>
-          </div>
-          {/* contents */}
-          <div className=" mx-auto mb-8  w-11/12 md:w-4/5">
-            <div className="mb-4 w-full">
-              <div className=" mb-2 flex justify-between ">
-                <p
-                  title={post.metadata.name || 'untitled'}
-                  className="text-light text-xl"
-                >
-                  {post.metadata.name || 'untitled'}
-                </p>
 
-                <div className="flex content-baseline  ">
-                  <p className="mt-2 text-xs font-light text-gray-400">
-                    {moment(post.createdAt).format('MMM Do YY')}
-                  </p>
+            {/* contents */}
+            <div className=" mx-auto mb-8  w-11/12 md:w-4/5">
+              <div className="mb-4 w-full">
+                <div className=" mb-2 flex justify-between ">
+                  <div className="flex content-baseline  ">
+                    <p className="mt-2 text-xs font-light text-gray-400">
+                      {moment(post.createdAt).format('MMM Do YY')}
+                    </p>
 
-                  {/* menu */}
-                  <div className="dropdown relative inline-block">
-                    <div className=" ml-4 items-center   rounded pt-1 font-semibold  text-gray-700">
-                      <span className="">
-                        <ImageProxied
-                          category="profile"
-                          src="/assets/icons/dots-vertical.svg"
-                          alt=""
-                          width={20}
-                          height={20}
-                        />
-                      </span>
+                    {/* menu */}
+                    <div className="dropdown relative inline-block">
+                      <div className=" ml-4 items-center   rounded pt-1 font-semibold  text-gray-700">
+                        <span className="">
+                          <ImageProxied
+                            category="profile"
+                            src="/assets/icons/dots-vertical.svg"
+                            alt=""
+                            width={20}
+                            height={20}
+                          />
+                        </span>
+                      </div>
+                      <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
+                        <li className="">
+                          <a
+                            className="whitespace-no-wrap block rounded-t-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
+                            href="#"
+                          >
+                            Share
+                          </a>
+                        </li>
+                        <li className="">
+                          <a
+                            className="whitespace-no-wrap block rounded-b-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
+                            href="#"
+                          >
+                            Report
+                          </a>
+                        </li>
+                      </ul>
                     </div>
-                    <ul className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
-                      <li className="">
-                        <a
-                          className="whitespace-no-wrap block rounded-t-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                          href="#"
-                        >
-                          Share
-                        </a>
-                      </li>
-                      <li className="">
-                        <a
-                          className="whitespace-no-wrap block rounded-b-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                          href="#"
-                        >
-                          Report
-                        </a>
-                      </li>
-                    </ul>
                   </div>
                 </div>
+
+                <p className=" text-sm font-thin text-gray-500">
+                  {post.metadata.description || ' '}
+                </p>
+
+                <div
+                  className=" my-8 py-8 "
+                  dangerouslySetInnerHTML={createMarkup(
+                    post.metadata.content || 'no-contents'
+                  )}
+                ></div>
               </div>
-
-              <p className=" text-sm font-thin text-gray-500">
-                {post.metadata.description || ' '}
-              </p>
-
-              <div
-                className="my-8 "
-                dangerouslySetInnerHTML={createMarkup(
-                  post.metadata.content || 'no-contents'
-                )}
-              ></div>
             </div>
 
-            {/* tag list  */}
-            <ul className=" flex flex-wrap justify-start text-xs">
-              {post.metadata.tags.map((tag: string) => {
-                const tagValue = `${post.id}${tag}`;
-                return (
-                  <li
-                    key={tagValue}
-                    className=" mr-1 rounded-md bg-lensGray px-2 shadow-sm shadow-lensGray2"
-                  >
-                    {tag.replace('-', ' ').toUpperCase()}
-                  </li>
-                );
-              })}
+            {/* comments section  */}
+            <div className="mx-auto w-11/12 md:w-4/5">
+              <p>Comments</p>
 
-              {(!post.metadata.tags || post.metadata.tags.length === 0) && (
-                <li
-                  key={`${post.id}untagged`}
-                  className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
-                >
-                  {' '}
-                  {/* untagged */}
-                </li>
-              )}
-            </ul>
-
-            {/* source  */}
-            <div className="ext-ellipsis my-4 text-xs text-gray-400">
-              {post.metadata.attributes[1]?.value && (
-                <>
-                  Source:
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-ellipsis"
-                    href={post.metadata.attributes[1]?.value}
-                  >
-                    {' '}
-                    {post.metadata.attributes[1]?.value}
-                  </a>
-                </>
-              )}
-            </div>
-          </div>
-
-          {/* comments section  */}
-          <div className="mx-auto w-11/12 md:w-4/5">
-            <p>Comments</p>
-
-            <div className="">
-              <div className=" flex bg-white py-4 ">
-                <input
-                  type="text"
-                  autoComplete="off"
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  className="w-full rounded-lg border border-stone-300 
+              <div className="">
+                <div className=" flex bg-white py-4 ">
+                  <input
+                    type="text"
+                    autoComplete="off"
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="w-full rounded-lg border border-stone-300 
                    bg-stone-100  px-3 py-1 
                       leading-none  outline-none"
-                  name="tag-search-input"
-                  id="tag-search-input"
-                  placeholder="Add your comment..."
-                />
+                    name="tag-search-input"
+                    id="tag-search-input"
+                    placeholder="Add your comment..."
+                  />
 
-                {isSpinnerVisible ? (
-                  <button className="ml-3 rounded-lg  bg-stone-400 px-3 py-2 text-white">
-                    <div className="flex items-center">
-                      <span className="mr-1">Sending</span>
-                      <DotWave size={22} color="#FFFFFF" />
-                    </div>
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleComment(comment)}
-                    className="ml-3 rounded-lg  bg-black px-3 py-2 text-white"
-                  >
-                    <div className="flex items-center">
-                      <span className="mr-1">Send</span>
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 18 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M5.00038 9.00013H9.00038M4.73057 8.51449L1.57019 2.82579C1.09271 1.96633 2.01216 1.00602 2.89156 1.44572L16.2115 8.1057C16.9486 8.47423 16.9486 9.52603 16.2115 9.89456L2.89156 16.5545C2.01216 16.9942 1.09271 16.0339 1.57019 15.1745L4.73057 9.48577C4.89836 9.18375 4.89836 8.81651 4.73057 8.51449Z"
-                          stroke="white"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </div>
-                  </button>
-                )}
-              </div>
-              {/* other comments */}
-              {allComments &&
-                allComments.map((c: any) => {
-                  return (
-                    <div
-                      key={c.id}
-                      className=" mb-2 rounded-xl bg-stone-100 px-4 py-2"
+                  {isSpinnerVisible ? (
+                    <button className="ml-3 rounded-lg  bg-stone-400 px-3 py-2 text-white">
+                      <div className="flex items-center">
+                        <span className="mr-1">Sending</span>
+                        <DotWave size={22} color="#FFFFFF" />
+                      </div>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleComment(comment)}
+                      className="ml-3 rounded-lg  bg-black px-3 py-2 text-white"
                     >
-                      <div className=" flex items-center">
-                        <ImageProxied
-                          category="profile"
-                          // title={`Loading from ${c.profile.picture?.original?.url}`}
-                          alt="Profile"
-                          height={40}
-                          width={40}
-                          className="mr-2 h-8 w-8 cursor-pointer  rounded-full object-cover"
-                          src={c.profile.picture?.original?.url}
-                        />
-                        <div className="">
-                          <div className="text-sm">{c.profile.name}</div>
-                          <div className="flex text-gray-400">
-                            <div className="text-xs">{c.profile.handle}</div>
-                            <div className="text-xs">
-                              &nbsp;• {moment(c.createdAt).fromNow()}
+                      <div className="flex items-center">
+                        <span className="mr-1">Send</span>
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 18 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M5.00038 9.00013H9.00038M4.73057 8.51449L1.57019 2.82579C1.09271 1.96633 2.01216 1.00602 2.89156 1.44572L16.2115 8.1057C16.9486 8.47423 16.9486 9.52603 16.2115 9.89456L2.89156 16.5545C2.01216 16.9942 1.09271 16.0339 1.57019 15.1745L4.73057 9.48577C4.89836 9.18375 4.89836 8.81651 4.73057 8.51449Z"
+                            stroke="white"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      </div>
+                    </button>
+                  )}
+                </div>
+                {/* other comments */}
+                {allComments &&
+                  allComments.map((c: any) => {
+                    return (
+                      <div
+                        key={c.id}
+                        className=" mb-2 rounded-xl bg-stone-100 px-4 py-2"
+                      >
+                        <div className=" flex items-center">
+                          <ImageProxied
+                            category="profile"
+                            // title={`Loading from ${c.profile.picture?.original?.url}`}
+                            alt="Profile"
+                            height={40}
+                            width={40}
+                            className="mr-2 h-8 w-8 cursor-pointer  rounded-full object-cover"
+                            src={c.profile.picture?.original?.url}
+                          />
+                          <div className="">
+                            <div className="text-sm">{c.profile.name}</div>
+                            <div className="flex text-gray-400">
+                              <div className="text-xs">{c.profile.handle}</div>
+                              <div className="text-xs">
+                                &nbsp;• {moment(c.createdAt).fromNow()}
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
 
-                      <div className="ml-10 mt-2 text-sm">
-                        {c.metadata.content}
+                        <div className="ml-10 mt-2 text-sm">
+                          {c.metadata.content}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+              </div>
             </div>
           </div>
         </div>
-      </Layout>
+      </LayoutReading>
     )
   );
 }

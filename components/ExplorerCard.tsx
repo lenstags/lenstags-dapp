@@ -8,6 +8,7 @@ import ListImages from './ListImages';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from './Spinner';
+import TurndownService from 'turndown';
 import { addPostIdtoListId } from '@lib/lens/post';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { doesFollow } from '@lib/lens/does-follow';
@@ -64,6 +65,16 @@ const ExploreCard: FC<Props> = (props) => {
     )?.value || `[]`
   );
   // console.log('firstList ', firstList, lensProfile);
+  const fromHtml = new TurndownService();
+
+  fromHtml.keep(['br', 'p', 'div']); // Mantiene los saltos de línea
+  fromHtml.addRule('lineElementsToPlain', {
+    filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    replacement: (content) => {
+      const trimmedContent = content.replace(/\n+$/g, '');
+      return trimmedContent + '\n';
+    }
+  });
 
   const [lists, setLists] = useState<typeList[]>(firstList);
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
@@ -691,7 +702,15 @@ const ExploreCard: FC<Props> = (props) => {
                       overflowY: 'scroll'
                     }}
                   >
-                    {isList ? <br /> : post.metadata.description || ' '}
+                    {isList ? (
+                      <br />
+                    ) : (
+                      (
+                        <pre className=" whitespace-break-spaces font-sans">
+                          {fromHtml.turndown(post.metadata.content)}
+                        </pre>
+                      ) || ' '
+                    )}
                     <style>{`
                       ::-webkit-scrollbar {
                         width: 3px;
