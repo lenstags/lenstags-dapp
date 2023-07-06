@@ -15,6 +15,7 @@ import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
+import PostIndicators from 'components/PostIndicators';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import TagStrip from 'components/TagStrip';
 import { commentGasless } from '@lib/lens/comment-gasless';
@@ -303,8 +304,15 @@ export default function PostDetails() {
                 </p>
               </div>
 
-              {/* collect zone */}
-              <div className="flex items-center">collect</div>
+              <div className="flex items-center gap-2">
+                <PostIndicators
+                  collects={post.stats.totalAmountOfCollects}
+                  comments={post.stats.totalAmountOfComments || 0}
+                />
+
+                {/* collect zone */}
+                <div className="flex items-center">collect</div>
+              </div>
             </div>
 
             {/* contents area*/}

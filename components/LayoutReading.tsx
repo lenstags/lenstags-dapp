@@ -94,20 +94,6 @@ export const LayoutReading: FC<Props> = ({
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></script>
 
-      {/* <div style="
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-  
-  background-image: url('ruta/de/la/imagen.jpg'); background-repeat: no-repeat; background-size: cover; z-index: -1;"></div> */}
-      {/* <div
-      // style={{
-      //   backgroundImage: 'url(/img/app-background.svg)',
-      //   backgroundSize: 'cover',
-      //   backgroundRepeat: 'no-repeat',
-      //   backgroundPosition: 'center'
-      // }}
-      > */}
-      {/* <div className="flex"> */}
-
       <div className=" flex h-screen w-full ">
         <Sidebar position="left" />
 

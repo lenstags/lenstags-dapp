@@ -5,6 +5,8 @@ import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import ListImages from './ListImages';
+import ListsModal from './ListsModal';
+import PostIndicators from './PostIndicators';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from './Spinner';
@@ -55,6 +57,28 @@ const ExploreCard: FC<Props> = (props) => {
   const [showCard, setShowCard] = useState(false);
   const [showUnfollow, setShowUnfollow] = useState('Following');
   const [data, setData] = useState(null);
+
+  // modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [status, setStatus] = useState('idle');
+  const [postId, setPostId] = useState('');
+  const [listId, setListId] = useState('');
+
+  const handleOpenModal = (postId: string, listId: string) => {
+    setPostId(postId);
+    setListId(listId);
+    setStatus('processing');
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleProcessEnd = () => {
+    setStatus('ok');
+  };
+
   // const profil: ProfileQuery['profile'] = await queryProfile({
   //   profileId: pro.id
   // });
@@ -283,6 +307,20 @@ const ExploreCard: FC<Props> = (props) => {
       ) : (
         <article>
           {/* favllect content goes here */}
+          <div>
+            <p>Status: {status}</p>
+            <button onClick={() => handleOpenModal('post1', 'list1')}>
+              Abrir Modal
+            </button>
+            <ListsModal
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              postId={postId}
+              listId={listId}
+              onProcessEnd={handleProcessEnd}
+            />
+          </div>
+
           {isFavMenuVisible && (
             <div className=" lens-post h -96 mt -4">
               <div className="flex p-2">
@@ -663,11 +701,8 @@ const ExploreCard: FC<Props> = (props) => {
               </a>
 
               {/* comments and collect indicators */}
-              <div
-                id="indicators"
-                className=" flex w-full items-center justify-between text-xs"
-              >
-                <div
+              <div className=" flex w-full items-center justify-between text-xs">
+                {/* <div
                   style={{ fontSize: '10px' }}
                   className="flex rounded-md bg-stone-100 px-3 py-1 font-serif"
                 >
@@ -694,7 +729,11 @@ const ExploreCard: FC<Props> = (props) => {
                   <div className="ml-1 ">
                     {post.stats.totalAmountOfComments || 0}
                   </div>
-                </div>
+                </div> */}
+                <PostIndicators
+                  collects={post.stats.totalAmountOfCollects}
+                  comments={post.stats.totalAmountOfComments || 0}
+                />
 
                 {lensProfile && post.hasCollectedByMe && (
                   // && post.metadata.attributes[0].value === 'post'
