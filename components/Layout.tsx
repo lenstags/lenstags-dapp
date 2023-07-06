@@ -1,9 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import { Navbar } from 'components';
-import Script from 'next/script';
 import Sidebar from './Sidebar';
+import { Toaster } from './ui/ToasterUI';
 
 interface Props {
   title: string;
@@ -122,6 +121,7 @@ export const Layout: FC<Props> = ({
           {children}
         </main>
         <Sidebar position="right" />
+        <Toaster />
       </div>
       {/* </div> */}
       {/* </div> */}

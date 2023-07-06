@@ -1,7 +1,10 @@
 import { useContext, useState } from 'react';
 
+import { PublicRoutes } from '@/models';
+import { useSorts } from '@lib/hooks/use-sort';
 import { getPublications } from '@lib/lens/get-publications';
 import { PublicationTypes } from '@lib/lens/graphql/generated';
+import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import Image from 'next/image';
@@ -10,8 +13,14 @@ import { useRouter } from 'next/router';
 import { useDisconnect } from 'wagmi';
 import ImageProxied from './ImageProxied';
 import { ProfileContext } from './LensAuthenticationProvider';
-import SidePanel from './SidePanel';
-import { PublicRoutes } from '@/models';
+import PostsByList from './PostsByList';
+import SidePanel, { sortBy } from './SidePanel';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from './ui/Accordion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,18 +28,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
-import {
-  ChevronRightIcon,
-  DotsHorizontalIcon,
-  LockClosedIcon,
-  TextAlignBottomIcon
-} from '@radix-ui/react-icons';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from './ui/Accordion';
 
 interface SidebarProps {
   position: 'left' | 'right';
@@ -42,6 +39,7 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
   const [profileView, setProfileView] = useState(false);
   const router = useRouter();
   const [publications, setPublications] = useState<any[]>([]);
+  const [sortByValue, setSortByValue] = useState('newest');
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
@@ -69,6 +67,12 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
           r.metadata.attributes[0].value === 'privateDefaultList'
       )
     );
+  };
+
+  const { sortItems } = useSorts();
+  const handleSort = (value: string) => {
+    setSortByValue(value);
+    sortItems({ items: publications, sort: value });
   };
 
   return (
@@ -153,11 +157,15 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                   />
                 ) : (
                   <Accordion type="single">
-                    <AccordionItem value="my-investory" className="border-0">
+                    <AccordionItem
+                      value="my-investory"
+                      className="border-0 py-0"
+                    >
                       <AccordionTrigger
                         onClick={() => {
                           fetchMyLists();
                         }}
+                        className="h-12 border-l-4 px-6 hover:border-l-teal-100 hover:bg-teal-50 data-[state=open]:border-l-teal-400 data-[state=open]:font-bold"
                       >
                         <svg
                           width="20"
@@ -177,8 +185,10 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                         <span className="text-md ml-2">My inventory</span>
                       </AccordionTrigger>
                       <AccordionContent className="flex h-full flex-col border-0 outline-none">
-                        <div className="mb-2 flex w-full justify-between gap-2 px-6">
-                          <span className="font-serif font-bold">LISTS</span>
+                        <div className="flex w-full justify-between border-l-4 border-transparent px-6">
+                          <span className="my-2 font-serif font-bold">
+                            LISTS
+                          </span>
                           <DropdownMenu>
                             <DropdownMenuTrigger className="outline-none">
                               <TextAlignBottomIcon className="h-4 w-4 text-lensBlack" />
@@ -190,61 +200,19 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                               <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
                                 SORT BY
                               </DropdownMenuLabel>
-                              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
-                                Recents
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
-                                Alphabetical
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
-                                Most collected
-                              </DropdownMenuItem>
+                              {sortBy.map((item) => (
+                                <DropdownMenuItem
+                                  className="cursor-pointer select-none px-0 font-serif outline-none"
+                                  key={item.value}
+                                  onClick={() => handleSort(item.value)}
+                                >
+                                  {item.name}
+                                </DropdownMenuItem>
+                              ))}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                        <div className="flex flex-col gap-1">
-                          {publications?.map((list: any) => (
-                            <div
-                              key={list.id}
-                              className="group flex h-11 w-full cursor-pointer items-center justify-between border-l-4 border-transparent px-6 hover:border-l-teal-400 hover:bg-teal-50"
-                            >
-                              <div className="flex items-center gap-2">
-                                <ChevronRightIcon className="h-5 w-5 text-lensBlack" />
-                                <span className="text-md ml-2 group-hover:font-bold">
-                                  {list.metadata.name}
-                                </span>
-                              </div>
-                              <div className="flex gap-2">
-                                <LockClosedIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger className="outline-none data-[state=open]:bg-teal-400">
-                                    <DotsHorizontalIcon className="h-4 w-4 text-lensBlack opacity-0 group-open:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100" />
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent
-                                    className="flex w-40 flex-col gap-2 border-lensBlack p-4"
-                                    align="start"
-                                  >
-                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                                      Go to list
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                                      Copy link
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                                      Duplicate
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                                      Rename
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                                      Delete
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                        <PostsByList publications={publications} />
                       </AccordionContent>
                     </AccordionItem>
                   </Accordion>

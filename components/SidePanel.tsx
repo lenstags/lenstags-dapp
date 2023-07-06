@@ -1,4 +1,12 @@
+import { useSorts } from '@lib/hooks/use-sort';
+import {
+  MagnifyingGlassIcon,
+  TextAlignBottomIcon
+} from '@radix-ui/react-icons';
 import { ArrowLeftIcon } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
+import PostsByList from './PostsByList';
 import {
   DoubleSidebar,
   DoubleSidebarClose,
@@ -7,14 +15,6 @@ import {
   DoubleSidebarTitle,
   DoubleSidebarTrigger
 } from './ui/DoubleSidebar';
-import Link from 'next/link';
-import {
-  ChevronRightIcon,
-  DotsHorizontalIcon,
-  LockClosedIcon,
-  MagnifyingGlassIcon,
-  TextAlignBottomIcon
-} from '@radix-ui/react-icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,7 +27,29 @@ interface SidePanelProps {
   publications: any;
 }
 
+export const sortBy = [
+  { name: 'Newest', value: 'newest' },
+  { name: 'Alphabetical', value: 'alphabetical' },
+  { name: 'Most collected', value: 'most-collected' }
+];
+
+export const actions = [
+  { name: 'Go to list', value: 'go' },
+  { name: 'Copy link', value: 'copy' },
+  { name: 'Duplicate', value: 'duplicate' },
+  { name: 'Rename', value: 'rename' },
+  { name: 'Delete', value: 'delete' }
+];
+
 const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
+  const [sortByValue, setSortByValue] = useState('newest');
+
+  const { sortItems } = useSorts();
+  const handleSort = (value: string) => {
+    setSortByValue(value);
+    sortItems({ items: publications, sort: value });
+  };
+
   return (
     <DoubleSidebar>
       <DoubleSidebarTrigger asChild onClick={() => fetchMyLists()}>
@@ -93,61 +115,19 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
               <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
                 SORT BY
               </DropdownMenuLabel>
-              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
-                Recents
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
-                Alphabetical
-              </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer select-none font-serif outline-none">
-                Most collected
-              </DropdownMenuItem>
+              {sortBy.map((item) => (
+                <DropdownMenuItem
+                  className="cursor-pointer select-none px-0 font-serif outline-none"
+                  key={item.value}
+                  onClick={() => handleSort(item.value)}
+                >
+                  {item.name}
+                </DropdownMenuItem>
+              ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="flex flex-col gap-1">
-          {publications?.map((list: any) => (
-            <div
-              key={list.id}
-              className="group flex h-11 w-full cursor-pointer items-center justify-between border-l-4 border-transparent px-6 hover:border-l-teal-400 hover:bg-teal-50"
-            >
-              <div className="flex items-center gap-2">
-                <ChevronRightIcon className="h-5 w-5 text-lensBlack" />
-                <span className="text-md ml-2 group-hover:font-bold">
-                  {list.metadata.name}
-                </span>
-              </div>
-              <div className="flex gap-2">
-                <LockClosedIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="outline-none data-[state=open]:bg-teal-400">
-                    <DotsHorizontalIcon className="h-4 w-4 text-lensBlack opacity-0 group-open:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="flex w-40 flex-col gap-2 border-lensBlack p-4"
-                    align="start"
-                  >
-                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                      Go to list
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                      Copy link
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                      Duplicate
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                      Rename
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer select-none outline-none">
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-          ))}
-        </div>
+        <PostsByList publications={publications} />
       </DoubleSidebarContent>
     </DoubleSidebar>
   );
