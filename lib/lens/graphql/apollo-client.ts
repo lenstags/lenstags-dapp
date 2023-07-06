@@ -43,12 +43,14 @@ const httpLink = new HttpLink({
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   try {
-    if (graphQLErrors)
+    if (graphQLErrors) {
+      console.log('DETECTION: ', graphQLErrors);
       graphQLErrors.forEach(({ message, locations, path }) =>
         console.log(
           `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
         )
       );
+    }
 
     if (networkError) {
       console.log(`[Network error]: ${networkError}`);

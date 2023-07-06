@@ -11,6 +11,7 @@ import { NextPage } from 'next';
 import { ProfileContext } from 'components';
 import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
+import TurndownService from 'turndown';
 import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
@@ -28,6 +29,8 @@ type ToastContent = {
   message?: string;
   level?: string;
 };
+
+const fromHtml = new TurndownService();
 
 const checkIfUrl = (value: string): boolean => {
   try {
@@ -170,6 +173,20 @@ const Create: NextPage = () => {
 
   const handleChangeEditor = (content: string) => {
     console.log('rr ', content);
+
+    const existing = fromHtml.turndown(content);
+    // if (existing !== $content) {
+    //     const html = htmlFromMarkdown($content);
+    //     editor.setContent(html);
+    // }
+    console.log(existing);
+
+    // const existing = fromHtml.turndown(textInput.innerHTML)
+    // if (existing !== $content) {
+    //     const html = htmlFromMarkdown($content);
+    //     editor.setContent(html);
+    // }
+
     return setEditorContents(content);
   };
 

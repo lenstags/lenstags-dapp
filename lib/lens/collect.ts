@@ -45,26 +45,26 @@ export const freeCollect = async (postId: string) => {
     }
   });
 
-  if (result.data) {
-    while (true) {
-      const statusResult = await proxyActionStatusRequest(
-        result.data.proxyAction
-      );
-      console.log('Minting...', statusResult);
-      if (statusResult.__typename === 'ProxyActionStatusResult') {
-        if (statusResult.status === ProxyActionStatusTypes.Complete) {
-          console.log('Minting complete.', statusResult);
-          break;
-        }
-      }
-      if (statusResult.__typename === 'ProxyActionError') {
-        console.log('Minting failed! ', statusResult);
-        return statusResult; // TODO verify
-      }
-      await sleep(1000);
-    }
+  // if (result.data) {
+  //   while (true) {
+  //     const statusResult = await proxyActionStatusRequest(
+  //       result.data.proxyAction
+  //     );
+  //     console.log('Minting...', statusResult);
+  //     if (statusResult.__typename === 'ProxyActionStatusResult') {
+  //       if (statusResult.status === ProxyActionStatusTypes.Complete) {
+  //         console.log('Minting complete.', statusResult);
+  //         break;
+  //       }
+  //     }
+  //     if (statusResult.__typename === 'ProxyActionError') {
+  //       console.log('Minting failed! ', statusResult);
+  //       return statusResult; // TODO verify
+  //     }
+  //     await sleep(1000);
+  //   }
 
-    // return result.data.proxyAction;
-  }
+  //   // return result.data.proxyAction;
+  // }
   return result; //.errors;
 };

@@ -1,13 +1,16 @@
-import React, { FC, useContext, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 import { createUserList, typeList } from '@lib/lens/load-lists';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import ListImages from './ListImages';
+import ListsModal from './ListsModal';
+import PostIndicators from './PostIndicators';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from './Spinner';
+import TurndownService from 'turndown';
 import { addPostIdtoListId } from '@lib/lens/post';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { doesFollow } from '@lib/lens/does-follow';
@@ -35,7 +38,6 @@ const ExploreCard: FC<Props> = (props) => {
     (post.metadata.attributes[0].value === 'list' ||
       post.metadata.attributes[0].value === 'privateDefaultList');
 
-  // console.log(post.id, post.stats.total);
   const { profile: lensProfile } = useContext(ProfileContext);
   const [openReconnect, setOpenReconnect] = useState(false);
   const [isFavMenuVisible, setFavMenuVisible] = useState(false);
@@ -51,9 +53,58 @@ const ExploreCard: FC<Props> = (props) => {
   const [isListExistent, setIsListExistent] = useState(false);
   const [isFollowing, setIsFollowing] = useState(post.profile.isFollowedByMe);
   const [isDotFollowing, setIsDotFollowing] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [showUnfollow, setShowUnfollow] = useState('Following');
   const [data, setData] = useState(null);
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnter = () => {
+    timeoutId.current = setTimeout(() => {
+      setShowCard(true);
+    }, 600);
+  };
+
+  const handleMouseLeave = () => {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+    setShowCard(false);
+  };
+
+  // modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [collectStatus, setCollectStatus] = useState('idle');
+  const [postId, setPostId] = useState('');
+
+  const handleOpenModal = (postId: string) => {
+    setPostId(postId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleProcessStatus = (actualStatus: string) => {
+    setCollectStatus(actualStatus);
+    if (
+      actualStatus === 'creating-list' ||
+      actualStatus === 'collecting-post' ||
+      actualStatus === 'adding-post' ||
+      actualStatus === 'indexing'
+    ) {
+      setIsPosting(true);
+    }
+
+    if (actualStatus === 'finished') {
+      setIsPosting(false);
+      setIsFinished(true);
+    }
+
+    // error-unauthenticated//
+  };
+
   // const profil: ProfileQuery['profile'] = await queryProfile({
   //   profileId: pro.id
   // });
@@ -64,6 +115,16 @@ const ExploreCard: FC<Props> = (props) => {
     )?.value || `[]`
   );
   // console.log('firstList ', firstList, lensProfile);
+  const fromHtml = new TurndownService();
+
+  fromHtml.keep(['br', 'p', 'div']); // keep line breaks
+  fromHtml.addRule('lineElementsToPlain', {
+    filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    replacement: (content) => {
+      const trimmedContent = content.replace(/\n+$/g, '');
+      return trimmedContent + '\n';
+    }
+  });
 
   const [lists, setLists] = useState<typeList[]>(firstList);
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
@@ -145,74 +206,6 @@ const ExploreCard: FC<Props> = (props) => {
   // - create the post list, post.attributes = attributes [ { postSubType = 'favsList' }, ... ]
   // - get the postId, and add it to the profile.metadata
 
-  const handleAddPostToList = async (
-    profileId: string,
-    selectedPostId: string,
-    listId?: string,
-    name?: string
-  ) => {
-    setIsPosting(true);
-    setDotColor(' border-red-400 bg-red-600 ');
-    setDotTitle('Creating post');
-    setFavMenuVisible(false);
-
-    // verifies if selected list does exist in the current profile, if not, create it
-    if (!listId) {
-      // FIXME: DON'T RETURN AN OBJECT?
-      // TODO: OPTIMIZE IT
-      setDotColor(' border-red-400 bg-black');
-      setDotTitle('Creating list');
-      snackbar.showMessage(
-        '🟦 Creating the new list, you can continue exploring.'
-      );
-      listId = (await createUserList(lensProfile, name!)).key;
-      console.log('List (post) ID returned to the UI: ', listId);
-    }
-
-    // TODO: DEPRECATED ATM
-    // const clonedId = await cloneAndCollectPost(lensProfile, selectedPostId);
-    // if (!clonedId) {
-    //   throw 'Unknown error when cloning';
-    // }
-
-    snackbar.showMessage(
-      '🟦 Collecting and minting item, you can continue exploring.'
-    );
-    const collectResult = await freeCollect(selectedPostId);
-    if (collectResult.errors?.length > 0) {
-      setIsPosting(false);
-      if (collectResult.errors[0].extensions.code === 'UNAUTHENTICATED') {
-        snackbar.showMessage(`🟥 Error: ${collectResult.errors[0].message}`);
-        setOpenReconnect(true);
-        return;
-      }
-      setIsPosting(false);
-      snackbar.showMessage(`🟨 Attention: ${collectResult.errors[0].message}`);
-      return;
-    }
-
-    // just add the post to the list
-    setDotColor(' border-yellow-400 bg-yellow-600 ');
-    setDotTitle('Indexing list');
-
-    const addResult = await addPostIdtoListId(
-      profileId,
-      listId,
-      selectedPostId
-    );
-
-    snackbar.showMessage(
-      '🟩 Item added to list! 🗂️'
-      // 'Undo', () => handleUndo()
-    ); // TODO: SHOW SOME UI BOX
-    // TODO: update lists in UI!
-    setDotColor(' border-blue-400 bg-blue-600 ');
-    setDotTitle('Finished');
-    setIsPosting(false);
-
-    return;
-  };
-
   const handleFollow = async (profileId: string) => {
     setIsDotFollowing(true);
     if (showUnfollow === 'Unfollow') {
@@ -240,129 +233,58 @@ const ExploreCard: FC<Props> = (props) => {
   }, [showCard]);
 
   return (
-    <div
-      // lens-post should be here
-      key={post.id}
-      className=" w-11/12 px-1 animate-in fade-in-50
+    <>
+      <div
+        // lens-post should be here
+        key={post.id}
+        className=" w-full px-1 animate-in fade-in-50
       duration-1000
-      xs:w-10/12
-      sm:w-8/12
+      xs:w-11/12
+      sm:w-11/12
       md:w-6/12
-      lg:w-5/12
-      xl:w-4/12
-      2xl:w-3/12
-      3xl:w-2/12
-      4xl:w-1/12"
-      style={{ opacity, pointerEvents, height: '310px' }}
-      ref={props?.refProp}
-    >
-      {/* animate-in slide-in-from-bottom duration-1000 */}
-      {openReconnect ? (
-        <div className="mt-14 h-full text-center ">
-          {/* TODO  write status in a context so the app shows a modal */}
-          <p className="my-4 text-2xl">⛔️</p>
-          <p className="my-4 ">You were logged out</p>
-          <button
-            onClick={handleDisconnect}
-            className=" bg-lensGreen px-3 py-2"
-          >
-            Connect!
-          </button>
-        </div>
-      ) : (
-        <article>
-          {/* favllect content goes here */}
-          {isFavMenuVisible && (
-            <div className=" lens-post h -96 mt -4">
-              <div className="flex p-2">
-                <button
-                  id="btnBack"
-                  onClick={() => setFavMenuVisible(false)}
-                  className="bg-white text-xl "
-                >
-                  ←
-                </button>
-                <span className="w-full items-center truncate text-ellipsis pl-1 pt-2 text-sm ">
-                  {post.metadata.name || 'untitled'}
-                </span>
-              </div>
+      lg:w-6/12
+      xl:w-6/12
+      2xl:w-4/12
+      3xl:w-3/12
+      4xl:w-2/12"
+        style={{ opacity, pointerEvents, height: '310px' }}
+        ref={props?.refProp}
+      >
+        {openReconnect ? (
+          <div className="mt-14 h-full text-center ">
+            {/* TODO  write status in a context so the app shows a modal */}
+            <p className="my-4 text-2xl">⛔️</p>
+            <p className="my-4 ">You were logged out</p>
+            <button
+              onClick={handleDisconnect}
+              className=" bg-lensGreen px-3 py-2"
+            >
+              Connect!
+            </button>
+          </div>
+        ) : (
+          <article>
+            {/* favllect content goes here */}
+            <ListsModal
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              postId={postId}
+              processStatus={handleProcessStatus}
+            />
 
-              <div className="m-2">
-                <input
-                  type="text"
-                  autoComplete="off"
-                  value={valueListName}
-                  onChange={handleChangeListName}
-                  className=" w-full rounded-lg border-2 border-solid border-gray-200 px-2 py-1 text-sm leading-none text-gray-600 outline-none"
-                  name="tag-search-input"
-                  id="tag-search-input"
-                  // onKeyDown={handleKeyDown}
-                  placeholder="Select a list or type one..."
-                />
-              </div>
-
-              <div
-                className="scrollbar-hide z-10 
-               overflow-y-auto border-b-2 border-solid
-              border-gray-100 px-2"
-              >
-                {selectedList.map((list: typeList) => {
-                  return (
-                    <button
-                      className=" my-1 w-full rounded-lg  
-                        bg-gray-100 py-1 text-sm hover:bg-black hover:text-white"
-                      key={list.key}
-                      value={list.key}
-                      onClick={() =>
-                        handleAddPostToList(
-                          lensProfile?.id,
-                          post.id,
-                          list.key,
-                          undefined
-                        )
-                      }
-                    >
-                      {list.name}
-                    </button>
-                  );
-                })}
-              </div>
-
-              <footer className="py-4 text-center">
-                <button
-                  onClick={() =>
-                    handleAddPostToList(
-                      lensProfile?.id,
-                      post.id,
-                      undefined,
-                      valueListName
-                    )
-                  }
-                  className={`rounded-lg px-2 py-2 font-bold ${
-                    valueListName && !isListExistent
-                      ? 'bg-black text-white'
-                      : 'disabled cursor-not-allowed bg-gray-100'
-                  }`}
-                  disabled={!valueListName || isListExistent}
-                >
-                  ✦ Create and add
-                </button>
-              </footer>
-            </div>
-          )}
-
-          {/* main tab contents goes here */}
-          {!isFavMenuVisible && (
+            {/* main tab contents goes here */}
             <div className="lens-post relative p-4">
               {/* card contents */}
               <div className="flex justify-between pb-3 text-sm text-black">
                 {/* profile */}
                 <div
-                  onMouseEnter={() => setShowCard(true)}
-                  onMouseLeave={() => setShowCard(false)}
-                  className="dropd own relative  flex"
+                  // onMouseEnter={() => setShowCard(true)}
+                  // onMouseLeave={() => setShowCard(false)}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                  className=" relative flex"
                 >
-                  {/* profile hover */}
+                  {/* profile header */}
                   <div className="inline-block cursor-pointer">
                     <div className="items-center rounded font-semibold text-gray-700">
                       <ImageProxied
@@ -402,9 +324,9 @@ const ExploreCard: FC<Props> = (props) => {
                   {/* profile hover */}
                   {showCard && (
                     <div
-                      className="dro pdown-menu lens-post  
-                     hi dden absolute top-5 z-10 w-64 shadow-xl shadow-black animate-in fade-in-50
-                         duration-500 "
+                      className="lens-post  
+                      absolute top-5 z-10 
+                     w-64 shadow-xl  animate-in fade-in-50 duration-500 "
                     >
                       <div className="items-center rounded p-4 font-semibold text-gray-700">
                         <div className="flex justify-between bg-white">
@@ -459,29 +381,6 @@ const ExploreCard: FC<Props> = (props) => {
                           ) : (
                             ''
                           )}
-
-                          {/* backup  */}
-                          {/* <button
-                            onMouseEnter={() => setShowUnfollow(true)}
-                            onMouseLeave={() => setShowUnfollow(false)}
-                            onClick={() => handleFollow(post.profile.id)}
-                            className="te xt-xs m-2 flex items-center rounded-lg border border-solid
-                                 border-black bg-transparent px-2 py-1 font-bold"
-                          >
-                            {isDotFollowing ? (
-                              <div className="mx-2">
-                                <DotWave size={22} color="#000000" />
-                              </div>
-                            ) : isFollowing ? (
-                              showUnfollow ? (
-                                'Unfollow'
-                              ) : (
-                                'Following'
-                              )
-                            ) : (
-                              'Follow'
-                            )}
-                          </button> */}
                         </div>
                         <a
                           rel="noreferrer"
@@ -517,8 +416,11 @@ const ExploreCard: FC<Props> = (props) => {
                   )}
                 </div>
 
-                {/* profile menu */}
-                <div className="dropdown relative inline-block cursor-pointer">
+                {/* card menu */}
+                <div
+                  id="cardMenu"
+                  className="dropdown relative inline-block cursor-pointer"
+                >
                   <div className="items-center rounded py-2 font-semibold text-gray-700">
                     <ImageProxied
                       category="profile"
@@ -598,7 +500,7 @@ const ExploreCard: FC<Props> = (props) => {
                             strokeLinecap="round"
                           />
                         </svg>
-                        <span className="ml-1 font-serif text-xs">
+                        <span className="ml-1  font-serif text-xs">
                           {post.stats.totalAmountOfComments}{' '}
                           {post.stats.totalAmountOfComments === 1
                             ? 'Element'
@@ -619,63 +521,14 @@ const ExploreCard: FC<Props> = (props) => {
                   />
                 )}
 
-                {/* subimage & tags area  */}
-                {/* <div
-                    className={`
-                  ${!isList ? '-mt-2 ' : ''}
-                  flex items-center gap-1 rounded-b-lg bg-stone-100 p-2`}
-                  >
-                    <div className="my-1">
-                      <ImageProxied
-                        src="/assets/icons/tag.svg"
-                        category="post"
-                        width={16}
-                        height={16}
-                      />
-                    </div>
-                    <div
-                      className=" scrollbar-hide scrollbar-thin scrollbar-lightgray-transparent flex items-center
-                      gap-1 overflow-auto
-                      text-right text-xs"
-                    >
-                      {post.metadata.tags.map((tag: string) => {
-                        const tagValue = `${post.id}${tag}`;
-                        return (
-                          <div
-                            key={tagValue}
-                            style={{
-                              fontSize: '8px',
-                              lineHeight: '12px',
-                              paddingTop: '3px',
-                              paddingBottom: '3px'
-                            }}
-                            className="whitespace-nowrap
-                             rounded-full border border-black bg-white px-2 font-serif font-bold tracking-wider"
-                          >
-                            {tag.replace('-', ' ').toUpperCase()}
-                          </div>
-                        );
-                      })}
-
-                      {(!post.metadata.tags ||
-                        post.metadata.tags.length === 0) && (
-                        <div
-                          key={`${post.id}untagged`}
-                          className=" rounded-md bg-lensGray px-2 italic shadow-sm shadow-lensGray2"
-                        ></div>
-                      )}
-                    </div>
-                  </div> */}
-
                 {/* titles  */}
                 <div
                   style={{
-                    height: '70px'
+                    height: '75px'
                   }}
                   className="mt-1"
                 >
                   <div
-                    // title={post.metadata.name || 'untitled'}
                     className="truncate text-ellipsis font-serif
                        text-sm"
                   >
@@ -683,15 +536,24 @@ const ExploreCard: FC<Props> = (props) => {
                     {post.metadata.name || 'untitled'}
                   </div>
                   <p
-                    className="overflow-au to my-1 mb-3
+                    className=" mt-1
                        font-sans font-thin text-gray-700"
                     style={{
                       fontSize: '10px',
+                      lineHeight: 1.5,
                       height: '32px',
                       overflowY: 'scroll'
                     }}
                   >
-                    {!isList ? post.metadata.description || ' ' : <br />}
+                    {isList ? (
+                      <br />
+                    ) : (
+                      (
+                        <pre className=" whitespace-break-spaces font-sans">
+                          {fromHtml.turndown(post.metadata.content)}
+                        </pre>
+                      ) || ' '
+                    )}
                     <style>{`
                       ::-webkit-scrollbar {
                         width: 3px;
@@ -711,131 +573,79 @@ const ExploreCard: FC<Props> = (props) => {
                 </div>
               </a>
 
-              {/* date and collected indicators*/}
+              {/* comments and collect indicators */}
               <div className=" flex w-full items-center justify-between text-xs">
-                <div
-                  style={{ fontSize: '10px' }}
-                  className="flex rounded-md bg-stone-100 px-3 py-1 font-serif"
-                >
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/collect.svg"
-                    alt="Collect"
-                    title="Total amount of collects"
-                    width={12}
-                    height={12}
-                  />
-                  <div className="ml-1 mr-3">
-                    {post.stats.totalAmountOfCollects}
-                  </div>
+                <PostIndicators
+                  collects={post.stats.totalAmountOfCollects}
+                  comments={post.stats.totalAmountOfComments || 0}
+                />
 
-                  <ImageProxied
-                    category="profile"
-                    src="/assets/icons/comments.svg"
-                    alt="Comments"
-                    title="Comments"
-                    width={15}
-                    height={12}
-                  />
-                  <div className="ml-1 ">{post.stats.totalComments || 0}</div>
-                </div>
-
-                {lensProfile && post.hasCollectedByMe && (
+                {(isFinished || (lensProfile && post.hasCollectedByMe)) && (
                   // && post.metadata.attributes[0].value === 'post'
                   <div
                     title="You do own this item!"
-                    className="flex cursor-default items-end  rounded-md bg-teal-300 px-2 py-1 text-right text-xs font-bold "
+                    className="flex cursor-default items-end rounded-md bg-teal-300 px-2 py-1 text-right text-xs font-bold "
                   >
                     Collected
                   </div>
                 )}
 
-                {lensProfile && !post.hasCollectedByMe && !isPosting ? (
-                  <button
-                    onClick={() => {
-                      refreshLists(lensProfile?.id);
-                      return setFavMenuVisible(!isListVisible);
-                    }}
-                    className="  rounded-lg bg-black  "
-                  >
-                    <div
-                      className="flex items-center px-2 py-1
-                       text-xs "
+                {!isFinished &&
+                  !isPosting &&
+                  lensProfile &&
+                  !post.hasCollectedByMe && (
+                    <button
+                      onClick={() => {
+                        handleOpenModal(post.id);
+                      }}
+                      className="  rounded-lg bg-black "
                     >
-                      <svg
-                        width="14"
-                        height="14"
-                        viewBox="0 0 14 14"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
+                      <div
+                        className="flex items-center px-2 py-1
+                       text-xs "
                       >
-                        <path
-                          d="M7.5 1C7.5 0.723858 7.27614 0.5 7 0.5C6.72386 0.5 6.5 0.723858 6.5 1L7.5 1ZM6.5 8.33333C6.5 8.60948 6.72386 8.83333 7 8.83333C7.27614 8.83333 7.5 8.60948 7.5 8.33333H6.5ZM10.0202 7.35355C10.2155 7.15829 10.2155 6.84171 10.0202 6.64645C9.82496 6.45118 9.50838 6.45118 9.31311 6.64645L10.0202 7.35355ZM7.4714 9.19526L7.11785 8.84171L7.4714 9.19526ZM6.5286 9.19526L6.88215 8.84171L6.5286 9.19526ZM4.68689 6.64645C4.49162 6.45118 4.17504 6.45118 3.97978 6.64645C3.78452 6.84171 3.78452 7.15829 3.97978 7.35355L4.68689 6.64645ZM1.5 9.66667C1.5 9.39052 1.27614 9.16667 1 9.16667C0.723858 9.16667 0.5 9.39052 0.5 9.66667H1.5ZM13.5 9.66667C13.5 9.39052 13.2761 9.16667 13 9.16667C12.7239 9.16667 12.5 9.39052 12.5 9.66667H13.5ZM11.908 12.782L11.681 12.3365H11.681L11.908 12.782ZM12.782 11.908L13.2275 12.135L12.782 11.908ZM1.21799 11.908L0.772484 12.135L1.21799 11.908ZM2.09202 12.782L1.86502 13.2275H1.86502L2.09202 12.782ZM6.5 1L6.5 8.33333H7.5L7.5 1L6.5 1ZM9.31311 6.64645L7.11785 8.84171L7.82496 9.54882L10.0202 7.35355L9.31311 6.64645ZM6.88215 8.84171L4.68689 6.64645L3.97978 7.35355L6.17504 9.54882L6.88215 8.84171ZM7.11785 8.84171C7.05276 8.9068 6.94724 8.9068 6.88215 8.84171L6.17504 9.54882C6.63065 10.0044 7.36935 10.0044 7.82496 9.54882L7.11785 8.84171ZM0.5 9.66667V9.8H1.5V9.66667H0.5ZM4.2 13.5H9.8V12.5H4.2V13.5ZM13.5 9.8V9.66667H12.5V9.8H13.5ZM9.8 13.5C10.3518 13.5 10.7957 13.5004 11.1543 13.4711C11.5187 13.4413 11.8388 13.3784 12.135 13.2275L11.681 12.3365C11.5493 12.4036 11.3755 12.4497 11.0729 12.4744C10.7645 12.4996 10.3683 12.5 9.8 12.5V13.5ZM12.5 9.8C12.5 10.3683 12.4996 10.7645 12.4744 11.0729C12.4497 11.3755 12.4036 11.5493 12.3365 11.681L13.2275 12.135C13.3784 11.8388 13.4413 11.5187 13.4711 11.1543C13.5004 10.7957 13.5 10.3518 13.5 9.8H12.5ZM12.135 13.2275C12.6054 12.9878 12.9878 12.6054 13.2275 12.135L12.3365 11.681C12.1927 11.9632 11.9632 12.1927 11.681 12.3365L12.135 13.2275ZM0.5 9.8C0.5 10.3518 0.499611 10.7957 0.528909 11.1543C0.558684 11.5187 0.62159 11.8388 0.772484 12.135L1.66349 11.681C1.5964 11.5493 1.55031 11.3755 1.52559 11.0729C1.50039 10.7645 1.5 10.3683 1.5 9.8H0.5ZM4.2 12.5C3.6317 12.5 3.23554 12.4996 2.92712 12.4744C2.62454 12.4497 2.45069 12.4036 2.31901 12.3365L1.86502 13.2275C2.16117 13.3784 2.48126 13.4413 2.84569 13.4711C3.20428 13.5004 3.6482 13.5 4.2 13.5V12.5ZM0.772484 12.135C1.01217 12.6054 1.39462 12.9878 1.86502 13.2275L2.31901 12.3365C2.03677 12.1927 1.8073 11.9632 1.66349 11.681L0.772484 12.135Z"
-                          fill="white"
-                        />
-                      </svg>
-                      <span className="ml-2 mr-1 font-bold text-white ">
-                        Collect
-                      </span>
-                    </div>
-                  </button>
-                ) : (
-                  isPosting && (
-                    <div className="flex text-right">
-                      <div className=" flex items-center rounded-md bg-lensGreen px-2 py-1 text-xs ">
-                        Collecting
-                        <div className="relative ml-1 flex items-center">
-                          <div
-                            title={dotTitle}
-                            className={`absolute inset-0 m-auto h-1 w-1 animate-ping
-                                rounded-full border ${dotColor}`}
+                        <svg
+                          width="14"
+                          height="14"
+                          viewBox="0 0 14 14"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M7.5 1C7.5 0.723858 7.27614 0.5 7 0.5C6.72386 0.5 6.5 0.723858 6.5 1L7.5 1ZM6.5 8.33333C6.5 8.60948 6.72386 8.83333 7 8.83333C7.27614 8.83333 7.5 8.60948 7.5 8.33333H6.5ZM10.0202 7.35355C10.2155 7.15829 10.2155 6.84171 10.0202 6.64645C9.82496 6.45118 9.50838 6.45118 9.31311 6.64645L10.0202 7.35355ZM7.4714 9.19526L7.11785 8.84171L7.4714 9.19526ZM6.5286 9.19526L6.88215 8.84171L6.5286 9.19526ZM4.68689 6.64645C4.49162 6.45118 4.17504 6.45118 3.97978 6.64645C3.78452 6.84171 3.78452 7.15829 3.97978 7.35355L4.68689 6.64645ZM1.5 9.66667C1.5 9.39052 1.27614 9.16667 1 9.16667C0.723858 9.16667 0.5 9.39052 0.5 9.66667H1.5ZM13.5 9.66667C13.5 9.39052 13.2761 9.16667 13 9.16667C12.7239 9.16667 12.5 9.39052 12.5 9.66667H13.5ZM11.908 12.782L11.681 12.3365H11.681L11.908 12.782ZM12.782 11.908L13.2275 12.135L12.782 11.908ZM1.21799 11.908L0.772484 12.135L1.21799 11.908ZM2.09202 12.782L1.86502 13.2275H1.86502L2.09202 12.782ZM6.5 1L6.5 8.33333H7.5L7.5 1L6.5 1ZM9.31311 6.64645L7.11785 8.84171L7.82496 9.54882L10.0202 7.35355L9.31311 6.64645ZM6.88215 8.84171L4.68689 6.64645L3.97978 7.35355L6.17504 9.54882L6.88215 8.84171ZM7.11785 8.84171C7.05276 8.9068 6.94724 8.9068 6.88215 8.84171L6.17504 9.54882C6.63065 10.0044 7.36935 10.0044 7.82496 9.54882L7.11785 8.84171ZM0.5 9.66667V9.8H1.5V9.66667H0.5ZM4.2 13.5H9.8V12.5H4.2V13.5ZM13.5 9.8V9.66667H12.5V9.8H13.5ZM9.8 13.5C10.3518 13.5 10.7957 13.5004 11.1543 13.4711C11.5187 13.4413 11.8388 13.3784 12.135 13.2275L11.681 12.3365C11.5493 12.4036 11.3755 12.4497 11.0729 12.4744C10.7645 12.4996 10.3683 12.5 9.8 12.5V13.5ZM12.5 9.8C12.5 10.3683 12.4996 10.7645 12.4744 11.0729C12.4497 11.3755 12.4036 11.5493 12.3365 11.681L13.2275 12.135C13.3784 11.8388 13.4413 11.5187 13.4711 11.1543C13.5004 10.7957 13.5 10.3518 13.5 9.8H12.5ZM12.135 13.2275C12.6054 12.9878 12.9878 12.6054 13.2275 12.135L12.3365 11.681C12.1927 11.9632 11.9632 12.1927 11.681 12.3365L12.135 13.2275ZM0.5 9.8C0.5 10.3518 0.499611 10.7957 0.528909 11.1543C0.558684 11.5187 0.62159 11.8388 0.772484 12.135L1.66349 11.681C1.5964 11.5493 1.55031 11.3755 1.52559 11.0729C1.50039 10.7645 1.5 10.3683 1.5 9.8H0.5ZM4.2 12.5C3.6317 12.5 3.23554 12.4996 2.92712 12.4744C2.62454 12.4497 2.45069 12.4036 2.31901 12.3365L1.86502 13.2275C2.16117 13.3784 2.48126 13.4413 2.84569 13.4711C3.20428 13.5004 3.6482 13.5 4.2 13.5V12.5ZM0.772484 12.135C1.01217 12.6054 1.39462 12.9878 1.86502 13.2275L2.31901 12.3365C2.03677 12.1927 1.8073 11.9632 1.66349 11.681L0.772484 12.135Z"
+                            fill="white"
                           />
-                          <Spinner h="3" w="3" />
-                        </div>
+                        </svg>
+                        <span className="ml-2 mr-1 font-bold text-white ">
+                          Collect
+                        </span>
+                      </div>
+                    </button>
+                  )}
+
+                {isPosting && (
+                  <div className="flex text-right">
+                    <div className=" flex items-center rounded-md bg-teal-100 px-2 py-1 text-xs ">
+                      <DotWave size={22} color="#000000" />
+                      <span className="ml-2">Collecting</span>
+                      <div className="relative ml-1 flex items-center">
+                        <div
+                          title={dotTitle}
+                          className={`absolute inset-0 m-auto h-1 w-1 animate-ping
+                                rounded-full border ${dotColor}`}
+                        />
+                        <Spinner h="3" w="3" />
                       </div>
                     </div>
-                  )
-                )}
-                {/* comments */}
-                {/* <div className="flex items-center text-xs ">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="icon icon-tabler icon-tabler-messages"
-                    width={24}
-                    height={24}
-                    viewBox="0 0 24 24"
-                    strokeWidth={1}
-                    stroke="#718096"
-                    fill="none"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" />
-                    <path d="M21 14l-3 -3h-7a1 1 0 0 1 -1 -1v-6a1 1 0 0 1 1 -1h9a1 1 0 0 1 1 1v10" />
-                    <path d="M14 15v2a1 1 0 0 1 -1 1h-7l-3 3v-10a1 1 0 0 1 1 -1h2" />
-                  </svg>
-
-                  {post.profile.stats?.totalComments || '0'}
-                </div> */}
-                {isListVisible && (
-                  <>
-                    <br />
-                    <div className="absolute mt-24 w-44 rounded-lg bg-yellow-200 p-2 text-left">
-                      <button className="bg-white px-3 py-1 text-black">
-                        Set
-                      </button>
-                      <button className=" bg-white px-3 py-1 text-black">
-                        + New list
-                      </button>
-                    </div>
-                  </>
+                  </div>
                 )}
               </div>
+              {/* comments and collect indicators */}
             </div>
-          )}
-        </article>
-      )}
-    </div>
+          </article>
+        )}
+      </div>
+    </>
   );
 };
 
