@@ -14,16 +14,14 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
-  // listId: string;
-  onProcessEnd: () => void;
+  processStatus: (status: string) => void;
 }
 
 const ListsModal: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   postId,
-  // listId,
-  onProcessEnd
+  processStatus
 }) => {
   const snackbar = useSnackbar();
   const [valueListName, setValueListName] = useState('');
@@ -61,9 +59,15 @@ const ListsModal: React.FC<ModalProps> = ({
     listId?: string,
     name?: string
   ) => {
-    setIsPosting(true);
-    setDotColor(' border-red-400 bg-red-600 ');
-    setDotTitle('Creating post');
+    // setIsPosting(true);
+    // setDotColor(' border-red-400 bg-red-600 ');
+    // setDotTitle('Creating post');
+
+    // modalStatus = 'creating-list';
+    // modalStatus='collecting-post'
+    // modalStatus='adding-post'
+    // modalStatus='indexing'
+    onClose();
 
     // verifies if selected list does exist in the current profile, if not, create it
     if (!listId) {
@@ -74,8 +78,10 @@ const ListsModal: React.FC<ModalProps> = ({
       snackbar.showMessage(
         '🟦 Creating the new list, you can continue exploring.'
       );
+      processStatus('creating-list');
+
       listId = (await createUserList(lensProfile, name!)).key;
-      console.log('List (post) ID returned to the UI: ', listId);
+      console.log('List created, (post) ID returned to the UI: ', listId);
     }
 
     // TODO: DEPRECATED ATM
@@ -85,11 +91,16 @@ const ListsModal: React.FC<ModalProps> = ({
     // }
 
     snackbar.showMessage(
-      '🟦 Collecting and minting item, you can continue exploring.'
+      '🟦 Minting the collected item, you can continue exploring.'
     );
+    processStatus('collecting-post');
+
     const collectResult = await freeCollect(selectedPostId);
+
     if (collectResult.errors?.length > 0) {
-      setIsPosting(false);
+      // FIXME
+      // setIsPosting(false);
+      processStatus('error-unauthenticated');
       if (collectResult.errors[0].extensions.code === 'UNAUTHENTICATED') {
         snackbar.showMessage(
           `🟥 Error UNAUTHENTICATED: ${collectResult.errors[0].message}`
@@ -97,7 +108,7 @@ const ListsModal: React.FC<ModalProps> = ({
         // setOpenReconnect(true);
         return;
       }
-      setIsPosting(false);
+      // setIsPosting(false);
       snackbar.showMessage(`🟨 Attention: ${collectResult.errors[0].message}`);
       return;
     }
@@ -105,7 +116,7 @@ const ListsModal: React.FC<ModalProps> = ({
     // just add the post to the list
     // setDotColor(' border-yellow-400 bg-yellow-600 ');
     // setDotTitle('Indexing list');
-
+    processStatus('adding-post');
     const addResult = await addPostIdtoListId(
       profileId,
       listId,
@@ -117,9 +128,10 @@ const ListsModal: React.FC<ModalProps> = ({
       // 'Undo', () => handleUndo()
     ); // TODO: SHOW SOME UI BOX
     // TODO: update lists in UI!
-    setDotColor(' border-blue-400 bg-blue-600 ');
-    setDotTitle('Finished');
-    setIsPosting(false);
+    // setDotColor(' border-blue-400 bg-blue-600 ');
+    // setDotTitle('Finished');
+    // setIsPosting(false);
+    processStatus('finished');
     onClose();
     return;
   };
@@ -145,13 +157,22 @@ const ListsModal: React.FC<ModalProps> = ({
   });
 
   return isOpen ? (
-    <div className="fixed bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
-      {!createMenu ? (
+    <div
+      className="duration-600 fixed bottom-0 left-0 right-0 top-0 z-50 flex 
+     items-center justify-center bg-stone-900
+       bg-opacity-60 
+       opacity-100 backdrop-blur-sm animate-in fade-in-5"
+    >
+      {createMenu ? (
+        // create new list and add
         <div className="w-1/4 rounded-lg bg-white px-6 py-3">
           {/* title  */}
           <div className="my-4 flex items-center justify-between font-serif text-xl">
             <div className="flex items-center gap-3">
-              <button className="bg-transparent" onClick={onClose}>
+              <button
+                className="bg-transparent"
+                onClick={() => setCreateMenu(false)}
+              >
                 <Image width={24} height={24} alt="" src="/icons/back.svg" />
               </button>
               <span>Create a list</span>
@@ -171,34 +192,74 @@ const ListsModal: React.FC<ModalProps> = ({
               </svg>
             </button>
           </div>
-
           {/* name  */}
-          <input
-            type="text"
-            autoComplete="off"
-            value={valueListName}
-            onChange={handleChangeListName}
-            className=" w-full rounded-full bg-gray-100 px-4 py-3 text-sm 
+          <div className="py-2">
+            Name
+            <input
+              type="text"
+              autoComplete="off"
+              value={valueListName}
+              onChange={handleChangeListName}
+              className=" w-full rounded-lg bg-gray-100 px-4 py-3 text-sm 
              text-gray-500 outline-none"
-            name="tag-search-input"
-            id="tag-search-input"
-            // onKeyDown={handleKeyDown}
-            placeholder="List name"
-          />
+              name="tag-search-input"
+              id="tag-search-input"
+              // onKeyDown={handleKeyDown}
+              placeholder="List name"
+            />
+          </div>
+
+          {/* tags  */}
+          <div className="py-2 text-stone-400">
+            Select your tags
+            <input
+              type="text"
+              autoComplete="off"
+              // value={valueListName}
+              // onChange={handleChangeListName}
+              className="w-full cursor-not-allowed rounded-lg bg-gray-200 px-4 py-3 text-sm 
+             text-gray-500 outline-none"
+              // onKeyDown={handleKeyDown}
+              placeholder="Pick at least 1 tag..."
+            />
+          </div>
+
+          {/* private toggle  */}
+          <div className="py-2 text-stone-400">
+            <label className="flex items-center space-x-3">
+              <span className="text-teal-700 dark:text-gray-400">
+                Private list
+              </span>{' '}
+              <input
+                disabled
+                checked={false}
+                type="checkbox"
+                className="form-checkbox h-5 w-5 text-teal-200"
+              />
+            </label>
+          </div>
 
           {/* create button  */}
           <button
-            onClick={() => setCreateMenu(true)}
-            className="rounded-lg bg-black px-4 py-2 text-white"
+            onClick={() =>
+              handleAddPostToList(
+                lensProfile?.id,
+                postId,
+                undefined,
+                valueListName
+              )
+            }
+            className="my-4 rounded-lg bg-black px-4 py-2 text-white"
           >
-            <div className=" flex items-center text-xs ">+ Create and add</div>
+            <div className=" flex items-center  ">+ Create and add</div>
           </button>
         </div>
       ) : (
+        // existing list (main)
         <div className="w-1/4 rounded-lg bg-white px-6 py-3">
           {/* title  */}
           <div className="my-4 flex items-center justify-between font-serif text-xl">
-            <span>Collect into a list</span>
+            <span>Collect {postId} into a list</span>
             <button className="bg-transparent" onClick={onClose}>
               <svg
                 width="17"
@@ -306,20 +367,15 @@ const ListsModal: React.FC<ModalProps> = ({
           {/* create button  */}
           <button
             onClick={() => setCreateMenu(true)}
-            className="border-1  rounded-lg border-solid border-black
-           bg-white px-4 py-2"
+            className="border-1  my-4 rounded-lg border-solid
+           border-black bg-white px-4 py-2"
           >
-            <div className=" flex items-center text-xs ">+ Create a list</div>
+            <div className=" flex items-center">+ Create a list</div>
           </button>
         </div>
       )}
     </div>
   ) : null;
 };
-
-// Reemplaza esta función con tu operación asíncrona real
-async function processAsync(postId: string, listId: string) {
-  return new Promise((resolve) => setTimeout(resolve, 99201100));
-}
 
 export default ListsModal;
