@@ -225,12 +225,12 @@ const ExploreCard: FC<Props> = (props) => {
     const fetchProfileFollow = () =>
       doesFollow(post.profile.id, lensProfile?.ownedBy);
 
-    if (showCard) {
+    if (showCard && lensProfile?.ownedBy) {
       fetchProfileFollow().then((r) => {
         setIsFollowing(r.follows);
       });
     }
-  }, [showCard]);
+  }, [showCard, lensProfile?.ownedBy]);
 
   return (
     <>
