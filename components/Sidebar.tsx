@@ -1,4 +1,4 @@
-import { ConnectButton, useConnectModal } from '@rainbow-me/rainbowkit';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useContext, useState } from 'react';
 
 import { PublicRoutes } from '@/models';
@@ -11,9 +11,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useDisconnect } from 'wagmi';
-import ImageProxied from './ImageProxied';
 import { ProfileContext } from './LensAuthenticationProvider';
 import PostsByList from './PostsByList';
+import ProfileButton from './ProfileButton';
 import SidePanel, { sortBy } from './SidePanel';
 import {
   Accordion,
