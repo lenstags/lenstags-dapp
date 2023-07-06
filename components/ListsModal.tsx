@@ -259,7 +259,7 @@ const ListsModal: React.FC<ModalProps> = ({
         <div className="w-1/4 rounded-lg bg-white px-6 py-3">
           {/* title  */}
           <div className="my-4 flex items-center justify-between font-serif text-xl">
-            <span>Collect {postId} into a list</span>
+            <span>Collect into a list</span>
             <button className="bg-transparent" onClick={onClose}>
               <svg
                 width="17"
