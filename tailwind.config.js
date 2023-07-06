@@ -12,11 +12,20 @@ module.exports = {
       screens: {
         '3xl': '2000px',
         '4xl': '3200px'
+      },
+      transitionProperty: {
+        all: 'all'
+      },
+      transitionDuration: {
+        700: '700ms'
       }
     },
     variants: {
       extend: {
-        scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce']
+        scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce'],
+        opacity: ['responsive', 'hover', 'focus', 'group-hover'],
+        transitionProperty: ['responsive', 'hover', 'focus', 'group-hover'],
+        transitionDuration: ['responsive', 'hover', 'focus']
       }
     },
 
@@ -919,7 +928,8 @@ module.exports = {
         'color, background-color, border-color, text-decoration-color, fill, stroke',
       opacity: 'opacity',
       shadow: 'box-shadow',
-      transform: 'transform'
+      transform: 'transform',
+      all: 'all'
     },
     transitionTimingFunction: {
       DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',

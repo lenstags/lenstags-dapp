@@ -280,7 +280,7 @@ const App: NextPage = () => {
       <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
         {showWelcome ? (
           <div
-            className=" h-full w-full"
+            className=" flex h-full w-full flex-col"
             style={{
               backgroundImage:
                 'linear-gradient(to bottom, gray, rgb(45 212 191))',
@@ -288,6 +288,15 @@ const App: NextPage = () => {
               animation: 'gradient 10s ease infinite'
             }}
           >
+            <ImageProxied
+              className="mt-20"
+              category="profile"
+              src="/img/landing/nata-logo.svg"
+              alt=""
+              width={200}
+              height={120}
+            />
+
             <style jsx>{`
               @keyframes gradient {
                 0% {
@@ -301,14 +310,8 @@ const App: NextPage = () => {
                 }
               }
             `}</style>
-            <div className=" mx-auto h-full w-2/3 items-center justify-center py-20 text-center font-mono">
-              <ImageProxied
-                category="profile"
-                src="/img/landing/nata-logo.svg"
-                alt=""
-                width={200}
-                height={120}
-              />
+            <div className="mx-auto h-full w-2/3 content-center items-center justify-center py-20 text-center font-mono">
+              <p className=" mb-6 text-center font-sans text-4xl ">Welcome!</p>
               <p className=" text-justify font-serif text-lg">
                 This platform is an <b>Alpha</b> release
                 <i> (fresh out of the oven)</i>, meaning that some unexpected
@@ -334,7 +337,7 @@ const App: NextPage = () => {
                 </div>
               ) : (
                 <div className="flex justify-center">
-                  <Spinner h="10" w="10" />
+                  <Spinner h="8" w="8" />
                 </div>
               )}
             </div>

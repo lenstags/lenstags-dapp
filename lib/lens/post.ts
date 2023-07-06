@@ -250,10 +250,10 @@ export const addPostIdtoListId = async (
     return false;
   }
 
-  console.log('THIS IS ONLY FOR VERIFICATION: ');
-
-  const p = await getLastComment(listId);
-  console.log('Post (that in fact it is a list) with new comments: ', p);
+  // FIXME return a better value
+  // console.log('THIS IS ONLY FOR VERIFICATION: ');
+  // const p = await getLastComment(listId);
+  // console.log('Post (that in fact it is a list) with new comments: ', p);
 
   return true;
 
