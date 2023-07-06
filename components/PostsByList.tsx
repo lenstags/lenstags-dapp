@@ -87,10 +87,10 @@ const PostsByList = ({ publications }: PostByListProps) => {
       {publications?.map((list: any) => (
         <AccordionItem
           value={list.id}
-          className="flex flex-col border-0"
+          className="flex flex-col border-0 [&[data-state=open]>div]:border-l-teal-400"
           key={list.id}
         >
-          <div className="group flex h-11 w-full cursor-pointer items-center justify-between gap-2 border-l-4 border-transparent px-4 hover:border-l-teal-400 hover:bg-teal-50">
+          <div className="group flex h-11 w-full cursor-pointer items-center justify-between gap-2 border-l-4 border-transparent px-4 hover:border-l-teal-400 hover:bg-teal-50 data-[state=open]:bg-lensPurple">
             <AccordionTrigger
               arrowLeft
               onClick={() => handlePostByList(list.id)}

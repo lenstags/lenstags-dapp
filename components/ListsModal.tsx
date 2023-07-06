@@ -154,7 +154,7 @@ const ListsModal: React.FC<ModalProps> = ({
 
   useEffect(() => {
     refreshLists(lensProfile?.id);
-  });
+  }, [lensProfile?.id]);
 
   return isOpen ? (
     <div

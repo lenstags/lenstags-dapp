@@ -23,22 +23,29 @@ AccordionItem.displayName = 'AccordionItem';
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, arrowLeft = false, children, ...props }, ref) => (
-  <AccordionPrimitive.Header className="flex h-full w-full">
-    <AccordionPrimitive.Trigger
-      ref={ref}
-      className={`${
-        arrowLeft && 'flex-row-reverse'
-      } flex flex-1 items-center text-sm font-medium transition-all [&[data-state=open]>svg]:rotate-90`}
-      {...props}
-    >
-      <div className={cn('flex w-full cursor-pointer items-center', className)}>
-        {children}
-      </div>
-      <ChevronRightIcon className="h-6 w-6" />
-    </AccordionPrimitive.Trigger>
-  </AccordionPrimitive.Header>
-));
+>(
+  (
+    { className, arrowLeft = false, hiddenArrow = false, children, ...props },
+    ref
+  ) => (
+    <AccordionPrimitive.Header className="flex h-full w-full">
+      <AccordionPrimitive.Trigger
+        ref={ref}
+        className={`${
+          arrowLeft && 'flex-row-reverse'
+        } flex flex-1 items-center text-sm font-medium transition-all [&[data-state=open]>div]:border-l-teal-400 [&[data-state=open]>div]:font-bold [&[data-state=open]>svg]:rotate-90 `}
+        {...props}
+      >
+        <div
+          className={cn('flex w-full cursor-pointer items-center', className)}
+        >
+          {children}
+        </div>
+        {!hiddenArrow && <ChevronRightIcon className="h-6 w-6" />}
+      </AccordionPrimitive.Trigger>
+    </AccordionPrimitive.Header>
+  )
+);
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
 
 const AccordionContent = React.forwardRef<

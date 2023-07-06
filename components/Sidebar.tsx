@@ -34,9 +34,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ position }) => {
-  const { openConnectModal } = useConnectModal();
   const { profile: lensProfile } = useContext(ProfileContext);
-  const [profileView, setProfileView] = useState(false);
   const router = useRouter();
   const [publications, setPublications] = useState<any[]>([]);
   const [sortByValue, setSortByValue] = useState('newest');
@@ -84,6 +82,17 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
         position === 'left' ? 'left-0 w-2/12 bg-stone-100 py-4 ' : 'right-0'
       } `}
     >
+      {/*Button Sidebar Collapsable */}
+      <button className="absolute right-0 top-0 mr-4 mt-4 sm:hidden">
+        <Image
+          src="/icons/close.svg"
+          alt="Close"
+          width={20}
+          height={20}
+          className="cursor-pointer"
+        />
+      </button>
+
       {position === 'left' ? (
         <>
           <div className="px-6 pb-6">
@@ -146,7 +155,8 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                         onClick={() => {
                           fetchMyLists();
                         }}
-                        className="h-12 border-l-4 px-6 hover:border-l-teal-100 hover:bg-teal-50 data-[state=open]:border-l-teal-400 data-[state=open]:font-bold"
+                        className="h-12 border-l-4 px-6 hover:border-l-teal-100 hover:bg-teal-50 "
+                        hiddenArrow
                       >
                         <svg
                           width="20"
