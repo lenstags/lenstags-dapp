@@ -2,8 +2,8 @@ import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
 import { Navbar } from 'components';
-import Sidebar from './Sidebar';
 import Topbar from './Topbar';
+import SideBarLeft from './SideBarLeft';
 
 interface Props {
   title: string;
@@ -95,7 +95,7 @@ export const LayoutReading: FC<Props> = ({
       ></script>
 
       <div className=" flex h-screen w-full ">
-        <Sidebar position="left" />
+        <SideBarLeft />
 
         <div
           style={{ left: '16.666667%', width: '83.333%' }}

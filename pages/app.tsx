@@ -345,11 +345,7 @@ const App: NextPage = () => {
         ) : (
           <>
             {/* top bar container*/}
-            <div
-              className="h-50 fixed top-0 z-10 w-full
-                 bg-white px-8 pt-4"
-              style={{ width: '59%' }}
-            >
+            <div className="h-50 top-0 z-10 w-full bg-white px-8 pt-4">
               {/* search bar */}
               <div className="flex justify-start ">
                 <input
@@ -468,7 +464,7 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="h-screen px-4 pt-40">
+            <div className="px-4">
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {

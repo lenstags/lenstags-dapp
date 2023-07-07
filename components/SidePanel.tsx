@@ -5,7 +5,7 @@ import {
 } from '@radix-ui/react-icons';
 import { ArrowLeftIcon } from 'lucide-react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import PostsByList from './PostsByList';
 import {
   DoubleSidebar,
@@ -22,9 +22,11 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
+import { SidebarContext } from '@/context/SideBarSizeContext';
 interface SidePanelProps {
   fetchMyLists: () => void;
   publications: any;
+  sideBarSize: '3.6' | '16.6';
 }
 
 export const sortBy = [
@@ -41,7 +43,11 @@ export const actions = [
   { name: 'Delete', value: 'delete' }
 ];
 
-const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
+const SidePanel = ({
+  fetchMyLists,
+  publications,
+  sideBarSize
+}: SidePanelProps) => {
   const [sortByValue, setSortByValue] = useState('newest');
 
   const { sortItems } = useSorts();
@@ -49,6 +55,7 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
     setSortByValue(value);
     sortItems({ items: publications, sort: value });
   };
+  const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
 
   return (
     <DoubleSidebar>
@@ -73,10 +80,18 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
             />
           </svg>
 
-          <span className="text-md ml-2">My inventory</span>
+          {!sidebarCollapsedStateLeft.collapsed && (
+            <span className="text-md ml-2">My inventory</span>
+          )}
         </div>
       </DoubleSidebarTrigger>
-      <DoubleSidebarContent className="px-0">
+      <DoubleSidebarContent
+        className={
+          sidebarCollapsedStateLeft.collapsed
+            ? 'ml-[7%] 2xl:ml-[3.6%]'
+            : 'ml-[16.6%]'
+        }
+      >
         <DoubleSidebarTitle className="flex items-center justify-center gap-2 px-6 font-serif">
           <div className="flex h-6 w-9 items-center justify-center rounded-full border border-lensBlack">
             <DoubleSidebarClose className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">

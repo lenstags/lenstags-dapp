@@ -1,4 +1,5 @@
 import React, { createContext, useState } from 'react';
+import { SidebarContextProvider } from './SideBarSizeContext';
 
 export const AppContext = createContext();
 
@@ -15,7 +16,7 @@ export function AppProvider(props) {
 
   return (
     <AppContext.Provider value={{ config, updateConfig }}>
-      {props.children}
+      <SidebarContextProvider>{props.children}</SidebarContextProvider>
     </AppContext.Provider>
   );
 }

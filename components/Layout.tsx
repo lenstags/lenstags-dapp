@@ -1,7 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import Sidebar from './Sidebar';
+import SideBarLeft from './SideBarLeft';
+import SideBarRight from './SideBarRight';
 import { Toaster } from './ui/ToasterUI';
 
 interface Props {
@@ -109,18 +110,10 @@ export const Layout: FC<Props> = ({
       {/* <nav>
             <Navbar />
           </nav> */}
-      <div className=" flex h-screen w-full  ">
-        <Sidebar position="left" />
-        <main
-          style={{ left: '16.666667%', width: '59%' }}
-          className=" absolute h-screen 
-               
-               overflow-x-clip
-               "
-        >
-          {children}
-        </main>
-        <Sidebar position="right" />
+      <div className="grid  w-full grid-cols-12">
+        <SideBarLeft />
+        <main className="col-span-7  overflow-x-clip">{children}</main>
+        <SideBarRight />
         <Toaster />
       </div>
       {/* </div> */}
