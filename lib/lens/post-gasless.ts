@@ -19,7 +19,6 @@ import { uploadImageIpfs, uploadIpfs } from './ipfs';
 import { DEFAULT_METADATA_ATTRIBUTES } from './post';
 import { apolloClient } from './graphql/apollo-client';
 import { broadcastRequest } from './broadcast';
-import fs from 'fs';
 import { getAddressFromSigner } from './ethers.service';
 import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 import { queryProfile } from './dispatcher';
@@ -85,8 +84,10 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
 
 export const createPostGasless = async (
   profileId: string,
-  builtPost: IbuiltPost
+  builtPost: IbuiltPost,
+  waitForIndexer: boolean = false
 ) => {
+  console.log('createpostgasless ', waitForIndexer);
   if (!profileId) {
     throw new Error('No profileId defined');
   }
@@ -213,5 +214,6 @@ export const createPostGasless = async (
     internalPubId,
     pubId
   };
+  console.log('postresult en post-gasless', postResult);
   return postResult;
 };

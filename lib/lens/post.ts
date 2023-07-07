@@ -1,4 +1,5 @@
 import { APP_NAME, PUBLICATION_METADATA_VERSION } from '@lib/config';
+import { BigNumber, utils } from 'ethers/lib/ethers';
 import {
   IbuiltPost,
   MetadataAttribute,
@@ -16,9 +17,48 @@ import { freeCollect } from './collect';
 import { getAddressFromSigner } from './ethers.service';
 import { getLastComment } from './get-publications';
 import { getPublication } from './get-publication';
+import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 import { signCreatePostTypedData } from './publication-post';
 import { uploadIpfs } from './ipfs';
 import { v4 as uuidv4 } from 'uuid';
+
+export const pollAndIndexPost = async (
+  txHash: string,
+  profileId: string,
+  prefix: string
+) => {
+  console.log(`${prefix}: poll until indexed`);
+  const indexedResult = await pollUntilIndexed(txHash);
+
+  console.log(`${prefix}: profile has been indexed`);
+
+  const logs = indexedResult.txReceipt!.logs;
+
+  console.log(`${prefix}: logs`, logs);
+
+  const topicId = utils.id(
+    'PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)'
+  );
+  console.log('topicid we care about', topicId);
+
+  const profileCreatedLog = logs.find((l: any) => l.topics[0] === topicId);
+  console.log(`${prefix}: created log`, profileCreatedLog);
+
+  let profileCreatedEventLog = profileCreatedLog!.topics;
+  console.log(`${prefix}: created event logs`, profileCreatedEventLog);
+
+  const publicationId = utils.defaultAbiCoder.decode(
+    ['uint256'],
+    profileCreatedEventLog[2]
+  )[0];
+
+  const contractPublicationId = BigNumber.from(publicationId).toHexString();
+  const internalPublicationId = profileId + '-' + contractPublicationId;
+
+  console.log(`${prefix}: contract publication id`, contractPublicationId);
+  console.log(`${prefix}: internal publication id`, internalPublicationId);
+  return internalPublicationId;
+};
 
 export const DEFAULT_METADATA_ATTRIBUTES = [
   {
@@ -30,7 +70,8 @@ export const DEFAULT_METADATA_ATTRIBUTES = [
 
 export const createPostPaid = async (
   profileId: string,
-  builtPost: IbuiltPost
+  builtPost: IbuiltPost,
+  waitForIndexer: boolean = false
 ) => {
   if (!profileId) {
     throw new Error('Must define profileId');
@@ -137,12 +178,19 @@ export const createPostPaid = async (
   // const pubId = BigNumber.from(publicationId).toHexString();
 
   // return { txHash: broadcastResult.txHash, txId: broadcastResult.txId };
-  const postResult = {
-    txHash: broadcastResult.txHash,
-    txId: broadcastResult.txId,
-    internalPubId: '',
-    pubId: ''
-  };
+  // const postResult = {
+  //   txHash: broadcastResult.txHash,
+  //   txId: broadcastResult.txId,
+  //   internalPubId: '',
+  //   pubId: ''
+  // };
+
+  const postResult = await pollAndIndexPost(
+    broadcastResult.txHash,
+    profileId,
+    'prefix'
+  );
+  console.log('resultado ', postResult);
   return postResult;
   // TODO: VERIFY THIS return profileId + '-' + BigNumber.from(publicationId).toHexString();
 };
