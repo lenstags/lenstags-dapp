@@ -2,10 +2,10 @@ import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { polygon, polygonMumbai } from '@wagmi/core/chains';
+import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+import { polygon, polygonMumbai } from 'wagmi/chains';
 
-import { APP_NAME } from '@lib/config';
+import { APP_NAME, envConfig } from '@lib/config';
 import type { AppProps } from 'next/app';
 import { AppProvider } from 'context/AppContext';
 import LensAuthenticationProvider from 'components/LensAuthenticationProvider';
@@ -15,25 +15,26 @@ import { publicProvider } from 'wagmi/providers/public';
 import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 
-const { chains, provider } = configureChains(
+const { chains, publicClient } = configureChains(
   [polygonMumbai],
   [publicProvider()]
 );
 
 const { connectors } = getDefaultWallets({
   appName: APP_NAME,
+  projectId: envConfig.NEXT_PUBLIC_WC_PROJECT_ID!,
   chains
 });
 
-const wagmiClient = createClient({
+const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
-  provider
+  publicClient
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={wagmiConfig}>
       <SnackbarProvider SnackbarProps={{ autoHideDuration: 3000 }}>
         <LensAuthenticationProvider>
           <ApolloProvider client={apolloClient}>
