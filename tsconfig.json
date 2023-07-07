@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -16,7 +20,15 @@
     "incremental": true,
     "baseUrl": ".",
     "paths": {
-      "@lib/*": ["lib/*"]
+      "@components/*": [
+        "components/*"
+      ],
+      "@context/*": [
+        "context/*"
+      ],
+      "@lib/*": [
+        "lib/*"
+      ],
     }
   },
   "include": [
@@ -25,5 +37,7 @@
     "**/*.tsx",
     "components/UI/Carousel.Jsx"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }

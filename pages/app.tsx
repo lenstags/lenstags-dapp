@@ -280,7 +280,11 @@ const App: NextPage = () => {
       <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
         {showWelcome ? (
           <div
-            className=" flex h-full w-full flex-col"
+            className=" duration-600 fixed 
+            bottom-0 
+            left-0 right-0
+            top-0 z-50 flex h-full w-full flex-col items-center  justify-center bg-stone-900
+            "
             style={{
               backgroundImage:
                 'linear-gradient(to bottom, gray, rgb(45 212 191))',
@@ -310,9 +314,9 @@ const App: NextPage = () => {
                 }
               }
             `}</style>
-            <div className="mx-auto h-full w-2/3 content-center items-center justify-center py-20 text-center font-mono">
+            <div className="  h-full w-2/3 max-w-xl content-center items-center justify-center py-20 text-center font-mono">
               <p className=" mb-6 text-center font-sans text-4xl ">Welcome!</p>
-              <p className=" text-justify font-serif text-lg">
+              <p className="py-6 text-justify font-serif text-lg">
                 This platform is an <b>Alpha</b> release
                 <i> (fresh out of the oven)</i>, meaning that some unexpected
                 behaviour may occur. We appreciate your understanding and

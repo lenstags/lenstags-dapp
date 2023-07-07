@@ -5,16 +5,14 @@ import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import ListImages from './ListImages';
-import ListsModal from './ListsModal';
+import ModalLists from './ModalLists';
 import PostIndicators from './PostIndicators';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from './Spinner';
 import TurndownService from 'turndown';
-import { addPostIdtoListId } from '@lib/lens/post';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { doesFollow } from '@lib/lens/does-follow';
-import { freeCollect } from '@lib/lens/collect';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
@@ -225,12 +223,12 @@ const ExploreCard: FC<Props> = (props) => {
     const fetchProfileFollow = () =>
       doesFollow(post.profile.id, lensProfile?.ownedBy);
 
-    if (showCard) {
+    if (showCard && lensProfile?.ownedBy) {
       fetchProfileFollow().then((r) => {
         setIsFollowing(r.follows);
       });
     }
-  }, [showCard]);
+  }, [showCard, lensProfile?.ownedBy]);
 
   return (
     <>
@@ -265,7 +263,7 @@ const ExploreCard: FC<Props> = (props) => {
         ) : (
           <article>
             {/* favllect content goes here */}
-            <ListsModal
+            <ModalLists
               isOpen={isModalOpen}
               onClose={handleCloseModal}
               postId={postId}
@@ -535,7 +533,7 @@ const ExploreCard: FC<Props> = (props) => {
                     {post.metadata.name === 'My private list' ? '🔒 ' : ''}
                     {post.metadata.name || 'untitled'}
                   </div>
-                  <p
+                  <div
                     className=" mt-1
                        font-sans font-thin text-gray-700"
                     style={{
@@ -569,7 +567,7 @@ const ExploreCard: FC<Props> = (props) => {
                         background-color: transparent;
                       }
                     `}</style>
-                  </p>
+                  </div>
                 </div>
               </a>
 
