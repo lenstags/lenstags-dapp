@@ -372,8 +372,7 @@ const App: NextPage = () => {
                     In order to finish your account setup, we encourage to sign
                     the following two wallet interactions:
                     <p>
-                      - The dispatcher signature: will you enable to make
-                      zero-cost transactions!
+                      - The dispatcher signature: sets you free from signing TX!
                     </p>
                     <p>
                       - The default saved items list: the main folder where you
