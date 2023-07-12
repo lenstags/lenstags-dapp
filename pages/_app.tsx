@@ -2,8 +2,8 @@ import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { WagmiConfig, configureChains, createClient } from 'wagmi';
-import { polygon, polygonMumbai } from '@wagmi/core/chains';
+import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+import { polygon, polygonMumbai } from 'wagmi/chains';
 
 import { APP_NAME } from '@lib/config';
 import { ApolloProvider } from '@apollo/client';
@@ -15,7 +15,7 @@ import TagsFilterProvider from 'components/TagsFilterProvider';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { publicProvider } from 'wagmi/providers/public';
 
-const { chains, provider } = configureChains(
+const { chains, publicClient } = configureChains(
   [polygonMumbai],
   [publicProvider()]
 );
@@ -26,15 +26,15 @@ const { connectors } = getDefaultWallets({
   chains
 });
 
-const wagmiClient = createClient({
+const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
-  provider
+  publicClient
 });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={wagmiConfig}>
       <SnackbarProvider SnackbarProps={{ autoHideDuration: 3000 }}>
         <LensAuthenticationProvider>
           <ApolloProvider client={apolloClient}>
