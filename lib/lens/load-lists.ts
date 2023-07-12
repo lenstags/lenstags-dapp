@@ -33,15 +33,37 @@ export const createDefaultList = async (lensProfile: any) => {
   };
 
   // TODO test with no dispatcher
-  const result = lensProfile?.dispatcher?.canUseRelay
-    ? await createPostGasless(lensProfile?.id, constructedDefaultPost)
-    : await createPostPaid(lensProfile?.id, constructedDefaultPost);
 
+  let defaultListId: string, result: any;
+
+  if (lensProfile?.dispatcher?.canUseRelay) {
+    result = await createPostGasless(
+      lensProfile?.id,
+      constructedDefaultPost,
+      true
+    );
+    defaultListId = result.internalPubId;
+  } else {
+    result = await createPostPaid(
+      lensProfile?.id,
+      constructedDefaultPost,
+      true
+    );
+    defaultListId = result;
+  }
+
+  // const result = lensProfile?.dispatcher?.canUseRelay
+  //   ? await createPostGasless(lensProfile?.id, constructedDefaultPost, true)
+  //   : await createPostPaid(lensProfile?.id, constructedDefaultPost, true);
+  console.log('result en load-lists ', result);
   ////////////////////
   // area de update del perfil metadata
   ////////////////////
 
-  const defaultListId = result.internalPubId; // got the postId, and ADD it to the profile.metadata
+  // const defaultListId = result.internalPubId;
+
+  console.log('BBBBB ', defaultListId);
+  // got the postId, and ADD it to the profile.metadata
   // update profile metadata!
   // TODO: refactor into updateProfileMetadata(profileId, attributes)
 
@@ -135,9 +157,11 @@ export const createUserList = async (lensProfile: any, name: string) => {
   };
 
   // TODO test with no dispatcher
-  const result = lensProfile?.dispatcher?.canUseRelay
-    ? await createPostGasless(lensProfile?.id, constructedUserPost)
-    : await createPostPaid(lensProfile?.id, constructedUserPost);
+  // const result = lensProfile?.dispatcher?.canUseRelay
+  //   ? await createPostGasless(lensProfile?.id, constructedUserPost)
+  //   : await createPostPaid(lensProfile?.id, constructedUserPost);
+
+  const result = await createPostGasless(lensProfile?.id, constructedUserPost);
 
   // got the postId!
   console.log('New list created: ', result.internalPubId);

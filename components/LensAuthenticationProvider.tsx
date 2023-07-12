@@ -208,8 +208,9 @@ export default function LensAuthenticationProvider({
       if (!pro) {
         const profiles = await getProfiles(address);
         if (!profiles || profiles.items.length === 0) {
-          console.log('No profiles, ask for a handler! ');
-          return false;
+          console.log('No profile, ask for a handler! ');
+
+          return Boolean(false);
         }
         console.log('No default profile, taking first');
         pro = profiles.items[0];

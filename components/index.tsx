@@ -7,5 +7,5 @@ export * from './Tabs';
 export * from './LensAuthenticationProvider';
 export * from './Layout';
 export * from './LayoutReading';
-export * from './ListsModal';
+export * from './ModalLists';
 export * from './explore';
