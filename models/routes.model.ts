@@ -8,4 +8,5 @@ export const PublicRoutes = {
     CREATE: "/create",
     ORGANIZATIONS: "/organizations",
     LIST: "/list",
+    PROFILE: "/profile",
 };

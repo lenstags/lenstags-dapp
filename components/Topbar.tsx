@@ -8,7 +8,7 @@ interface SidebarProps {
 // const Topbar: React.FC<SidebarProps> = ({ position }) => {
 const Topbar: React.FC<SidebarProps> = () => {
   return (
-    <div className="absolute top-0 w-full">
+    <div className="absolute right-0 top-0">
       <div className="pr-6 pt-4">
         <ProfileButton />
       </div>

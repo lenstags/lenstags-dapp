@@ -1,4 +1,5 @@
-import { createContext, useState } from 'react';
+import { useRouter } from 'next/router';
+import { createContext, useEffect, useState } from 'react';
 
 export interface SidebarCollapsedState {
   collapsed: boolean;
@@ -25,6 +26,16 @@ export const SidebarContextProvider: React.FC<{
     useState<SidebarCollapsedState>({
       collapsed: false
     });
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (sidebarCollapsedStateLeft.collapsed) {
+      setSidebarCollapsedStateLeft({
+        collapsed: false
+      });
+    }
+  }, [router.pathname]);
 
   return (
     <SidebarContext.Provider

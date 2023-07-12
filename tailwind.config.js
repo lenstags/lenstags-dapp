@@ -54,12 +54,12 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))'
         },
-      transitionProperty: {
-        all: 'all'
-      },
-      transitionDuration: {
-        700: '700ms'
-      }
+        transitionProperty: {
+          all: 'all'
+        },
+        transitionDuration: {
+          700: '700ms'
+        }
       },
       borderRadius: {
         lg: `var(--radius)`,
@@ -88,7 +88,9 @@ module.exports = {
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       bounce: 'bounce 1s infinite',
       'accordion-down': 'accordion-down 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-      'accordion-up': 'accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1)'
+      'accordion-up': 'accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeLeft: 'fadeLeft 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeRight: 'fadeRight 300ms cubic-bezier(0.87, 0, 0.13, 1)'
     },
     aria: {
       checked: 'checked="true"',
@@ -648,6 +650,26 @@ module.exports = {
         '50%': {
           transform: 'none',
           animationTimingFunction: 'cubic-bezier(0,0,0.2,1)'
+        }
+      },
+      fadeLeft: {
+        '0%': {
+          opacity: '0',
+          transform: 'translateX(-20px)'
+        },
+        '100%': {
+          opacity: '1',
+          transform: 'translateX(0)'
+        }
+      },
+      fadeRight: {
+        '0%': {
+          opacity: '0',
+          transform: 'translateX(20px)'
+        },
+        '100%': {
+          opacity: '1',
+          transform: 'translateX(0)'
         }
       }
     },

@@ -1,15 +1,11 @@
-import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 
+import { SidebarContext } from '@/context/SideBarSizeContext';
 import { PublicRoutes } from '@/models';
 import { useSorts } from '@lib/hooks/use-sort';
 import { getPublications } from '@lib/lens/get-publications';
 import { PublicationTypes } from '@lib/lens/graphql/generated';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  TextAlignBottomIcon
-} from '@radix-ui/react-icons';
+import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -17,7 +13,6 @@ import { useRouter } from 'next/router';
 import { useDisconnect } from 'wagmi';
 import { ProfileContext } from './LensAuthenticationProvider';
 import PostsByList from './PostsByList';
-import ProfileButton from './ProfileButton';
 import SidePanel, { sortBy } from './SidePanel';
 import {
   Accordion,
@@ -32,7 +27,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
-import { SidebarContext } from '@/context/SideBarSizeContext';
+import { PlusSmallIcon } from '@heroicons/react/24/outline';
 
 interface SidebarProps {}
 
@@ -51,6 +46,26 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     deleteLensLocalStorage();
     disconnect();
   };
+
+  const routesCollapsed =
+    router.pathname === PublicRoutes.CREATE ||
+    router.pathname.includes(PublicRoutes.LIST) ||
+    router.pathname.includes(PublicRoutes.POST);
+
+  useEffect(() => {
+    if (router.pathname === PublicRoutes.MYPROFILE) {
+      setSidebarCollapsedState({ collapsed: false });
+      setSideBarSize('16.6');
+    } else if (routesCollapsed) {
+      setSidebarCollapsedState({ collapsed: true });
+      setSideBarSize('3.6');
+    }
+  }, [
+    router.pathname,
+    sidebarCollapsedStateLeft.collapsed,
+    setSidebarCollapsedState,
+    routesCollapsed
+  ]);
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -79,40 +94,44 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     sortItems({ items: publications, sort: value });
   };
 
-  const handleCollapse = () => {
-    if (sidebarCollapsedStateLeft.collapsed) {
-      setSidebarCollapsedState({ collapsed: false });
-      setSideBarSize('16.6');
-    } else {
-      setSidebarCollapsedState({ collapsed: true });
-      setSideBarSize('3.6');
-    }
-  };
-
   return (
     <div
       className={`bg-stone-100 sm:inline ${
-        sidebarCollapsedStateLeft.collapsed ? 'w-20' : 'col-span-2'
+        sidebarCollapsedStateLeft.collapsed
+          ? 'col-span-1 w-24 animate-fadeRight'
+          : 'col-span-2 animate-fadeLeft'
       }`}
     >
       <div className="sticky top-0 h-screen py-4">
         <div className="px-6 pb-6">
           <Link href={'/'}>
-            <Image
-              className=" cursor-pointer  "
-              src="/img/landing/nata-logo.svg"
-              alt=""
-              width={150}
-              height={40}
-            />
+            {!sidebarCollapsedStateLeft.collapsed ? (
+              <Image
+                className="cursor-pointer"
+                src="/img/landing/nata-logo.svg"
+                alt=""
+                width={150}
+                height={40}
+              />
+            ) : (
+              <Image
+                className="mx-auto cursor-pointer"
+                src="/img/landing/nata-isologo.svg"
+                alt=""
+                width={40}
+                height={40}
+              />
+            )}
           </Link>
         </div>
         {/* menu items */}
         <div className="font-serif text-base">
           <Link href={'/app'}>
             <div
-              className="flex h-12 cursor-pointer items-center gap-1 border-l-4 bg-white px-6
-             hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold"
+              className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+             hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+               sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+             }`}
             >
               <Image src="/icons/home.svg" alt="Home" width={20} height={20} />
               {!sidebarCollapsedStateLeft.collapsed && (
@@ -123,8 +142,10 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
           <Link href={'/app'}>
             <div
-              className="flex h-12 cursor-pointer items-center gap-1 border-l-4 
-                px-6 hover:border-l-teal-100 hover:bg-teal-50 active:font-bold"
+              className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+              hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+              }`}
             >
               <Image
                 src="/icons/explore.svg"
@@ -139,7 +160,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
           </Link>
 
           {lensProfile && (
-            <div className=" animate-in fade-in-50 duration-1000 ">
+            <div className="animate-in fade-in-50 duration-1000 ">
               {router.pathname !== PublicRoutes.MYPROFILE ? (
                 <SidePanel
                   fetchMyLists={fetchMyLists}
@@ -153,7 +174,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                       onClick={() => {
                         fetchMyLists();
                       }}
-                      className="h-12 border-l-4 px-6 hover:border-l-teal-100 hover:bg-teal-50 "
+                      className="h-12 gap-1 border-l-4 px-6 hover:border-l-teal-100 hover:bg-teal-50"
                       hiddenArrow
                     >
                       <svg
@@ -172,7 +193,9 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                         />
                       </svg>
                       {!sidebarCollapsedStateLeft.collapsed && (
-                        <span className="text-md ml-2">My inventory</span>
+                        <span className="ml-2 text-base font-normal">
+                          My inventory
+                        </span>
                       )}
                     </AccordionTrigger>
                     <AccordionContent className="flex h-full flex-col border-0 outline-none">
@@ -208,8 +231,9 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
               )}
               <Link href={'/app'}>
                 <div
-                  className="flex h-12 cursor-pointer items-center gap-1
-              border-l-4 border-l-stone-100  px-6 hover:bg-teal-50"
+                  className={`flex h-12 cursor-pointer items-center gap-1 border-l-4 border-l-stone-100 hover:bg-teal-50 ${
+                    sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                  }`}
                 >
                   <Image
                     src="/icons/notifications.svg"
@@ -225,31 +249,29 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
               <div className="flex px-6 py-4  ">
                 <button
-                  className={`w-full rounded-lg align-middle font-sans text-white ${
+                  className={`w-full rounded-lg align-middle font-sans ${
                     sidebarCollapsedStateLeft.collapsed
-                      ? 'px-2 py-1'
+                      ? 'h-12 w-12 text-4xl font-extralight'
                       : 'px-4 py-2'
+                  } ${
+                    router.pathname === PublicRoutes.CREATE
+                      ? 'bg-white text-black'
+                      : 'text-white'
                   }`}
+                  onClick={() => {
+                    router.push(PublicRoutes.CREATE);
+                  }}
                 >
-                  <Link href={'/create'}>
-                    {sidebarCollapsedStateLeft.collapsed ? '+' : '+ Create'}
-                  </Link>
+                  {sidebarCollapsedStateLeft.collapsed ? (
+                    <PlusSmallIcon />
+                  ) : (
+                    '+ Create'
+                  )}
                 </button>
               </div>
             </div>
           )}
         </div>
-        {/*Button SideBar Collapsable */}
-        <button
-          className={`absolute -right-3.5 bottom-10 z-50 rounded-lg align-middle font-sans text-white`}
-          onClick={handleCollapse}
-        >
-          {sidebarCollapsedStateLeft.collapsed ? (
-            <ChevronRightIcon className="h-7 w-7 text-gray-500" />
-          ) : (
-            <ChevronLeftIcon className="h-7 w-7 text-gray-500" />
-          )}
-        </button>
       </div>
     </div>
   );

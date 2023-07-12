@@ -94,21 +94,17 @@ export const LayoutReading: FC<Props> = ({
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></script>
 
-      <div className=" flex h-screen w-full ">
+      <div className="grid w-full grid-cols-12">
         <SideBarLeft />
 
-        <div
-          style={{ left: '16.666667%', width: '83.333%' }}
-          className="absolute h-screen w-full"
-        >
+        <div className="col-span-10 col-start-2 overflow-x-clip">
           <Topbar />
           <main
             // FIXME Remove the absolute and left, when the sidebar
             // has no the fixed anymore!!!
             // plus adjust to use w-10/12
             // style={{ left: '16.666667%', width: '75.6667%' }}
-            className="absolute h-screen w-full overflow-x-clip
-          pt-20 "
+            className="w-full pt-20"
           >
             {children}
           </main>
