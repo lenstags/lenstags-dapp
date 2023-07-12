@@ -26,10 +26,6 @@ import { refresh } from '@lib/lens/refresh';
 import { setAuthenticationToken } from '@lib/lens/graphql/apollo-client';
 import { useAccount } from 'wagmi';
 
-// export const ProfileContext = createContext<ProfileQuery['profile'] | null>(
-//   null
-// );
-
 export const ProfileContext = createContext<{
   profile: ProfileQuery['profile'] | null;
   authenticationStatus: string;
@@ -84,6 +80,7 @@ export default function LensAuthenticationProvider({
       key: 'website'
     };
 
+    // BUG: CHECK
     const attLists: AttributeData = {
       displayType: MetadataDisplayType.string,
       value:

@@ -1,5 +1,5 @@
 import { ProfileContext, TagsFilterContext } from 'components';
-import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
+import { enable as enableDispatcher, queryProfile } from '@lib/lens/dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
@@ -20,6 +20,9 @@ import type { NextPage } from 'next';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
+import { deleteLensLocalStorage } from '@lib/lens/localStorage';
+import { findKeyAttributeInProfile } from '@lib/helpers';
+import { useDisconnect } from 'wagmi';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
@@ -32,52 +35,64 @@ const App: NextPage = () => {
 
   const { tags } = useContext(TagsFilterContext);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showReject, setShowReject] = useState(false);
   const [ready, setReady] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
-
+  const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
-  // const lensProfile = useContext(ProfileContext);
   const { profile: lensProfile } = useContext(ProfileContext);
 
-  useEffect(() => {
-    const findDefault = async () => {
-      const profileResult = await queryProfile({ profileId: lensProfile?.id });
+  const handleSetup = async () => {
+    const profileResult = await queryProfile({ profileId: lensProfile!.id });
+    const listAttributeObject = findKeyAttributeInProfile(
+      profileResult,
+      ATTRIBUTES_LIST_KEY
+    );
+    // console.log('33333 ', profileResult);
+    // console.log('33333 listAttributeObject', listAttributeObject);
 
-      // console.log('🎇🎇🎇🎇 profileResult ', profileResult);
-      // console.log('🎇🎇🎇🎇 ATTRIBUTES_LIST_KEY ', ATTRIBUTES_LIST_KEY);
+    const hasLists =
+      listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
+    // console.log('>>> hasLists ', hasLists);
 
-      let defaultListId = profileResult?.attributes?.find(
-        (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-      )?.value;
-      // console.log('🎇🎇🎇 hay defaultListId?: ', defaultListId);
+    const dispatcherEnabled = profileResult
+      ? profileResult.dispatcher?.canUseRelay || false
+      : false;
 
-      const enableRelayer =
-        profileResult && !profileResult.dispatcher?.canUseRelay;
+    if (!dispatcherEnabled || !hasLists) {
+      // console.log('>>> entro al welcome');
+      // console.log('>>>   enabledRelayer: ', dispatcherEnabled);
+      // console.log('>>>   hasLists:', hasLists);
 
-      if (enableRelayer || !defaultListId) {
-        setShowWelcome(true);
+      setShowWelcome(true);
 
-        if (enableRelayer) {
+      try {
+        if (profileResult && !dispatcherEnabled) {
           snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
-          await enable(profileResult.id);
+          await enableDispatcher(profileResult.id);
           snackbar.showMessage('🟦 Dispatcher enabled successfully.');
         }
-
-        if (!defaultListId) {
+        if (!hasLists) {
           snackbar.showMessage('🟦 Creating default list...');
           await createDefaultList(profileResult);
           snackbar.showMessage('💚 LFGrow ⚜️!');
         }
         setReady(true);
+      } catch (err: any) {
+        if (err.code === 'ACTION_REJECTED') {
+          setShowReject(true);
+        } else {
+          console.log('Unknown error: ', err.code);
+        }
       }
-    };
-
-    // FIXME THIS MUST BE STORED ON LOCALSTORAGE
-    if (lensProfile?.id) {
-      // console.log('🔆 Verifying first connection');
-      findDefault();
     }
-  }, [lensProfile, snackbar]);
+  };
+
+  useEffect(() => {
+    if (lensProfile?.id) {
+      handleSetup();
+    }
+  }, [lensProfile]);
 
   /**
    * Infinite scroll
@@ -151,7 +166,6 @@ const App: NextPage = () => {
 
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
-      console.log(data);
       return setPublications(data.items);
     });
     refetch();
@@ -340,8 +354,55 @@ const App: NextPage = () => {
                   </button>
                 </div>
               ) : (
-                <div className="flex justify-center">
-                  <Spinner h="8" w="8" />
+                !showReject && (
+                  <div className="flex justify-center">
+                    <Spinner h="8" w="8" />
+                  </div>
+                )
+              )}
+
+              {showReject && (
+                <div className="mt-6 rounded-lg border border-black px-8 py-4 text-center font-sans  ">
+                  <h1 className="py-2">⛔️ Oops!</h1>
+                  <h2>
+                    Seems that you rejected your wallet signature petitions.
+                  </h2>
+                  <br></br>
+                  <div className=" text-justify">
+                    In order to finish your account setup, we encourage to sign
+                    the following two wallet interactions:
+                    <p>
+                      - The dispatcher signature: sets you free from signing TX!
+                    </p>
+                    <p>
+                      - The default saved items list: the main folder where you
+                      will store your posts.
+                    </p>
+                  </div>
+
+                  <div className="my-4 flex justify-between">
+                    <button
+                      onClick={() => {
+                        setShowReject(false);
+                        handleSetup();
+                      }}
+                      className="rounded-lg bg-black px-6 py-1 text-white"
+                    >
+                      Retry
+                    </button>
+                    <button
+                      onClick={() => {
+                        deleteLensLocalStorage();
+                        disconnect();
+                        setShowReject(false);
+                        setShowWelcome(false);
+                      }}
+                      className="rounded-lg  border border-solid border-black 
+                      bg-transparent px-6 py-1"
+                    >
+                      Cancel, navigate without registering
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
