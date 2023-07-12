@@ -34,8 +34,8 @@ export const loadLists = async (lensProfileOld: any) => {
     : await createDefaultList(lensProfile);
 };
 
+// the setup of the default list
 export const createDefaultList = async (lensProfile: any) => {
-  // the setup of the default list
   const constructedDefaultPost: IbuiltPost = {
     name: 'My private list', // HACK should it be 'My stuff {private)?
     content: 'All my collected items',

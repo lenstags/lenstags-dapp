@@ -140,7 +140,7 @@ const ExploreCard: FC<Props> = (props) => {
   //     )?.value || `[]`
   //   );
   //   setLists(parsedLists);
-  //   setSelectedList(parsedLists); // FIXME: should be only one?
+  //   setSelectedList(parsedLists);
   // };
 
   // - if profile doesnt have a deflist on its profile.metadata >>>>  !profile.metadata.listArray.find(r=>r.name==='default')

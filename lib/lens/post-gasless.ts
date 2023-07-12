@@ -85,7 +85,7 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
 export const createPostGasless = async (
   profileId: string,
   builtPost: IbuiltPost,
-  waitForIndexer: boolean = false
+  waitForIndexer: boolean = false // TBD
 ) => {
   // console.log('createpostgasless waitForIndexer:', waitForIndexer);
   if (!profileId) {

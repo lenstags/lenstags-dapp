@@ -76,8 +76,19 @@ const Create: NextPage = () => {
   const [plainText, setPlainText] = useState('');
   const { profile: lensProfile } = useContext(ProfileContext);
 
+  // useEffect(() => {
+  //   if (document) {
+  //     const html = editorContents;
+  //     const div = document.createElement('div');
+  //     div.innerHTML = html;
+  //     const text = div.textContent;
+  //     setPlainText(text || '');
+  //   }
+  // }, [editorContents]);
+
   useEffect(() => {
-    if (document) {
+    const isClient = typeof window !== 'undefined';
+    if (isClient) {
       const html = editorContents;
       const div = document.createElement('div');
       div.innerHTML = html;
@@ -495,7 +506,7 @@ const Create: NextPage = () => {
           <div className="w-2/12">Tags</div>
           <div className="w-10/12">
             <div className="w-full rounded-lg border border-black bg-stone-100 ">
-              {document && (
+              {typeof window !== 'undefined' && (
                 <CreatableSelect
                   styles={{
                     control: (baseStyles, state) => ({

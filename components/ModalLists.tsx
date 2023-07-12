@@ -27,8 +27,6 @@ const ListsModal: React.FC<ModalProps> = ({
   const [valueListName, setValueListName] = useState('');
   const { profile: lensProfile } = useContext(ProfileContext);
 
-  // const [listAttributeObj, setListAttributeObj] = useState( );
-
   // const firstList = JSON.parse(
   //   lensProfile?.attributes?.find(
   //     (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
