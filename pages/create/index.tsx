@@ -14,6 +14,7 @@ import Toast from '../../components/Toast';
 import TurndownService from 'turndown';
 import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
+import { genericFetch } from '@lib/helpers';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
@@ -50,9 +51,10 @@ const Create: NextPage = () => {
   const [title, setTitle] = useState('');
   const snackbar = useSnackbar();
 
-  const [dispatcherStatus, setDispatcherStatus] = useState<boolean | undefined>(
-    undefined
-  );
+  // const [dispatcherStatus, setDispatcherStatus] =
+  //  useState<boolean | undefined>(
+  //   undefined
+  // );
   const router = useRouter();
   const [abstract, setAbstract] = useState<string | undefined>('');
   const [editorContents, setEditorContents] = useState('');
@@ -72,16 +74,19 @@ const Create: NextPage = () => {
   const [loadingLP, setLoadingLP] = useState(false);
   const [selectedOption, setSelectedOption] = useState([]);
   const [plainText, setPlainText] = useState('');
+  const { profile: lensProfile } = useContext(ProfileContext);
 
   useEffect(() => {
-    const html = editorContents;
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    const text = div.textContent;
-    setPlainText(text || '');
+    if (document) {
+      const html = editorContents;
+      const div = document.createElement('div');
+      div.innerHTML = html;
+      const text = div.textContent;
+      setPlainText(text || '');
+    }
   }, [editorContents]);
 
-  const handleChange = (selectedOptions: any) => {
+  const handleTagsChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
   };
 
@@ -89,51 +94,63 @@ const Create: NextPage = () => {
     setActualPanel(selectedPanel);
   };
 
-  const { profile: lensProfile } = useContext(ProfileContext);
-
-  if (!lensProfile) {
-    return null;
-  }
-
   const fetchLinkPreview = async (url: string) => {
     setLoadingLP(true);
-    const response = await fetch(`/api/linkPreview?url=${url}`);
-    const jsonResponse = await response.json();
-    setLoadingLP(false);
-    return jsonResponse.data;
+
+    return genericFetch(`/api/linkPreview?url=${url}`)
+      .then((response) => response.data)
+      .catch((err) => {
+        console.log('error linkPreview  call: ', err);
+        snackbar.showMessage(
+          'Something went wrong getting the link preview, try again in a few minutes'
+        );
+      })
+      .finally(() => setLoadingLP(false));
   };
 
-  const fetchTLDR = async (text: string) => {
-    const response = await fetch(`/api/tldr?text=${text}`);
-    const jsonResponse = await response.json();
-    return jsonResponse.data;
-  };
-
-  const fetchImageAI = async (text: string) => {
-    const response = await fetch(`/api/imageAI?text=${text}`);
-    const jsonResponse = await response.json();
-    return jsonResponse.data;
-  };
-
-  const generateTLDR = async () => {
-    setLoadingTLDR(true);
-    if (plainText) {
-      try {
-        const dataTLDR = await fetchTLDR(plainText);
-        setAbstract(dataTLDR?.choices[0]?.text?.trim());
-      } catch (err) {
-        console.log(err);
-      }
-      setLoadingTLDR(false);
+  const handleGeneratePic = async () => {
+    if (!title) {
+      snackbar.showMessage('⚠️ A title is required!');
+      return;
     }
+    setLoadingIA(true);
+
+    return genericFetch(`/api/imageAI?text=${title.substring(0, 1000)}`)
+      .then((response) => {
+        const imageB64 =
+          'data:image/png;base64,' + response.data.data[0].b64_json;
+        setGeneratedImage(imageB64);
+        setGeneratedImage2(response.data.data[0].b64_json);
+      })
+      .catch((err) => {
+        console.log('error on ai call: ', err);
+        snackbar.showMessage(
+          'Something went wrong generating the image, try again in a few minutes'
+        );
+      })
+      .finally(() => setLoadingIA(false));
   };
 
-  queryProfile({ profileId: lensProfile.id }).then((profile) => {
-    setDispatcherStatus(
-      profile?.dispatcher?.canUseRelay ? profile.dispatcher.canUseRelay : false
-    );
-    return;
-  });
+  const handleGenerateTLDR = async () => {
+    if (!plainText) {
+      snackbar.showMessage('⚠️ Some text in the body is required!');
+      return;
+    }
+    setLoadingTLDR(true);
+
+    return genericFetch(`/api/tldr?text=${plainText}`)
+      .then((response) => {
+        console.log('ss', response);
+        setAbstract(response.data.choices[0]?.text?.trim());
+      })
+      .catch((err) => {
+        console.log('error on ai call: ', err);
+        snackbar.showMessage(
+          'Something went wrong generating the TLDR, try again in a few minutes'
+        );
+      })
+      .finally(() => setLoadingTLDR(false));
+  };
 
   const handleInputChange = _.debounce(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -158,19 +175,6 @@ const Create: NextPage = () => {
     2000
   );
 
-  const handleIAImage = async () => {
-    if (!title) {
-      snackbar.showMessage('⚠️ Attention: Title is required!');
-      return;
-    }
-    setLoadingIA(true);
-    const response = await fetchImageAI(title.substring(0, 1000));
-    const imageB64 = 'data:image/png;base64,' + response.data[0].b64_json;
-    setGeneratedImage(imageB64);
-    setGeneratedImage2(response.data[0].b64_json);
-    setLoadingIA(false);
-  };
-
   const handleChangeEditor = (content: string) => {
     console.log('rr ', content);
 
@@ -179,7 +183,7 @@ const Create: NextPage = () => {
     //     const html = htmlFromMarkdown($content);
     //     editor.setContent(html);
     // }
-    console.log(existing);
+    // console.log(existing);
 
     // const existing = fromHtml.turndown(textInput.innerHTML)
     // if (existing !== $content) {
@@ -197,7 +201,7 @@ const Create: NextPage = () => {
     }
 
     setLoading(true);
-    const profileResult = await queryProfile({ profileId: lensProfile.id });
+    const profileResult = await queryProfile({ profileId: lensProfile?.id });
 
     if (!profileResult) {
       snackbar.showMessage('❌ You are not connected!');
@@ -301,7 +305,7 @@ const Create: NextPage = () => {
             </p>
 
             <button
-              onClick={handleIAImage}
+              onClick={handleGeneratePic}
               className="flex w-1/6 items-center justify-center rounded-md bg-black px-1 py-2 text-center font-serif text-xs text-white"
             >
               GENERATE
@@ -433,7 +437,7 @@ const Create: NextPage = () => {
           <button
             className="ml-2 flex w-2/12 items-center justify-center whitespace-nowrap rounded-md
              bg-black p-2 text-center font-serif text-xs text-white"
-            onClick={generateTLDR}
+            onClick={handleGenerateTLDR}
           >
             GENERATE TLDR
             {loadingTLDR && (
@@ -491,23 +495,25 @@ const Create: NextPage = () => {
           <div className="w-2/12">Tags</div>
           <div className="w-10/12">
             <div className="w-full rounded-lg border border-black bg-stone-100 ">
-              <CreatableSelect
-                styles={{
-                  control: (baseStyles, state) => ({
-                    ...baseStyles,
-                    boxShadow: 'none',
-                    margin: '2px',
-                    borderColor: 'transparent',
-                    '&:hover': {
-                      borderColor: 'transparent'
-                    }
-                  })
-                }}
-                menuPortalTarget={document.querySelector('body')}
-                isMulti
-                onChange={handleChange}
-                options={TAGS}
-              />
+              {document && (
+                <CreatableSelect
+                  styles={{
+                    control: (baseStyles, state) => ({
+                      ...baseStyles,
+                      boxShadow: 'none',
+                      margin: '2px',
+                      borderColor: 'transparent',
+                      '&:hover': {
+                        borderColor: 'transparent'
+                      }
+                    })
+                  }}
+                  menuPortalTarget={document.querySelector('body')}
+                  isMulti
+                  onChange={handleTagsChange}
+                  options={TAGS}
+                />
+              )}
             </div>
           </div>
         </div>

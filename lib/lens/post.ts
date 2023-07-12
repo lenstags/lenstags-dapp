@@ -247,7 +247,10 @@ export const addPostIdtoListId = async (
   }
 
   if (!arrPosts || !arrPosts.includes(postId)) {
-    console.log('no previously collected, adding comment');
+    console.log(
+      'Post not previously collected, adding comment to the list: ',
+      listId
+    );
 
     if (!arrPosts) {
       arrPosts = [postId];
@@ -294,7 +297,7 @@ export const addPostIdtoListId = async (
     // await freeCollect(postId);
     // console.log('Collecting post finished.');
   } else {
-    console.log('post already collected: ', postId, 'list: ', arrPosts);
+    console.log('Post already collected: ', postId, 'list: ', arrPosts, listId);
     return false;
   }
 

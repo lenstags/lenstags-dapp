@@ -6,14 +6,14 @@ import { WagmiConfig, configureChains, createClient } from 'wagmi';
 import { polygon, polygonMumbai } from '@wagmi/core/chains';
 
 import { APP_NAME } from '@lib/config';
+import { ApolloProvider } from '@apollo/client';
 import type { AppProps } from 'next/app';
 import { AppProvider } from 'context/AppContext';
 import LensAuthenticationProvider from 'components/LensAuthenticationProvider';
 import { SnackbarProvider } from 'material-ui-snackbar-provider';
 import TagsFilterProvider from 'components/TagsFilterProvider';
-import { publicProvider } from 'wagmi/providers/public';
-import { ApolloProvider } from '@apollo/client';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
+import { publicProvider } from 'wagmi/providers/public';
 
 const { chains, provider } = configureChains(
   [polygonMumbai],
@@ -22,6 +22,7 @@ const { chains, provider } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: APP_NAME,
+  projectId: 'f2ffc4207fed16f1809cee500fbceb8f',
   chains
 });
 

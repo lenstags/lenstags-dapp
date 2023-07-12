@@ -100,7 +100,7 @@ export const pollUntilIndexed = async (txHash: string) => {
 
     const response = result.data.hasTxHashBeenIndexed;
     if (response.__typename === 'TransactionIndexedResult') {
-      console.log('Indexing...'); //, response.indexed);
+      console.log('pollUntilIndexed > Indexing...'); //, response.indexed);
       // console.log(
       //   'pool until metadataStatus: metadataStatus',
       //   response.metadataStatus
@@ -112,6 +112,7 @@ export const pollUntilIndexed = async (txHash: string) => {
         }
 
         if (response.metadataStatus.status === 'METADATA_VALIDATION_FAILED') {
+          console.log('error a detectar ', response);
           throw new Error(response.metadataStatus.reason);
         }
       } else {

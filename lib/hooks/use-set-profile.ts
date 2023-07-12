@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 
 import { ProfileMetadata } from '@lib/lens/interfaces/profile-metadata'; //'types/profile-metadata'
 import { getLensPeriphery } from '@lib/lens/lens-hub';
-import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 import { uploadIpfs } from '@lib/lens/ipfs';
 import { useCreateSetProfileMetadataTypedDataMutation } from '@lib/lens/graphql/generated';
 import { useIndexedTx } from './use-indexed-tx';

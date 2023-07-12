@@ -1,25 +1,20 @@
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
-import { createUserList, typeList } from '@lib/lens/load-lists';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import ListImages from './ListImages';
 import ModalLists from './ModalLists';
-import PostIndicators from './PostIndicators';
+import PostIndicators from '@components/PostIndicators';
+import { PostProcessStatus } from '@lib/helpers';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { Spinner } from './Spinner';
 import TurndownService from 'turndown';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { doesFollow } from '@lib/lens/does-follow';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
-import { getLastComment } from '@lib/lens/get-publications';
-import { getPublication } from '@lib/lens/get-publication';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
-import { queryProfile } from '@lib/lens/dispatcher';
 import { useDisconnect } from 'wagmi';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
@@ -30,7 +25,6 @@ interface Props {
 
 const ExploreCard: FC<Props> = (props) => {
   const { post } = props;
-  // fetch data for current post, get the latest comments
   const isList =
     post.metadata.attributes.length > 0 &&
     (post.metadata.attributes[0].value === 'list' ||
@@ -38,24 +32,26 @@ const ExploreCard: FC<Props> = (props) => {
 
   const { profile: lensProfile } = useContext(ProfileContext);
   const [openReconnect, setOpenReconnect] = useState(false);
-  const [isFavMenuVisible, setFavMenuVisible] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
-  const [dotColor, setDotColor] = useState('');
-  const [dotTitle, setDotTitle] = useState('');
   const snackbar = useSnackbar();
-  const [isDeleted, setIsDeleted] = useState(false);
   const [opacity, setOpacity] = useState(1);
   const [pointerEvents, setPointerEvents] = useState<any>('all');
-  const [valueListName, setValueListName] = useState('');
-  const [isListVisible, setIsListVisible] = useState(false);
-  const [isListExistent, setIsListExistent] = useState(false);
   const [isFollowing, setIsFollowing] = useState(post.profile.isFollowedByMe);
   const [isDotFollowing, setIsDotFollowing] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [showCard, setShowCard] = useState(false);
   const [showUnfollow, setShowUnfollow] = useState('Following');
-  const [data, setData] = useState(null);
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
+  const { disconnect } = useDisconnect();
+  const fromHtml = new TurndownService();
+  fromHtml.keep(['br', 'p', 'div']); // keep line breaks
+  fromHtml.addRule('lineElementsToPlain', {
+    filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    replacement: (content) => {
+      const trimmedContent = content.replace(/\n+$/g, '');
+      return trimmedContent + '\n';
+    }
+  });
 
   const handleMouseEnter = () => {
     timeoutId.current = setTimeout(() => {
@@ -72,9 +68,7 @@ const ExploreCard: FC<Props> = (props) => {
 
   // modal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [collectStatus, setCollectStatus] = useState('idle');
   const [postId, setPostId] = useState('');
-
   const handleOpenModal = (postId: string) => {
     setPostId(postId);
     setIsModalOpen(true);
@@ -84,49 +78,22 @@ const ExploreCard: FC<Props> = (props) => {
     setIsModalOpen(false);
   };
 
-  const handleProcessStatus = (actualStatus: string) => {
-    setCollectStatus(actualStatus);
+  const handleProcessStatus = (actualStatus: PostProcessStatus) => {
     if (
-      actualStatus === 'creating-list' ||
-      actualStatus === 'collecting-post' ||
-      actualStatus === 'adding-post' ||
-      actualStatus === 'indexing'
+      actualStatus === PostProcessStatus.CREATING_LIST ||
+      actualStatus === PostProcessStatus.COLLECTING_POST ||
+      actualStatus === PostProcessStatus.ADDING_POST ||
+      actualStatus === PostProcessStatus.INDEXING
     ) {
       setIsPosting(true);
     }
 
-    if (actualStatus === 'finished') {
+    if (actualStatus === PostProcessStatus.FINISHED) {
       setIsPosting(false);
       setIsFinished(true);
     }
-
-    // error-unauthenticated//
+    // TODO error-unauthenticated//
   };
-
-  // const profil: ProfileQuery['profile'] = await queryProfile({
-  //   profileId: pro.id
-  // });
-
-  const firstList = JSON.parse(
-    lensProfile?.attributes?.find(
-      (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-    )?.value || `[]`
-  );
-  // console.log('firstList ', firstList, lensProfile);
-  const fromHtml = new TurndownService();
-
-  fromHtml.keep(['br', 'p', 'div']); // keep line breaks
-  fromHtml.addRule('lineElementsToPlain', {
-    filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-    replacement: (content) => {
-      const trimmedContent = content.replace(/\n+$/g, '');
-      return trimmedContent + '\n';
-    }
-  });
-
-  const [lists, setLists] = useState<typeList[]>(firstList);
-  const [selectedList, setSelectedList] = useState<typeList[]>(lists);
-  const { disconnect } = useDisconnect();
 
   const handleDisconnect = () => {
     deleteLensLocalStorage();
@@ -134,71 +101,47 @@ const ExploreCard: FC<Props> = (props) => {
   };
 
   //handles debounce
-  useEffect(() => {
-    const handleDebounce = setTimeout(() => {
-      const bounceResult = lists
-        .map((l: typeList) => l.name.toLowerCase())
-        .includes(valueListName.toLowerCase());
+  // useEffect(() => {
+  //   const handleDebounce = setTimeout(() => {
+  //     const bounceResult = lists
+  //       .map((l: typeList) => l.name.toLowerCase())
+  //       .includes(valueListName.toLowerCase());
 
-      setIsListExistent(bounceResult);
-      const filteredList = lists.filter((l: typeList) =>
-        l.name.toLowerCase().includes(valueListName.toLowerCase())
-      );
+  //     setIsListExistent(bounceResult);
+  //     const filteredList = lists.filter((l: typeList) =>
+  //       l.name.toLowerCase().includes(valueListName.toLowerCase())
+  //     );
 
-      setSelectedList(filteredList);
-    }, 300); // Adjust this timeout value to your desired delay
+  //     setSelectedList(filteredList);
+  //   }, 300); // Adjust this timeout value to your desired delay
 
-    return () => {
-      clearTimeout(handleDebounce); // This cleanup function will clear the timeout if the component is unmounted before it can execute
-    };
-  }, [valueListName]);
-
-  // handles timeout
-  useEffect(() => {
-    const fetchData = async () => {
-      const latestComment = await getLastComment(post.id);
-      // @ts-ignore
-      if (latestComment?.metadata?.tags?.length > 0) {
-        // @ts-ignore
-        // console.log('latestComment,  ', latestComment?.metadata?.tags);
-        // @ts-ignore
-        latestComment.metadata.tags.map((postId: string) => {
-          getPublication(postId).then((post) => {
-            // @ts-ignore
-            return post?.metadata.media?.original?.url;
-          });
-        });
-      }
-    };
-    fetchData();
-  }, [post]);
+  //   return () => {
+  //     clearTimeout(handleDebounce); // This cleanup function will clear the timeout if the component is unmounted before it can execute
+  //   };
+  // }, [valueListName]);
 
   const handleRemove = (postId: string) =>
     hidePublication(postId).then((res) => {
-      snackbar.showMessage(
-        '🗑️ Post removed successfully'
-        // 'Undo', () => handleUndo()
-      );
+      snackbar.showMessage('🗑️ Post removed successfully');
       setOpacity(0.3);
       setPointerEvents('none');
-      setIsDeleted(true);
     });
 
-  const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setValueListName(event.target.value);
+  // const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
+  //   setValueListName(event.target.value);
 
-  const refreshLists = async (profileId: string) => {
-    const readProfile: ProfileQuery['profile'] = await queryProfile({
-      profileId
-    });
-    const parsedLists = JSON.parse(
-      readProfile?.attributes?.find(
-        (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-      )?.value || `[]`
-    );
-    setLists(parsedLists);
-    setSelectedList(parsedLists); // FIXME: should be only one?
-  };
+  // const refreshLists = async (profileId: string) => {
+  //   const readProfile: ProfileQuery['profile'] = await queryProfile({
+  //     profileId
+  //   });
+  //   const parsedLists = JSON.parse(
+  //     readProfile?.attributes?.find(
+  //       (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
+  //     )?.value || `[]`
+  //   );
+  //   setLists(parsedLists);
+  //   setSelectedList(parsedLists); // FIXME: should be only one?
+  // };
 
   // - if profile doesnt have a deflist on its profile.metadata >>>>  !profile.metadata.listArray.find(r=>r.name==='default')
   // - create the post list, post.attributes = attributes [ { postSubType = 'favsList' }, ... ]
@@ -212,7 +155,7 @@ const ExploreCard: FC<Props> = (props) => {
         setIsDotFollowing(false);
       });
     } else {
-      return proxyActionFreeFollow(profileId).then((r) => {
+      return proxyActionFreeFollow(profileId).then(() => {
         setIsFollowing(true);
         setIsDotFollowing(false);
       });
@@ -233,24 +176,22 @@ const ExploreCard: FC<Props> = (props) => {
   return (
     <>
       <div
-        // lens-post should be here
         key={post.id}
         className=" w-full px-1 animate-in fade-in-50
-      duration-1000
-      xs:w-11/12
-      sm:w-11/12
-      md:w-6/12
-      lg:w-6/12
-      xl:w-6/12
-      2xl:w-4/12
-      3xl:w-3/12
-      4xl:w-2/12"
+          duration-1000
+          xs:w-11/12
+          sm:w-11/12
+          md:w-6/12
+          lg:w-6/12
+          xl:w-6/12
+          2xl:w-4/12
+          3xl:w-3/12
+          4xl:w-2/12"
         style={{ opacity, pointerEvents, height: '310px' }}
         ref={props?.refProp}
       >
         {openReconnect ? (
           <div className="mt-14 h-full text-center ">
-            {/* TODO  write status in a context so the app shows a modal */}
             <p className="my-4 text-2xl">⛔️</p>
             <p className="my-4 ">You were logged out</p>
             <button
@@ -276,8 +217,6 @@ const ExploreCard: FC<Props> = (props) => {
               <div className="flex justify-between pb-3 text-sm text-black">
                 {/* profile */}
                 <div
-                  // onMouseEnter={() => setShowCard(true)}
-                  // onMouseLeave={() => setShowCard(false)}
                   onMouseEnter={handleMouseEnter}
                   onMouseLeave={handleMouseLeave}
                   className=" relative flex"
@@ -537,17 +476,21 @@ const ExploreCard: FC<Props> = (props) => {
                     className=" mt-1
                        font-sans font-thin text-gray-700"
                     style={{
-                      fontSize: '10px',
-                      lineHeight: 1.5,
-                      height: '32px',
-                      overflowY: 'scroll'
+                      fontSize: '10px'
                     }}
                   >
                     {isList ? (
                       <br />
                     ) : (
                       (
-                        <pre className=" whitespace-break-spaces font-sans">
+                        <pre
+                          className="overflow-hidden whitespace-pre-wrap font-sans"
+                          style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical'
+                          }}
+                        >
                           {fromHtml.turndown(post.metadata.content)}
                         </pre>
                       ) || ' '
@@ -628,9 +571,8 @@ const ExploreCard: FC<Props> = (props) => {
                       <span className="ml-2">Collecting</span>
                       <div className="relative ml-1 flex items-center">
                         <div
-                          title={dotTitle}
                           className={`absolute inset-0 m-auto h-1 w-1 animate-ping
-                                rounded-full border ${dotColor}`}
+                                rounded-full border `}
                         />
                         <Spinner h="3" w="3" />
                       </div>

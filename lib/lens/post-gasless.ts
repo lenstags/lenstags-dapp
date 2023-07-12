@@ -87,7 +87,7 @@ export const createPostGasless = async (
   builtPost: IbuiltPost,
   waitForIndexer: boolean = false
 ) => {
-  console.log('createpostgasless ', waitForIndexer);
+  // console.log('createpostgasless waitForIndexer:', waitForIndexer);
   if (!profileId) {
     throw new Error('No profileId defined');
   }
@@ -176,17 +176,14 @@ export const createPostGasless = async (
   };
 
   const result = await post(createPostRequest);
-  // console.log('create post gasless', result);
+  console.log('create post gasless', result);
 
-  // console.log('create post: poll until indexed');
+  console.log('77create post: poll until indexed');
   const indexedResult = await pollUntilIndexed(result.txHash);
 
   console.log('Indexing finished.', result);
 
   const logs = indexedResult.txReceipt!.logs;
-
-  // console.log('create post: logs', logs);
-
   const topicId = utils.id(
     'PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)'
   );

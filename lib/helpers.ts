@@ -3,6 +3,13 @@
 import { IPFS_PROXY_URL } from './config';
 import omitDeep from 'omit-deep';
 
+export const genericFetch = (url: string) =>
+  fetch(url).then((response) =>
+    response.ok
+      ? response.json()
+      : Promise.reject(new Error('Error HTTP: ' + response.status))
+  );
+
 export const prettyJSON = (message: string, obj: string) =>
   console.log(message, JSON.stringify(obj, null, 2));
 
@@ -76,3 +83,26 @@ export const pickPicture = (elementPicture: any, defaultPNG: string) =>
     : elementPicture?.__typename === 'NftImage'
     ? elementPicture.uri
     : defaultPNG;
+
+export const findKeyAttributeInProfile = (
+  lensProfile: any,
+  key: string
+): any => {
+  if (lensProfile?.attributes && lensProfile?.attributes.length > 0) {
+    const attributeObj = lensProfile?.attributes?.find(
+      (obj: any) => obj.key === key // In most cases ATTRIBUTES_LIST_KEY
+    );
+    return attributeObj;
+  }
+  return false;
+};
+
+export enum PostProcessStatus {
+  CREATING_LIST,
+  COLLECTING_POST,
+  ADDING_POST,
+  INDEXING,
+  FINISHED,
+  ERROR_UNAUTHORIZED,
+  IDLE
+}

@@ -120,10 +120,12 @@ const Sidebar: React.FC<SidebarProps> = ({ position }) => {
                   </div>
                 </Link>
 
-                <div className="flex px-6 py-4  ">
-                  <button className="w-full rounded-lg px-4 py-2 align-middle font-sans text-white">
-                    <Link href={'/create'}>+ Create</Link>
-                  </button>
+                <div className="flex px-6 py-4">
+                  <Link href={'/create'} className="w-full ">
+                    <button className="w-full rounded-lg px-4 py-2 align-middle font-sans text-white">
+                      + Create
+                    </button>
+                  </Link>
                 </div>
               </div>
             )}

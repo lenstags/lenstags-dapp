@@ -43,12 +43,10 @@ export default async function handler(
       data: response.data
     });
   } catch (error: any) {
-    {
-      return res.status(500).json({
-        status: 'error',
-        message: error.message,
-        data: null
-      });
-    }
+    return res.status(500).json({
+      status: 'error',
+      message: error.message,
+      data: null
+    });
   }
 }
