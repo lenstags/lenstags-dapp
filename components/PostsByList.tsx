@@ -1,4 +1,4 @@
-import { PublicRoutes } from '@/models';
+import { PublicRoutes } from 'models';
 import { getPublication } from '@lib/lens/get-publication';
 import { getLastComment } from '@lib/lens/get-publications';
 import {

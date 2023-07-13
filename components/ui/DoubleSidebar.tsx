@@ -4,7 +4,7 @@ import * as DoubleSidebarPrimitive from '@radix-ui/react-dialog';
 import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 
-import { cn } from '@/lib/utils';
+import { cn } from '@lib/utils';
 
 const DoubleSidebar = DoubleSidebarPrimitive.Root;
 

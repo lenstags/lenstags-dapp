@@ -1,4 +1,4 @@
-import { SortBy } from "@/models"
+import { SortBy } from "models"
 interface sortItemsProps {
     items: any[],
     sort: string

@@ -4,9 +4,9 @@ import Head from 'next/head';
 import SideBarLeft from './SideBarLeft';
 import SideBarRight from './SideBarRight';
 import { Toaster } from './ui/ToasterUI';
-import { SidebarContext } from '@/context/SideBarSizeContext';
+import { SidebarContext } from '@context/SideBarSizeContext';
 import { useRouter } from 'next/router';
-import { PublicRoutes } from '@/models';
+import { PublicRoutes } from 'models';
 
 interface Props {
   title: string;

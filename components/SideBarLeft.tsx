@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 
-import { SidebarContext } from '@/context/SideBarSizeContext';
-import { PublicRoutes } from '@/models';
+import { SidebarContext } from '@context/SideBarSizeContext';
+import { PublicRoutes } from 'models';
 import { useSorts } from '@lib/hooks/use-sort';
 import { getPublications } from '@lib/lens/get-publications';
 import { PublicationTypes } from '@lib/lens/graphql/generated';

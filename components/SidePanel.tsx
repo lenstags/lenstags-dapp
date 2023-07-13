@@ -22,9 +22,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
-import { SidebarContext } from '@/context/SideBarSizeContext';
+import { SidebarContext } from '@context/SideBarSizeContext';
 import { useRouter } from 'next/router';
-import { PublicRoutes } from '@/models';
+import { PublicRoutes } from 'models';
 interface SidePanelProps {
   fetchMyLists: () => void;
   publications: any;
