@@ -1,19 +1,3 @@
-import React, { useContext, useEffect, useState } from 'react';
-
-import { SidebarContext } from '@context/SideBarSizeContext';
-import { PublicRoutes } from 'models';
-import { useSorts } from '@lib/hooks/use-sort';
-import { getPublications } from '@lib/lens/get-publications';
-import { PublicationTypes } from '@lib/lens/graphql/generated';
-import { TextAlignBottomIcon } from '@radix-ui/react-icons';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { useDisconnect } from 'wagmi';
-import { ProfileContext } from './LensAuthenticationProvider';
-import PostsByList from './PostsByList';
-import SidePanel, { sortBy } from './SidePanel';
 import {
   Accordion,
   AccordionContent,
@@ -27,7 +11,23 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
+import React, { useContext, useEffect, useState } from 'react';
+import SidePanel, { sortBy } from './SidePanel';
+
+import Image from 'next/image';
+import Link from 'next/link';
 import { PlusSmallIcon } from '@heroicons/react/24/outline';
+import PostsByList from './PostsByList';
+import { ProfileContext } from './LensAuthenticationProvider';
+import { PublicRoutes } from 'models';
+import { PublicationTypes } from '@lib/lens/graphql/generated';
+import { SidebarContext } from '@context/SideBarSizeContext';
+import { TextAlignBottomIcon } from '@radix-ui/react-icons';
+import { deleteLensLocalStorage } from 'lib/lens/localStorage';
+import { getPublications } from '@lib/lens/get-publications';
+import { useDisconnect } from 'wagmi';
+import { useRouter } from 'next/router';
+import { useSorts } from '@lib/hooks/use-sort';
 
 interface SidebarProps {}
 
@@ -76,16 +76,23 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
   const fetchMyLists = async () => {
     if (!lensProfile) return;
+
     if (publications.length !== 0) return;
     const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
-    setPublications(
-      res.items.filter(
-        (r) =>
-          (r.profile.id === lensProfile?.id &&
-            r.metadata.attributes[0].value === 'list') ||
-          r.metadata.attributes[0].value === 'privateDefaultList'
-      )
-    );
+    console.log('xxx ', res);
+
+    const filteredItems = res.items.filter((item) => {
+      const id = lensProfile?.id;
+      const attributes = item.metadata.attributes;
+      return (
+        item.profile.id === id &&
+        attributes?.length > 0 &&
+        (attributes[0].value === 'list' ||
+          attributes[0].value === 'privateDefaultList')
+      );
+    });
+
+    setPublications(filteredItems);
   };
 
   const { sortItems } = useSorts();
