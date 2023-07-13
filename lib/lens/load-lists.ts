@@ -38,7 +38,7 @@ export const loadLists = async (lensProfileOld: any) => {
 export const createDefaultList = async (lensProfile: any) => {
   const constructedDefaultPost: IbuiltPost = {
     name: 'My private list', // HACK should it be 'My stuff {private)?
-    content: 'All my collected items',
+    content: 'My private list',
     locale: 'ia', // INTERLINGUA https://www.wikidata.org/wiki/Q22282939
     attributes: [
       {

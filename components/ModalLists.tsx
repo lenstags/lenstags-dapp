@@ -76,6 +76,8 @@ const ListsModal: React.FC<ModalProps> = ({
     // listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
 
     // console.log('listas parseadas en json', parsedLists);
+    console.log('refreshing lists ', parsedLists);
+
     setSelectedList(parsedLists);
   };
 
@@ -85,7 +87,6 @@ const ListsModal: React.FC<ModalProps> = ({
     listId?: string,
     name?: string
   ) => {
-    refreshLists(lensProfile!.id);
     onClose();
 
     // verifies if selected list does exist in the current profile, if not, create it
@@ -136,11 +137,16 @@ const ListsModal: React.FC<ModalProps> = ({
     return;
   };
 
+  // useEffect(() => {
+  //   if (lensProfile) {
+  //     refreshLists(lensProfile.id);
+  //   }
+  // });
   useEffect(() => {
-    if (lensProfile) {
+    if (isOpen && lensProfile) {
       refreshLists(lensProfile.id);
     }
-  }, [lensProfile]);
+  }, [isOpen, lensProfile]);
 
   return isOpen ? (
     <div

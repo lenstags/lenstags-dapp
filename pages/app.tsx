@@ -1,5 +1,5 @@
 import { ProfileContext, TagsFilterContext } from 'components';
-import { enable as enableDispatcher, queryProfile } from '@lib/lens/dispatcher';
+import { enableDispatcher, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
@@ -65,13 +65,18 @@ const App: NextPage = () => {
       // console.log('>>>   hasLists:', hasLists);
 
       setShowWelcome(true);
-
       try {
         if (profileResult && !dispatcherEnabled) {
           snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
-          await enableDispatcher(profileResult.id);
+          const res = await enableDispatcher(profileResult.id);
+          if (!res) {
+            setShowReject(true);
+            return;
+          }
+          // console.log('RRR ', res);
           snackbar.showMessage('🟦 Dispatcher enabled successfully.');
         }
+
         if (!hasLists) {
           snackbar.showMessage('🟦 Creating default list...');
           await createDefaultList(profileResult);
