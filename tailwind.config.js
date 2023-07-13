@@ -67,6 +67,7 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       }
     },
+    animation: {},
     variants: {
       extend: {
         scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce'],

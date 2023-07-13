@@ -38,7 +38,6 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
   const [posts, setPosts] = useState<any[]>([]);
   const { toast } = useToast();
   const router = useRouter();
-  const snackbar = useSnackbar();
   const handleAction = (value: string, item: any) => {
     switch (value) {
       case 'go':
@@ -127,7 +126,7 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
                   className="flex w-40 flex-col gap-2 border-lensBlack p-4"
                   align="start"
                 >
-                  {actions.map((item) => (
+                  {actions.map((item: any) => (
                     <DropdownMenuItem
                       className="cursor-pointer select-none outline-none"
                       key={item.value}
