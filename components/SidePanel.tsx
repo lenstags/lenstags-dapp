@@ -25,6 +25,7 @@ import {
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { useRouter } from 'next/router';
 import { PublicRoutes } from 'models';
+import { Tooltip } from './ui/Tooltip';
 interface SidePanelProps {
   fetchMyLists: () => void;
   publications: any;
@@ -40,8 +41,6 @@ export const sortBy = [
 export const actions = [
   { name: 'Go to list', value: 'go' },
   { name: 'Copy link', value: 'copy' },
-  { name: 'Duplicate', value: 'duplicate' },
-  { name: 'Rename', value: 'rename' },
   { name: 'Delete', value: 'delete' }
 ];
 
@@ -97,33 +96,35 @@ const SidePanel = ({
         setOpen(!open);
       }}
     >
-      <DoubleSidebarTrigger asChild onClick={handleTrigger}>
-        <div
-          className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent hover:border-l-teal-100 hover:bg-teal-50 data-[state=open]:px-5 data-[state=open]:font-bold [&[data-state=open]>div]:rounded-xl [&[data-state=open]>div]:bg-white [&[data-state=open]>div]:p-3 ${styles()}`}
-        >
-          <div>
-            <svg
-              width="20"
-              height="18"
-              viewBox="0 0 20 18"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
-                stroke="#121212"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
+      <Tooltip tooltip="My inventory">
+        <DoubleSidebarTrigger asChild onClick={handleTrigger}>
+          <div
+            className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent hover:border-l-teal-100 hover:bg-teal-50 data-[state=open]:px-5 data-[state=open]:font-bold [&[data-state=open]>div]:rounded-xl [&[data-state=open]>div]:bg-white [&[data-state=open]>div]:p-3 ${styles()}`}
+          >
+            <div>
+              <svg
+                width="20"
+                height="18"
+                viewBox="0 0 20 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
+                  stroke="#121212"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
 
-          {!sidebarCollapsedStateLeft.collapsed && (
-            <span className="text-md ml-2">My inventory</span>
-          )}
-        </div>
-      </DoubleSidebarTrigger>
+            {!sidebarCollapsedStateLeft.collapsed && (
+              <span className="text-md ml-2">My inventory</span>
+            )}
+          </div>
+        </DoubleSidebarTrigger>
+      </Tooltip>
       <DoubleSidebarContent
         className={
           sidebarCollapsedStateLeft.collapsed
@@ -181,7 +182,7 @@ const SidePanel = ({
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <PostsByList publications={publications} />
+        <PostsByList publications={publications} className="pb-4" />
       </DoubleSidebarContent>
     </DoubleSidebar>
   );

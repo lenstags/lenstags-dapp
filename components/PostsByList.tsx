@@ -2,10 +2,10 @@ import { PublicRoutes } from 'models';
 import { getPublication } from '@lib/lens/get-publication';
 import { getLastComment } from '@lib/lens/get-publications';
 import {
-  DotsHorizontalIcon,
   LockClosedIcon,
-  LockOpen1Icon
-} from '@radix-ui/react-icons';
+  LockOpenIcon,
+  EllipsisHorizontalIcon
+} from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import { actions } from './SidePanel';
@@ -23,18 +23,22 @@ import {
   DropdownMenuTrigger
 } from './ui/Dropdown';
 import { useToast } from './ui/useToast';
+import { hidePublication } from '@lib/lens/hide-publication';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface PostByListProps {
   publications: any;
+  className?: string;
 }
 
-const PostsByList = ({ publications }: PostByListProps) => {
+const PostsByList = ({ publications, className }: PostByListProps) => {
   const [fetchList, setFetchList] = useState(false);
   const [loading, setLoading] = useState(false);
   const [postId, setPostId] = useState<any>('' as any);
   const [posts, setPosts] = useState<any[]>([]);
   const { toast } = useToast();
   const router = useRouter();
+  const snackbar = useSnackbar();
   const handleAction = (value: string, item: any) => {
     switch (value) {
       case 'go':
@@ -48,16 +52,23 @@ const PostsByList = ({ publications }: PostByListProps) => {
           variant: 'default'
         });
         break;
-      case 'duplicate':
-        break;
-      case 'rename':
-        break;
       case 'delete':
+        handleRemove(item.id);
         break;
       default:
         break;
     }
   };
+
+  const handleRemove = (postId: string) =>
+    hidePublication(postId).then((res) => {
+      if (res) {
+        toast({
+          title: '🗑️ Post removed successfully',
+          variant: 'destructive'
+        });
+      }
+    });
 
   const handlePostByList = useCallback(
     async (listId: any) => {
@@ -83,7 +94,11 @@ const PostsByList = ({ publications }: PostByListProps) => {
     [postId]
   );
   return (
-    <Accordion type="single" className="flex flex-col gap-1" collapsible>
+    <Accordion
+      type="single"
+      className={`flex h-full flex-col gap-1 overflow-x-scroll ${className}`}
+      collapsible
+    >
       {publications?.map((list: any) => (
         <AccordionItem
           value={list.id}
@@ -100,13 +115,13 @@ const PostsByList = ({ publications }: PostByListProps) => {
             </AccordionTrigger>
             <div className="flex items-center justify-between gap-2">
               {list.metadata.attributes[0].value === 'list' ? (
-                <LockOpen1Icon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
+                <LockOpenIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
               ) : (
                 <LockClosedIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
               )}
               <DropdownMenu>
                 <DropdownMenuTrigger className="outline-none data-[state=open]:bg-teal-400">
-                  <DotsHorizontalIcon className="h-4 w-4 text-lensBlack opacity-0 group-open:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100" />
+                  <EllipsisHorizontalIcon className="h-4 w-4 text-lensBlack opacity-0 group-open:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   className="flex w-40 flex-col gap-2 border-lensBlack p-4"

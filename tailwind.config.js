@@ -67,7 +67,6 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       }
     },
-    animation: {},
     variants: {
       extend: {
         scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce'],
@@ -278,7 +277,6 @@ module.exports = {
       '6xl': '72rem',
       '7xl': '80rem'
     },
-    container: {},
     content: {
       none: 'none'
     },
@@ -1008,8 +1006,7 @@ module.exports = {
         'color, background-color, border-color, text-decoration-color, fill, stroke',
       opacity: 'opacity',
       shadow: 'box-shadow',
-      transform: 'transform',
-      all: 'all'
+      transform: 'transform'
     },
     transitionTimingFunction: {
       DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',
