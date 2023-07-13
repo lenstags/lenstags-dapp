@@ -1,9 +1,12 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import { Navbar } from 'components';
-import Script from 'next/script';
-import Sidebar from './Sidebar';
+import SideBarLeft from './SideBarLeft';
+import SideBarRight from './SideBarRight';
+import { Toaster } from './ui/ToasterUI';
+import { SidebarContext } from '@context/SideBarSizeContext';
+import { useRouter } from 'next/router';
+import { PublicRoutes } from 'models';
 
 interface Props {
   title: string;
@@ -22,6 +25,10 @@ export const Layout: FC<Props> = ({
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
+
+  const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
+
+  const router = useRouter();
 
   if (hydrationLoading) {
     return (
@@ -110,18 +117,21 @@ export const Layout: FC<Props> = ({
       {/* <nav>
             <Navbar />
           </nav> */}
-      <div className=" flex h-screen w-full  ">
-        <Sidebar position="left" />
+      <div className="grid  w-full grid-cols-12">
+        <SideBarLeft />
         <main
-          style={{ left: '16.666667%', width: '59%' }}
-          className=" absolute h-screen 
-               
-               overflow-x-clip
-               "
+          className={`col-span-7 overflow-x-clip ${
+            sidebarCollapsedStateLeft.collapsed &&
+            router.pathname !== PublicRoutes.APP &&
+            !router.pathname.includes(PublicRoutes.PROFILE)
+              ? 'col-start-2 col-end-10'
+              : 'col-start-3'
+          }`}
         >
           {children}
         </main>
-        <Sidebar position="right" />
+        <SideBarRight />
+        <Toaster />
       </div>
       {/* </div> */}
       {/* </div> */}

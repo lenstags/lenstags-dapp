@@ -42,7 +42,7 @@ export const createDefaultList = async (lensProfile: any) => {
     locale: 'ia', // INTERLINGUA https://www.wikidata.org/wiki/Q22282939
     attributes: [
       {
-        key: 'internalPublicationType', // FIXME this key isn't returned by get-publications?
+        key: 'internalPublicationType', // FIXME this key isn't returned by get-publications!!!
         displayType: MetadataDisplayType.string,
         value: 'privateDefaultList' // the type list either [ list, post ]
       }

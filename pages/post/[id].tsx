@@ -207,7 +207,7 @@ export default function PostDetails() {
         pageDescription="Post"
         screen={true}
       >
-        <div className="w-full px-6 pb-4">
+        <div className="w-full pb-4">
           {/* cover */}
           <div
             style={{

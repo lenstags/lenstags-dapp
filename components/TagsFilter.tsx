@@ -25,7 +25,7 @@ export const TagsFilter = () => {
           styles={{
             control: (baseStyles, state) => ({
               ...baseStyles,
-              zIndex: 9999,
+              zIndex: 10,
               boxShadow: 'none',
               backgroundColor: 'transparent',
               borderColor: 'transparent',
