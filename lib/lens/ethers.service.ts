@@ -20,6 +20,7 @@ export const getSigner = () => {
     // return singer;
   } else {
     // client side
+    // @ts-ignore
     const p: any = window.ethereum;
     if (typeof p === 'undefined') {
       return undefined; // no-provider;

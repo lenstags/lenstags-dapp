@@ -13,11 +13,11 @@ import { useContext, useEffect, useState } from 'react';
 import DotWave from '@uiball/loaders/dist/components/DotWave';
 import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
-import ListsModal from 'components/ListsModal';
 import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
+import ModalLists from 'components/ModalLists';
 import PostIndicators from 'components/PostIndicators';
-import { ProfileQuery } from '@lib/lens/graphql/generated';
+import { PostProcessStatus } from '@lib/helpers';
 import { Spinner } from 'components/Spinner';
 import TagStrip from 'components/TagStrip';
 import { commentGasless } from '@lib/lens/comment-gasless';
@@ -27,7 +27,6 @@ import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { typeList } from '@lib/lens/load-lists';
-import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
@@ -70,7 +69,7 @@ export default function PostDetails() {
 
   // modal
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [collectStatus, setCollectStatus] = useState('idle');
+  const [collectStatus, setCollectStatus] = useState(PostProcessStatus.IDLE);
   const [postId, setPostId] = useState('');
   const [isPosting, setIsPosting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
@@ -84,18 +83,18 @@ export default function PostDetails() {
     setIsModalOpen(false);
   };
 
-  const handleProcessStatus = (actualStatus: string) => {
+  const handleProcessStatus = (actualStatus: PostProcessStatus) => {
     setCollectStatus(actualStatus);
     if (
-      actualStatus === 'creating-list' ||
-      actualStatus === 'collecting-post' ||
-      actualStatus === 'adding-post' ||
-      actualStatus === 'indexing'
+      actualStatus === PostProcessStatus.CREATING_LIST ||
+      actualStatus === PostProcessStatus.COLLECTING_POST ||
+      actualStatus === PostProcessStatus.ADDING_POST ||
+      actualStatus === PostProcessStatus.INDEXING
     ) {
       setIsPosting(true);
     }
 
-    if (actualStatus === 'finished') {
+    if (actualStatus === PostProcessStatus.FINISHED) {
       setIsPosting(false);
       setIsFinished(true);
     }
@@ -344,8 +343,6 @@ export default function PostDetails() {
                   !post.hasCollectedByMe && (
                     <button
                       onClick={() => {
-                        // refreshLists(lensProfile?.id);
-                        // return setFavMenuVisible(!isListVisible);
                         handleOpenModal(post.id);
                       }}
                       className="  rounded-lg bg-black "
@@ -392,7 +389,7 @@ export default function PostDetails() {
                 {/* collect zone */}
                 <div className="flex items-center">
                   {/* favllect content goes here */}
-                  <ListsModal
+                  <ModalLists
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     postId={postId}

@@ -27,7 +27,7 @@ export const reqQuery: ExplorePublicationRequest = {
   sortCriteria: PublicationSortCriteria.Latest,
   noRandomize: true,
   sources: [LENSTAGS_SOURCE],
-  limit: 50,
+  limit: 30,
   publicationTypes: [PublicationTypes.Post],
   customFilters: [CustomFiltersTypes.Gardeners]
 };
