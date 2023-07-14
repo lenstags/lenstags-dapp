@@ -28,6 +28,7 @@ import { getPublications } from '@lib/lens/get-publications';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
+import { Tooltip } from './ui/Tooltip';
 
 interface SidebarProps {}
 
@@ -134,36 +135,45 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
         {/* menu items */}
         <div className="font-serif text-base">
           <Link href={'/app'}>
-            <div
-              className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+            <Tooltip tooltip="Home">
+              <div
+                className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
              hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
                sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
              }`}
-            >
-              <Image src="/icons/home.svg" alt="Home" width={20} height={20} />
-              {!sidebarCollapsedStateLeft.collapsed && (
-                <span className="ml-2">Home</span>
-              )}
-            </div>
+              >
+                <Image
+                  src="/icons/home.svg"
+                  alt="Home"
+                  width={20}
+                  height={20}
+                />
+                {!sidebarCollapsedStateLeft.collapsed && (
+                  <span className="ml-2">Home</span>
+                )}
+              </div>
+            </Tooltip>
           </Link>
 
           <Link href={'/app'}>
-            <div
-              className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+            <Tooltip tooltip="Explore">
+              <div
+                className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
               hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
                 sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
               }`}
-            >
-              <Image
-                src="/icons/explore.svg"
-                alt="Explore"
-                width={20}
-                height={20}
-              />
-              {!sidebarCollapsedStateLeft.collapsed && (
-                <span className="ml-2">Explore</span>
-              )}
-            </div>
+              >
+                <Image
+                  src="/icons/explore.svg"
+                  alt="Explore"
+                  width={20}
+                  height={20}
+                />
+                {!sidebarCollapsedStateLeft.collapsed && (
+                  <span className="ml-2">Explore</span>
+                )}
+              </div>
+            </Tooltip>
           </Link>
 
           {lensProfile && (
@@ -231,27 +241,32 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      <PostsByList publications={publications} />
+                      <PostsByList
+                        publications={publications}
+                        className="-mb-4"
+                      />
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
               )}
               <Link href={'/app'}>
-                <div
-                  className={`flex h-12 cursor-pointer items-center gap-1 border-l-4 border-l-stone-100 hover:bg-teal-50 ${
-                    sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-                  }`}
-                >
-                  <Image
-                    src="/icons/notifications.svg"
-                    alt="Notifications"
-                    width={20}
-                    height={20}
-                  />
-                  {!sidebarCollapsedStateLeft.collapsed && (
-                    <span className="ml-2">Notifications</span>
-                  )}
-                </div>
+                <Tooltip tooltip="Notifications">
+                  <div
+                    className={`flex h-12 cursor-pointer items-center gap-1 border-l-4 border-l-transparent hover:border-l-teal-100 hover:bg-teal-50 ${
+                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                    }`}
+                  >
+                    <Image
+                      src="/icons/notifications.svg"
+                      alt="Notifications"
+                      width={20}
+                      height={20}
+                    />
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2">Notifications</span>
+                    )}
+                  </div>
+                </Tooltip>
               </Link>
 
               <div className="flex px-6 py-4  ">
