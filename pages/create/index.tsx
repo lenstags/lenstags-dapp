@@ -274,23 +274,21 @@ const Create: NextPage = () => {
     // ];
 
     if (!imageBuffer) {
-      const htmlToImage = require('html-to-image');
       const parentNode = document.getElementById('defaultImage');
 
       if (parentNode) {
         const svgNode = parentNode.firstElementChild;
         if (svgNode) {
-          await htmlToImage
-            .toPng(svgNode as HTMLElement)
-            .then((dataUrl: any) => {
-              const base64Image = dataUrl.split(';base64,').pop();
-              imageBuffer = base64Image
-                ? Buffer.from(base64Image, 'base64')
-                : null;
-            })
-            .catch((error: any) => {
-              console.error('Could not create image from SVG:', error);
-            });
+          const { toPng } = await import('html-to-image');
+          try {
+            const dataUrl = await toPng(svgNode as HTMLElement);
+            const base64Image = dataUrl.split(';base64,').pop();
+            imageBuffer = base64Image
+              ? Buffer.from(base64Image, 'base64')
+              : null;
+          } catch (error) {
+            console.error('Could not create image from SVG:', error);
+          }
         }
       }
     }
@@ -607,9 +605,8 @@ const Create: NextPage = () => {
             square={true}
             variant="marble"
             // colors={
-              // ['#180A29', '#49007E', '#FF005B', '#FF7D10', '#FFB238']
-              colors={['#413E4A', '#73626E', '#B38184', '#F0B49E', '#F7E4BE']
-            }
+            // ['#180A29', '#49007E', '#FF005B', '#FF7D10', '#FFB238']
+            colors={['#413E4A', '#73626E', '#B38184', '#F0B49E', '#F7E4BE']}
           />
         </div>
       </div>
