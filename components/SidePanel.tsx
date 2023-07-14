@@ -1,12 +1,3 @@
-import { useSorts } from '@lib/hooks/use-sort';
-import {
-  MagnifyingGlassIcon,
-  TextAlignBottomIcon
-} from '@radix-ui/react-icons';
-import { ArrowLeftIcon } from 'lucide-react';
-import Link from 'next/link';
-import { useContext, useState } from 'react';
-import PostsByList from './PostsByList';
 import {
   DoubleSidebar,
   DoubleSidebarClose,
@@ -22,10 +13,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
-import { SidebarContext } from '@context/SideBarSizeContext';
-import { useRouter } from 'next/router';
+import {
+  MagnifyingGlassIcon,
+  TextAlignBottomIcon
+} from '@radix-ui/react-icons';
+import { useContext, useState } from 'react';
+
+import { ArrowLeftIcon } from 'lucide-react';
+import Link from 'next/link';
+import PostsByList from './PostsByList';
 import { PublicRoutes } from 'models';
+import { SidebarContext } from '@context/SideBarSizeContext';
 import { Tooltip } from './ui/Tooltip';
+import { useRouter } from 'next/router';
+import { useSorts } from '@lib/hooks/use-sort';
 interface SidePanelProps {
   fetchMyLists: () => void;
   publications: any;
@@ -138,7 +139,7 @@ const SidePanel = ({
               <ArrowLeftIcon className="h-4 w-4 text-lensBlack" />
             </DoubleSidebarClose>
           </div>
-          <span className="text-md w-full">My Iventory</span>
+          <span className="text-md w-full">My Inventory</span>
           <Link
             href={'/my-profile'}
             className="rounded-lg bg-black px-5 py-1 text-xs text-white"
