@@ -26,6 +26,7 @@ import { findKeyAttributeInProfile } from '@lib/helpers';
 import { useDisconnect } from 'wagmi';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { search } from '@lib/lens/graphql/search';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -183,6 +184,10 @@ const App: NextPage = () => {
     });
     setCachedNames(publicationsData);
   }, [publications]);
+
+  search('nader').then((data) => {
+    console.log(data.items);
+  });
 
   if (hydrationLoading) {
     return (

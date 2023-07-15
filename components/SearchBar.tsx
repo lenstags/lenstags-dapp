@@ -64,8 +64,10 @@ export const SearchBar = ({ cachedNames }: { cachedNames: CachedName[] }) => {
                 <Link
                   key={item.id}
                   href={`/${item.type}/${item.id}`}
-                  rel="noopener noreferrer"
-                  target="_blank"
+                  /* rel="noopener noreferrer"
+                  target="_blank" */
+                  onMouseDown={(e) => e.preventDefault()}
+                  onTouchStart={(e) => e.preventDefault()}
                 >
                   <li className="hover:font-semibold">{item.name}</li>
                 </Link>
