@@ -124,7 +124,7 @@ const App: NextPage = () => {
     }
   );
 
-  const handleLoadMore = () => {
+  const handleLoadMoreWithoutTags = () => {
     if (!cursor) return console.log('no more results');
     fetchMore({
       variables: {
@@ -154,23 +154,67 @@ const App: NextPage = () => {
     });
   };
 
+  const handleLoadMoreWithTags = () => {
+    if (!cursor) return console.log('no more results');
+    const filter = JSON.parse(cursor).filter;
+    let tagsFilter = JSON.parse(filter).tags;
+    if (tags) {
+      tagsFilter = tags;
+    }
+    let newCursorStringify = JSON.stringify({
+      ...JSON.parse(cursor),
+      filter: JSON.stringify({
+        tags: tagsFilter
+      })
+    });
+    fetchMore({
+      variables: {
+        request: {
+          ...query,
+          cursor: newCursorStringify
+        }
+      },
+      updateQuery: (prev, { fetchMoreResult }): any => {
+        if (!fetchMoreResult) return 'no more results';
+        return {
+          explorePublications: {
+            ...fetchMoreResult.explorePublications
+          }
+        };
+      }
+    }).then((res) => {
+      if (res.data.explorePublications.items.length > 0) {
+        setCursor(res.data.explorePublications.pageInfo.next);
+        setPublications((prev) => [
+          ...prev,
+          ...res.data.explorePublications.items
+        ]);
+      } else {
+        return console.log('no more results');
+      }
+    });
+  };
+
   const observer = useRef<IntersectionObserver>();
   const lastPublicationRef = useCallback(
     (node: HTMLDivElement | null | undefined) => {
       if (publications.length === 0) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && cursor) {
-          handleLoadMore();
+        if (entries[0].isIntersecting && cursor && tags.length === 0) {
+          handleLoadMoreWithoutTags();
+        } else if (entries[0].isIntersecting && cursor && tags.length > 0) {
+          handleLoadMoreWithTags();
         }
       });
       if (node) observer.current.observe(node);
     },
-    [cursor, publications.length]
+    [cursor, publications?.length]
   );
 
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
+      if (!data) return setPublications([]);
       return setPublications(data.items);
     });
     refetch();

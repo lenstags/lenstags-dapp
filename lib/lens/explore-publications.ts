@@ -27,7 +27,7 @@ export const reqQuery: ExplorePublicationRequest = {
   sortCriteria: PublicationSortCriteria.Latest,
   noRandomize: true,
   sources: [LENSTAGS_SOURCE],
-  limit: 30,
+  limit: 48,
   publicationTypes: [PublicationTypes.Post],
   customFilters: [CustomFiltersTypes.Gardeners]
 };
@@ -42,5 +42,5 @@ export const explore = async (filter?: IExplorePublications) => {
   }
 
   const result = await explorePublications(reqQuery);
-  return result.data.explorePublications;
+  return result.data?.explorePublications;
 };
