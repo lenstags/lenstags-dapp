@@ -1,23 +1,81 @@
-import { useState, ChangeEvent } from 'react';
+import { useState, useEffect, useRef, ChangeEvent } from 'react';
 import Link from 'next/link';
+import { search } from '@lib/lens/graphql/search';
 
-export interface CachedName {
+interface User {
   id: string;
-  name: string;
-  type: string;
+  handle: string;
 }
 
-export const SearchBar = ({ cachedNames }: { cachedNames: CachedName[] }) => {
+interface Publication {
+  id: string;
+  type: string;
+  name: string;
+}
+
+export const SearchBar = () => {
   const [inputText, setInputText] = useState<string>('');
+  const [cachedUsers, setCachedUsers] = useState<User[]>([]);
+  const [cachedPublications, setCachedPublications] = useState<Publication[]>(
+    []
+  );
+  const timeoutId = useRef<NodeJS.Timeout | null>(null);
 
   const handleInputText = (event: ChangeEvent<HTMLInputElement>) => {
     setInputText(event.target.value);
   };
 
-  const filteredNames = cachedNames.filter((publication) => {
+  /* const filteredUsers = cachedUsers.filter((user: any) => {
     const regex = new RegExp(inputText, 'i');
-    return publication.name.match(regex);
-  });
+    return user.name.match(regex);
+  }); */
+
+  const fetchData = async (input: string) => {
+    const res = await search(input);
+
+    const users = await res.profilesData.items.map((user: any) => {
+      return {
+        id: user.id,
+        handle: user.handle
+      };
+    });
+
+    const publications = await res.publicationsData.items.map(
+      (publication: any) => {
+        return {
+          id: publication.id,
+          type: publication.metadata.attributes[0].value,
+          name: publication.metadata.name
+        };
+      }
+    );
+
+    return { users, publications };
+  };
+
+  useEffect(() => {
+    if (timeoutId.current) {
+      clearTimeout(timeoutId.current);
+    }
+
+    timeoutId.current = setTimeout(() => {
+      if (inputText) {
+        const fetchAndSetUsers = async () => {
+          const data = await fetchData(inputText);
+          setCachedUsers(data.users);
+          setCachedPublications(data.publications);
+        };
+
+        fetchAndSetUsers();
+      }
+    }, 500);
+
+    return () => {
+      if (timeoutId.current) {
+        clearTimeout(timeoutId.current);
+      }
+    };
+  }, [inputText]);
 
   return (
     <div className="relative">
@@ -57,23 +115,51 @@ export const SearchBar = ({ cachedNames }: { cachedNames: CachedName[] }) => {
         </button>
       </div>
       {inputText !== '' && (
-        <div className="absolute md:w-1/3 z-[10000]">
-          <ul className="bg-white max-w-[94%] ml-2 p-2 rounded-md">
-            {filteredNames
-              .map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/${item.type}/${item.id}`}
-                  /* rel="noopener noreferrer"
-                  target="_blank" */
-                  onMouseDown={(e) => e.preventDefault()}
-                  onTouchStart={(e) => e.preventDefault()}
-                >
-                  <li className="hover:font-semibold">{item.name}</li>
-                </Link>
-              ))
-              .slice(0, 3)}
-          </ul>
+        <div className="flex flex-col absolute md:w-1/3 z-[10000] bg-white py-2 px-3 rounded-md">
+          {cachedPublications.length > 0 && (
+            <div className="flex flex-col">
+              <span className="underline">Content</span>
+              <ul>
+                {cachedPublications
+                  .map((publication: Publication) => (
+                    <Link
+                      key={publication.id}
+                      href={`/${publication.type}/${publication.id}`}
+                      /* rel="noopener noreferrer"
+                    target="_blank" */
+                      onMouseDown={(e) => e.preventDefault()}
+                      onTouchStart={(e) => e.preventDefault()}
+                    >
+                      <li className="hover:font-semibold">
+                        {publication.name}
+                      </li>
+                    </Link>
+                  ))
+                  .slice(0, 3)}
+              </ul>
+            </div>
+          )}
+          {cachedUsers.length > 0 && (
+            <div className="flex flex-col">
+              <span className="underline">Users</span>
+              <ul>
+                {cachedUsers
+                  .map((user: User) => (
+                    <Link
+                      key={user.id}
+                      href={`/profile/${user.id}`}
+                      /* rel="noopener noreferrer"
+                    target="_blank" */
+                      onMouseDown={(e) => e.preventDefault()}
+                      onTouchStart={(e) => e.preventDefault()}
+                    >
+                      <li className="hover:font-semibold">{user.handle}</li>
+                    </Link>
+                  ))
+                  .slice(0, 3)}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </div>

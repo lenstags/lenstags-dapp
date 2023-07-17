@@ -1,9 +1,12 @@
 import {
+  CustomFiltersTypes,
   SearchProfilesDocument,
   SearchRequestTypes,
-  SearchQueryRequest
+  SearchQueryRequest,
+  SearchPublicationsDocument
 } from './generated';
 
+import { LENSTAGS_SOURCE } from '@lib/config';
 import { apolloClient } from './apollo-client';
 
 const searchProfiles = (request: SearchQueryRequest) => {
@@ -15,15 +18,40 @@ const searchProfiles = (request: SearchQueryRequest) => {
   });
 };
 
-export const reqSearchQuery: SearchQueryRequest = {
+const searchPublications = (request: SearchQueryRequest) => {
+  return apolloClient.query({
+    query: SearchPublicationsDocument,
+    variables: {
+      request
+    }
+  });
+};
+
+export const reqSearchProfilesQuery: SearchQueryRequest = {
   query: '',
   type: SearchRequestTypes.Profile,
   limit: 10
 };
 
-export const search = async (input: string) => {
-  reqSearchQuery.query = input;
+export const reqSearchPublicationsQuery: SearchQueryRequest = {
+  query: '',
+  type: SearchRequestTypes.Publication,
+  limit: 10,
+  sources: [LENSTAGS_SOURCE],
+  customFilters: [CustomFiltersTypes.Gardeners]
+};
 
-  const result = await searchProfiles(reqSearchQuery);
-  return result.data.search;
+export const search = async (input: string) => {
+  reqSearchProfilesQuery.query = input;
+  reqSearchPublicationsQuery.query = input;
+
+  const profilesResult = await searchProfiles(reqSearchProfilesQuery);
+  const publicationsResult = await searchPublications(
+    reqSearchPublicationsQuery
+  );
+
+  return {
+    profilesData: profilesResult.data.search,
+    publicationsData: publicationsResult.data.search
+  };
 };

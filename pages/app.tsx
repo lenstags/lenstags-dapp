@@ -18,7 +18,7 @@ import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
 import { Spinner } from 'components/Spinner';
-import { SearchBar, CachedName } from '@components/SearchBar';
+import { SearchBar } from '@components/SearchBar';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
@@ -26,7 +26,6 @@ import { findKeyAttributeInProfile } from '@lib/helpers';
 import { useDisconnect } from 'wagmi';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import { search } from '@lib/lens/graphql/search';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -43,7 +42,6 @@ const App: NextPage = () => {
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
   const { profile: lensProfile } = useContext(ProfileContext);
-  const [cachedNames, setCachedNames] = useState<CachedName[]>([]);
 
   const handleSetup = async () => {
     const profileResult = await queryProfile({ profileId: lensProfile!.id });
@@ -173,21 +171,6 @@ const App: NextPage = () => {
     });
     refetch();
   }, [tags, refetch]);
-
-  useEffect(() => {
-    const publicationsData = publications.map((publication) => {
-      return {
-        id: publication.id,
-        name: publication.metadata.name,
-        type: publication.metadata.attributes[0].value
-      };
-    });
-    setCachedNames(publicationsData);
-  }, [publications]);
-
-  search('nader').then((data) => {
-    console.log(data.items);
-  });
 
   if (hydrationLoading) {
     return (
@@ -434,7 +417,7 @@ const App: NextPage = () => {
               style={{ width: '59%' }}
             >
               {/* search bar */}
-              <SearchBar cachedNames={cachedNames} />
+              <SearchBar />
               <TagsFilter />
 
               {/* view options */}
