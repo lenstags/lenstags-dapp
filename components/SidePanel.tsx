@@ -45,11 +45,7 @@ export const actions = [
   { name: 'Delete', value: 'delete' }
 ];
 
-const SidePanel = ({
-  fetchMyLists,
-  publications,
-  sideBarSize
-}: SidePanelProps) => {
+const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
   const [sortByValue, setSortByValue] = useState('newest');
   const [open, setOpen] = useState(false);
 
@@ -130,7 +126,7 @@ const SidePanel = ({
         className={
           sidebarCollapsedStateLeft.collapsed
             ? 'ml-24 w-80 p-0 py-6'
-            : 'ml-[16.6%] w-80'
+            : 'ml-24 w-80 animate-fadeLeft'
         }
       >
         <DoubleSidebarTitle className="flex items-center justify-center gap-2 px-6 font-serif">

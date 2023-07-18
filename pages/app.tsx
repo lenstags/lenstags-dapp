@@ -37,6 +37,7 @@ const App: NextPage = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showReject, setShowReject] = useState(false);
   const [ready, setReady] = useState(false);
+  const [loadingFetchMore, setLoadingFetchMore] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
@@ -111,21 +112,19 @@ const App: NextPage = () => {
     return reqQuery;
   }, [tags]);
 
-  const { fetchMore, refetch, loading } = useQuery(
-    ExplorePublicationsDocument,
-    {
-      variables: {
-        request: query
-      },
-      onCompleted: (data) => {
-        if (cursor === undefined)
-          setCursor(data.explorePublications.pageInfo.next);
-      }
+  const { fetchMore } = useQuery(ExplorePublicationsDocument, {
+    variables: {
+      request: query
+    },
+    onCompleted: (data) => {
+      if (cursor === undefined)
+        setCursor(data.explorePublications.pageInfo.next);
     }
-  );
+  });
 
-  const handleLoadMoreWithoutTags = () => {
+  const handleLoadMoreWithoutTags = useCallback(() => {
     if (!cursor) return console.log('no more results');
+    setLoadingFetchMore(true);
     fetchMore({
       variables: {
         request: {
@@ -148,30 +147,21 @@ const App: NextPage = () => {
           ...prev,
           ...res.data.explorePublications.items
         ]);
+        setLoadingFetchMore(false);
       } else {
+        setLoadingFetchMore(false);
         return console.log('no more results');
       }
     });
-  };
+  }, [cursor, fetchMore, query]);
 
-  const handleLoadMoreWithTags = () => {
-    if (!cursor) return console.log('no more results');
-    const filter = JSON.parse(cursor).filter;
-    let tagsFilter = JSON.parse(filter).tags;
-    if (tags) {
-      tagsFilter = tags;
-    }
-    let newCursorStringify = JSON.stringify({
-      ...JSON.parse(cursor),
-      filter: JSON.stringify({
-        tags: tagsFilter
-      })
-    });
+  const handleLoadMoreWithTags = useCallback(() => {
+    setLoadingFetchMore(true);
     fetchMore({
       variables: {
         request: {
           ...query,
-          cursor: newCursorStringify
+          cursor
         }
       },
       updateQuery: (prev, { fetchMoreResult }): any => {
@@ -189,11 +179,13 @@ const App: NextPage = () => {
           ...prev,
           ...res.data.explorePublications.items
         ]);
+        setLoadingFetchMore(false);
       } else {
+        setLoadingFetchMore(false);
         return console.log('no more results');
       }
     });
-  };
+  }, [cursor, fetchMore, query]);
 
   const observer = useRef<IntersectionObserver>();
   const lastPublicationRef = useCallback(
@@ -209,16 +201,26 @@ const App: NextPage = () => {
       });
       if (node) observer.current.observe(node);
     },
-    [cursor, publications?.length]
+    [
+      cursor,
+      publications?.length,
+      tags.length,
+      handleLoadMoreWithTags,
+      handleLoadMoreWithoutTags
+    ]
   );
 
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
       if (!data) return setPublications([]);
+      setCursor(data.pageInfo.next);
       return setPublications(data.items);
     });
-    refetch();
-  }, [tags, refetch]);
+  }, [tags]);
+
+  useEffect(() => {
+    console.log(loadingFetchMore);
+  }, [loadingFetchMore]);
 
   if (hydrationLoading) {
     return (
@@ -578,8 +580,8 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="px-4">
-              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
+            <div className="px-4 pb-6">
+              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
                     if (publications.length === index + 1) {
@@ -602,6 +604,11 @@ const App: NextPage = () => {
                   </div>
                 )}
               </div>
+              {loadingFetchMore && (
+                <div className="mx-auto mb-10 flex w-10 items-center justify-center">
+                  <Spinner h="10" w="10" />
+                </div>
+              )}
             </div>
           </>
         )}

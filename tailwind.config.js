@@ -67,7 +67,6 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       }
     },
-    animation: {},
     variants: {
       extend: {
         scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce'],
@@ -89,7 +88,7 @@ module.exports = {
       bounce: 'bounce 1s infinite',
       'accordion-down': 'accordion-down 300ms cubic-bezier(0.87, 0, 0.13, 1)',
       'accordion-up': 'accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-      fadeLeft: 'fadeLeft 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeLeft: 'fadeLeft 500ms cubic-bezier(0.87, 0, 0.13, 1)',
       fadeRight: 'fadeRight 300ms cubic-bezier(0.87, 0, 0.13, 1)'
     },
     aria: {
@@ -654,7 +653,7 @@ module.exports = {
       fadeLeft: {
         '0%': {
           opacity: '0',
-          transform: 'translateX(-20px)'
+          transform: 'translateX(-100px)'
         },
         '100%': {
           opacity: '1',
