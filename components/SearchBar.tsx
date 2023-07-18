@@ -1,4 +1,9 @@
-import { useState, useEffect, useRef, ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import {
+  ProfileSearchResult,
+  PublicationSearchResult
+} from '@lib/lens/graphql/generated';
+
 import Link from 'next/link';
 import { search } from '@lib/lens/graphql/search';
 
@@ -33,22 +38,23 @@ export const SearchBar = () => {
   const fetchData = async (input: string) => {
     const res = await search(input);
 
-    const users = await res.profilesData.items.map((user: any) => {
+    const resUsers = (await res.profilesData) as ProfileSearchResult;
+    const users = resUsers.items.map((user: any) => {
       return {
         id: user.id,
         handle: user.handle
       };
     });
 
-    const publications = await res.publicationsData.items.map(
-      (publication: any) => {
-        return {
-          id: publication.id,
-          type: publication.metadata.attributes[0].value,
-          name: publication.metadata.name
-        };
-      }
-    );
+    const arrPublications =
+      (await res.publicationsData) as PublicationSearchResult;
+    const publications = arrPublications.items.map((publication: any) => {
+      return {
+        id: publication.id,
+        type: publication.metadata.attributes[0].value,
+        name: publication.metadata.name
+      };
+    });
 
     return { users, publications };
   };
@@ -115,7 +121,7 @@ export const SearchBar = () => {
         </button>
       </div>
       {inputText !== '' && (
-        <div className="flex flex-col absolute md:w-1/3 z-[10000] bg-white py-2 px-3 rounded-md">
+        <div className="absolute z-[10000] flex flex-col rounded-md bg-white px-3 py-2 md:w-1/3">
           {cachedPublications.length > 0 && (
             <div className="flex flex-col">
               <span className="underline">Content</span>
