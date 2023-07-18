@@ -1,11 +1,12 @@
 import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 
+import { APP_NAME, envConfig } from '@lib/config';
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+ import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+ 
 import { polygon, polygonMumbai } from 'wagmi/chains';
 
-import { APP_NAME } from '@lib/config';
 import { ApolloProvider } from '@apollo/client';
 import type { AppProps } from 'next/app';
 import { AppProvider } from 'context/AppContext';
@@ -22,7 +23,7 @@ const { chains, publicClient } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: APP_NAME,
-  projectId: 'f2ffc4207fed16f1809cee500fbceb8f',
+  projectId: envConfig.NEXT_PUBLIC_WC_PROJECT_ID!,
   chains
 });
 

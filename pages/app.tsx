@@ -1,5 +1,5 @@
 import { ProfileContext, TagsFilterContext } from 'components';
-import { enable as enableDispatcher, queryProfile } from '@lib/lens/dispatcher';
+import { enableDispatcher, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
@@ -66,13 +66,18 @@ const App: NextPage = () => {
       // console.log('>>>   hasLists:', hasLists);
 
       setShowWelcome(true);
-
       try {
         if (profileResult && !dispatcherEnabled) {
           snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
-          await enableDispatcher(profileResult.id);
+          const res = await enableDispatcher(profileResult.id);
+          if (!res) {
+            setShowReject(true);
+            return;
+          }
+          // console.log('RRR ', res);
           snackbar.showMessage('🟦 Dispatcher enabled successfully.');
         }
+
         if (!hasLists) {
           snackbar.showMessage('🟦 Creating default list...');
           await createDefaultList(profileResult);
@@ -411,11 +416,7 @@ const App: NextPage = () => {
         ) : (
           <>
             {/* top bar container*/}
-            <div
-              className="h-50 fixed top-0 z-10 w-full
-                 bg-white px-8 pt-4"
-              style={{ width: '59%' }}
-            >
+            <div className="h-50 top-0 z-10 w-full bg-white px-8 pt-4">
               {/* search bar */}
               <SearchBar />
               <TagsFilter />
@@ -500,7 +501,7 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="h-screen px-4 pt-40">
+            <div className="px-4">
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {

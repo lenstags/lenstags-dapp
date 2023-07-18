@@ -66,13 +66,39 @@ const MyProfile: NextPage = () => {
         [PublicationTypes.Post],
         lensProfile.id
       );
-      setPublications(
-        res.items.filter(
-          (r) =>
-            r.profile.id === lensProfile?.id &&
-            r.metadata.attributes[0].value === 'post'
-        )
-      ); // TODO PAGINATION CURSOR
+
+      const filteredItems = res.items.filter((item) => {
+        const id = lensProfile?.id;
+        const attributes = item.metadata.attributes;
+        return (
+          item.profile.id === id &&
+          attributes?.length > 0 &&
+          attributes[0].value === 'post'
+        );
+      });
+
+      setPublications(filteredItems);
+      // TODO PAGINATION CURSOR
+    };
+
+    const fetchMyLists = async () => {
+      const res = await getPublications(
+        [PublicationTypes.Post],
+        lensProfile.id
+      );
+
+      const filteredItems = res.items.filter((item) => {
+        const id = lensProfile?.id;
+        const attributes = item.metadata.attributes;
+        return (
+          item.profile.id === id &&
+          attributes?.length > 0 &&
+          (attributes[0].value === 'list' ||
+            attributes[0].value === 'privateDefaultList')
+        );
+      });
+
+      setPublications(filteredItems);
     };
 
     const fetchMyCollects = async () => {
@@ -88,22 +114,6 @@ const MyProfile: NextPage = () => {
       console.log('RES ', res);
       // TODO LENS ISSUE: APPID MISMATCHES SOURCES PARAM
       setPublications(res.items.filter((i) => i.appId === APP_NAME)); // TODO PAGINATION CURSOR
-    };
-
-    const fetchMyLists = async () => {
-      const res = await getPublications(
-        [PublicationTypes.Post],
-        lensProfile.id
-      );
-      setPublications(
-        res.items.filter(
-          (r) =>
-            (r.profile.id === lensProfile?.id &&
-              r.metadata.attributes[0].value === 'list') ||
-            r.metadata.attributes[0].value === 'privateDefaultList' // FIXME internalPublicationType
-          //     .attributes?.find((attribute) => attribute.key === 'internalPublicationType')?.value || '',
-        )
-      ); // TODO PAGINATION CURSOR
     };
 
     const fetchAll = async () => {

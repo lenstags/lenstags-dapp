@@ -19,7 +19,7 @@ const Toast: React.FC<ToastProps> = ({ text, level }) => {
   useEffect(() => {
     const timeoutId = setTimeout(() => setDismissed(true), DISMISS_TIMEOUT);
     return () => clearTimeout(timeoutId);
-  }, [DISMISS_TIMEOUT]);
+  }, []);
 
   if (isDismissed) {
     // setDismissed(false);

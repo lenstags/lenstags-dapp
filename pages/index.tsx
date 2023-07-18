@@ -131,7 +131,7 @@ const Home: NextPage = () => {
 
     function resize() {
       let a1, a2;
-      var imageAspect = imgSize[1] / imgSize[0];
+      const imageAspect = imgSize[1] / imgSize[0];
       if (window.innerHeight / window.innerWidth < imageAspect) {
         a1 = 1;
         a2 = window.innerHeight / window.innerWidth / imageAspect;
@@ -173,7 +173,7 @@ const Home: NextPage = () => {
     }
 
     let a1, a2;
-    var imageAspect = imgSize[1] / imgSize[0];
+    let imageAspect = imgSize[1] / imgSize[0];
     if (window.innerHeight / window.innerWidth < imageAspect) {
       a1 = 1;
       a2 = window.innerHeight / window.innerWidth / imageAspect;

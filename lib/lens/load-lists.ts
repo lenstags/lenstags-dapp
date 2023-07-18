@@ -38,11 +38,11 @@ export const loadLists = async (lensProfileOld: any) => {
 export const createDefaultList = async (lensProfile: any) => {
   const constructedDefaultPost: IbuiltPost = {
     name: 'My private list', // HACK should it be 'My stuff {private)?
-    content: 'All my collected items',
+    content: 'My private list',
     locale: 'ia', // INTERLINGUA https://www.wikidata.org/wiki/Q22282939
     attributes: [
       {
-        key: 'internalPublicationType', // FIXME this key isn't returned by get-publications?
+        key: 'internalPublicationType', // FIXME this key isn't returned by get-publications!!!
         displayType: MetadataDisplayType.string,
         value: 'privateDefaultList' // the type list either [ list, post ]
       }

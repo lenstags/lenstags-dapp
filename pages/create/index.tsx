@@ -1,5 +1,6 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
+import Avatar from 'boring-avatars';
 import CollapsiblePanels from 'components/Panels';
 import CreatableSelect from 'react-select/creatable';
 import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
@@ -271,6 +272,27 @@ const Create: NextPage = () => {
     //     value: builtPost.originalPostId || ''
     //   }
     // ];
+
+    if (!imageBuffer) {
+      const parentNode = document.getElementById('defaultImage');
+
+      if (parentNode) {
+        const svgNode = parentNode.firstElementChild;
+        if (svgNode) {
+          const { toPng } = await import('html-to-image');
+          try {
+            const dataUrl = await toPng(svgNode as HTMLElement);
+            const base64Image = dataUrl.split(';base64,').pop();
+            imageBuffer = base64Image
+              ? Buffer.from(base64Image, 'base64')
+              : null;
+          } catch (error) {
+            console.error('Could not create image from SVG:', error);
+          }
+        }
+      }
+    }
+
     const constructedPost: IbuiltPost = {
       attributes: DEFAULT_METADATA_ATTRIBUTES,
       name: title || ' ',
@@ -565,6 +587,27 @@ const Create: NextPage = () => {
               )}
             </div>
           </div>
+        </div>
+        <div
+          id="defaultImage"
+          style={{
+            height: 0,
+            width: 0,
+            overflow: 'hidden',
+            padding: 0,
+            border: 0,
+            margin: 0
+          }}
+        >
+          <Avatar
+            size={512}
+            name={title + editorContents}
+            square={true}
+            variant="marble"
+            // colors={
+            // ['#180A29', '#49007E', '#FF005B', '#FF7D10', '#FFB238']
+            colors={['#413E4A', '#73626E', '#B38184', '#F0B49E', '#F7E4BE']}
+          />
         </div>
       </div>
     </Layout>

@@ -7,19 +7,67 @@ module.exports = {
   presets: [],
   darkMode: 'media', // or 'class'
   theme: {
+    container: {
+      center: true,
+      padding: '2rem',
+      screens: {
+        '2xl': '1400px'
+      }
+    },
     extend: {
       scrollBehavior: ['smooth'],
       screens: {
         '3xl': '2000px',
         '4xl': '3200px'
       },
-      transitionProperty: {
-        all: 'all'
+      colors: {
+        border: 'hsl(var(--border))',
+        input: 'hsl(var(--input))',
+        ring: 'hsl(var(--ring))',
+        background: 'hsl(var(--background))',
+        foreground: 'hsl(var(--foreground))',
+        primary: {
+          DEFAULT: 'hsl(var(--primary))',
+          foreground: 'hsl(var(--primary-foreground))'
+        },
+        secondary: {
+          DEFAULT: 'hsl(var(--secondary))',
+          foreground: 'hsl(var(--secondary-foreground))'
+        },
+        destructive: {
+          DEFAULT: 'hsl(var(--destructive))',
+          foreground: 'hsl(var(--destructive-foreground))'
+        },
+        muted: {
+          DEFAULT: 'hsl(var(--muted))',
+          foreground: 'hsl(var(--muted-foreground))'
+        },
+        accent: {
+          DEFAULT: 'hsl(var(--accent))',
+          foreground: 'hsl(var(--accent-foreground))'
+        },
+        popover: {
+          DEFAULT: 'hsl(var(--popover))',
+          foreground: 'hsl(var(--popover-foreground))'
+        },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))'
+        },
+        transitionProperty: {
+          all: 'all'
+        },
+        transitionDuration: {
+          700: '700ms'
+        }
       },
-      transitionDuration: {
-        700: '700ms'
+      borderRadius: {
+        lg: `var(--radius)`,
+        md: `calc(var(--radius) - 2px)`,
+        sm: 'calc(var(--radius) - 4px)'
       }
     },
+    animation: {},
     variants: {
       extend: {
         scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce'],
@@ -38,7 +86,11 @@ module.exports = {
       spin: 'spin 1s linear infinite',
       ping: 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
       pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-      bounce: 'bounce 1s infinite'
+      bounce: 'bounce 1s infinite',
+      'accordion-down': 'accordion-down 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+      'accordion-up': 'accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeLeft: 'fadeLeft 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeRight: 'fadeRight 300ms cubic-bezier(0.87, 0, 0.13, 1)'
     },
     aria: {
       checked: 'checked="true"',
@@ -226,7 +278,6 @@ module.exports = {
       '6xl': '72rem',
       '7xl': '80rem'
     },
-    container: {},
     content: {
       none: 'none'
     },
@@ -566,6 +617,14 @@ module.exports = {
       DEFAULT: '100%'
     },
     keyframes: {
+      'accordion-down': {
+        from: { height: 0 },
+        to: { height: 'var(--radix-accordion-content-height)' }
+      },
+      'accordion-up': {
+        from: { height: 'var(--radix-accordion-content-height)' },
+        to: { height: 0 }
+      },
       spin: {
         to: {
           transform: 'rotate(360deg)'
@@ -590,6 +649,26 @@ module.exports = {
         '50%': {
           transform: 'none',
           animationTimingFunction: 'cubic-bezier(0,0,0.2,1)'
+        }
+      },
+      fadeLeft: {
+        '0%': {
+          opacity: '0',
+          transform: 'translateX(-20px)'
+        },
+        '100%': {
+          opacity: '1',
+          transform: 'translateX(0)'
+        }
+      },
+      fadeRight: {
+        '0%': {
+          opacity: '0',
+          transform: 'translateX(20px)'
+        },
+        '100%': {
+          opacity: '1',
+          transform: 'translateX(0)'
         }
       }
     },
@@ -928,8 +1007,7 @@ module.exports = {
         'color, background-color, border-color, text-decoration-color, fill, stroke',
       opacity: 'opacity',
       shadow: 'box-shadow',
-      transform: 'transform',
-      all: 'all'
+      transform: 'transform'
     },
     transitionTimingFunction: {
       DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',
