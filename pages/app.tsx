@@ -17,6 +17,7 @@ import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
+import { SearchBar } from '@components/SearchBar';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
@@ -417,41 +418,7 @@ const App: NextPage = () => {
             {/* top bar container*/}
             <div className="h-50 top-0 z-10 w-full bg-white px-8 pt-4">
               {/* search bar */}
-              <div className="flex justify-start ">
-                <input
-                  type="text"
-                  autoComplete="off"
-                  // value={valueListName}
-                  // onChange={handleChangeListName}
-                  className="rounded-full
-                   bg-stone-100 p-3
-                  leading-none outline-none  md:w-1/3"
-                  name="tag-search-input"
-                  id="tag-search-input"
-                  // onKeyDown={handleKeyDown}
-                  placeholder="🔍 Search..."
-                />
-                <button
-                  className="ml-2 hidden rounded-lg border  border-solid border-black bg-stone-100
-                   p-2"
-                >
-                  <svg
-                    width="20"
-                    height="18"
-                    viewBox="0 0 20 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M14 3L19 3M1 3L10 3M1 15L10 15M1 9H6M10 9H19M14 15H19M14 1V5M6 7V11M14 13V17"
-                      stroke="#4D4D4D"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-
+              <SearchBar />
               <TagsFilter />
 
               {/* view options */}

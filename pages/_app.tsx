@@ -3,7 +3,8 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 import { APP_NAME, envConfig } from '@lib/config';
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
-import { WagmiConfig, configureChains, createConfig } from 'wagmi';
+ import { configureChains, createConfig, WagmiConfig } from 'wagmi';
+ 
 import { polygon, polygonMumbai } from 'wagmi/chains';
 
 import { ApolloProvider } from '@apollo/client';
