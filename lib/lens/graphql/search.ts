@@ -1,9 +1,9 @@
 import {
   CustomFiltersTypes,
   SearchProfilesDocument,
-  SearchRequestTypes,
+  SearchPublicationsDocument,
   SearchQueryRequest,
-  SearchPublicationsDocument
+  SearchRequestTypes
 } from './generated';
 
 import { LENSTAGS_SOURCE } from '@lib/config';
