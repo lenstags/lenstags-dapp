@@ -461,7 +461,7 @@ const App: NextPage = () => {
         ) : (
           <>
             {/* top bar container*/}
-            <div className="h-50 top-0 z-10 w-full bg-white px-8 pt-4">
+            <div className="h-50 sticky top-0 z-10 w-full bg-white px-8 py-2 pt-4">
               {/* search bar */}
               <div className="flex justify-start ">
                 <input

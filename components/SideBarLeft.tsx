@@ -177,7 +177,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
           </Link>
 
           {lensProfile && (
-            <div className="animate-in fade-in-50 duration-1000 ">
+            <div className="max-h-12 w-full duration-1000 animate-in fade-in-50">
               {router.pathname !== PublicRoutes.MYPROFILE ? (
                 <SidePanel
                   fetchMyLists={fetchMyLists}
@@ -249,48 +249,53 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                   </AccordionItem>
                 </Accordion>
               )}
-              <Link href={'/app'}>
-                <Tooltip tooltip="Notifications">
-                  <div
-                    className={`flex h-12 cursor-pointer items-center gap-1 border-l-4 border-l-transparent hover:border-l-teal-100 hover:bg-teal-50 ${
+            </div>
+          )}
+          {lensProfile && (
+            <Link href={'/app'}>
+              <Tooltip tooltip="Notifications">
+                <div
+                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
                       sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
                     }`}
-                  >
-                    <Image
-                      src="/icons/notifications.svg"
-                      alt="Notifications"
-                      width={20}
-                      height={20}
-                    />
-                    {!sidebarCollapsedStateLeft.collapsed && (
-                      <span className="ml-2">Notifications</span>
-                    )}
-                  </div>
-                </Tooltip>
-              </Link>
-
-              <div className="flex px-6 py-4  ">
-                <button
-                  className={`w-full rounded-lg align-middle font-sans ${
-                    sidebarCollapsedStateLeft.collapsed
-                      ? 'h-12 w-12 text-4xl font-extralight'
-                      : 'px-4 py-2'
-                  } ${
-                    router.pathname === PublicRoutes.CREATE
-                      ? 'bg-white text-black'
-                      : 'text-white'
-                  }`}
-                  onClick={() => {
-                    router.push(PublicRoutes.CREATE);
-                  }}
                 >
-                  {sidebarCollapsedStateLeft.collapsed ? (
-                    <PlusSmallIcon />
-                  ) : (
-                    '+ Create'
+                  <Image
+                    src="/icons/notifications.svg"
+                    alt="Notifications"
+                    width={20}
+                    height={20}
+                  />
+                  {!sidebarCollapsedStateLeft.collapsed && (
+                    <span className="ml-2">Notifications</span>
                   )}
-                </button>
-              </div>
+                </div>
+              </Tooltip>
+            </Link>
+          )}
+
+          {lensProfile && (
+            <div className="flex w-full items-center justify-center py-4">
+              <button
+                className={`rounded-lg align-middle font-sans ${
+                  sidebarCollapsedStateLeft.collapsed
+                    ? 'h-10 w-10 font-extralight'
+                    : 'mx-6 w-full px-4 py-2'
+                } ${
+                  router.pathname === PublicRoutes.CREATE
+                    ? 'bg-white text-black'
+                    : 'text-white'
+                }`}
+                onClick={() => {
+                  router.push(PublicRoutes.CREATE);
+                }}
+              >
+                {sidebarCollapsedStateLeft.collapsed ? (
+                  <PlusSmallIcon />
+                ) : (
+                  '+ Create'
+                )}
+              </button>
             </div>
           )}
         </div>
