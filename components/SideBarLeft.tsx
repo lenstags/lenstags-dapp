@@ -104,13 +104,13 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
   return (
     <div
-      className={`bg-stone-100 sm:inline ${
+      className={`z-[100] bg-stone-100 transition-all sm:inline ${
         sidebarCollapsedStateLeft.collapsed
-          ? 'col-span-1 w-24 animate-fadeRight'
+          ? 'col-span-1 w-24 '
           : 'col-span-2 animate-fadeLeft'
       }`}
     >
-      <div className="sticky top-0 h-screen py-4">
+      <div className="pointer-events-auto sticky top-0 h-screen py-4">
         <div className="px-6 pb-6">
           <Link href={'/'}>
             {!sidebarCollapsedStateLeft.collapsed ? (
@@ -126,7 +126,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                 className="mx-auto cursor-pointer"
                 src="/img/landing/nata-isologo.svg"
                 alt=""
-                width={40}
+                width={38}
                 height={40}
               />
             )}
@@ -134,7 +134,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
         </div>
         {/* menu items */}
         <div className="font-serif text-base">
-          <Link href={'/app'}>
+          <Link href={PublicRoutes.APP}>
             <Tooltip tooltip="Home">
               <div
                 className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
@@ -155,7 +155,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </Tooltip>
           </Link>
 
-          <Link href={'/app'}>
+          <Link href={PublicRoutes.APP}>
             <Tooltip tooltip="Explore">
               <div
                 className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
@@ -177,7 +177,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
           </Link>
 
           {lensProfile && (
-            <div className="max-h-12 w-full duration-1000 animate-in fade-in-50">
+            <div className="w-full duration-1000 animate-in fade-in-50">
               {router.pathname !== PublicRoutes.MYPROFILE ? (
                 <SidePanel
                   fetchMyLists={fetchMyLists}
@@ -252,7 +252,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </div>
           )}
           {lensProfile && (
-            <Link href={'/app'}>
+            <Link href={PublicRoutes.APP}>
               <Tooltip tooltip="Notifications">
                 <div
                   className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
@@ -274,7 +274,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </Link>
           )}
 
-          {lensProfile && (
+          {lensProfile && !sidebarCollapsedStateLeft.collapsed && (
             <div className="flex w-full items-center justify-center py-4">
               <button
                 className={`rounded-lg align-middle font-sans ${
@@ -290,13 +290,18 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                   router.push(PublicRoutes.CREATE);
                 }}
               >
-                {sidebarCollapsedStateLeft.collapsed ? (
-                  <PlusSmallIcon />
-                ) : (
-                  '+ Create'
-                )}
+                + Create
               </button>
             </div>
+          )}
+          {lensProfile && sidebarCollapsedStateLeft.collapsed && (
+            <Link href={PublicRoutes.CREATE}>
+              <Tooltip tooltip="Create" className="my-4 h-10">
+                <button className="h-10 w-10 rounded-lg bg-lensBlack">
+                  <PlusSmallIcon className="text-white" />
+                </button>
+              </Tooltip>
+            </Link>
           )}
         </div>
       </div>

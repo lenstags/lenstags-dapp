@@ -87,9 +87,11 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
     <DoubleSidebar
       open={openSidebar}
       onOpenChange={() => {
-        setSidebarCollapsedState({
-          collapsed: !sidebarCollapsedStateLeft.collapsed
-        });
+        setTimeout(() => {
+          setSidebarCollapsedState({
+            collapsed: !sidebarCollapsedStateLeft.collapsed
+          });
+        }, 100);
         setOpen(!open);
       }}
     >

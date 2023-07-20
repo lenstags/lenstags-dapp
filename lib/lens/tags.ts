@@ -19,7 +19,7 @@ export const TAGS: Tag[] = [
   { color: '#ddf555', value: 'health', label: 'Health' },
   { color: '#ddf555', value: 'home', label: 'Home' },
   { color: '#ddf555', value: 'latam', label: 'LATAM' },
-  { color: '#ddf555', value: 'layer 2', label: 'Layer 2' },
+  { color: '#ddf555', value: 'layer-2', label: 'Layer 2' },
   { color: '#ddf555', value: 'metaverse', label: 'Metaverse' },
   { color: '#ddf555', value: 'nature', label: 'Nature' },
   { color: '#ddf555', value: 'nft', label: 'NFT' },

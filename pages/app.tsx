@@ -38,6 +38,7 @@ const App: NextPage = () => {
   const [showReject, setShowReject] = useState(false);
   const [ready, setReady] = useState(false);
   const [loadingFetchMore, setLoadingFetchMore] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
@@ -211,11 +212,18 @@ const App: NextPage = () => {
   );
 
   useEffect(() => {
-    explore({ locale: 'en', tags }).then((data) => {
-      if (!data) return setPublications([]);
-      setCursor(data.pageInfo.next);
-      return setPublications(data.items);
-    });
+    setLoader(true);
+    explore({ locale: 'en', tags })
+      .then((data) => {
+        setLoader(false);
+        if (!data) return setPublications([]);
+        setCursor(data.pageInfo.next);
+        return setPublications(data.items);
+      })
+      .catch((err) => {
+        console.log('ERROR ', err);
+        setLoader(false);
+      });
   }, [tags]);
 
   useEffect(() => {
@@ -598,14 +606,20 @@ const App: NextPage = () => {
                       );
                     }
                   })
-                ) : (
+                ) : loader ? (
                   <div className="my-8">
                     <Spinner h="10" w="10" />
+                  </div>
+                ) : (
+                  <div className="my-8">
+                    <span className="text-lg font-medium">
+                      No results found 🤷‍♂️
+                    </span>
                   </div>
                 )}
               </div>
               {loadingFetchMore && (
-                <div className="mx-auto mb-10 flex w-10 items-center justify-center">
+                <div className="mx-auto mb-10 flex w-10 items-center justify-center ">
                   <Spinner h="10" w="10" />
                 </div>
               )}
