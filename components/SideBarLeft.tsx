@@ -1,3 +1,12 @@
+import React, {
+  MutableRefObject,
+  Ref,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
+import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
 import {
   Accordion,
   AccordionContent,
@@ -11,34 +20,46 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
-import React, { useContext, useEffect, useState } from 'react';
-import SidePanel, { sortBy } from './SidePanel';
 
-import Image from 'next/image';
-import Link from 'next/link';
-import { PlusSmallIcon } from '@heroicons/react/24/outline';
-import PostsByList from './PostsByList';
-import { ProfileContext } from './LensAuthenticationProvider';
-import { PublicRoutes } from 'models';
-import { PublicationTypes } from '@lib/lens/graphql/generated';
 import { SidebarContext } from '@context/SideBarSizeContext';
+import {
+  BellIcon,
+  FolderIcon,
+  GlobeAltIcon,
+  PlusSmallIcon
+} from '@heroicons/react/24/outline';
+import {
+  BellIcon as BellIconFilled,
+  FolderIcon as FolderIconFilled,
+  GlobeAltIcon as GlobeAltIconFilled
+} from '@heroicons/react/24/solid';
+import { useSorts } from '@lib/hooks/use-sort';
+import { getPublications } from '@lib/lens/get-publications';
+import { PublicationTypes } from '@lib/lens/graphql/generated';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
-import { getPublications } from '@lib/lens/get-publications';
-import { useDisconnect } from 'wagmi';
+import { PublicRoutes } from 'models';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import { useSorts } from '@lib/hooks/use-sort';
+import { useDisconnect } from 'wagmi';
+import { ProfileContext } from './LensAuthenticationProvider';
+import PostsByList from './PostsByList';
 import { Tooltip } from './ui/Tooltip';
+import SidePanelNotifications from './SidePanelNotifications';
 
 interface SidebarProps {}
 
 const SideBarLeft: React.FC<SidebarProps> = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
-  const { setSidebarCollapsedState, sidebarCollapsedStateLeft } =
+  const { setSidebarCollapsedState, sidebarCollapsedStateLeft, setTriggerBy } =
     useContext(SidebarContext);
   const [publications, setPublications] = useState<any[]>([]);
   const [sideBarSize, setSideBarSize] = useState<'3.6' | '16.6'>('16.6');
+  const [openTo, setOpenTo] = useState<
+    'my-inventory' | 'notifications' | 'none'
+  >('none');
   const [sortByValue, setSortByValue] = useState('newest');
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
@@ -48,25 +69,8 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     disconnect();
   };
 
-  const routesCollapsed =
-    router.pathname === PublicRoutes.CREATE ||
-    router.pathname.includes(PublicRoutes.LIST) ||
-    router.pathname.includes(PublicRoutes.POST);
-
-  useEffect(() => {
-    if (router.pathname === PublicRoutes.MYPROFILE) {
-      setSidebarCollapsedState({ collapsed: false });
-      setSideBarSize('16.6');
-    } else if (routesCollapsed) {
-      setSidebarCollapsedState({ collapsed: true });
-      setSideBarSize('3.6');
-    }
-  }, [
-    router.pathname,
-    sidebarCollapsedStateLeft.collapsed,
-    setSidebarCollapsedState,
-    routesCollapsed
-  ]);
+  const triggerNotificationsRef = useRef<any>();
+  const triggerMyInventoryRef = useRef<any>();
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -100,6 +104,17 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
   const handleSort = (value: string) => {
     setSortByValue(value);
     sortItems({ items: publications, sort: value });
+  };
+
+  const handleOpenMyInventory = () => {
+    if (publications.length === 0) {
+      fetchMyLists();
+    }
+    setOpenTo('my-inventory');
+  };
+
+  const handleOpenNotifications = () => {
+    setOpenTo('notifications');
   };
 
   return (
@@ -163,12 +178,20 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                 sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
               }`}
               >
-                <Image
-                  src="/icons/explore.svg"
-                  alt="Explore"
-                  width={20}
-                  height={20}
-                />
+                {router.pathname === PublicRoutes.APP &&
+                !sidebarCollapsedStateLeft.collapsed ? (
+                  <GlobeAltIconFilled
+                    width={22}
+                    height={22}
+                    className="text-lensBlack"
+                  />
+                ) : (
+                  <GlobeAltIcon
+                    width={22}
+                    height={22}
+                    className="text-lensBlack"
+                  />
+                )}
                 {!sidebarCollapsedStateLeft.collapsed && (
                   <span className="ml-2">Explore</span>
                 )}
@@ -176,102 +199,120 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </Tooltip>
           </Link>
 
-          {lensProfile && (
+          {lensProfile && router.pathname !== PublicRoutes.MYPROFILE ? (
+            <div className="h-12 w-full duration-1000 animate-in fade-in-50">
+              <SidePanelMyInventory
+                fetchMyLists={fetchMyLists}
+                publications={publications}
+                sideBarSize={sideBarSize}
+                notificationRef={triggerNotificationsRef}
+                ref={triggerMyInventoryRef}
+              />
+            </div>
+          ) : (
             <div className="w-full duration-1000 animate-in fade-in-50">
-              {router.pathname !== PublicRoutes.MYPROFILE ? (
-                <SidePanel
-                  fetchMyLists={fetchMyLists}
-                  publications={publications}
-                  sideBarSize={sideBarSize}
-                />
-              ) : (
-                <Accordion type="single">
-                  <AccordionItem value="my-investory" className="border-0 py-0">
-                    <AccordionTrigger
-                      onClick={() => {
-                        fetchMyLists();
-                      }}
-                      className="h-12 gap-1 border-l-4 px-6 hover:border-l-teal-100 hover:bg-teal-50"
-                      hiddenArrow
-                    >
-                      <svg
-                        width="20"
-                        height="18"
-                        viewBox="0 0 20 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
-                          stroke="#121212"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        />
-                      </svg>
-                      {!sidebarCollapsedStateLeft.collapsed && (
-                        <span className="ml-2 text-base font-normal">
-                          My inventory
-                        </span>
-                      )}
-                    </AccordionTrigger>
-                    <AccordionContent className="flex h-full flex-col border-0 outline-none">
-                      <div className="flex w-full justify-between border-l-4 border-transparent px-6">
-                        <span className="my-2 font-serif font-bold">LISTS</span>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger className="outline-none">
-                            <TextAlignBottomIcon className="h-4 w-4 text-lensBlack" />
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            className="flex w-40 flex-col gap-1 border-lensBlack px-2"
-                            align="start"
-                          >
-                            <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
-                              SORT BY
-                            </DropdownMenuLabel>
-                            {sortBy.map((item) => (
-                              <DropdownMenuItem
-                                className="cursor-pointer select-none px-0 font-serif outline-none"
-                                key={item.value}
-                                onClick={() => handleSort(item.value)}
-                              >
-                                {item.name}
-                              </DropdownMenuItem>
-                            ))}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                      <PostsByList
-                        publications={publications}
-                        className="-mb-4"
+              <Accordion type="single">
+                <AccordionItem value="my-investory" className="border-0 py-0">
+                  <AccordionTrigger
+                    onClick={handleOpenMyInventory}
+                    className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
+                    hiddenArrow
+                  >
+                    {openTo === 'my-inventory' ? (
+                      <FolderIconFilled
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
                       />
-                    </AccordionContent>
-                  </AccordionItem>
-                </Accordion>
-              )}
+                    ) : (
+                      <FolderIcon
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    )}
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2 text-base font-normal">
+                        My inventory
+                      </span>
+                    )}
+                  </AccordionTrigger>
+                  <AccordionContent className="flex h-full flex-col border-0 outline-none">
+                    <div className="flex w-full justify-between border-l-4 border-transparent px-6">
+                      <span className="my-2 font-serif font-bold">LISTS</span>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger className="outline-none">
+                          <TextAlignBottomIcon className="h-4 w-4 text-lensBlack" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          className="flex w-40 flex-col gap-1 border-lensBlack px-2"
+                          align="start"
+                        >
+                          <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
+                            SORT BY
+                          </DropdownMenuLabel>
+                          {sortBy.map((item) => (
+                            <DropdownMenuItem
+                              className="cursor-pointer select-none px-0 font-serif outline-none"
+                              key={item.value}
+                              onClick={() => handleSort(item.value)}
+                            >
+                              {item.name}
+                            </DropdownMenuItem>
+                          ))}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                    <PostsByList
+                      publications={publications}
+                      className="-mb-4"
+                    />
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="notifications" className="border-0 py-0">
+                  <AccordionTrigger
+                    onClick={handleOpenNotifications}
+                    className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
+                    hiddenArrow
+                  >
+                    {openTo === 'notifications' ? (
+                      <BellIconFilled
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    ) : (
+                      <BellIcon
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    )}
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2 text-base font-normal">
+                        Notifications
+                      </span>
+                    )}
+                  </AccordionTrigger>
+                  <AccordionContent className="flex h-full flex-col border-0 outline-none">
+                    <div className="flex w-full justify-between border-l-4 border-transparent px-6">
+                      <span className="my-2 font-serif font-bold">
+                        NOTIFICATIONS
+                      </span>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           )}
-          {lensProfile && (
-            <Link href={PublicRoutes.APP}>
-              <Tooltip tooltip="Notifications">
-                <div
-                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-                    }`}
-                >
-                  <Image
-                    src="/icons/notifications.svg"
-                    alt="Notifications"
-                    width={20}
-                    height={20}
-                  />
-                  {!sidebarCollapsedStateLeft.collapsed && (
-                    <span className="ml-2">Notifications</span>
-                  )}
-                </div>
-              </Tooltip>
-            </Link>
+
+          {lensProfile && router.pathname !== PublicRoutes.MYPROFILE && (
+            <div className="h-12 w-full duration-1000 animate-in fade-in-50">
+              <SidePanelNotifications
+                ref={triggerNotificationsRef}
+                myInventoryRef={triggerMyInventoryRef}
+              />
+            </div>
           )}
 
           {lensProfile && !sidebarCollapsedStateLeft.collapsed && (
@@ -294,15 +335,17 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
               </button>
             </div>
           )}
-          {lensProfile && sidebarCollapsedStateLeft.collapsed && (
-            <Link href={PublicRoutes.CREATE}>
-              <Tooltip tooltip="Create" className="my-4 h-10">
-                <button className="h-10 w-10 rounded-lg bg-lensBlack">
-                  <PlusSmallIcon className="text-white" />
-                </button>
-              </Tooltip>
-            </Link>
-          )}
+          {lensProfile &&
+            router.pathname !== PublicRoutes.CREATE &&
+            sidebarCollapsedStateLeft.collapsed && (
+              <Link href={PublicRoutes.CREATE}>
+                <Tooltip tooltip="Create" className="my-4 h-10">
+                  <button className="h-10 w-10 rounded-lg bg-lensBlack">
+                    <PlusSmallIcon className="text-white" />
+                  </button>
+                </Tooltip>
+              </Link>
+            )}
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
-import { actions } from './SidePanel';
+import { actions } from './SidePanelMyInventory';
 import { Spinner } from './Spinner';
 import {
   Accordion,

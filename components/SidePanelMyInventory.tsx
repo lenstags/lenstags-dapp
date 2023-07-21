@@ -17,7 +17,7 @@ import {
   MagnifyingGlassIcon,
   TextAlignBottomIcon
 } from '@radix-ui/react-icons';
-import { useContext, useState } from 'react';
+import { Ref, forwardRef, useContext, useState } from 'react';
 
 import { ArrowLeftIcon } from 'lucide-react';
 import Link from 'next/link';
@@ -27,10 +27,13 @@ import { SidebarContext } from '@context/SideBarSizeContext';
 import { Tooltip } from './ui/Tooltip';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
+import { FolderIcon } from '@heroicons/react/24/outline';
+import { FolderIcon as FolderIconFilled } from '@heroicons/react/24/solid';
 interface SidePanelProps {
   fetchMyLists: () => void;
   publications: any;
   sideBarSize: '3.6' | '16.6';
+  notificationRef: any;
 }
 
 export const sortBy = [
@@ -45,7 +48,10 @@ export const actions = [
   { name: 'Delete', value: 'delete' }
 ];
 
-const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
+const SidePanelMyInventory = forwardRef(function (
+  { fetchMyLists, publications, notificationRef }: SidePanelProps,
+  ref: Ref<HTMLButtonElement> | undefined
+) {
   const [sortByValue, setSortByValue] = useState('newest');
   const [open, setOpen] = useState(false);
 
@@ -54,14 +60,19 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
     setSortByValue(value);
     sortItems({ items: publications, sort: value });
   };
-  const { sidebarCollapsedStateLeft, setSidebarCollapsedState } =
-    useContext(SidebarContext);
+  const {
+    sidebarCollapsedStateLeft,
+    setSidebarCollapsedState,
+    setTriggerBy,
+    triggerBy
+  } = useContext(SidebarContext);
 
   const handleTrigger = () => {
     setSidebarCollapsedState({
       collapsed: true
     });
-    fetchMyLists();
+    if (publications.length === 0) fetchMyLists();
+    setTriggerBy('my-inventory');
     setOpen(true);
   };
 
@@ -71,51 +82,36 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
     sidebarCollapsedStateLeft.collapsed &&
     (!router.pathname.includes(PublicRoutes.LIST) || open) &&
     (router.pathname !== PublicRoutes.CREATE || open) &&
-    (!router.pathname.includes(PublicRoutes.POST) || open);
-
-  const styles = () => {
-    if (
-      router.pathname === PublicRoutes.CREATE ||
-      router.pathname.includes(PublicRoutes.LIST) ||
-      router.pathname.includes(PublicRoutes.POST)
-    ) {
-      return 'px-8';
-    } else return 'px-6';
-  };
+    (!router.pathname.includes(PublicRoutes.POST) || open) &&
+    triggerBy === 'my-inventory';
 
   return (
-    <DoubleSidebar
-      open={openSidebar}
-      onOpenChange={() => {
-        setTimeout(() => {
-          setSidebarCollapsedState({
-            collapsed: !sidebarCollapsedStateLeft.collapsed
-          });
-        }, 100);
-        setOpen(!open);
-      }}
-    >
-      <Tooltip tooltip="My inventory">
-        <DoubleSidebarTrigger asChild onClick={handleTrigger}>
+    <DoubleSidebar>
+      <Tooltip tooltip="My inventory" id="radix-:r0:">
+        <DoubleSidebarTrigger asChild onClick={handleTrigger} ref={ref}>
           <div
-            className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent hover:border-l-teal-100 hover:bg-teal-50 data-[state=open]:px-5 data-[state=open]:font-bold [&[data-state=open]>div]:rounded-xl [&[data-state=open]>div]:bg-white [&[data-state=open]>div]:p-3 ${styles()}`}
+            id="radix-:r0:"
+            className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent ${
+              sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+            } hover:border-l-teal-100 hover:bg-teal-50 data-[state=open]:px-5 data-[state=open]:font-bold [&[data-state=open]>div]:rounded-xl [&[data-state=open]>div]:bg-white [&[data-state=open]>div]:p-3`}
           >
-            <div>
-              <svg
-                width="20"
-                height="18"
-                viewBox="0 0 20 18"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
-                  stroke="#121212"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
+            <div id="radix-:r0:">
+              {triggerBy === 'my-inventory' &&
+              sidebarCollapsedStateLeft.collapsed ? (
+                <FolderIconFilled
+                  width={22}
+                  height={22}
+                  className="pointer-events-none text-lensBlack"
+                  id="radix-:r0:"
                 />
-              </svg>
+              ) : (
+                <FolderIcon
+                  width={22}
+                  height={22}
+                  className="text-lensBlack"
+                  id="radix-:r0:"
+                />
+              )}
             </div>
 
             {!sidebarCollapsedStateLeft.collapsed && (
@@ -130,10 +126,24 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
             ? 'ml-24 w-80 p-0 py-6'
             : 'ml-24 w-80 animate-fadeLeft'
         }
+        onInteractOutside={(e) => {
+          // @ts-ignore
+          if (notificationRef.current.id === e.target?.id) return;
+          // @ts-ignore
+          if (e.target?.id === 'radix-:r0:') return;
+          console.log('outside', e.target);
+          setTimeout(() => {
+            setTriggerBy('none');
+            setOpen(false);
+          }, 200);
+        }}
       >
         <DoubleSidebarTitle className="flex items-center justify-center gap-2 px-6 font-serif">
           <div className="flex h-6 w-9 items-center justify-center rounded-full border border-lensBlack">
-            <DoubleSidebarClose className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary">
+            <DoubleSidebarClose
+              id="radix-:r0:"
+              className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
+            >
               <ArrowLeftIcon className="h-4 w-4 text-lensBlack" />
             </DoubleSidebarClose>
           </div>
@@ -185,5 +195,8 @@ const SidePanel = ({ fetchMyLists, publications }: SidePanelProps) => {
       </DoubleSidebarContent>
     </DoubleSidebar>
   );
-};
-export default SidePanel;
+});
+
+SidePanelMyInventory.displayName = 'SidePanelMyInventory';
+
+export default SidePanelMyInventory;

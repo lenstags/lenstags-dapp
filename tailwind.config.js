@@ -88,8 +88,8 @@ module.exports = {
       bounce: 'bounce 1s infinite',
       'accordion-down': 'accordion-down 300ms cubic-bezier(0.87, 0, 0.13, 1)',
       'accordion-up': 'accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-      fadeLeft: 'fadeLeft 500ms cubic-bezier(0.87, 0, 0.13, 1)',
-      fadeRight: 'fadeRight 300ms cubic-bezier(0.87, 0, 0.13, 1)'
+      fadeLeft: 'fadeLeft 300ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeRight: 'fadeRight 500ms cubic-bezier(0.87, 0, 0.13, 1)'
     },
     aria: {
       checked: 'checked="true"',
@@ -653,7 +653,7 @@ module.exports = {
       fadeLeft: {
         '0%': {
           opacity: '0',
-          transform: 'translateX(-100px)'
+          transform: 'translateX(-10px)'
         },
         '100%': {
           opacity: '1',

@@ -13,12 +13,14 @@ interface TooltipProps {
   children: React.ReactNode;
   tooltip: React.ReactNode;
   className?: string;
+  id?: string;
 }
 
 export const Tooltip: React.FC<TooltipProps> = ({
   children,
   tooltip,
-  className
+  className,
+  id
 }) => {
   const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
   if (!sidebarCollapsedStateLeft.collapsed) return <>{children}</>;
@@ -27,6 +29,7 @@ export const Tooltip: React.FC<TooltipProps> = ({
       <TooltipUI>
         <TooltipTrigger
           className={cn('h-max w-full bg-transparent', className)}
+          id={id}
         >
           {children}
         </TooltipTrigger>

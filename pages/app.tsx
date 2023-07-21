@@ -226,10 +226,6 @@ const App: NextPage = () => {
       });
   }, [tags]);
 
-  useEffect(() => {
-    console.log(loadingFetchMore);
-  }, [loadingFetchMore]);
-
   if (hydrationLoading) {
     return (
       <div className="flex">
