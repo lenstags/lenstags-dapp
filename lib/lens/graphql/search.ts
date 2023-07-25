@@ -29,21 +29,21 @@ const searchPublications = (request: SearchQueryRequest) => {
 
 export const reqSearchProfilesQuery: SearchQueryRequest = {
   query: '',
-  type: SearchRequestTypes.Profile,
-  limit: 10
+  type: SearchRequestTypes.Profile
 };
 
 export const reqSearchPublicationsQuery: SearchQueryRequest = {
   query: '',
   type: SearchRequestTypes.Publication,
-  limit: 10,
   sources: [LENSTAGS_SOURCE],
   customFilters: [CustomFiltersTypes.Gardeners]
 };
 
-export const search = async (input: string) => {
+export const search = async (input: string, limit: number) => {
   reqSearchProfilesQuery.query = input;
   reqSearchPublicationsQuery.query = input;
+  reqSearchProfilesQuery.limit = limit;
+  reqSearchPublicationsQuery.limit = limit;
 
   const profilesResult = await searchProfiles(reqSearchProfilesQuery);
   const publicationsResult = await searchPublications(
