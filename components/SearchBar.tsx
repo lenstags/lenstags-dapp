@@ -12,12 +12,22 @@ import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 export interface UserSearchType {
   id: string;
   handle: string;
+  name: string;
+  profilePicture: string;
 }
 
 export interface PublicationSearchType {
   id: string;
   type: string;
   name: string;
+  profilePicture: string;
+  profileName: string;
+  profileHandle: string;
+  image: string;
+  tags: string[];
+  content: string;
+  createdAt: string;
+  totalAmountOfCollects: number;
 }
 
 export const fetchData = async (input: string, limit: number = 5) => {
@@ -27,17 +37,27 @@ export const fetchData = async (input: string, limit: number = 5) => {
   const users = resUsers.items.map((user: any) => {
     return {
       id: user.id,
-      handle: user.handle
+      handle: user.handle,
+      name: user.name,
+      profilePicture: user.picture?.original.url
     };
   });
 
-  const arrPublications =
+  const resPublications =
     (await res.publicationsData) as PublicationSearchResult;
-  const publications = arrPublications.items.map((publication: any) => {
+  const publications = resPublications.items.map((publication: any) => {
     return {
       id: publication.id,
       type: publication.metadata.attributes[0].value,
-      name: publication.metadata.name
+      name: publication.metadata.name,
+      profilePicture: publication.profile.picture.original.url,
+      profileName: publication.profile.name,
+      profileHandle: publication.profile.handle,
+      image: publication.metadata.media[0]?.original.url,
+      tags: publication.metadata.tags,
+      content: publication.metadata.content,
+      createdAt: publication.createdAt,
+      totalAmountOfCollects: publication.stats.totalAmountOfCollects
     };
   });
 
@@ -50,13 +70,18 @@ export const SearchBar = () => {
   const [cachedPublications, setCachedPublications] = useState<
     PublicationSearchType[]
   >([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   const handleInputText = (event: ChangeEvent<HTMLInputElement>) => {
     setInputText(event.target.value);
+
+    if (event.target.value === '') {
+      setCachedPublications([]);
+      setCachedUsers([]);
+    }
   };
 
   const clearInput = () => {
@@ -68,6 +93,10 @@ export const SearchBar = () => {
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       router.push(`/search?q=${inputText}`);
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
+      clearInput();
     } else if (event.key === 'Escape') {
       if (inputRef.current) {
         inputRef.current.blur();
@@ -153,7 +182,7 @@ export const SearchBar = () => {
         (cachedPublications.length > 0 || cachedUsers.length > 0) && (
           <div className="absolute z-[10000] flex flex-col rounded-md bg-stone-100 px-4 py-3 mt-2 border-black border-[1px] md:w-1/2">
             {cachedPublications.length > 0 && (
-              <div className="flex flex-col mb-2">
+              <div className="flex flex-col mb-1">
                 <span className="font-semibold">Recommended</span>
                 <ul>
                   {cachedPublications
@@ -166,7 +195,9 @@ export const SearchBar = () => {
                         onMouseDown={(e) => e.preventDefault()}
                         onTouchStart={(e) => e.preventDefault()}
                       >
-                        <li className="hover:underline">{publication.name}</li>
+                        <li className="truncate hover:underline">
+                          {publication.name}
+                        </li>
                       </Link>
                     ))
                     .slice(0, 3)}
@@ -196,7 +227,7 @@ export const SearchBar = () => {
             )}
             <Link
               href={`/search?q=${inputText}`}
-              className="self-center"
+              className="self-center hover:underline"
               onMouseDown={(e) => e.preventDefault()}
               onTouchStart={(e) => e.preventDefault()}
             >
