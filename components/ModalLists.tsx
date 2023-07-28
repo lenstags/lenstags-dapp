@@ -9,19 +9,29 @@ import { addPostIdtoListId } from '@lib/lens/post';
 import { freeCollect } from '@lib/lens/collect';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { followers } from '@lib/lens/followers';
+import { NotificationTypes } from '@models/index';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
+  postTitle: string;
   processStatus: (status: PostProcessStatus) => void;
+  ownedBy: `0x${string}`;
+  isList?: boolean;
 }
 
-const ListsModal: React.FC<ModalProps> = ({
+const ModalList: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   postId,
-  processStatus
+  postTitle,
+  processStatus,
+  ownedBy,
+  isList
 }) => {
   const snackbar = useSnackbar();
   const [valueListName, setValueListName] = useState('');
@@ -90,49 +100,90 @@ const ListsModal: React.FC<ModalProps> = ({
     onClose();
 
     // verifies if selected list does exist in the current profile, if not, create it
-    if (!listId) {
-      snackbar.showMessage('🟦 Creating the new list...');
-      processStatus(PostProcessStatus.CREATING_LIST);
-      listId = (await createUserList(lensProfile, name!)).key;
-      console.log('List created, (post) ID returned to the UI: ', listId);
-    }
+    // if (!listId) {
+    //   snackbar.showMessage('🟦 Creating the new list...');
+    //   processStatus(PostProcessStatus.CREATING_LIST);
+    //   listId = (await createUserList(lensProfile, name!)).key;
+    //   console.log('List created, (post) ID returned to the UI: ', listId);
 
-    console.log('****** just in case :  ', listId);
-
-    // TODO: DEPRECATED ATM
-    // const clonedId = await cloneAndCollectPost(lensProfile, selectedPostId);
-    // if (!clonedId) {
-    //   throw 'Unknown error when cloning';
+    /* Send Notification For Followers a list created */
+    //   sendNotificationsForFollowers createList
     // }
 
-    snackbar.showMessage('🟦 Minting the collected item.');
-    processStatus(PostProcessStatus.COLLECTING_POST);
+    // console.log('****** just in case :  ', listId);
 
-    const collectResult = await freeCollect(selectedPostId);
+    // // TODO: DEPRECATED ATM
+    // // const clonedId = await cloneAndCollectPost(lensProfile, selectedPostId);
+    // // if (!clonedId) {
+    // //   throw 'Unknown error when cloning';
+    // // }
 
-    if (collectResult.errors?.length > 0) {
-      processStatus(PostProcessStatus.ERROR_UNAUTHORIZED);
-      if (collectResult.errors[0].extensions.code === 'UNAUTHENTICATED') {
-        snackbar.showMessage(
-          `🟥 Error UNAUTHENTICATED: ${collectResult.errors[0].message}`
-        );
-        // setOpenReconnect(true);
-        return;
-      }
-      snackbar.showMessage(`🟨 Attention: ${collectResult.errors[0].message}`);
-      return;
-    }
+    // snackbar.showMessage('🟦 Minting the collected item.');
+    // processStatus(PostProcessStatus.COLLECTING_POST);
 
-    // just add the post to the list
-    processStatus(PostProcessStatus.ADDING_POST);
-    const addResult = await addPostIdtoListId(
-      profileId,
-      listId,
-      selectedPostId
+    // const collectResult = await freeCollect(selectedPostId);
+
+    // if (collectResult.errors?.length > 0) {
+    //   processStatus(PostProcessStatus.ERROR_UNAUTHORIZED);
+    //   if (collectResult.errors[0].extensions.code === 'UNAUTHENTICATED') {
+    //     snackbar.showMessage(
+    //       `🟥 Error UNAUTHENTICATED: ${collectResult.errors[0].message}`
+    //     );
+    //     // setOpenReconnect(true);
+    //     return;
+    //   }
+    //   snackbar.showMessage(`🟨 Attention: ${collectResult.errors[0].message}`);
+    //   return;
+    // }
+
+    // // just add the post to the list
+    // processStatus(PostProcessStatus.ADDING_POST);
+    // const addResult = await addPostIdtoListId(
+    //   profileId,
+    //   listId,
+    //   selectedPostId
+    // );
+
+    // snackbar.showMessage('🟩 Item added to list! 🗂️');
+    // processStatus(PostProcessStatus.FINISHED);
+
+    const listFollowers = await followers(lensProfile?.id);
+    const listAddressByFollowers = listFollowers.items.map(
+      (follower) => follower.wallet.address
     );
-
-    snackbar.showMessage('🟩 Item added to list! 🗂️');
-    processStatus(PostProcessStatus.FINISHED);
+    /* Send Notification collect post */
+    if (lensProfile?.name) {
+      sendNotification(
+        ownedBy,
+        isList
+          ? NotificationTypes.CollectedList
+          : NotificationTypes.CollectedPost,
+        lensProfile.name,
+        NOTIFICATION_TYPE.TARGETTED,
+        postTitle
+      );
+      if (listAddressByFollowers.length > 1) {
+        sendNotification(
+          listAddressByFollowers,
+          isList
+            ? NotificationTypes.CollectedList
+            : NotificationTypes.CollectedPost,
+          lensProfile.name,
+          NOTIFICATION_TYPE.SUBSET,
+          postTitle
+        );
+      } else {
+        sendNotification(
+          listAddressByFollowers[0],
+          isList
+            ? NotificationTypes.CollectedList
+            : NotificationTypes.CollectedPost,
+          lensProfile.name,
+          NOTIFICATION_TYPE.TARGETTED,
+          postTitle
+        );
+      }
+    }
     onClose();
     return;
   };
@@ -366,4 +417,4 @@ const ListsModal: React.FC<ModalProps> = ({
   ) : null;
 };
 
-export default ListsModal;
+export default ModalList;

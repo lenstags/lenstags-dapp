@@ -186,6 +186,7 @@ export default function PostDetails() {
         }
       };
       const newAll = [draftComment, ...allComments];
+      /* Send Notification for target */
       setAllComments(newAll);
       setIsSpinnerVisible(false);
       setComment('');
@@ -393,7 +394,9 @@ export default function PostDetails() {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     postId={postId}
+                    postTitle={post.metadata.title}
                     processStatus={handleProcessStatus}
+                    ownedBy={lensProfile.ownedBy}
                   />
                 </div>
               </div>

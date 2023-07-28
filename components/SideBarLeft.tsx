@@ -119,9 +119,9 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
   return (
     <div
-      className={`z-[100] bg-stone-100 transition-all sm:inline ${
+      className={`bg-stone-100 transition-all sm:inline ${
         sidebarCollapsedStateLeft.collapsed
-          ? 'col-span-1 w-24 '
+          ? 'z-[100] col-span-1 w-24 '
           : 'col-span-2 animate-fadeLeft'
       }`}
     >
@@ -210,100 +210,105 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
               />
             </div>
           ) : (
-            <div className="w-full duration-1000 animate-in fade-in-50">
-              <Accordion type="single">
-                <AccordionItem value="my-investory" className="border-0 py-0">
-                  <AccordionTrigger
-                    onClick={handleOpenMyInventory}
-                    className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
-                    hiddenArrow
+            lensProfile && (
+              <div className="w-full duration-1000 animate-in fade-in-50">
+                <Accordion type="single">
+                  <AccordionItem value="my-investory" className="border-0 py-0">
+                    <AccordionTrigger
+                      onClick={handleOpenMyInventory}
+                      className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
+                      hiddenArrow
+                    >
+                      {openTo === 'my-inventory' ? (
+                        <FolderIconFilled
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
+                        />
+                      ) : (
+                        <FolderIcon
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
+                        />
+                      )}
+                      {!sidebarCollapsedStateLeft.collapsed && (
+                        <span className="ml-2 text-base font-normal">
+                          My inventory
+                        </span>
+                      )}
+                    </AccordionTrigger>
+                    <AccordionContent className="flex h-full flex-col border-0 outline-none">
+                      <div className="flex w-full justify-between border-l-4 border-transparent px-6">
+                        <span className="my-2 font-serif font-bold">LISTS</span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger className="outline-none">
+                            <TextAlignBottomIcon className="h-4 w-4 text-lensBlack" />
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            className="flex w-40 flex-col gap-1 border-lensBlack px-2"
+                            align="start"
+                          >
+                            <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
+                              SORT BY
+                            </DropdownMenuLabel>
+                            {sortBy.map((item) => (
+                              <DropdownMenuItem
+                                className="cursor-pointer select-none px-0 font-serif outline-none"
+                                key={item.value}
+                                onClick={() => handleSort(item.value)}
+                              >
+                                {item.name}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                      <PostsByList
+                        publications={publications}
+                        className="-mb-4"
+                      />
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem
+                    value="notifications"
+                    className="border-0 py-0"
                   >
-                    {openTo === 'my-inventory' ? (
-                      <FolderIconFilled
-                        width={22}
-                        height={22}
-                        className="text-lensBlack"
-                      />
-                    ) : (
-                      <FolderIcon
-                        width={22}
-                        height={22}
-                        className="text-lensBlack"
-                      />
-                    )}
-                    {!sidebarCollapsedStateLeft.collapsed && (
-                      <span className="ml-2 text-base font-normal">
-                        My inventory
-                      </span>
-                    )}
-                  </AccordionTrigger>
-                  <AccordionContent className="flex h-full flex-col border-0 outline-none">
-                    <div className="flex w-full justify-between border-l-4 border-transparent px-6">
-                      <span className="my-2 font-serif font-bold">LISTS</span>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger className="outline-none">
-                          <TextAlignBottomIcon className="h-4 w-4 text-lensBlack" />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent
-                          className="flex w-40 flex-col gap-1 border-lensBlack px-2"
-                          align="start"
-                        >
-                          <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
-                            SORT BY
-                          </DropdownMenuLabel>
-                          {sortBy.map((item) => (
-                            <DropdownMenuItem
-                              className="cursor-pointer select-none px-0 font-serif outline-none"
-                              key={item.value}
-                              onClick={() => handleSort(item.value)}
-                            >
-                              {item.name}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                    <PostsByList
-                      publications={publications}
-                      className="-mb-4"
-                    />
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="notifications" className="border-0 py-0">
-                  <AccordionTrigger
-                    onClick={handleOpenNotifications}
-                    className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
-                    hiddenArrow
-                  >
-                    {openTo === 'notifications' ? (
-                      <BellIconFilled
-                        width={22}
-                        height={22}
-                        className="text-lensBlack"
-                      />
-                    ) : (
-                      <BellIcon
-                        width={22}
-                        height={22}
-                        className="text-lensBlack"
-                      />
-                    )}
-                    {!sidebarCollapsedStateLeft.collapsed && (
-                      <span className="ml-2 text-base font-normal">
-                        Notifications
-                      </span>
-                    )}
-                  </AccordionTrigger>
-                  <AccordionContent className="flex h-full flex-col border-0 outline-none">
-                    <div className="flex w-full justify-between border-l-4 border-transparent px-6">
-                      <span className="my-2 font-serif font-bold">
-                        NOTIFICATIONS
-                      </span>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
-            </div>
+                    <AccordionTrigger
+                      onClick={handleOpenNotifications}
+                      className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
+                      hiddenArrow
+                    >
+                      {openTo === 'notifications' ? (
+                        <BellIconFilled
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
+                        />
+                      ) : (
+                        <BellIcon
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
+                        />
+                      )}
+                      {!sidebarCollapsedStateLeft.collapsed && (
+                        <span className="ml-2 text-base font-normal">
+                          Notifications
+                        </span>
+                      )}
+                    </AccordionTrigger>
+                    <AccordionContent className="flex h-full flex-col border-0 outline-none">
+                      <div className="flex w-full justify-between border-l-4 border-transparent px-6">
+                        <span className="my-2 font-serif font-bold">
+                          NOTIFICATIONS
+                        </span>
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+            )
           )}
 
           {lensProfile && router.pathname !== PublicRoutes.MYPROFILE && (

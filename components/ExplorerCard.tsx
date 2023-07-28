@@ -156,6 +156,7 @@ const ExploreCard: FC<Props> = (props) => {
       });
     } else {
       return proxyActionFreeFollow(profileId).then(() => {
+        /* Send Notification for followers and target profile: follow to */
         setIsFollowing(true);
         setIsDotFollowing(false);
       });
@@ -177,8 +178,8 @@ const ExploreCard: FC<Props> = (props) => {
     <>
       <div
         key={post.id}
-        className=" w-full px-1 animate-in fade-in-50
-          duration-1000
+        className=" w-full px-1 duration-1000 animate-in
+          fade-in-50
           xs:w-11/12
           sm:w-11/12
           md:w-6/12
@@ -208,7 +209,10 @@ const ExploreCard: FC<Props> = (props) => {
               isOpen={isModalOpen}
               onClose={handleCloseModal}
               postId={postId}
+              postTitle={post.metadata.name}
               processStatus={handleProcessStatus}
+              ownedBy={post.profile.ownedBy}
+              isList={isList}
             />
 
             {/* main tab contents goes here */}
@@ -263,7 +267,7 @@ const ExploreCard: FC<Props> = (props) => {
                     <div
                       className="lens-post  
                       absolute top-5 z-10 
-                     w-64 shadow-xl  animate-in fade-in-50 duration-500 "
+                     w-64 shadow-xl  duration-500 animate-in fade-in-50 "
                     >
                       <div className="items-center rounded p-4 font-semibold text-gray-700">
                         <div className="flex justify-between bg-white">
@@ -453,7 +457,7 @@ const ExploreCard: FC<Props> = (props) => {
                     height={200}
                     priority={true}
                     alt=""
-                    className=" h-28 w-full rounded-lg object-cover animate-in fade-in-50 duration-1000"
+                    className=" h-28 w-full rounded-lg object-cover duration-1000 animate-in fade-in-50"
                     src={post.metadata.media[0]?.original.url}
                   />
                 )}

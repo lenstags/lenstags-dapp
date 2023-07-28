@@ -131,7 +131,6 @@ const SidePanelMyInventory = forwardRef(function (
           if (notificationRef.current.id === e.target?.id) return;
           // @ts-ignore
           if (e.target?.id === 'radix-:r0:') return;
-          console.log('outside', e.target);
           setTimeout(() => {
             setTriggerBy('none');
             setOpen(false);
@@ -143,6 +142,10 @@ const SidePanelMyInventory = forwardRef(function (
             <DoubleSidebarClose
               id="radix-:r0:"
               className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
+              onClick={() => {
+                setTriggerBy('none');
+                setOpen(false);
+              }}
             >
               <ArrowLeftIcon className="h-4 w-4 text-lensBlack" />
             </DoubleSidebarClose>

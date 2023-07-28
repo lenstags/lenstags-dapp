@@ -316,6 +316,7 @@ const Create: NextPage = () => {
       );
       console.log('POST RESULT: ', result);
       snackbar.showMessage('👌🏻 Post created successfully!');
+      /* Send Notification for followers: create post */
       await sleep();
       router.push('/app');
     } catch (e: any) {
