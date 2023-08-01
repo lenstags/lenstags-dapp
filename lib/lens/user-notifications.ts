@@ -42,13 +42,13 @@ export const sendNotification = async (address: `0x${string}` | undefined | Arra
     let body;
     let recipients
     if (target === NOTIFICATION_TYPE.SUBSET && Array.isArray(address)) {
-        body = `${subjects[subject][1]}${titleContent ? ` ${titleContent}` : ''}`
+        body = `${subjects[subject][1]}`
         recipients = address.map((addressFollower) => `eip155:80001:${addressFollower}`)
     } else if (target === NOTIFICATION_TYPE.TARGETTED && Array.isArray(address)) {
-        body = `${subjects[subject][1]}${titleContent ? ` ${titleContent}` : ''}`
+        body = `${subjects[subject][1]}`
         recipients = `eip155:80001:${address[0]}`
     } else {
-        body = `${subjects[subject][0]}${titleContent ? ` ${titleContent}` : ''}`
+        body = `${subjects[subject][0]}`
         recipients = `eip155:80001:${address}`
     }
     const apiResponse = await PushAPI.payloads.sendNotification({
@@ -61,9 +61,9 @@ export const sendNotification = async (address: `0x${string}` | undefined | Arra
         },
         payload: {
             title: profileName,
-            body: body,
+            body: titleContent ? titleContent : '',
             cta: subject,
-            img: '',
+            img: ''
         },
         recipients,
         channel: `eip155:80001:${channelAddress}`,

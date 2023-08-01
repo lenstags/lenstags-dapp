@@ -172,7 +172,7 @@ const ModalList: React.FC<ModalProps> = ({
           NOTIFICATION_TYPE.SUBSET,
           postTitle
         );
-      } else {
+      } else if (listAddressByFollowers.length === 1) {
         sendNotification(
           [listAddressByFollowers[0]],
           isList
@@ -187,7 +187,6 @@ const ModalList: React.FC<ModalProps> = ({
     onClose();
     return;
   };
-
   // useEffect(() => {
   //   if (lensProfile) {
   //     refreshLists(lensProfile.id);

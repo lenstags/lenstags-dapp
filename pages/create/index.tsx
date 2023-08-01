@@ -211,117 +211,117 @@ const Create: NextPage = () => {
   };
 
   const handlePost = async () => {
-    if (!title) {
-      snackbar.showMessage('⚠️ Attention: Title is required!');
-      return;
-    }
+    // if (!title) {
+    //   snackbar.showMessage('⚠️ Attention: Title is required!');
+    //   return;
+    // }
 
-    setLoading(true);
-    const profileResult = await queryProfile({ profileId: lensProfile?.id });
+    // setLoading(true);
+    // const profileResult = await queryProfile({ profileId: lensProfile?.id });
 
-    if (!profileResult) {
-      snackbar.showMessage('❌ You are not connected!');
-    }
+    // if (!profileResult) {
+    //   snackbar.showMessage('❌ You are not connected!');
+    // }
 
-    let imageBuffer: Buffer | null = null;
+    // let imageBuffer: Buffer | null = null;
 
-    if (actualPanel === 'panelUpload') {
-      if (cover) {
-        const reader = new FileReader();
-        reader.readAsArrayBuffer(cover);
-        await new Promise((resolve, reject) => {
-          reader.onloadend = () => {
-            if (reader.result instanceof ArrayBuffer) {
-              imageBuffer = Buffer.from(reader.result);
-            } else if (reader.result !== null) {
-              imageBuffer = Buffer.from(reader.result.toString());
-            } else {
-              // TODO: handle the case where reader.result is null
-            }
-            resolve(imageBuffer);
-          };
-          reader.onerror = () => {
-            return snackbar.showMessage('❌ Upload failed! Please try again.');
-          };
-        });
-      }
-    }
-
-    if (actualPanel === 'panelLink') {
-      const imgTarget = imageURL ? imageURL : 'public/img/post.png';
-      imageBuffer = await getBufferFromElement(imgTarget);
-    }
-
-    if (actualPanel === 'panelAI') {
-      imageBuffer = generatedImage2
-        ? Buffer.from(generatedImage2, 'base64')
-        : null;
-    }
-
-    //     SI ES UN DEFAULT POST (LIST) DEBERIA TENER OTROS ATRIBUTOS?
-    //      {
-    //     traitType: 'string',
-    //     value: 'post',
-    //     key: 'publicationType' // ex default_key
+    // if (actualPanel === 'panelUpload') {
+    //   if (cover) {
+    //     const reader = new FileReader();
+    //     reader.readAsArrayBuffer(cover);
+    //     await new Promise((resolve, reject) => {
+    //       reader.onloadend = () => {
+    //         if (reader.result instanceof ArrayBuffer) {
+    //           imageBuffer = Buffer.from(reader.result);
+    //         } else if (reader.result !== null) {
+    //           imageBuffer = Buffer.from(reader.result.toString());
+    //         } else {
+    //           // TODO: handle the case where reader.result is null
+    //         }
+    //         resolve(imageBuffer);
+    //       };
+    //       reader.onerror = () => {
+    //         return snackbar.showMessage('❌ Upload failed! Please try again.');
+    //       };
+    //     });
     //   }
-    //   const otherAttributes = [ // PORQUE NO ESTA EN EL BUILTPOST ORIGINAL???
-    //   {
-    //     traitType: 'string',
-    //     key: 'userLink',
-    //     value: builtPost.link || 'NO-LINK'
-    //   },
-    //   {
-    //     traitType: 'string',
-    //     key: 'customData',
-    //     value: builtPost.originalPostId || ''
+    // }
+
+    // if (actualPanel === 'panelLink') {
+    //   const imgTarget = imageURL ? imageURL : 'public/img/post.png';
+    //   imageBuffer = await getBufferFromElement(imgTarget);
+    // }
+
+    // if (actualPanel === 'panelAI') {
+    //   imageBuffer = generatedImage2
+    //     ? Buffer.from(generatedImage2, 'base64')
+    //     : null;
+    // }
+
+    // //     SI ES UN DEFAULT POST (LIST) DEBERIA TENER OTROS ATRIBUTOS?
+    // //      {
+    // //     traitType: 'string',
+    // //     value: 'post',
+    // //     key: 'publicationType' // ex default_key
+    // //   }
+    // //   const otherAttributes = [ // PORQUE NO ESTA EN EL BUILTPOST ORIGINAL???
+    // //   {
+    // //     traitType: 'string',
+    // //     key: 'userLink',
+    // //     value: builtPost.link || 'NO-LINK'
+    // //   },
+    // //   {
+    // //     traitType: 'string',
+    // //     key: 'customData',
+    // //     value: builtPost.originalPostId || ''
+    // //   }
+    // // ];
+
+    // if (!imageBuffer) {
+    //   const parentNode = document.getElementById('defaultImage');
+
+    //   if (parentNode) {
+    //     const svgNode = parentNode.firstElementChild;
+    //     if (svgNode) {
+    //       const { toPng } = await import('html-to-image');
+    //       try {
+    //         const dataUrl = await toPng(svgNode as HTMLElement);
+    //         const base64Image = dataUrl.split(';base64,').pop();
+    //         imageBuffer = base64Image
+    //           ? Buffer.from(base64Image, 'base64')
+    //           : null;
+    //       } catch (error) {
+    //         console.error('Could not create image from SVG:', error);
+    //       }
+    //     }
     //   }
-    // ];
+    // }
 
-    if (!imageBuffer) {
-      const parentNode = document.getElementById('defaultImage');
-
-      if (parentNode) {
-        const svgNode = parentNode.firstElementChild;
-        if (svgNode) {
-          const { toPng } = await import('html-to-image');
-          try {
-            const dataUrl = await toPng(svgNode as HTMLElement);
-            const base64Image = dataUrl.split(';base64,').pop();
-            imageBuffer = base64Image
-              ? Buffer.from(base64Image, 'base64')
-              : null;
-          } catch (error) {
-            console.error('Could not create image from SVG:', error);
-          }
-        }
-      }
-    }
-
-    const constructedPost: IbuiltPost = {
-      attributes: DEFAULT_METADATA_ATTRIBUTES,
-      name: title || ' ',
-      abstract: abstract || '',
-      content: editorContents || '',
-      link: sourceUrl,
-      locale: 'en',
-      image: imageBuffer || null,
-      imageMimeType: 'image/jpeg',
-      tags: selectedOption.map((r) => r['value'])
-      // TODO: GET FILTER ARRAY FROM THE UI
-      // title: title,
-      // todo: image?: Buffer[]
-    };
+    // const constructedPost: IbuiltPost = {
+    //   attributes: DEFAULT_METADATA_ATTRIBUTES,
+    //   name: title || ' ',
+    //   abstract: abstract || '',
+    //   content: editorContents || '',
+    //   link: sourceUrl,
+    //   locale: 'en',
+    //   image: imageBuffer || null,
+    //   imageMimeType: 'image/jpeg',
+    //   tags: selectedOption.map((r) => r['value'])
+    //   // TODO: GET FILTER ARRAY FROM THE UI
+    //   // title: title,
+    //   // todo: image?: Buffer[]
+    // };
 
     try {
-      const result = await createPostManager(
-        profileResult,
-        constructedPost,
-        false // TODO FIXME POST_SELF_COLLECT
-      );
-      console.log('POST RESULT: ', result);
-      snackbar.showMessage('👌🏻 Post created successfully!');
+      // const result = await createPostManager(
+      //   profileResult,
+      //   constructedPost,
+      //   false // TODO FIXME POST_SELF_COLLECT
+      // );
+      // console.log('POST RESULT: ', result);
+      // snackbar.showMessage('👌🏻 Post created successfully!');
 
-      /* Send Notification for followers: create post */
+      // /* Send Notification for followers: create post */
       const listFollowers = await followers(lensProfile?.id);
       const listAddressByFollowers = listFollowers.items.map(
         (follower) => follower.wallet.address
@@ -335,7 +335,7 @@ const Create: NextPage = () => {
             NOTIFICATION_TYPE.SUBSET,
             title
           );
-        } else {
+        } else if (listAddressByFollowers.length === 1) {
           sendNotification(
             [listAddressByFollowers[0]],
             NotificationTypes.CreatedPost,

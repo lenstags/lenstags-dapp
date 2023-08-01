@@ -149,65 +149,65 @@ export default function PostDetails() {
       return;
     }
 
-    setIsSpinnerVisible(true);
-    const attType: MetadataAttribute = {
-      value: 'listLog', // FIXME
-      displayType: MetadataDisplayType.string,
-      key: 'commentType'
-    };
+    // setIsSpinnerVisible(true);
+    // const attType: MetadataAttribute = {
+    //   value: 'listLog', // FIXME
+    //   displayType: MetadataDisplayType.string,
+    //   key: 'commentType'
+    // };
 
-    const commentMetadata: Metadata = {
-      version: PUBLICATION_METADATA_VERSION,
-      mainContentFocus: PublicationMainFocus.TEXT_ONLY,
-      metadata_id: uuidv4(),
-      name: 'Nata Social Comment™',
-      description: 'you-are-the-owner',
-      content: comment, // new Date().getTime().toString(),
-      locale: 'en-US',
-      attributes: [attType], // , attDate],
-      appId: APP_NAME
-    };
+    // const commentMetadata: Metadata = {
+    //   version: PUBLICATION_METADATA_VERSION,
+    //   mainContentFocus: PublicationMainFocus.TEXT_ONLY,
+    //   metadata_id: uuidv4(),
+    //   name: 'Nata Social Comment™',
+    //   description: 'you-are-the-owner',
+    //   content: comment, // new Date().getTime().toString(),
+    //   locale: 'en-US',
+    //   attributes: [attType], // , attDate],
+    //   appId: APP_NAME
+    // };
 
-    //TODO: use with no gasless too
-    return commentGasless(loggedProfile?.id, ii, commentMetadata).then(() => {
-      const currentDate = new Date();
-      const formattedDate = currentDate.toISOString();
+    /* Send Notification for target */
+    if (
+      loggedProfile?.name &&
+      lensProfile?.ownedBy &&
+      loggedProfile.id !== lensProfile.id
+    ) {
+      sendNotification(
+        lensProfile.ownedBy,
+        NotificationTypes.CommentedPost,
+        loggedProfile.name,
+        NOTIFICATION_TYPE.TARGETTED,
+        post.metadata.title
+      );
+    }
+    // //TODO: use with no gasless too
+    // return commentGasless(loggedProfile?.id, ii, commentMetadata).then(() => {
+    //   const currentDate = new Date();
+    //   const formattedDate = currentDate.toISOString();
 
-      const draftComment = {
-        id: uuidv4(),
-        profile: {
-          picture: {
-            // @ts-ignore
-            original: { url: profileUrl }
-          },
-          name: loggedProfile?.name,
-          handle: loggedProfile?.handle
-        },
-        createdAt: formattedDate,
-        metadata: {
-          content: comment
-        }
-      };
-      const newAll = [draftComment, ...allComments];
+    //   const draftComment = {
+    //     id: uuidv4(),
+    //     profile: {
+    //       picture: {
+    //         // @ts-ignore
+    //         original: { url: profileUrl }
+    //       },
+    //       name: loggedProfile?.name,
+    //       handle: loggedProfile?.handle
+    //     },
+    //     createdAt: formattedDate,
+    //     metadata: {
+    //       content: comment
+    //     }
+    //   };
+    //   const newAll = [draftComment, ...allComments];
 
-      /* Send Notification for target */
-      if (
-        loggedProfile?.name &&
-        lensProfile?.ownedBy &&
-        loggedProfile.id !== lensProfile.id
-      ) {
-        sendNotification(
-          lensProfile.ownedBy,
-          NotificationTypes.CommentedPost,
-          loggedProfile.name,
-          NOTIFICATION_TYPE.TARGETTED,
-          post.metadata.title
-        );
-      }
-      setAllComments(newAll);
-      setIsSpinnerVisible(false);
-      setComment('');
-    });
+    //   setAllComments(newAll);
+    //   setIsSpinnerVisible(false);
+    //   setComment('');
+    // });
   };
 
   const handleRemove = (postId: string) =>
@@ -411,7 +411,7 @@ export default function PostDetails() {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     postId={postId}
-                    postTitle={post.metadata.title}
+                    postTitle={post.metadata.name}
                     processStatus={handleProcessStatus}
                     ownedBy={lensProfile.ownedBy}
                   />

@@ -123,7 +123,6 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
           (item: { channel: string }) =>
             item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
         );
-      console.log('channelNataSocial', res, channelAddress, channelNataSocial);
       setSubcribed(channelNataSocial);
     });
   }, [lensProfile?.ownedBy]);
