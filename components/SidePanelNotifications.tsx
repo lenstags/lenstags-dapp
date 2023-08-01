@@ -1,4 +1,4 @@
-import { Ref, forwardRef, useContext, useState } from 'react';
+import { Ref, forwardRef, useContext, useEffect, useState } from 'react';
 import {
   DoubleSidebar,
   DoubleSidebarContent,
@@ -9,17 +9,24 @@ import {
 import { SidebarContext } from '@context/SideBarSizeContext';
 import {
   BellIcon,
+  BookOpenIcon,
   BookmarkSquareIcon,
-  UserPlusIcon,
   ChatBubbleOvalLeftEllipsisIcon,
-  BookOpenIcon
+  UserPlusIcon
 } from '@heroicons/react/24/outline';
 import { BellIcon as BellIconFilled } from '@heroicons/react/24/solid';
-import { getNotifications } from '@lib/lens/user-notifications';
+import { getSigner } from '@lib/lens/ethers.service';
+import {
+  channelAddress,
+  getNotifications,
+  getSubscriptions,
+  optIn
+} from '@lib/lens/user-notifications';
+import { NotificationTypes } from '@models/notifications.models';
 import * as PushAPI from '@pushprotocol/restapi';
 import { useAccount } from 'wagmi';
+import Notifications from './Notifications';
 import { Tooltip } from './ui/Tooltip';
-import { NotificationTypes } from '@models/notifications.models';
 
 interface SidePanelProps {
   myInventoryRef: any;
@@ -64,6 +71,7 @@ const SidePanelNotifications = forwardRef(function (
   const [notifications, setNotifications] = useState<
     PushAPI.ParsedResponseType[]
   >([]);
+  const [subcribed, setSubcribed] = useState(false);
   const { address } = useAccount();
 
   const {
@@ -73,7 +81,20 @@ const SidePanelNotifications = forwardRef(function (
     setTriggerBy
   } = useContext(SidebarContext);
 
-  const handleTrigger = () => {
+  useEffect(() => {
+    getSubscriptions(address).then((res: any) => {
+      const channelNataSocial = !!res?.find(
+        (item: { channel: string }) => item.channel === channelAddress
+      );
+      setSubcribed(channelNataSocial);
+    });
+  }, [address]);
+
+  const signer = getSigner();
+  const handleTrigger = async () => {
+    if (!subcribed) {
+      optIn(address, signer);
+    }
     if (notifications.length === 0)
       getNotifications(address).then((res) => {
         setNotifications(res);
@@ -85,7 +106,6 @@ const SidePanelNotifications = forwardRef(function (
     setOpen(true);
   };
 
-  console.log(notifications);
   return (
     <DoubleSidebar>
       <Tooltip tooltip="Notifications" id="radix-:r3:">
@@ -117,7 +137,9 @@ const SidePanelNotifications = forwardRef(function (
             </div>
 
             {!sidebarCollapsedStateLeft.collapsed && (
-              <span className="text-md ml-2">Notifications</span>
+              <span className="text-md ml-2" id="radix-:r3:">
+                Notifications
+              </span>
             )}
           </div>
         </DoubleSidebarTrigger>
@@ -125,50 +147,28 @@ const SidePanelNotifications = forwardRef(function (
       <DoubleSidebarContent
         className={
           sidebarCollapsedStateLeft.collapsed
-            ? 'ml-24 w-80 p-0 py-6'
-            : 'ml-24 w-80 animate-fadeLeft'
+            ? 'w-80 p-0 py-6'
+            : 'w-80 animate-fadeLeft'
         }
         onInteractOutside={(e) => {
           // @ts-ignore
           if (myInventoryRef.current.id === e.target?.id) return;
           // @ts-ignore
-          if (e.target?.id === 'radix-:r3:') return;
+          if (e.target?.id === 'radix-:r3:' || e.target?.id.includes('radix'))
+            return;
           setTimeout(() => {
             setTriggerBy('none');
             setOpen(false);
           }, 100);
         }}
       >
-        <DoubleSidebarTitle className="mb-4 flex items-center justify-center gap-2 px-6 font-serif">
-          {/* <div className="flex h-6 w-7 items-center justify-center rounded-full border border-lensBlack">
-            <DoubleSidebarClose
-              id="radix-:r3:"
-              className="opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary"
-              onClick={() => {
-                setTriggerBy('none');
-                setOpen(false);
-              }}
-            >
-              <ArrowLeftIcon className="h-4 w-4 text-lensBlack" />
-            </DoubleSidebarClose>
-          </div> */}
+        <DoubleSidebarTitle className="flex items-center justify-center gap-2 px-6 font-serif">
           <span className="text-md w-full">Notifications</span>
         </DoubleSidebarTitle>
-        <div className="mb-2 flex w-full flex-col justify-between gap-2 px-6">
+        <div className="mb-2 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-4">
           {notifications.length > 0 &&
             notifications.map((notif, index: number) => {
-              return (
-                <div
-                  className="my-2 flex w-full items-center gap-2"
-                  key={notif.sid}
-                >
-                  {notifToIconMap[notif.cta]}
-                  <span className="w-full truncate text-ellipsis text-[14px]">
-                    <span className="font-bold text-black">{notif.title}</span>{' '}
-                    {notif.notification.body}
-                  </span>
-                </div>
-              );
+              return <Notifications notif={notif} key={index} />;
             })}
         </div>
       </DoubleSidebarContent>

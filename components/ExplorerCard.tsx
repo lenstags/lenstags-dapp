@@ -17,6 +17,10 @@ import moment from 'moment';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { useDisconnect } from 'wagmi';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { followers } from '@lib/lens/followers';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { NotificationTypes } from '@models/notifications.models';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 interface Props {
   post: any;
@@ -155,8 +159,37 @@ const ExploreCard: FC<Props> = (props) => {
         setIsDotFollowing(false);
       });
     } else {
-      return proxyActionFreeFollow(profileId).then(() => {
+      return proxyActionFreeFollow(profileId).then(async () => {
         /* Send Notification for followers and target profile: follow to */
+        const listFollowers = await followers(lensProfile?.id);
+        const listAddressByFollowers = listFollowers.items.map(
+          (follower) => follower.wallet.address
+        );
+        if (lensProfile?.name) {
+          sendNotification(
+            post.profile.ownedBy,
+            NotificationTypes.Followed,
+            lensProfile.name,
+            NOTIFICATION_TYPE.TARGETTED
+          );
+          if (listAddressByFollowers.length > 1) {
+            sendNotification(
+              listAddressByFollowers,
+              NotificationTypes.Followed,
+              lensProfile.name,
+              NOTIFICATION_TYPE.SUBSET,
+              post.profile.name
+            );
+          } else {
+            sendNotification(
+              [listAddressByFollowers[0]],
+              NotificationTypes.Followed,
+              lensProfile.name,
+              NOTIFICATION_TYPE.TARGETTED,
+              post.profile.name
+            );
+          }
+        }
         setIsFollowing(true);
         setIsDotFollowing(false);
       });

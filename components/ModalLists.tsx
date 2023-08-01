@@ -174,7 +174,7 @@ const ModalList: React.FC<ModalProps> = ({
         );
       } else {
         sendNotification(
-          listAddressByFollowers[0],
+          [listAddressByFollowers[0]],
           isList
             ? NotificationTypes.CollectedList
             : NotificationTypes.CollectedPost,

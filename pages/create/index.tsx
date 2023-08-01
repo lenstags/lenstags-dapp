@@ -19,6 +19,10 @@ import { genericFetch } from '@lib/helpers';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { followers } from '@lib/lens/followers';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { NotificationTypes } from '@models/notifications.models';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -316,7 +320,31 @@ const Create: NextPage = () => {
       );
       console.log('POST RESULT: ', result);
       snackbar.showMessage('👌🏻 Post created successfully!');
+
       /* Send Notification for followers: create post */
+      const listFollowers = await followers(lensProfile?.id);
+      const listAddressByFollowers = listFollowers.items.map(
+        (follower) => follower.wallet.address
+      );
+      if (lensProfile?.name) {
+        if (listAddressByFollowers.length > 1) {
+          sendNotification(
+            listAddressByFollowers,
+            NotificationTypes.CreatedPost,
+            lensProfile.name,
+            NOTIFICATION_TYPE.SUBSET,
+            title
+          );
+        } else {
+          sendNotification(
+            [listAddressByFollowers[0]],
+            NotificationTypes.CreatedPost,
+            lensProfile.name,
+            NOTIFICATION_TYPE.TARGETTED,
+            title
+          );
+        }
+      }
       await sleep();
       router.push('/app');
     } catch (e: any) {

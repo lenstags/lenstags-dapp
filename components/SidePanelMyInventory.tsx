@@ -108,14 +108,16 @@ const SidePanelMyInventory = forwardRef(function (
                 <FolderIcon
                   width={22}
                   height={22}
-                  className="text-lensBlack"
+                  className="pointer-events-none text-lensBlack"
                   id="radix-:r0:"
                 />
               )}
             </div>
 
             {!sidebarCollapsedStateLeft.collapsed && (
-              <span className="text-md ml-2">My inventory</span>
+              <span className="text-md ml-2" id="radix-:r0:">
+                My inventory
+              </span>
             )}
           </div>
         </DoubleSidebarTrigger>
@@ -123,14 +125,15 @@ const SidePanelMyInventory = forwardRef(function (
       <DoubleSidebarContent
         className={
           sidebarCollapsedStateLeft.collapsed
-            ? 'ml-24 w-80 p-0 py-6'
-            : 'ml-24 w-80 animate-fadeLeft'
+            ? 'w-80 p-0 py-6'
+            : 'w-80 animate-fadeLeft'
         }
         onInteractOutside={(e) => {
           // @ts-ignore
           if (notificationRef.current.id === e.target?.id) return;
           // @ts-ignore
-          if (e.target?.id === 'radix-:r0:') return;
+          if (e.target?.id === 'radix-:r0:' || e.target?.id.includes('radix'))
+            return;
           setTimeout(() => {
             setTriggerBy('none');
             setOpen(false);

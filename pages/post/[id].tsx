@@ -30,6 +30,9 @@ import { typeList } from '@lib/lens/load-lists';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { NotificationTypes } from '@models/notifications.models';
 
 export default function PostDetails() {
   const router = useRouter();
@@ -186,7 +189,21 @@ export default function PostDetails() {
         }
       };
       const newAll = [draftComment, ...allComments];
+
       /* Send Notification for target */
+      if (
+        loggedProfile?.name &&
+        lensProfile?.ownedBy &&
+        loggedProfile.id !== lensProfile.id
+      ) {
+        sendNotification(
+          lensProfile.ownedBy,
+          NotificationTypes.CommentedPost,
+          loggedProfile.name,
+          NOTIFICATION_TYPE.TARGETTED,
+          post.metadata.title
+        );
+      }
       setAllComments(newAll);
       setIsSpinnerVisible(false);
       setComment('');

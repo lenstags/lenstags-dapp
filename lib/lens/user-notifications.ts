@@ -7,7 +7,7 @@ import { ethers } from 'ethers';
 
 const Pkey = `0x${envConfig.NEXT_PUBLIC_PUSH_PROTOCOL_KEY}`;
 const _signer = new ethers.Wallet(Pkey)
-const channelAddress = '0xA58Bea78CFbD31566CCF7d70E764695A504b92D2'
+export const channelAddress = '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
 
 export const getNotifications = async (address: `0x${string}` | undefined) => {
     const fetchNotifications = await PushAPI.user
@@ -18,7 +18,7 @@ export const getNotifications = async (address: `0x${string}` | undefined) => {
         .catch((err) => {
             console.log('Error fetching notifications: ', err);
         });
-    return fetchNotifications;
+    return fetchNotifications.filter((notification: any) => notification.app === 'Nata.Social')
 }
 
 const subjects: SubjectsNotifications
@@ -28,6 +28,7 @@ const subjects: SubjectsNotifications
     [NotificationTypes.CollectedPost]: ['collected your post', 'collected a post'],
     [NotificationTypes.CommentedComment]: ['commented on your comment', 'commented on a comment'],
     [NotificationTypes.CommentedPost]: ['commented on your post', 'commented on a post'],
+    [NotificationTypes.CreatedPost]: ['created a post', 'created a post'],
     [NotificationTypes.Followed]: ['followed you', 'followed'],
     [NotificationTypes.MentionComment]: ['mentioned you in a comment', 'mentioned in a comment'],
     [NotificationTypes.MentionPost]: ['mentioned you in a post', 'mentioned in a post'],
@@ -38,12 +39,14 @@ const subjects: SubjectsNotifications
 }
 
 export const sendNotification = async (address: `0x${string}` | undefined | Array<`0x${string}` | undefined>, subject: NotificationTypes, profileName: string, target: number, titleContent?: string) => {
-    console.log(subject, target)
     let body;
     let recipients
     if (target === NOTIFICATION_TYPE.SUBSET && Array.isArray(address)) {
         body = `${subjects[subject][1]}${titleContent ? ` ${titleContent}` : ''}`
         recipients = address.map((addressFollower) => `eip155:80001:${addressFollower}`)
+    } else if (target === NOTIFICATION_TYPE.TARGETTED && Array.isArray(address)) {
+        body = `${subjects[subject][1]}${titleContent ? ` ${titleContent}` : ''}`
+        recipients = `eip155:80001:${address[0]}`
     } else {
         body = `${subjects[subject][0]}${titleContent ? ` ${titleContent}` : ''}`
         recipients = `eip155:80001:${address}`
@@ -75,3 +78,36 @@ export const sendNotification = async (address: `0x${string}` | undefined | Arra
     return apiResponse;
 }
 
+
+export const optIn = async (address: `0x${string}` | undefined, signer: any) => {
+    console.log(address, signer)
+    const restultOpt = await PushAPI.channels.subscribe({
+        signer,
+        channelAddress: 'eip155:80001:0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3', // channel address in CAIP
+        userAddress: `eip155:80001:${address}`, // user address in CAIP
+        onSuccess: () => {
+            console.log('opt in success');
+        },
+        onError: (err) => {
+            console.error('opt in error', err);
+        },
+        env: ENV.STAGING
+    })
+    return restultOpt
+}
+
+
+export const getSubscriptions = async (address: `0x${string}` | undefined) => {
+    const fetchSubscriptions = await PushAPI.user
+        .getSubscriptions({
+            user: `eip155:80001:${address}`,
+            env: ENV.STAGING
+        })
+        .then((res) => {
+            return res
+        })
+        .catch((err) => {
+            console.log('Error fetching subscriptions: ', err);
+        });
+    return fetchSubscriptions;
+}

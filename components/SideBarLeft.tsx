@@ -1,11 +1,4 @@
-import React, {
-  MutableRefObject,
-  Ref,
-  useContext,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
 import {
   Accordion,
@@ -34,8 +27,15 @@ import {
   GlobeAltIcon as GlobeAltIconFilled
 } from '@heroicons/react/24/solid';
 import { useSorts } from '@lib/hooks/use-sort';
+import { getSigner } from '@lib/lens/ethers.service';
 import { getPublications } from '@lib/lens/get-publications';
 import { PublicationTypes } from '@lib/lens/graphql/generated';
+import {
+  channelAddress,
+  getNotifications,
+  getSubscriptions,
+  optIn
+} from '@lib/lens/user-notifications';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { PublicRoutes } from 'models';
@@ -44,23 +44,25 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useDisconnect } from 'wagmi';
 import { ProfileContext } from './LensAuthenticationProvider';
+import Notifications from './Notifications';
 import PostsByList from './PostsByList';
-import { Tooltip } from './ui/Tooltip';
 import SidePanelNotifications from './SidePanelNotifications';
+import { Tooltip } from './ui/Tooltip';
 
 interface SidebarProps {}
 
 const SideBarLeft: React.FC<SidebarProps> = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
-  const { setSidebarCollapsedState, sidebarCollapsedStateLeft, setTriggerBy } =
-    useContext(SidebarContext);
+  const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
   const [publications, setPublications] = useState<any[]>([]);
   const [sideBarSize, setSideBarSize] = useState<'3.6' | '16.6'>('16.6');
   const [openTo, setOpenTo] = useState<
     'my-inventory' | 'notifications' | 'none'
   >('none');
   const [sortByValue, setSortByValue] = useState('newest');
+  const [subcribed, setSubcribed] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
@@ -113,8 +115,33 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     setOpenTo('my-inventory');
   };
 
+  useEffect(() => {
+    getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
+      const channelNataSocial =
+        res &&
+        !!res.find(
+          (item: { channel: string }) =>
+            item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
+        );
+      console.log('channelNataSocial', res, channelAddress, channelNataSocial);
+      setSubcribed(channelNataSocial);
+    });
+  }, [lensProfile?.ownedBy]);
+
+  const signer = getSigner();
+
   const handleOpenNotifications = () => {
     setOpenTo('notifications');
+    if (!subcribed) {
+      optIn(lensProfile?.ownedBy, signer).then((res) => {
+        setSubcribed(true);
+      });
+    }
+    if (notifications.length === 0) {
+      getNotifications(lensProfile?.ownedBy).then((res) => {
+        setNotifications(res);
+      });
+    }
   };
 
   return (
@@ -299,10 +326,11 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                       )}
                     </AccordionTrigger>
                     <AccordionContent className="flex h-full flex-col border-0 outline-none">
-                      <div className="flex w-full justify-between border-l-4 border-transparent px-6">
-                        <span className="my-2 font-serif font-bold">
-                          NOTIFICATIONS
-                        </span>
+                      <div className="mb-2 ml-1 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-2">
+                        {notifications.length > 0 &&
+                          notifications.map((notif, index: number) => {
+                            return <Notifications notif={notif} key={index} />;
+                          })}
                       </div>
                     </AccordionContent>
                   </AccordionItem>

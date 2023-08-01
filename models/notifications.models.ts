@@ -4,6 +4,7 @@ export enum NotificationTypes {
     CollectedPost = 'COLLECTED_POST',
     CommentedComment = 'COMMENTED_COMMENT',
     CommentedPost = 'COMMENTED_POST',
+    CreatedPost = 'CREATED_POST',
     Followed = 'FOLLOWED',
     MentionComment = 'MENTION_COMMENT',
     MentionPost = 'MENTION_POST',
