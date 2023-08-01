@@ -100,59 +100,58 @@ const ModalList: React.FC<ModalProps> = ({
     onClose();
 
     // verifies if selected list does exist in the current profile, if not, create it
-    // if (!listId) {
-    //   snackbar.showMessage('🟦 Creating the new list...');
-    //   processStatus(PostProcessStatus.CREATING_LIST);
-    //   listId = (await createUserList(lensProfile, name!)).key;
-    //   console.log('List created, (post) ID returned to the UI: ', listId);
-
+    if (!listId) {
+      snackbar.showMessage('🟦 Creating the new list...');
+      processStatus(PostProcessStatus.CREATING_LIST);
+      listId = (await createUserList(lensProfile, name!)).key;
+      console.log('List created, (post) ID returned to the UI: ', listId);
+    }
     /* Send Notification For Followers a list created */
-    //   sendNotificationsForFollowers createList
+
+    console.log('****** just in case :  ', listId);
+
+    // TODO: DEPRECATED ATM
+    // const clonedId = await cloneAndCollectPost(lensProfile, selectedPostId);
+    // if (!clonedId) {
+    //   throw 'Unknown error when cloning';
     // }
 
-    // console.log('****** just in case :  ', listId);
+    snackbar.showMessage('🟦 Minting the collected item.');
+    processStatus(PostProcessStatus.COLLECTING_POST);
 
-    // // TODO: DEPRECATED ATM
-    // // const clonedId = await cloneAndCollectPost(lensProfile, selectedPostId);
-    // // if (!clonedId) {
-    // //   throw 'Unknown error when cloning';
-    // // }
+    const collectResult = await freeCollect(selectedPostId);
 
-    // snackbar.showMessage('🟦 Minting the collected item.');
-    // processStatus(PostProcessStatus.COLLECTING_POST);
+    if (collectResult.errors?.length > 0) {
+      processStatus(PostProcessStatus.ERROR_UNAUTHORIZED);
+      if (collectResult.errors[0].extensions.code === 'UNAUTHENTICATED') {
+        snackbar.showMessage(
+          `🟥 Error UNAUTHENTICATED: ${collectResult.errors[0].message}`
+        );
+        // setOpenReconnect(true);
+        return;
+      }
+      snackbar.showMessage(`🟨 Attention: ${collectResult.errors[0].message}`);
+      return;
+    }
 
-    // const collectResult = await freeCollect(selectedPostId);
+    // just add the post to the list
+    processStatus(PostProcessStatus.ADDING_POST);
+    const addResult = await addPostIdtoListId(
+      profileId,
+      listId,
+      selectedPostId
+    );
 
-    // if (collectResult.errors?.length > 0) {
-    //   processStatus(PostProcessStatus.ERROR_UNAUTHORIZED);
-    //   if (collectResult.errors[0].extensions.code === 'UNAUTHENTICATED') {
-    //     snackbar.showMessage(
-    //       `🟥 Error UNAUTHENTICATED: ${collectResult.errors[0].message}`
-    //     );
-    //     // setOpenReconnect(true);
-    //     return;
-    //   }
-    //   snackbar.showMessage(`🟨 Attention: ${collectResult.errors[0].message}`);
-    //   return;
-    // }
+    snackbar.showMessage('🟩 Item added to list! 🗂️');
+    processStatus(PostProcessStatus.FINISHED);
 
-    // // just add the post to the list
-    // processStatus(PostProcessStatus.ADDING_POST);
-    // const addResult = await addPostIdtoListId(
-    //   profileId,
-    //   listId,
-    //   selectedPostId
-    // );
-
-    // snackbar.showMessage('🟩 Item added to list! 🗂️');
-    // processStatus(PostProcessStatus.FINISHED);
-
+    /* Send Notification collect post */
     const listFollowers = await followers(lensProfile?.id);
     const listAddressByFollowers = listFollowers.items.map(
       (follower) => follower.wallet.address
     );
-    /* Send Notification collect post */
-    if (lensProfile?.name) {
+    const flag = false;
+    if (lensProfile?.name && flag) {
       sendNotification(
         ownedBy,
         isList
@@ -200,7 +199,7 @@ const ModalList: React.FC<ModalProps> = ({
 
   return isOpen ? (
     <div
-      className="duration-600 fixed bottom-0 left-0 right-0 top-0 z-50 flex 
+      className="duration-600 fixed bottom-0 left-0 right-0 top-0 z-[150] flex 
      items-center justify-center bg-stone-900
        bg-opacity-60 
        opacity-100 backdrop-blur-sm animate-in fade-in-5"

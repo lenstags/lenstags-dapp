@@ -159,40 +159,41 @@ const ExploreCard: FC<Props> = (props) => {
         setIsDotFollowing(false);
       });
     } else {
-      const listFollowers = await followers(lensProfile?.id);
-      const listAddressByFollowers = listFollowers.items.map(
-        (follower) => follower.wallet.address
-      );
-      if (lensProfile?.name) {
-        sendNotification(
-          post.profile.ownedBy,
-          NotificationTypes.Followed,
-          lensProfile.name,
-          NOTIFICATION_TYPE.TARGETTED
+      return proxyActionFreeFollow(profileId).then(async () => {
+        /* Send Notification for followers and target profile: follow to */
+        const listFollowers = await followers(lensProfile?.id);
+        const listAddressByFollowers = listFollowers.items.map(
+          (follower) => follower.wallet.address
         );
-        if (listAddressByFollowers.length > 1) {
+        const flag = false;
+        if (lensProfile?.name && flag) {
           sendNotification(
-            listAddressByFollowers,
+            post.profile.ownedBy,
             NotificationTypes.Followed,
             lensProfile.name,
-            NOTIFICATION_TYPE.SUBSET,
-            post.profile.name
+            NOTIFICATION_TYPE.TARGETTED
           );
-        } else if (listAddressByFollowers.length === 1) {
-          sendNotification(
-            [listAddressByFollowers[0]],
-            NotificationTypes.Followed,
-            lensProfile.name,
-            NOTIFICATION_TYPE.TARGETTED,
-            post.profile.name
-          );
+          if (listAddressByFollowers.length > 1) {
+            sendNotification(
+              listAddressByFollowers,
+              NotificationTypes.Followed,
+              lensProfile.name,
+              NOTIFICATION_TYPE.SUBSET,
+              post.profile.name
+            );
+          } else if (listAddressByFollowers.length === 1) {
+            sendNotification(
+              [listAddressByFollowers[0]],
+              NotificationTypes.Followed,
+              lensProfile.name,
+              NOTIFICATION_TYPE.TARGETTED,
+              post.profile.name
+            );
+          }
         }
-      }
-      // return proxyActionFreeFollow(profileId).then(async () => {
-      //   /* Send Notification for followers and target profile: follow to */
-      //   setIsFollowing(true);
-      //   setIsDotFollowing(false);
-      // });
+        setIsFollowing(true);
+        setIsDotFollowing(false);
+      });
     }
   };
 
