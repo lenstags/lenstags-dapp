@@ -1,6 +1,7 @@
 import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
 
 import Avatar from 'boring-avatars';
+import BackButton from '@components/ui/ButtonBack';
 import CollapsiblePanels from 'components/Panels';
 import CreatableSelect from 'react-select/creatable';
 import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
@@ -415,7 +416,11 @@ const Create: NextPage = () => {
   return (
     <Layout title="Nata Social | Create post" pageDescription="Create post">
       <div className="w-full px-6 pt-6 font-sans text-sm ">
-        <h1 className="py-2 font-serif font-bold">Create post</h1>
+        {/* title  */}
+        <div className="flex items-center">
+          <BackButton />
+          <h1 className="py-2 font-serif font-medium">Create post</h1>
+        </div>
 
         <div className="mb-4 flex items-center">
           <div className="w-2/12">Link</div>
