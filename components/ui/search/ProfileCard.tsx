@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export const ProfileCard = ({ user }: { user: UserSearchType }) => {
   return (
-    <Link href={`profile/${user.id}`} key={user.id} className="flex">
+    <Link href={`profile/${user.id}`} className="flex">
       {!user.profilePicture ? (
         <div className="min-w-[3.5rem] min-h-[3.5rem] max-w-[3.5rem] max-h-[3.5rem] bg-lensGray2 rounded-full mr-3"></div>
       ) : (

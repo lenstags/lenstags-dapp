@@ -11,10 +11,7 @@ export const ResultsCard = ({
   publication: PublicationSearchType;
 }) => {
   return (
-    <div
-      key={publication.id}
-      className="flex flex-col min-w-full border-4 border-stone-100 min-h-[200px] rounded-xl pt-3 pb-8 px-4"
-    >
+    <div className="flex flex-col min-w-full border-4 border-stone-100 min-h-[200px] rounded-xl pt-3 pb-8 px-4">
       <div className="flex min-w-full justify-between items-center">
         <div className="flex items-center space-x-2 mb-4">
           <ImageProxied

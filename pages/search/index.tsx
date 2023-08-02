@@ -64,7 +64,10 @@ const Search = () => {
                   </div>
                   <div className="flex flex-col space-y-4">
                     {data!.publications.map((publication) => (
-                      <ResultsCard publication={publication} />
+                      <ResultsCard
+                        key={publication.id}
+                        publication={publication}
+                      />
                     ))}
                   </div>
                 </div>
@@ -80,7 +83,7 @@ const Search = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-y-4">
                     {data!.users.map((user) => (
-                      <ProfileCard user={user} />
+                      <ProfileCard key={user.id} user={user} />
                     ))}
                   </div>
                 </div>
