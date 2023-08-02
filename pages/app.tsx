@@ -17,6 +17,7 @@ import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
+import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
@@ -266,12 +267,12 @@ const App: NextPage = () => {
         <meta property="og:site_name" content="Nata Social" />
         <meta property="og:locale" content="en_US" /> */}
 
-        <script
+        <Script
           async
           defer
           src="https://analytics.umami.is/script.js"
           data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
-        ></script>
+        ></Script>
         {/* <link
           rel="apple-touch-icon"
           sizes="180x180"
