@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
+import Script from 'next/script';
 import { Navbar } from 'components';
 import Topbar from './Topbar';
 import SideBarLeft from './SideBarLeft';
@@ -87,12 +88,12 @@ export const LayoutReading: FC<Props> = ({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <script
+      <Script
         async
         defer
         src="https://analytics.umami.is/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
-      ></script>
+      ></Script>
 
       <div className="grid w-full grid-cols-12">
         <SideBarLeft />
