@@ -169,7 +169,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             ) : (
               <Image
                 className="mx-auto cursor-pointer duration-5000 ease-in"
-                src="/img/landing/nata-isologo1.svg"
+                src="/img/landing/nata-isologo.svg"
                 alt=""
                 width={40}
                 height={40}
