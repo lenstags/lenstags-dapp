@@ -422,6 +422,39 @@ const Create: NextPage = () => {
           <h1 className="py-2 font-serif font-medium">Create post</h1>
         </div>
 
+        <div
+          className="border- flex w-full flex-col
+         place-items-center rounded-xl border border-dashed border-gray-400 p-6"
+        >
+          <svg
+            width="42"
+            height="42"
+            viewBox="0 0 42 42"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M21 12.75C21.4142 12.75 21.75 13.0858 21.75 13.5V20.25H28.5C28.9142 20.25 29.25 20.5858 29.25 21C29.25 21.4142 28.9142 21.75 28.5 21.75H21.75V28.5C21.75 28.9142 21.4142 29.25 21 29.25C20.5858 29.25 20.25 28.9142 20.25 28.5V21.75H13.5C13.0858 21.75 12.75 21.4142 12.75 21C12.75 20.5858 13.0858 20.25 13.5 20.25H20.25V13.5C20.25 13.0858 20.5858 12.75 21 12.75Z"
+              fill="#121212"
+            />
+            <rect
+              x="1"
+              y="1"
+              width="40"
+              height="40"
+              rx="20"
+              stroke="#121212"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+
+          <span className="mt-4 text-xl">Choose a cover image</span>
+        </div>
+
+        <hr />
         <div className="mb-4 flex items-center">
           <div className="w-2/12">Link</div>
           <div className="w-10/12">
@@ -440,6 +473,7 @@ const Create: NextPage = () => {
               <DotWave size={22} color="#231F20" />
             </div>
           )}
+          h
         </div>
 
         <div className="mb-4 flex items-center">
