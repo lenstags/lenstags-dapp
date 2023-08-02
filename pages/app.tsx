@@ -267,24 +267,18 @@ const App: NextPage = () => {
         <meta property="og:site_name" content="Nata Social" />
         <meta property="og:locale" content="en_US" /> */}
 
-        <Script
-          async
-          defer
-          src="https://analytics.umami.is/script.js"
-          data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
-        ></Script>
         {/* <link
           rel="apple-touch-icon"
           sizes="180x180"
           href="favicon/apple-touch-icon.png"
-        />
+          />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
           href="favicon/favicon-32x32.png"
-        />
-        <link
+          />
+          <link
           rel="icon"
           type="image/png"
           sizes="16x16"
@@ -297,15 +291,21 @@ const App: NextPage = () => {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
+      <Script
+        async
+        defer
+        src="https://analytics.umami.is/script.js"
+        data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
+      ></Script>
 
       <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
         {showWelcome ? (
           <div
             className=" duration-600 fixed 
-            bottom-0 
-            left-0 right-0
-            top-0 z-50 flex h-full w-full flex-col items-center  justify-center bg-stone-900
-            "
+          bottom-0 
+          left-0 right-0
+          top-0 z-50 flex h-full w-full flex-col items-center  justify-center bg-stone-900
+          "
             style={{
               backgroundImage:
                 'linear-gradient(to bottom, gray, rgb(45 212 191))',
