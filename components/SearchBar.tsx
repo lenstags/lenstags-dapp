@@ -27,6 +27,7 @@ export interface PublicationSearchType {
   tags: string[];
   content: string;
   createdAt: string;
+  totalAmountOfComments: number;
   totalAmountOfCollects: number;
 }
 
@@ -57,6 +58,7 @@ export const fetchData = async (input: string, limit: number = 5) => {
       tags: publication.metadata.tags,
       content: publication.metadata.content,
       createdAt: publication.createdAt,
+      totalAmountOfComments: publication.stats.totalAmountOfComments,
       totalAmountOfCollects: publication.stats.totalAmountOfCollects
     };
   });

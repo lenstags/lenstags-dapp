@@ -2,6 +2,8 @@ import { PublicationSearchType } from '@components/SearchBar';
 import ImageProxied from '@components/ImageProxied';
 import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 import moment from 'moment';
+import PostIndicators from '@components/PostIndicators';
+import Link from 'next/link';
 
 export const ResultsCard = ({
   publication
@@ -41,10 +43,13 @@ export const ResultsCard = ({
           className="max-w-[40%] min-w-[40%] max-h-[200px] rounded-xl mr-4 aspect-video object-cover"
         />
         <div className="flex flex-col justify-between">
-          <div className="flex flex-col">
+          <Link
+            href={`${publication.type}/${publication.id}`}
+            className="flex flex-col"
+          >
             <h3 className="font-bold text-xl mb-2">{publication.name}</h3>
             <p className="text-sm mb-2">{publication.content}</p>
-          </div>
+          </Link>
           <div className="flex justify-between my-2">
             <div className="flex space-x-1">
               {publication.tags.map((tag) => (
@@ -56,6 +61,10 @@ export const ResultsCard = ({
                 </span>
               ))}
             </div>
+            <PostIndicators
+              collects={publication.totalAmountOfCollects.toString()}
+              comments={publication.totalAmountOfComments.toString()}
+            />
           </div>
         </div>
       </div>
