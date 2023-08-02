@@ -6,6 +6,7 @@ import SideBarRight from './SideBarRight';
 import { Toaster } from './ui/ToasterUI';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { useRouter } from 'next/router';
+import Script from 'next/script';
 import { PublicRoutes } from 'models';
 
 interface Props {
@@ -94,12 +95,12 @@ export const Layout: FC<Props> = ({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <script
+      <Script
         async
         defer
         src="https://analytics.umami.is/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
-      ></script>
+      ></Script>
 
       {/* <div style="
   position: absolute; top: 0; left: 0; width: 100%; height: 100%; 

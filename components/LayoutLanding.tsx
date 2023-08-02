@@ -64,12 +64,12 @@ export const LayoutLanding: FC<Props> = ({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <script
+      <Script
         async
         defer
         src="https://analytics.umami.is/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
-      ></script>
+      ></Script>
       <nav
         style={{
           background:
@@ -122,7 +122,7 @@ export const LayoutLanding: FC<Props> = ({
           <div className="mx-2 p-2 ">
             <Link href={'#features'}>PRODUCTS</Link>
           </div>
- 
+
           <div className="mx-2 p-2 ">
             <a
               href="https://natasocial.gitbook.io"
