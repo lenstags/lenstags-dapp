@@ -63,6 +63,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
   const [sortByValue, setSortByValue] = useState('newest');
   const [subcribed, setSubcribed] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [loadingMyLists, setLoadingMyLists] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
@@ -85,6 +86,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     if (!lensProfile) return;
 
     if (publications.length !== 0) return;
+    setLoadingMyLists(true);
     const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
     console.log('xxx ', res);
 
@@ -100,6 +102,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     });
 
     setPublications(filteredItems);
+    setLoadingMyLists(false);
   };
 
   const { sortItems } = useSorts();
@@ -145,18 +148,19 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
   return (
     <div
-      className={`bg-stone-100 transition-all sm:inline ${
+      className={`bg-stone-100  sm:inline ${
         sidebarCollapsedStateLeft.collapsed
-          ? 'z-[100] col-span-1 w-24 '
+          ? 'z-[100] col-span-1 w-24 ease-in animate-in'
           : 'col-span-2 animate-fadeLeft'
       }`}
     >
       <div className="pointer-events-auto sticky top-0 h-screen py-4">
         <div className="px-6 pb-6">
-          <Link href={'/'}>
+          <Link href={'/'} className="h-full">
             {!sidebarCollapsedStateLeft.collapsed ? (
               <Image
-                className="cursor-pointer"
+                data-open={!sidebarCollapsedStateLeft.collapsed}
+                className="cursor-pointer data-[open=false]:animate-fadeOutLogo"
                 src="/img/landing/nata-logo.svg"
                 alt=""
                 width={150}
@@ -164,11 +168,12 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
               />
             ) : (
               <Image
-                className="mx-auto cursor-pointer"
-                src="/img/landing/nata-isologo.svg"
+                className="mx-auto cursor-pointer duration-5000 ease-in"
+                src="/img/landing/nata-isologo1.svg"
                 alt=""
-                width={38}
+                width={40}
                 height={40}
+                style={{ width: '40px', height: '40px' }}
               />
             )}
           </Link>
@@ -232,6 +237,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                 publications={publications}
                 sideBarSize={sideBarSize}
                 notificationRef={triggerNotificationsRef}
+                loadingMyLists={loadingMyLists}
                 ref={triggerMyInventoryRef}
               />
             </div>

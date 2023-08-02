@@ -147,7 +147,7 @@ const SidePanelNotifications = forwardRef(function (
       <DoubleSidebarContent
         className={
           sidebarCollapsedStateLeft.collapsed
-            ? 'w-80 p-0 py-6'
+            ? 'w-80 p-0 py-6 outline-none'
             : 'w-80 animate-fadeLeft'
         }
         onInteractOutside={(e) => {

@@ -25,6 +25,7 @@ import {
 import { useToast } from './ui/useToast';
 import { hidePublication } from '@lib/lens/hide-publication';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import Link from 'next/link';
 
 interface PostByListProps {
   publications: any;
@@ -143,8 +144,16 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
           {!loading && fetchList && posts.length > 0 ? (
             posts.map((post: any) => {
               return (
-                <AccordionContent key={post} className="ml-4 flex px-4">
-                  <span className="mx-4 my-2">{post.metadata.name}</span>
+                <AccordionContent
+                  key={post}
+                  className="ml-4 flex px-4 outline-none"
+                >
+                  <Link
+                    href={`${PublicRoutes.POST}/${post.id}`}
+                    className="mx-4 my-2"
+                  >
+                    {post.metadata.name}
+                  </Link>
                 </AccordionContent>
               );
             })

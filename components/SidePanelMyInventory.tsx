@@ -29,11 +29,13 @@ import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
 import { FolderIcon } from '@heroicons/react/24/outline';
 import { FolderIcon as FolderIconFilled } from '@heroicons/react/24/solid';
+import { Spinner } from './Spinner';
 interface SidePanelProps {
   fetchMyLists: () => void;
   publications: any;
   sideBarSize: '3.6' | '16.6';
   notificationRef: any;
+  loadingMyLists: boolean;
 }
 
 export const sortBy = [
@@ -49,7 +51,12 @@ export const actions = [
 ];
 
 const SidePanelMyInventory = forwardRef(function (
-  { fetchMyLists, publications, notificationRef }: SidePanelProps,
+  {
+    fetchMyLists,
+    publications,
+    notificationRef,
+    loadingMyLists
+  }: SidePanelProps,
   ref: Ref<HTMLButtonElement> | undefined
 ) {
   const [sortByValue, setSortByValue] = useState('newest');
@@ -197,7 +204,13 @@ const SidePanelMyInventory = forwardRef(function (
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <PostsByList publications={publications} className="pb-4" />
+        {loadingMyLists ? (
+          <div className="mt-24 flex w-full items-center justify-center">
+            <Spinner w="8" h="8" />
+          </div>
+        ) : (
+          <PostsByList publications={publications} className="pb-4" />
+        )}
       </DoubleSidebarContent>
     </DoubleSidebar>
   );
