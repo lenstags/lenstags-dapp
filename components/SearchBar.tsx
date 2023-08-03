@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { search } from '@lib/lens/graphql/search';
 import { Spinner } from './Spinner';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useSearchResultsStore } from '@lib/hooks/use-search-results-store';
 
 export interface UserSearchType {
   id: string;
@@ -34,7 +35,7 @@ export interface PublicationSearchType {
 export const fetchData = async (input: string, limit: number = 5) => {
   const res = await search(input, limit);
 
-  const resUsers = (await res.profilesData) as ProfileSearchResult;
+  const resUsers = res?.profilesData as ProfileSearchResult;
   const users = resUsers.items.map((user: any) => {
     return {
       id: user.id,
@@ -44,8 +45,7 @@ export const fetchData = async (input: string, limit: number = 5) => {
     };
   });
 
-  const resPublications =
-    (await res.publicationsData) as PublicationSearchResult;
+  const resPublications = res?.publicationsData as PublicationSearchResult;
   const publications = resPublications.items.map((publication: any) => {
     return {
       id: publication.id,
@@ -76,6 +76,7 @@ export const SearchBar = () => {
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchData = useSearchResultsStore();
 
   const handleInputText = (event: ChangeEvent<HTMLInputElement>) => {
     setInputText(event.target.value);
@@ -117,6 +118,8 @@ export const SearchBar = () => {
         const fetchAndSetUsers = async () => {
           setIsLoading(true);
           const data = await fetchData(inputText);
+          searchData.setSearchResults(data);
+          searchData.setQuery(inputText);
           setCachedUsers(data.users);
           setCachedPublications(data.publications);
           setIsLoading(false);

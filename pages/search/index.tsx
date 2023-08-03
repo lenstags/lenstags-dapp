@@ -12,8 +12,9 @@ import { TagsFilter } from '@components/TagsFilter';
 import { ResultsCard } from '@components/ui/search/ResultsCard';
 import { ProfileCard } from '@components/ui/search/ProfileCard';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { useSearchResultsStore } from '@lib/hooks/use-search-results-store';
 
-interface Data {
+export interface Data {
   users: UserSearchType[];
   publications: PublicationSearchType[];
 }
@@ -22,19 +23,26 @@ const Search = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<Data | null>(null);
   const { query } = useRouter();
+  const searchData = useSearchResultsStore();
 
   useEffect(() => {
-    const fetchDataFunction = async () => {
+    if (searchData.query === query.q) {
       setIsLoading(true);
-      const res = await fetchData(query.q as string, 10);
-      setData(res);
+      setData(searchData.searchResults);
       setIsLoading(false);
-    };
+    } else {
+      if (query.q) {
+        const fetchDataFunction = async () => {
+          setIsLoading(true);
+          const res = await fetchData(query.q as string, 10);
+          setData(res);
+          setIsLoading(false);
+        };
 
-    fetchDataFunction();
+        fetchDataFunction();
+      }
+    }
   }, [query.q]);
-
-  console.log(data);
 
   return (
     <Layout
