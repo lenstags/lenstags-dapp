@@ -6,7 +6,7 @@ import {
 } from '@lib/lens/graphql/generated';
 
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
-import { sleep } from '../helpers';
+import { sleep } from '../../utils/helpers';
 
 // import { proxyActionStatusRequest } from './proxy-action-status';
 const proxyActionStatusRequest = async (proxyActionId: string) => {

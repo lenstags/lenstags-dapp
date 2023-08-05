@@ -19,7 +19,8 @@ const Editor = ({ initialContent = '', onChange }: Props) => (
     onChange={onChange}
     height="30vh"
     width="100%"
-    setDefaultStyle="font-family: Inter; font-size: 12px;"
+    placeholder="Write a description for your post (double click on any word to stylize)"
+    setDefaultStyle="font-family: Inter; font-size: 12px; padding:0px"
     setOptions={{
       mode: 'balloon',
       buttonList: [

@@ -1,7 +1,6 @@
+import { LENS_API } from '@lib/config';
 import { createClient as createUrqlClient } from 'urql';
 import { refreshAuthToken } from './utils';
-
-const APIURL = 'https://api-mumbai.lens.dev';
 
 // TODO: MOVE TO THE CONFIG FILE? export const APIURL = 'https://api.lens.dev' // TODO: check according to profile used in demo
 export const STORAGE_KEY = 'LH_STORAGE_KEY';
@@ -12,7 +11,7 @@ export const PERIPHERY_CONTRACT_ADDRESS =
 
 // TODO: SHOULD WE USE URQL?
 export const basicClient = createUrqlClient({
-  url: APIURL
+  url: LENS_API
 });
 
 export async function createClient() {
@@ -26,7 +25,7 @@ export async function createClient() {
       console.log('URQL (REMOVE?) accessToken ', accessToken);
 
       const urqlClient = createUrqlClient({
-        url: APIURL,
+        url: LENS_API,
         fetchOptions: {
           headers: {
             'x-access-token': `Bearer ${accessToken}`

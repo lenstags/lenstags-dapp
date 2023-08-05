@@ -1,6 +1,6 @@
 import { ATTRIBUTES_LIST_KEY, PROFILE_METADATA_VERSION } from '@lib/config';
 import { AttributeData, ProfileMetadata } from './interfaces/profile-metadata';
-import { findKeyAttributeInProfile, pickPicture } from '@lib/helpers';
+import { findKeyAttributeInProfile, pickPicture } from 'utils/helpers';
 
 import { IbuiltPost } from './interfaces/publication';
 import { MetadataDisplayType } from './interfaces/generic';
