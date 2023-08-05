@@ -4,7 +4,7 @@ import * as React from 'react';
 import { DEFAULT_IMAGE_POST, DEFAULT_IMAGE_PROFILE } from '@lib/config';
 import Image, { ImageProps } from 'next/image';
 
-import { getIPFSImage } from '@lib/helpers';
+import { getIPFSImage } from 'utils/helpers';
 
 type ImageCategory = 'post' | 'profile';
 

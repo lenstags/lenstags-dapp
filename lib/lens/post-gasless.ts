@@ -34,6 +34,7 @@ const createPostViaDispatcherRequest = async (
       request
     }
   });
+  console.log('*** result ', result);
 
   return result.data!.createPostViaDispatcher;
 };
@@ -42,7 +43,7 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
   const profileResult = await queryProfile({
     profileId: createPostRequest.profileId
   });
-
+  console.log('*** profi ', profileResult);
   if (!profileResult) {
     throw new Error('Could not find profile');
   }

@@ -1,4 +1,11 @@
-import React, { ChangeEvent, useContext, useEffect, useState } from 'react';
+import React, {
+  ChangeEvent,
+  useContext,
+  useEffect,
+  useRef,
+  useState
+} from 'react';
+import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
 import Avatar from 'boring-avatars';
 import CollapsiblePanels from 'components/Panels';
@@ -7,15 +14,16 @@ import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import { DotWave } from '@uiball/loaders';
 import Editor from 'components/Editor';
 import { IbuiltPost } from '@lib/lens/interfaces/publication';
-import { Layout } from 'components';
+import Image from 'next/image';
+import { LayoutCreate } from '@components/LayourCreate';
 import { NextPage } from 'next';
 import { ProfileContext } from 'components';
+import { Spinner } from '@components/Spinner';
 import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
 import TurndownService from 'turndown';
 import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
-import { genericFetch } from '@lib/helpers';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
@@ -34,30 +42,11 @@ type ToastContent = {
 
 const fromHtml = new TurndownService();
 
-const checkIfUrl = (value: string): boolean => {
-  try {
-    new URL(value);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const sleep = () =>
-  new Promise((resolve) => {
-    setTimeout(resolve, 2500);
-  });
-
 const Create: NextPage = () => {
   const [title, setTitle] = useState('');
   const snackbar = useSnackbar();
-
-  // const [dispatcherStatus, setDispatcherStatus] =
-  //  useState<boolean | undefined>(
-  //   undefined
-  // );
   const router = useRouter();
-  const [abstract, setAbstract] = useState<string | undefined>('');
+  // const [abstract, setAbstract] = useState<string | undefined>('');
   const [editorContents, setEditorContents] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
   const [toast, setToast] = useState<ToastContent>({});
@@ -67,15 +56,23 @@ const Create: NextPage = () => {
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
 
   const [imageURL, setImageURL] = useState('');
-  const [actualPanel, setActualPanel] = useState<string | null>('panelAI');
+  // const [actualPanel, setActualPanel] = useState<string | null>('panelAI');
+  const [imageOrigin, setImageOrigin] = useState<string | null>('panelAI');
 
   const [loading, setLoading] = useState(false);
-  const [loadingTLDR, setLoadingTLDR] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  // const [loadingTLDR, setLoadingTLDR] = useState(false);
   const [loadingIA, setLoadingIA] = useState(false);
   const [loadingLP, setLoadingLP] = useState(false);
   const [selectedOption, setSelectedOption] = useState([]);
   const [plainText, setPlainText] = useState('');
   const { profile: lensProfile } = useContext(ProfileContext);
+  const inputFile = useRef<HTMLInputElement>(null);
+
+  const [hydrationLoading, setHydrationLoading] = useState(true);
+  useEffect(() => {
+    setHydrationLoading(false);
+  }, []);
 
   // useEffect(() => {
   //   if (document) {
@@ -102,9 +99,9 @@ const Create: NextPage = () => {
     setSelectedOption(selectedOptions);
   };
 
-  const handleActivePanelChange = (selectedPanel: string | null) => {
-    setActualPanel(selectedPanel);
-  };
+  // const handleActivePanelChange = (selectedPanel: string | null) => {
+  //   setActualPanel(selectedPanel);
+  // };
 
   const fetchLinkPreview = async (url: string) => {
     setLoadingLP(true);
@@ -132,7 +129,10 @@ const Create: NextPage = () => {
         const imageB64 =
           'data:image/png;base64,' + response.data.data[0].b64_json;
         setGeneratedImage(imageB64);
+        setImageOrigin('panelAI');
+
         setGeneratedImage2(response.data.data[0].b64_json);
+        setIsLoaded(true);
       })
       .catch((err) => {
         console.log('error on ai call: ', err);
@@ -143,26 +143,27 @@ const Create: NextPage = () => {
       .finally(() => setLoadingIA(false));
   };
 
-  const handleGenerateTLDR = async () => {
-    if (!plainText) {
-      snackbar.showMessage('⚠️ Some text in the body is required!');
-      return;
-    }
-    setLoadingTLDR(true);
+  // deprecated but useful
+  // const handleGenerateTLDR = async () => {
+  //   if (!plainText) {
+  //     snackbar.showMessage('⚠️ Some text in the body is required!');
+  //     return;
+  //   }
+  //   setLoadingTLDR(true);
 
-    return genericFetch(`/api/tldr?text=${plainText}`)
-      .then((response) => {
-        console.log('ss', response);
-        setAbstract(response.data.choices[0]?.text?.trim());
-      })
-      .catch((err) => {
-        console.log('error on ai call: ', err);
-        snackbar.showMessage(
-          'Something went wrong generating the TLDR, try again in a few minutes'
-        );
-      })
-      .finally(() => setLoadingTLDR(false));
-  };
+  //   return genericFetch(`/api/tldr?text=${plainText}`)
+  //     .then((response) => {
+  //       console.log('ss', response);
+  //       setAbstract(response.data.choices[0]?.text?.trim());
+  //     })
+  //     .catch((err) => {
+  //       console.log('error on ai call: ', err);
+  //       snackbar.showMessage(
+  //         'Something went wrong generating the TLDR, try again in a few minutes'
+  //       );
+  //     })
+  //     .finally(() => setLoadingTLDR(false));
+  // };
 
   const handleInputChange = _.debounce(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -172,20 +173,75 @@ const Create: NextPage = () => {
         return;
       }
 
-      const data = await fetchLinkPreview(event.target.value);
-
       setSourceUrl(event.target.value);
 
+      const data = await fetchLinkPreview(event.target.value);
       if (data) {
         setTitle(data.title as string);
         setImageURL(data.image as string);
+
+        const imgTarget = data.image ? data.image : 'public/img/post.png';
+        const imageBuffer = await getBufferFromElement(imgTarget);
+        console.log('i1: ', imageBuffer);
+        console.log('i1: ', imageBuffer.toString('base64'));
+
+        setGeneratedImage(
+          `data:image/png;base64,${imageBuffer.toString('base64')}`
+        );
         setEditorContents(data.description as string);
       } else {
         console.log('No link preview');
       }
     },
-    2000
+    1000
   );
+
+  const handleClickUpload = () => {
+    // `current` points to the mounted file input element
+    if (inputFile.current) {
+      setImageOrigin('panelUpload');
+      inputFile.current.click();
+    }
+  };
+
+  const handleClickLink = async () => {
+    if (!sourceUrl) {
+      snackbar.showMessage('⚠️ A link is required!');
+      return;
+    }
+
+    const data = await fetchLinkPreview(sourceUrl);
+
+    if (data) {
+      setImageURL(data.image as string);
+      setImageOrigin('panelLink');
+
+      console.log('ssss ', data.image);
+
+      // setGeneratedImage(data.image as string);
+      setIsLoaded(true);
+    } else {
+      snackbar.showMessage('⚠️ Link does not contain image preview');
+      setIsLoaded(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        const result = reader.result;
+        setGeneratedImage(result as string);
+        setIsLoaded(true);
+        if (e.target?.files![0]) {
+          setCover(e.target.files[0]);
+        }
+      };
+
+      reader.readAsDataURL(e.target.files[0]);
+    }
+  };
 
   const handleChangeEditor = (content: string) => {
     console.log('rr ', content);
@@ -221,7 +277,13 @@ const Create: NextPage = () => {
 
     let imageBuffer: Buffer | null = null;
 
-    if (actualPanel === 'panelUpload') {
+    imageBuffer = await getBufferFromElement(
+      imageURL ? imageURL : 'public/img/post.png'
+    );
+
+    // FIXME fixmeees
+    if (imageOrigin === 'panelUpload') {
+      console.log('aca ', cover);
       if (cover) {
         const reader = new FileReader();
         reader.readAsArrayBuffer(cover);
@@ -243,35 +305,23 @@ const Create: NextPage = () => {
       }
     }
 
-    if (actualPanel === 'panelLink') {
+    if (imageOrigin === 'panelLink') {
       const imgTarget = imageURL ? imageURL : 'public/img/post.png';
       imageBuffer = await getBufferFromElement(imgTarget);
     }
 
-    if (actualPanel === 'panelAI') {
+    if (imageOrigin === 'panelAI') {
       imageBuffer = generatedImage2
         ? Buffer.from(generatedImage2, 'base64')
         : null;
     }
 
-    //     SI ES UN DEFAULT POST (LIST) DEBERIA TENER OTROS ATRIBUTOS?
-    //      {
-    //     traitType: 'string',
-    //     value: 'post',
-    //     key: 'publicationType' // ex default_key
-    //   }
-    //   const otherAttributes = [ // PORQUE NO ESTA EN EL BUILTPOST ORIGINAL???
-    //   {
-    //     traitType: 'string',
-    //     key: 'userLink',
-    //     value: builtPost.link || 'NO-LINK'
-    //   },
-    //   {
-    //     traitType: 'string',
-    //     key: 'customData',
-    //     value: builtPost.originalPostId || ''
-    //   }
-    // ];
+    // imageBuffer = Buffer.from(generatedImage, 'base64');
+
+    // setGeneratedImage(imageBuffer);
+
+    console.log('iiii ', generatedImage);
+    // return;
 
     if (!imageBuffer) {
       const parentNode = document.getElementById('defaultImage');
@@ -296,7 +346,7 @@ const Create: NextPage = () => {
     const constructedPost: IbuiltPost = {
       attributes: DEFAULT_METADATA_ATTRIBUTES,
       name: title || ' ',
-      abstract: abstract || '',
+      abstract: '',
       content: editorContents || '',
       link: sourceUrl,
       locale: 'en',
@@ -316,7 +366,7 @@ const Create: NextPage = () => {
       );
       console.log('POST RESULT: ', result);
       snackbar.showMessage('👌🏻 Post created successfully!');
-      await sleep();
+      await sleep(2500);
       router.push('/app');
     } catch (e: any) {
       // setIsErrorVisible(true);
@@ -325,6 +375,26 @@ const Create: NextPage = () => {
       setLoading(false);
     }
   };
+
+  // const handleUpload = async () => {
+  //   const reader = new FileReader();
+  //   reader.readAsArrayBuffer(cover);
+  //   await new Promise((resolve, reject) => {
+  //     reader.onloadend = () => {
+  //       if (reader.result instanceof ArrayBuffer) {
+  //         imageBuffer = Buffer.from(reader.result);
+  //       } else if (reader.result !== null) {
+  //         imageBuffer = Buffer.from(reader.result.toString());
+  //       } else {
+  //         // TODO: handle the case where reader.result is null
+  //       }
+  //       resolve(imageBuffer);
+  //     };
+  //     reader.onerror = () => {
+  //       return snackbar.showMessage('❌ Upload failed! Please try again.');
+  //     };
+  //   });
+  // };
 
   const panels = [
     {
@@ -413,204 +483,309 @@ const Create: NextPage = () => {
   ];
 
   return (
-    <Layout title="Nata Social | Create post" pageDescription="Create post">
-      <div className="w-full px-6 pt-6 font-sans text-sm ">
-        <h1 className="py-2 font-serif font-bold">Create post</h1>
-
-        <div className="mb-4 flex items-center">
-          <div className="w-2/12">Link</div>
-          <div className="w-10/12">
-            <input
-              autoComplete="false"
-              className="lens-input outl ine-none w-full"
-              type="text"
-              name="link"
-              id="link"
-              placeholder="Insert the link starting with 'https://'"
-              onChange={handleInputChange}
-            />
-          </div>
-          {loadingLP && (
-            <div className="ml-2">
-              <DotWave size={22} color="#231F20" />
-            </div>
-          )}
+    <LayoutCreate
+      title="Nata Social | Create post"
+      pageDescription="Create post"
+    >
+      {hydrationLoading ? (
+        <div className="flex w-full justify-center p-10">
+          <Spinner h="10" w="10" />
         </div>
+      ) : (
+        <div className="flex w-full">
+          <div className="w-8/12 ">
+            {/* image uploader */}
 
-        <div className="mb-4 flex items-center">
-          <div className="w-2/12">Title</div>
-          <div className="w-10/12">
-            <input
-              className="lens-input w-full"
-              type="text"
-              name="title"
-              id="title"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.target.value);
-              }}
-            />
-          </div>
-        </div>
+            {isLoaded ? (
+              <div
+                // className="relative mb-6 flex h-40 w-full flex-col place-items-center rounded-lg
+                // border border-solid border-zinc-100 p-8 hover:h-80"
+                className="transition-height relative mb-6 flex h-40 w-full flex-col place-items-center
+                rounded-lg border border-solid border-zinc-100 p-8
+                duration-500 ease-in-out hover:h-96"
+                style={{
+                  backgroundImage: `url(${generatedImage})`,
+                  backgroundPosition: 'center',
+                  backgroundSize: 'cover',
+                  backgroundRepeat: 'no-repeat'
+                }}
+              >
+                <div className="absolute right-2 top-2">
+                  <button
+                    onClick={() => setIsLoaded(false)}
+                    className="inline-flex h-7 w-7 items-center justify-center
+               rounded-[40px] bg-stone-50 bg-opacity-70 p-1.5 backdrop-blur-[14px]"
+                  >
+                    <div className="inline-flex items-center justify-start gap-2 self-stretch">
+                      <div className="relative h-4 w-4">
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g clipPath="url(#clip0_3100_65103)">
+                            <path
+                              d="M11.2411 2.99111L12.3661 1.86612C12.8543 1.37796 13.6457 1.37796 14.1339 1.86612C14.622 2.35427 14.622 3.14573 14.1339 3.63388L4.55479 13.213C4.20234 13.5654 3.76762 13.8245 3.28993 13.9668L1.5 14.5L2.03319 12.7101C2.17548 12.2324 2.43456 11.7977 2.78701 11.4452L11.2411 2.99111ZM11.2411 2.99111L13 4.74999"
+                              stroke="#121212"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </g>
+                          <defs>
+                            <clipPath id="clip0_3100_65103">
+                              <rect width="16" height="16" fill="white" />
+                            </clipPath>
+                          </defs>
+                        </svg>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="mb-6 flex h-44 w-full flex-col
+              place-items-center rounded-lg border border-dashed border-stone-300 p-8"
+              >
+                {/* <Image
+              src="/icons/add-cover.svg"
+              alt="Add a file"
+              height={40}
+              width={40}
+            /> */}
 
-        {/* abstract */}
-        <div className="mb-4 flex items-center">
-          <div className="w-2/12">Abstract</div>
-          <div className="w-8/12">
-            <input
-              className="lens-input w-full"
-              type="text"
-              name="abstract"
-              value={abstract}
-              id="abstract"
-              onChange={(e) => setAbstract(e.target.value)}
-            />
-          </div>
+                <span className="mb-4 text-xl font-medium leading-7 text-neutral-900">
+                  Choose a cover image {imageOrigin}
+                </span>
 
-          <button
-            className="ml-2 flex w-2/12 items-center justify-center whitespace-nowrap rounded-md
-             bg-black p-2 text-center font-serif text-xs text-white"
-            onClick={handleGenerateTLDR}
-          >
-            GENERATE TLDR
-            {loadingTLDR && (
-              // <svg
-              //   className="ml-2 h-5 w-5 animate-spin items-center"
-              //   xmlns="http://www.w3.org/2000/svg"
-              //   fill="none"
-              //   viewBox="0 0 24 24"
-              // >
-              //   <circle
-              //     className="opacity-25"
-              //     cx="12"
-              //     cy="12"
-              //     r="10"
-              //     stroke="currentColor"
-              //     strokeWidth="4"
-              //   ></circle>
-              //   <path
-              //     className="opacity-75"
-              //     fill="currentColor"
-              //     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              //   ></path>
-              // </svg>
-              <div className="ml-2">
-                <DotWave size={22} color="#FFFFFF" />
+                <span className="mb-4 text-base font-normal leading-normal text-neutral-600">
+                  Upload your image, generate with AI or take from the link you
+                  provided.
+                </span>
+
+                <div className="flex gap-4">
+                  <input
+                    type="file"
+                    id="file"
+                    ref={inputFile}
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
+                  />
+
+                  <button
+                    className="rounded-lg border border-solid border-black
+                  bg-white px-9 py-2 text-xs font-bold"
+                    onClick={handleClickUpload}
+                  >
+                    Upload
+                  </button>
+
+                  {loadingIA ? (
+                    <div
+                      className="flex items-center rounded-lg border border-solid
+                    border-black bg-white px-9 py-2 text-xs font-bold"
+                      onClick={handleGeneratePic}
+                    >
+                      Generating
+                      <div className="ml-2">
+                        <DotWave size={14} color="#231F20" />
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      className="rounded-lg border border-solid border-black bg-white
+                      px-9 py-2 text-xs font-bold"
+                      onClick={handleGeneratePic}
+                    >
+                      AI Image
+                    </button>
+                  )}
+
+                  <button
+                    onClick={handleClickLink}
+                    className="rounded-lg border border-solid border-black bg-white
+               px-9 py-2 text-xs font-bold"
+                  >
+                    Link Image
+                  </button>
+                </div>
               </div>
             )}
-          </button>
-        </div>
 
-        <div className="mb-2 flex items-center">Image source</div>
-
-        <div className="mb-4 w-full">
-          <CollapsiblePanels
-            panels={panels}
-            onActivePanelChange={handleActivePanelChange}
-          />
-        </div>
-
-        <div className="mb-2 flex items-center">
-          Contents
-          <i className="ml-6 text-xs text-gray-300">
-            Double click on any word to stylize
-          </i>
-        </div>
-
-        <div className="mb-4 w-full rounded-lg border border-black p-2">
-          <Editor
-            initialContent={editorContents}
-            onChange={handleChangeEditor}
-          />
-        </div>
-
-        <div className="mb-4 flex items-center">
-          <div className="w-2/12">Tags</div>
-          <div className="w-10/12">
-            <div className="w-full rounded-lg border border-black bg-stone-100 ">
-              {typeof window !== 'undefined' && (
-                <CreatableSelect
-                  styles={{
-                    control: (baseStyles, state) => ({
-                      ...baseStyles,
-                      boxShadow: 'none',
-                      margin: '2px',
-                      borderColor: 'transparent',
-                      '&:hover': {
-                        borderColor: 'transparent'
-                      }
-                    })
-                  }}
-                  menuPortalTarget={document.querySelector('body')}
-                  isMulti
-                  onChange={handleTagsChange}
-                  options={TAGS}
-                />
-              )}
+            {/* the editor  */}
+            <div className="h-[540px] rounded-lg border border-zinc-100 p-4">
+              <input
+                className=" mb-3 w-full text-xl font-bold leading-normal   text-neutral-400  outline-none"
+                type="text"
+                name="title"
+                placeholder="Title"
+                id="title"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                }}
+              />
+              <Editor
+                initialContent={editorContents}
+                onChange={handleChangeEditor}
+              />
             </div>
           </div>
-        </div>
-        <div className="text-right">
-          {/* {isSuccessVisible && (
-            <Toast text="Post created successfully!" level="success" />
-          )}
-          {isErrorVisible && (
-            <Toast text="Something went wrong" level="error" />
-          )} */}
 
-          {isToastVisible && <Toast text={toast.message} level={toast.level} />}
-          <div className="pb-6 text-right">
-            <div className="flex h-full min-w-fit items-center  justify-end border-black   pl-8 ">
-              {!loading ? (
-                <button
-                  onClick={() =>
-                    handlePost().then(() => {
-                      // FIXME
-                      // useWaitFiveSeconds();
-                    })
-                  }
-                  className="flex align-middle"
-                >
-                  <div className=" flex items-center rounded-lg bg-black px-4 py-2 font-serif font-bold text-white">
-                    CREATE POST
+          <div className="ml-16 w-4/12 justify-center">
+            <div className="mb-10 rounded-lg border">
+              <div className="bg-zinc-100 px-4 py-3 font-serif text-base font-bold leading-normal ">
+                Settings
+              </div>
+              <div className=" text-sm">
+                {/* link */}
+                <div className="mb-4 mt-5 items-center px-4 ">
+                  <div className="flex items-center justify-between">
+                    <div className="mb-1">Create from a link</div>
+                    {loadingLP && (
+                      <div className="mr-2">
+                        <DotWave size={14} color="#231F20" />
+                      </div>
+                    )}
                   </div>
+                  <div className="flex w-full">
+                    <input
+                      autoComplete="false"
+                      className="w-full rounded-lg bg-zinc-50 px-4 py-2 text-xs outline-none"
+                      type="text"
+                      name="link"
+                      id="link"
+                      placeholder="Insert the link starting with 'https://'"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                </div>
+
+                {/* tags  */}
+                <div className="mb-4 items-center px-4 py-2">
+                  <div className="mb-1">Select your tags</div>
+                  <div className="w-full">
+                    <div className="w-full rounded-lg border bg-stone-50 ">
+                      {typeof window !== 'undefined' && (
+                        <CreatableSelect
+                          styles={{
+                            control: (baseStyles, state) => ({
+                              ...baseStyles,
+                              boxShadow: 'none',
+                              margin: '2px',
+                              borderColor: 'transparent',
+                              '&:hover': {
+                                borderColor: 'transparent'
+                              }
+                            })
+                          }}
+                          placeholder="Choose 1 tag minimum"
+                          menuPortalTarget={document.querySelector('body')}
+                          isMulti
+                          onChange={handleTagsChange}
+                          options={TAGS}
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* 
+                <div className="mb-4 w-full">
+                  <CollapsiblePanels
+                    panels={panels}
+                    onActivePanelChange={handleActivePanelChange}
+                  />
+                </div> */}
+              </div>
+              {/* abstract */}
+              {/*
+                <button
+                  className="ml-2 flex w-2/12 items-center justify-center whitespace-nowrap rounded-md
+                bg-black p-2 text-center font-serif text-xs text-white"
+                  onClick={handleGenerateTLDR}
+                >
+                  GENERATE TLDR
+                  {loadingTLDR && (
+                    <div className="ml-2">
+                      <DotWave size={22} color="#FFFFFF" />
+                    </div>
+                  )}
                 </button>
-              ) : (
-                <button className="flex cursor-default align-middle">
-                  <div className=" flex items-center rounded-lg border-2 bg-black font-serif text-white">
-                    <div className="py-2 pl-4 pr-4 ">Posting</div>
+              </div> */}
+
+              {/* hidden default image DO NOT REMOVE */}
+              <div
+                id="defaultImage"
+                style={{
+                  height: 0,
+                  width: 0,
+                  overflow: 'hidden',
+                  padding: 0,
+                  border: 0,
+                  margin: 0
+                }}
+              >
+                <Avatar
+                  size={512}
+                  name={title + editorContents}
+                  square={true}
+                  variant="marble"
+                  // colors={
+                  // ['#180A29', '#49007E', '#FF005B', '#FF7D10', '#FFB238']
+                  colors={[
+                    '#413E4A',
+                    '#73626E',
+                    '#B38184',
+                    '#F0B49E',
+                    '#F7E4BE'
+                  ]}
+                />
+              </div>
+            </div>
+
+            {/* create button  */}
+            <div className="flex w-full justify-center ">
+              {isToastVisible && (
+                <Toast text={toast.message} level={toast.level} />
+              )}
+              <div
+                className="flex h-full min-w-fit items-center justify-end
+             border-black "
+              >
+                {!loading ? (
+                  <button
+                    onClick={() =>
+                      handlePost().then(() => {
+                        // FIXME
+                        // useWaitFiveSeconds();
+                      })
+                    }
+                    className="flex align-middle"
+                  >
+                    <span
+                      className=" flex w-40 items-center justify-center rounded-lg bg-black py-2
+                     text-sm  text-white"
+                    >
+                      + Create
+                    </span>
+                  </button>
+                ) : (
+                  <div className="flex w-40 items-center justify-center rounded-lg bg-black  py-2 text-sm text-white">
+                    <div className=" pl-4 pr-4 ">Posting</div>
                     <div className="mr-2">
                       <DotWave size={22} color="#FFFFFF" />
                     </div>
                   </div>
-                </button>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>
-        <div
-          id="defaultImage"
-          style={{
-            height: 0,
-            width: 0,
-            overflow: 'hidden',
-            padding: 0,
-            border: 0,
-            margin: 0
-          }}
-        >
-          <Avatar
-            size={512}
-            name={title + editorContents}
-            square={true}
-            variant="marble"
-            // colors={
-            // ['#180A29', '#49007E', '#FF005B', '#FF7D10', '#FFB238']
-            colors={['#413E4A', '#73626E', '#B38184', '#F0B49E', '#F7E4BE']}
-          />
-        </div>
-      </div>
-    </Layout>
+      )}
+    </LayoutCreate>
   );
 };
 

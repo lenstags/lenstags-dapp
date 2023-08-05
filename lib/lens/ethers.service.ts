@@ -4,16 +4,14 @@ import {
 } from '@ethersproject/abstract-signer';
 import { ethers, utils } from 'ethers';
 
-import { omit } from '../helpers';
-
-// import { MUMBAI_RPC_URL } from '../config';
+import { omit } from '../../utils/helpers';
 
 // getSigner function from injected web3 provider
 export const getSigner = () => {
   if (typeof window === 'undefined') {
     // const privateKey: any = process.env.PRIVATE_KEY;
     // const provider = new ethers.providers.JsonRpcProvider(
-    //   MUMBAI_RPC_URL
+    //   MUM BAI_RPC_URL
     //   // process.env.POLYGON_RPC
     // );
     // const singer = new ethers.Wallet(privateKey, provider);
