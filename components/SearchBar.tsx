@@ -24,12 +24,18 @@ export interface PublicationSearchType {
   profilePicture: string;
   profileName: string;
   profileHandle: string;
+  profileBio: string;
+  profileId: string;
+  profileTotalFollowers: number;
+  profileTotalFollowing: number;
   image: string;
   tags: string[];
   content: string;
   createdAt: string;
   totalAmountOfComments: number;
   totalAmountOfCollects: number;
+  hasCollectedByMe: boolean;
+  isFollowedByMe: boolean;
 }
 
 export const fetchData = async (input: string, limit: number = 5) => {
@@ -54,12 +60,18 @@ export const fetchData = async (input: string, limit: number = 5) => {
       profilePicture: publication.profile.picture.original.url,
       profileName: publication.profile.name,
       profileHandle: publication.profile.handle,
+      profileBio: publication.profile.bio,
+      profileId: publication.profile.id,
+      profileTotalFollowers: publication.profile.stats.totalFollowers,
+      profileTotalFollowing: publication.profile.stats.totalFollowing,
       image: publication.metadata.media[0]?.original.url,
       tags: publication.metadata.tags,
       content: publication.metadata.content,
       createdAt: publication.createdAt,
       totalAmountOfComments: publication.stats.totalAmountOfComments,
-      totalAmountOfCollects: publication.stats.totalAmountOfCollects
+      totalAmountOfCollects: publication.stats.totalAmountOfCollects,
+      hasCollectedByMe: publication.hasCollectedByMe,
+      isFollowedByMe: publication.profile.isFollwedByMe
     };
   });
 
@@ -184,6 +196,7 @@ export const SearchBar = () => {
           )}
         </div>
       ) : (
+        inputText !== '' &&
         (cachedPublications.length > 0 || cachedUsers.length > 0) && (
           <div className="absolute z-[10000] flex flex-col rounded-md bg-stone-100 px-4 py-3 mt-2 border-black border-[1px] md:w-1/2">
             {cachedPublications.length > 0 && (

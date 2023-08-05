@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Layout } from '@components/Layout';
 import {
   fetchData,
@@ -9,10 +9,13 @@ import {
 } from '@components/SearchBar';
 import { Spinner } from '@components/Spinner';
 import { TagsFilter } from '@components/TagsFilter';
-import { ResultsCard } from '@components/ui/search/ResultsCard';
-import { ProfileCard } from '@components/ui/search/ProfileCard';
+import { ResultsCard } from '@components/search/ResultsCard';
+import { ProfileCard } from '@components/search/ProfileCard';
 import { ArrowRightIcon } from '@heroicons/react/24/outline';
 import { useSearchResultsStore } from '@lib/hooks/use-search-results-store';
+import { ProfileContext } from '@components/LensAuthenticationProvider';
+import ModalLists from '@components/ModalLists';
+import { PostProcessStatus } from '@lib/helpers';
 
 export interface Data {
   users: UserSearchType[];
@@ -24,6 +27,9 @@ const Search = () => {
   const [data, setData] = useState<Data | null>(null);
   const { query } = useRouter();
   const searchData = useSearchResultsStore();
+  const { profile: lensProfile } = useContext(ProfileContext);
+  const [isPosting, setIsPosting] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
     if (searchData.query === query.q) {
@@ -44,6 +50,35 @@ const Search = () => {
     }
   }, [query.q]);
 
+  // modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [postId, setPostId] = useState('');
+  const handleOpenModal = (postId: string) => {
+    setPostId(postId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleProcessStatus = (actualStatus: PostProcessStatus) => {
+    if (
+      actualStatus === PostProcessStatus.CREATING_LIST ||
+      actualStatus === PostProcessStatus.COLLECTING_POST ||
+      actualStatus === PostProcessStatus.ADDING_POST ||
+      actualStatus === PostProcessStatus.INDEXING
+    ) {
+      setIsPosting(true);
+    }
+
+    if (actualStatus === PostProcessStatus.FINISHED) {
+      setIsPosting(false);
+      setIsFinished(true);
+    }
+    // TODO error-unauthenticated//
+  };
+
   return (
     <Layout
       title={`Nata Social | Search results for "${query.q}"`}
@@ -54,6 +89,12 @@ const Search = () => {
           <SearchBar />
           <TagsFilter />
         </div>
+        <ModalLists
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          postId={postId}
+          processStatus={handleProcessStatus}
+        />
         <div className="flex flex-col min-w-full px-8">
           {isLoading ? (
             <div className="flex min-w-full justify-center my-8">
@@ -75,13 +116,17 @@ const Search = () => {
                       <ResultsCard
                         key={publication.id}
                         publication={publication}
+                        profile={lensProfile}
+                        isFinishedState={isFinished}
+                        isPostingState={isPosting}
+                        openModalHandler={handleOpenModal}
                       />
                     ))}
                   </div>
                 </div>
               )}
               {data!.users.length > 0 && (
-                <div className="flex flex-col min-w-full">
+                <div className="flex flex-col min-w-full mb-10">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="font-serif text-3xl font-bold">Profiles</h2>
                     <div className="flex items-center font-semibold">
