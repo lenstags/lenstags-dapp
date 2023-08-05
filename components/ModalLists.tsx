@@ -1,4 +1,4 @@
-import { PostProcessStatus, findKeyAttributeInProfile } from '@lib/helpers';
+import { PostProcessStatus, findKeyAttributeInProfile } from 'utils/helpers';
 import { createUserList, typeList } from '@lib/lens/load-lists';
 import { useContext, useEffect, useState } from 'react';
 

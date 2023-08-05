@@ -1,6 +1,7 @@
-import { useHasTxHashBeenIndexedLazyQuery } from '@lib/lens/graphql/generated';
 import { useCallback, useEffect, useState } from 'react';
-import { sleep } from '@lib/helpers';
+
+import { sleep } from 'utils/helpers';
+import { useHasTxHashBeenIndexedLazyQuery } from '@lib/lens/graphql/generated';
 // import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 
 export function useIndexedTx(txHash: string | null) {

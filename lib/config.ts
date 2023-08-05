@@ -1,4 +1,5 @@
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
+export const APP_UI_VERSION = '0.0.12';
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
 export const DEFAULT_IMAGE_IPFS_PROFILE =
@@ -8,13 +9,19 @@ export const ATTRIBUTES_LIST_KEY = 'list_warehouse_7';
 export const PROFILE_METADATA_VERSION = '1.0.0';
 export const PUBLICATION_METADATA_VERSION = '2.0.0';
 export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
+export const LENS_PERIPHERY_NAME = 'LensPeriphery';
 
-export const MUMBAI_RPC_URL = 'https://rpc-mumbai.matic.today';
+// testnet
 export const LENS_API = 'https://api-mumbai.lens.dev/';
 export const LENS_HUB_CONTRACT = '0x60Ae865ee4C725cd04353b5AAb364553f56ceF82';
 export const LENS_PERIPHERY_CONTRACT =
   '0xD5037d72877808cdE7F669563e9389930AF404E8';
-export const LENS_PERIPHERY_NAME = 'LensPeriphery';
+
+// mainnet
+// export const LENS_API = 'https://api.lens.dev'; // 'https://api-mum bai.lens.dev/';
+// export const LENS_HUB_CONTRACT = '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d';
+// export const LENS_PERIPHERY_CONTRACT =
+//   '0xeff187b4190E551FC25a7fA4dFC6cf7fDeF7194f';
 
 interface EnvConfig {
   [key: string]: string | undefined;

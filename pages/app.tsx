@@ -22,7 +22,7 @@ import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
-import { findKeyAttributeInProfile } from '@lib/helpers';
+import { findKeyAttributeInProfile } from 'utils/helpers';
 import { useDisconnect } from 'wagmi';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';

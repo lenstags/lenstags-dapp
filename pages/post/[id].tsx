@@ -17,7 +17,7 @@ import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import ModalLists from 'components/ModalLists';
 import PostIndicators from 'components/PostIndicators';
-import { PostProcessStatus } from '@lib/helpers';
+import { PostProcessStatus } from 'utils/helpers';
 import { Spinner } from 'components/Spinner';
 import TagStrip from 'components/TagStrip';
 import { commentGasless } from '@lib/lens/comment-gasless';

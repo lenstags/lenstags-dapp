@@ -1,16 +1,15 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 
 interface BackButtonProps {
   className?: string;
 }
 
 const BackButton: React.FC<BackButtonProps> = ({ className }) => {
-  const goBack = () => {
-    window.history.back();
-  };
+  const router = useRouter();
 
   return (
-    <button onClick={goBack} className="mr-4 bg-transparent">
+    <button onClick={router.back} className="mr-4 bg-transparent">
       <svg
         width="20"
         height="20"
