@@ -50,12 +50,12 @@ const App: NextPage = () => {
       profileResult,
       ATTRIBUTES_LIST_KEY
     );
-    // console.log('33333 ', profileResult);
+    console.log('33333 ', profileResult);
     // console.log('33333 listAttributeObject', listAttributeObject);
 
     const hasLists =
       listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-    // console.log('>>> hasLists ', hasLists);
+    console.log('>>> hasLists ', hasLists);
 
     const dispatcherEnabled = profileResult
       ? profileResult.dispatcher?.canUseRelay || false
@@ -63,7 +63,7 @@ const App: NextPage = () => {
 
     if (!dispatcherEnabled || !hasLists) {
       // console.log('>>> entro al welcome');
-      // console.log('>>>   enabledRelayer: ', dispatcherEnabled);
+      console.log('>>>   enabledRelayer: ', dispatcherEnabled);
       // console.log('>>>   hasLists:', hasLists);
 
       setShowWelcome(true);
@@ -71,11 +71,11 @@ const App: NextPage = () => {
         if (profileResult && !dispatcherEnabled) {
           snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
           const res = await enableDispatcher(profileResult.id);
+          console.log('RRR ', res);
           if (!res) {
             setShowReject(true);
             return;
           }
-          // console.log('RRR ', res);
           snackbar.showMessage('🟦 Dispatcher enabled successfully.');
         }
 
