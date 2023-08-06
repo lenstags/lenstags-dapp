@@ -12,7 +12,6 @@ import {
 } from './ethers.service';
 
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
-// import { gql } from 'graphql-tag';
 import { gql } from '@apollo/client/core';
 import { lensHub } from '@lib/lens/lens-hub';
 
@@ -87,16 +86,11 @@ export const enableDispatcher = async (profileId: string) => {
     }
 
     const address = await getAddressFromSigner();
-    console.log('DDD set dispatcher: address', address);
-    console.log('== READY TO SET THE DISPATCHER', address);
+    console.log('address got: ', address);
     const result = await enableDispatcherWithTypedData({
       profileId,
       enable: true
-      // leave it blank if you want to use the lens API dispatcher!
-      // dispatcher: '0xEEA0C1f5ab0159dba749Dc0BAee462E5e293daaF',
     });
-    console.log('DDDD set dispatcher: enableDispatcherWithTypedData', result);
-    console.log('== DISPATCHER FINISHED', result);
 
     const typedData = result.typedData;
     console.log('set dispatcher: typedData', typedData);
