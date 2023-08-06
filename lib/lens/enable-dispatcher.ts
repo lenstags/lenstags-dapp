@@ -12,9 +12,63 @@ import {
 } from './ethers.service';
 
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
+// import { gql } from 'graphql-tag';
+import { gql } from '@apollo/client/core';
 import { lensHub } from '@lib/lens/lens-hub';
 
-export const enableDispatcherWithTypedData = async (
+const CREATE_SET_DISPATCHER_TYPED_DATA = gql`
+  mutation CreateSetDispatcherTypedData(
+    $options: TypedDataOptions
+    $request: SetDispatcherRequest!
+  ) {
+    createSetDispatcherTypedData(options: $options, request: $request) {
+      id
+      expiresAt
+      typedData {
+        types {
+          SetDispatcherWithSig {
+            name
+            type
+            __typename
+          }
+          __typename
+        }
+        domain {
+          name
+          chainId
+          version
+          verifyingContract
+          __typename
+        }
+        value {
+          nonce
+          deadline
+          profileId
+          dispatcher
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+  }
+`;
+
+export const enableDispatcherWithTypedData = async (request: {
+  profileId: string;
+  enable: boolean;
+}) => {
+  const result = await apolloClient.mutate({
+    mutation: CREATE_SET_DISPATCHER_TYPED_DATA,
+    variables: {
+      request
+    }
+  });
+
+  return result.data!.createSetDispatcherTypedData;
+};
+
+export const enableDispatcherWithTypedDataold = async (
   request: SetDispatcherRequest
 ) => {
   const result = await apolloClient.mutate({
