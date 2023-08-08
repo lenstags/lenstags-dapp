@@ -63,6 +63,7 @@ export const enable = async (profileId: any) => {
   }
 
   if (dataBroadcast.__typename === 'RelayError') {
+    console.log('BROADCASTREQ ', dataBroadcast);
     const { v, r, s } = splitSignature(signature);
 
     const tx = await lensHub.setDispatcherWithSig({
