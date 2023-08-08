@@ -77,7 +77,7 @@ export const createPostPaid = async (
     throw new Error('Must define profileId');
   }
 
-  console.log('TU NO DEBERIAS ESTAR ACA!!');
+  console.log('This should nont run!');
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     image: builtPost.image,
