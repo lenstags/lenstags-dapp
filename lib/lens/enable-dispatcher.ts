@@ -78,9 +78,9 @@ export const enable = async (profileId: any) => {
     console.log('set dispatcher: tx hash: ', tx.hash);
     const indexedResult = await pollUntilIndexed(tx.hash);
     console.log('indexed! ', indexedResult);
-    return true;
+    return indexedResult;
   }
-  return false;
+  return dataBroadcast;
 };
 
 const disableDispatcherWithTypedData = async (
