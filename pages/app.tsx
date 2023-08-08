@@ -50,8 +50,7 @@ const App: NextPage = () => {
       profileResult,
       ATTRIBUTES_LIST_KEY
     );
-    console.log('33333 ', profileResult);
-    // console.log('33333 listAttributeObject', listAttributeObject);
+    console.log('profileResult ', profileResult);
 
     const hasLists =
       listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
@@ -62,9 +61,7 @@ const App: NextPage = () => {
       : false;
 
     if (!dispatcherEnabled || !hasLists) {
-      // console.log('>>> entro al welcome');
       console.log('>>>   enabledRelayer: ', dispatcherEnabled);
-      // console.log('>>>   hasLists:', hasLists);
 
       setShowWelcome(true);
       try {
