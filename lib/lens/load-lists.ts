@@ -226,7 +226,5 @@ export const createUserList = async (lensProfile: any, name: string) => {
     lensProfile?.id,
     profileMetadata
   );
-  // console.log('777 resUpdate ', resUpdate);
-  // console.log('777 newList', newList);
   return newList;
 };
