@@ -88,11 +88,9 @@ export const createPostGasless = async (
   builtPost: IbuiltPost,
   waitForIndexer: boolean = false // TBD
 ) => {
-  // console.log('createpostgasless waitForIndexer:', waitForIndexer);
   if (!profileId) {
     throw new Error('No profileId defined');
   }
-  // console.log('🟩🟩 🟩🟩 🟩🟩 CREANDO POST GASLESS ', builtPost);
   const address = await getAddressFromSigner();
 
   let mediaResult = [];
