@@ -63,7 +63,7 @@ export const enable = async (profileId: any) => {
   }
 
   console.log('BROADCAST ', dataBroadcast);
-  if (dataBroadcast.__typename === 'RelayError') {
+  if (dataBroadcast?.__typename === 'RelayError') {
     const { v, r, s } = splitSignature(signature);
     const tx = await lensHub.setDispatcherWithSig({
       profileId: typedData.value.profileId,
@@ -78,7 +78,9 @@ export const enable = async (profileId: any) => {
     console.log('set dispatcher: tx hash: ', tx.hash);
     const indexedResult = await pollUntilIndexed(tx.hash);
     console.log('indexed! ', indexedResult);
+    return true;
   }
+  return false;
 };
 
 const disableDispatcherWithTypedData = async (
@@ -129,7 +131,7 @@ export const disable = async (profileId: any) => {
     throw new Error('Error splitting signature');
   }
   console.log('disable dispatcher: dataBroadcast', dataBroadcast);
-  if (dataBroadcast.__typename === 'RelayError') {
+  if (dataBroadcast?.__typename === 'RelayError') {
     const { v, r, s } = splitSignature(signature);
 
     const tx = await lensHub.setDispatcherWithSig({

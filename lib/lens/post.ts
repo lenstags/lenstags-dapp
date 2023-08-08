@@ -155,7 +155,7 @@ export const createPostPaid = async (
     signature: signedResult.signature
   });
 
-  if (broadcastResult.__typename !== 'RelayerResult') {
+  if (broadcastResult?.__typename !== 'RelayerResult') {
     console.error('create post via broadcast: failed', broadcastResult);
     throw new Error('create post via broadcast: failed');
   }
