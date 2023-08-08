@@ -1,5 +1,5 @@
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
-export const APP_UI_VERSION = '0.0.13';
+export const APP_UI_VERSION = '0.0.14';
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
 export const DEFAULT_IMAGE_IPFS_PROFILE =
