@@ -5,7 +5,6 @@ import { findKeyAttributeInProfile, pickPicture } from 'utils/helpers';
 import { IbuiltPost } from './interfaces/publication';
 import { MetadataDisplayType } from './interfaces/generic';
 import { createPostGasless } from './post-gasless';
-import { createPostPaid } from './post';
 import { queryProfile } from './dispatcher';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { v4 as uuidv4 } from 'uuid';
@@ -49,24 +48,14 @@ export const createDefaultList = async (lensProfile: any) => {
     ]
   };
 
-  // TODO test with no dispatcher
   let defaultListId: string, result: any;
 
-  if (lensProfile?.dispatcher?.canUseRelay) {
-    result = await createPostGasless(
-      lensProfile?.id,
-      constructedDefaultPost,
-      true
-    );
-    defaultListId = result.internalPubId;
-  } else {
-    result = await createPostPaid(
-      lensProfile?.id,
-      constructedDefaultPost,
-      true
-    );
-    defaultListId = result;
-  }
+  result = await createPostGasless(
+    lensProfile?.id,
+    constructedDefaultPost,
+    true
+  );
+  defaultListId = result.internalPubId;
 
   // const result = lensProfile?.dispatcher?.canUseRelay
   //   ? await createPostGasless(lensProfile?.id, constructedDefaultPost, true)
@@ -245,7 +234,5 @@ export const createUserList = async (lensProfile: any, name: string) => {
     lensProfile?.id,
     profileMetadata
   );
-  // console.log('777 resUpdate ', resUpdate);
-  // console.log('777 newList', newList);
   return newList;
 };
