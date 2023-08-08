@@ -1,3 +1,4 @@
+import { APP_UI_VERSION, ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enableDispatcher, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
@@ -10,7 +11,6 @@ import {
   useState
 } from 'react';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
@@ -412,6 +412,10 @@ const App: NextPage = () => {
                   </div>
                 </div>
               )}
+            </div>
+            <div className="mt-10">
+              <hr />
+              <div className="font-mono text-xs">ui v{APP_UI_VERSION}</div>
             </div>
           </div>
         ) : (
