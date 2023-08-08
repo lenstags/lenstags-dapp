@@ -50,7 +50,7 @@ export const enable = async (profileId: any) => {
     typedData.types as any,
     typedData.value
   );
-  console.log('set dispatcher: signature', signature);
+  console.log('SET dispatcher: signature', signature);
 
   // here
   const dataBroadcast = await broadcastRequest({
@@ -80,7 +80,14 @@ export const enable = async (profileId: any) => {
     console.log('indexed! ', indexedResult);
     return indexedResult;
   }
-  return dataBroadcast;
+
+  if (dataBroadcast?.__typename === 'RelayerResult') {
+    const indexedResult = await pollUntilIndexed(dataBroadcast.txHash);
+    console.log('indexed2! ', indexedResult);
+    return indexedResult;
+  }
+
+  throw new Error('Unknown relayer error');
 };
 
 const disableDispatcherWithTypedData = async (
