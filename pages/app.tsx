@@ -1,5 +1,5 @@
 import { ProfileContext, TagsFilterContext } from 'components';
-import { enableDispatcher, queryProfile } from '@lib/lens/enable-dispatcher';
+import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
@@ -70,7 +70,8 @@ const App: NextPage = () => {
       try {
         if (profileResult && !dispatcherEnabled) {
           snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
-          const res = await enableDispatcher(profileResult.id);
+          const res = await enable(profileResult.id);
+          console.log('RRR ', res);
           if (!res) {
             setShowReject(true);
             return;
