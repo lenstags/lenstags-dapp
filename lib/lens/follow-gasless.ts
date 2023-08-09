@@ -88,7 +88,7 @@ export const followGaslessSignOnly = async (profileId: string) => {
     signature
   });
   console.log('follow with broadcast: broadcastResult', broadcastResult);
-  if (broadcastResult.__typename !== 'RelayerResult') {
+  if (broadcastResult?.__typename !== 'RelayerResult') {
     console.error('follow with broadcast: failed', broadcastResult);
     throw new Error('follow with broadcast: failed');
     // return false;

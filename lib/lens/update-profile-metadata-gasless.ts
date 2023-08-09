@@ -86,7 +86,7 @@ const setMetadata = async (
     });
     console.log('3//////////////////////////////////');
 
-    if (broadcastResult.__typename !== 'RelayerResult') {
+    if (broadcastResult?.__typename !== 'RelayerResult') {
       console.error(
         'create profile metadata via broadcast: failed',
         broadcastResult

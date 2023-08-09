@@ -1,5 +1,6 @@
+import { APP_UI_VERSION, ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { ProfileContext, TagsFilterContext } from 'components';
-import { enableDispatcher, queryProfile } from '@lib/lens/enable-dispatcher';
+import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
@@ -10,7 +11,6 @@ import {
   useState
 } from 'react';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
@@ -50,32 +50,29 @@ const App: NextPage = () => {
       profileResult,
       ATTRIBUTES_LIST_KEY
     );
-    // console.log('33333 ', profileResult);
-    // console.log('33333 listAttributeObject', listAttributeObject);
+    console.log('profileResult ', profileResult);
 
     const hasLists =
       listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-    // console.log('>>> hasLists ', hasLists);
+    console.log('>>> hasLists ', hasLists);
 
     const dispatcherEnabled = profileResult
       ? profileResult.dispatcher?.canUseRelay || false
       : false;
 
     if (!dispatcherEnabled || !hasLists) {
-      // console.log('>>> entro al welcome');
-      // console.log('>>>   enabledRelayer: ', dispatcherEnabled);
-      // console.log('>>>   hasLists:', hasLists);
+      console.log('>>>   enabledRelayer: ', dispatcherEnabled);
 
       setShowWelcome(true);
       try {
         if (profileResult && !dispatcherEnabled) {
           snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
-          const res = await enableDispatcher(profileResult.id);
+          const res = await enable(profileResult.id);
+          console.log('RRR ', res);
           if (!res) {
             setShowReject(true);
             return;
           }
-          // console.log('RRR ', res);
           snackbar.showMessage('🟦 Dispatcher enabled successfully.');
         }
 
@@ -412,6 +409,10 @@ const App: NextPage = () => {
                   </div>
                 </div>
               )}
+            </div>
+            <div className="mt-10">
+              <hr />
+              <div className="font-mono text-xs">ui v{APP_UI_VERSION}</div>
             </div>
           </div>
         ) : (

@@ -90,7 +90,7 @@ export const commentGasless = async (
       signature: signedResult.signature
     });
 
-    if (broadcastResult.__typename !== 'RelayerResult') {
+    if (broadcastResult?.__typename !== 'RelayerResult') {
       console.error('create comment via broadcast: failed', broadcastResult);
       throw new Error('create comment via broadcast: failed');
     }

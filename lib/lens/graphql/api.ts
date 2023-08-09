@@ -4,10 +4,6 @@ import { refreshAuthToken } from './utils';
 
 // TODO: MOVE TO THE CONFIG FILE? export const APIURL = 'https://api.lens.dev' // TODO: check according to profile used in demo
 export const STORAGE_KEY = 'LH_STORAGE_KEY';
-export const LENS_HUB_CONTRACT_ADDRESS =
-  '0x60Ae865ee4C725cd04353b5AAb364553f56ceF82';
-export const PERIPHERY_CONTRACT_ADDRESS =
-  '0xD5037d72877808cdE7F669563e9389930AF404E8';
 
 // TODO: SHOULD WE USE URQL?
 export const basicClient = createUrqlClient({

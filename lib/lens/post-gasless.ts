@@ -49,38 +49,42 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
   }
 
   // this means it they have not setup the dispatcher, if its a no you must use broadcast
-  if (profileResult.dispatcher?.canUseRelay) {
-    const dispatcherResult = await createPostViaDispatcherRequest(
-      createPostRequest
-    );
-    // console.log(
-    //   'create post via dispatcher: createPostViaDispatcherRequest',
-    //   dispatcherResult
-    // );
+  // if (profileResult.dispatcher?.canUseRelay) {
+  const dispatcherResult = await createPostViaDispatcherRequest(
+    createPostRequest
+  );
+  // console.log(
+  //   'create post via dispatcher: createPostViaDispatcherRequest',
+  //   dispatcherResult
+  // );
 
-    if (dispatcherResult.__typename !== 'RelayerResult') {
-      console.error('create post via dispatcher: failed', dispatcherResult);
-      throw new Error('create post via dispatcher: failed');
-    }
-
-    return { txHash: dispatcherResult.txHash, txId: dispatcherResult.txId };
-  } else {
-    const signedResult = await signCreatePostTypedData(createPostRequest);
-    console.log('create post via broadcast: signedResult', signedResult);
-
-    const broadcastResult = await broadcastRequest({
-      id: signedResult.result.id,
-      signature: signedResult.signature
-    });
-
-    if (broadcastResult.__typename !== 'RelayerResult') {
-      console.error('create post via broadcast: failed', broadcastResult);
-      throw new Error('create post via broadcast: failed');
-    }
-
-    console.log('create post via broadcast: broadcastResult', broadcastResult);
-    return { txHash: broadcastResult.txHash, txId: broadcastResult.txId };
+  if (dispatcherResult.__typename !== 'RelayerResult') {
+    console.error('create post via dispatcher: failed', dispatcherResult);
+    throw new Error('create post via dispatcher: failed');
   }
+
+  return { txHash: dispatcherResult.txHash, txId: dispatcherResult.txId };
+  // }
+
+  // forcedly deprecated
+
+  // else {
+  //   const signedResult = await signCreatePostTypedData(createPostRequest);
+  //   console.log('create post via broadcast: signedResult', signedResult);
+
+  //   const broadcastResult = await broadcastRequest({
+  //     id: signedResult.result.id,
+  //     signature: signedResult.signature
+  //   });
+
+  //   if (broadcastResult?.__typename !== 'RelayerResult') {
+  //     console.error('create post via broadcast: failed', broadcastResult);
+  //     throw new Error('create post via broadcast: failed');
+  //   }
+
+  //   console.log('create post via broadcast: broadcastResult', broadcastResult);
+  //   return { txHash: broadcastResult.txHash, txId: broadcastResult.txId };
+  // }
 };
 
 export const createPostGasless = async (
@@ -88,11 +92,9 @@ export const createPostGasless = async (
   builtPost: IbuiltPost,
   waitForIndexer: boolean = false // TBD
 ) => {
-  // console.log('createpostgasless waitForIndexer:', waitForIndexer);
   if (!profileId) {
     throw new Error('No profileId defined');
   }
-  // console.log('🟩🟩 🟩🟩 🟩🟩 CREANDO POST GASLESS ', builtPost);
   const address = await getAddressFromSigner();
 
   let mediaResult = [];
