@@ -63,7 +63,7 @@ export const enable = async (profileId: any) => {
     throw new Error('Error splitting signature');
   }
 
-  if (dataBroadcast.__typename === 'RelayError') {
+  if (dataBroadcast?.__typename === 'RelayError') {
     const { v, r, s } = splitSignature(signature);
 
     const tx = await lensHub.setDispatcherWithSig({
@@ -130,7 +130,7 @@ export const disable = async (profileId: any) => {
     throw new Error('Error splitting signature');
   }
   console.log('disable dispatcher: dataBroadcast', dataBroadcast);
-  if (dataBroadcast.__typename === 'RelayError') {
+  if (dataBroadcast?.__typename === 'RelayError') {
     const { v, r, s } = splitSignature(signature);
 
     const tx = await lensHub.setDispatcherWithSig({

@@ -396,7 +396,7 @@ const Create: NextPage = () => {
           );
         }
       }
-      await sleep();
+      await sleep(2500);
       router.push('/app');
     } catch (e: any) {
       // setIsErrorVisible(true);
