@@ -1,3 +1,4 @@
+import { APP_UI_VERSION, ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
@@ -10,18 +11,19 @@ import {
   useState
 } from 'react';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
+import Script from 'next/script';
+import { SearchBar } from '@components/SearchBar';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
-import { findKeyAttributeInProfile } from '@lib/helpers';
+import { findKeyAttributeInProfile } from 'utils/helpers';
 import { useDisconnect } from 'wagmi';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';
@@ -50,21 +52,18 @@ const App: NextPage = () => {
       profileResult,
       ATTRIBUTES_LIST_KEY
     );
-    // console.log('33333 ', profileResult);
-    // console.log('33333 listAttributeObject', listAttributeObject);
+    console.log('profileResult ', profileResult);
 
     const hasLists =
       listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-    // console.log('>>> hasLists ', hasLists);
+    console.log('>>> hasLists ', hasLists);
 
     const dispatcherEnabled = profileResult
       ? profileResult.dispatcher?.canUseRelay || false
       : false;
 
     if (!dispatcherEnabled || !hasLists) {
-      // console.log('>>> entro al welcome');
-      // console.log('>>>   enabledRelayer: ', dispatcherEnabled);
-      // console.log('>>>   hasLists:', hasLists);
+      console.log('>>>   enabledRelayer: ', dispatcherEnabled);
 
       setShowWelcome(true);
       try {
@@ -76,7 +75,6 @@ const App: NextPage = () => {
             setShowReject(true);
             return;
           }
-          // console.log('RRR ', res);
           snackbar.showMessage('🟦 Dispatcher enabled successfully.');
         }
 
@@ -316,24 +314,18 @@ const App: NextPage = () => {
         <meta property="og:site_name" content="Nata Social" />
         <meta property="og:locale" content="en_US" /> */}
 
-        <script
-          async
-          defer
-          src="https://analytics.umami.is/script.js"
-          data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
-        ></script>
         {/* <link
           rel="apple-touch-icon"
           sizes="180x180"
           href="favicon/apple-touch-icon.png"
-        />
+          />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
           href="favicon/favicon-32x32.png"
-        />
-        <link
+          />
+          <link
           rel="icon"
           type="image/png"
           sizes="16x16"
@@ -346,15 +338,21 @@ const App: NextPage = () => {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
+      <Script
+        async
+        defer
+        src="https://analytics.umami.is/script.js"
+        data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
+      ></Script>
 
       <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
         {showWelcome ? (
           <div
             className=" duration-600 fixed 
-            bottom-0 
-            left-0 right-0
-            top-0 z-50 flex h-full w-full flex-col items-center  justify-center bg-stone-900
-            "
+          bottom-0 
+          left-0 right-0
+          top-0 z-50 flex h-full w-full flex-col items-center  justify-center bg-stone-900
+          "
             style={{
               backgroundImage:
                 'linear-gradient(to bottom, gray, rgb(45 212 191))',
@@ -462,47 +460,17 @@ const App: NextPage = () => {
                 </div>
               )}
             </div>
+            <div className="mt-10">
+              <hr />
+              <div className="font-mono text-xs">ui v{APP_UI_VERSION}</div>
+            </div>
           </div>
         ) : (
           <>
             {/* top bar container*/}
             <div className="h-50 sticky top-0 z-10 w-full bg-white px-8 py-2 pt-4">
               {/* search bar */}
-              <div className="flex justify-start ">
-                <input
-                  type="text"
-                  autoComplete="off"
-                  // value={valueListName}
-                  // onChange={handleChangeListName}
-                  className="rounded-full
-                   bg-stone-100 p-3
-                  leading-none outline-none  md:w-1/3"
-                  name="tag-search-input"
-                  id="tag-search-input"
-                  // onKeyDown={handleKeyDown}
-                  placeholder="🔍 Search..."
-                />
-                <button
-                  className="ml-2 hidden rounded-lg border  border-solid border-black bg-stone-100
-                   p-2"
-                >
-                  <svg
-                    width="20"
-                    height="18"
-                    viewBox="0 0 20 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M14 3L19 3M1 3L10 3M1 15L10 15M1 9H6M10 9H19M14 15H19M14 1V5M6 7V11M14 13V17"
-                      stroke="#4D4D4D"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                </button>
-              </div>
-
+              <SearchBar />
               <TagsFilter />
 
               {/* view options */}

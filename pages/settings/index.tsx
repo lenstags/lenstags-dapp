@@ -11,7 +11,7 @@ import {
 } from '@lib/lens/interfaces/profile-metadata';
 import React, { useContext, useEffect, useState } from 'react';
 import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
-import { getIPFSImage, imageToBase64, pickPicture } from '@lib/helpers';
+import { getIPFSImage, imageToBase64, pickPicture } from 'utils/helpers';
 
 import { AppContext } from 'context/AppContext';
 import FileInput from 'components/FileInput';

@@ -14,6 +14,9 @@ import {
   DropdownMenuTrigger
 } from './ui/Dropdown';
 
+import { APP_UI_VERSION } from '@lib/config';
+import PostsByList from './PostsByList';
+import { ProfileContext } from './LensAuthenticationProvider';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import {
   BellIcon,
@@ -26,7 +29,6 @@ import {
   FolderIcon as FolderIconFilled,
   GlobeAltIcon as GlobeAltIconFilled
 } from '@heroicons/react/24/solid';
-import { useSorts } from '@lib/hooks/use-sort';
 import { getSigner } from '@lib/lens/ethers.service';
 import { getPublications } from '@lib/lens/get-publications';
 import { PublicationTypes } from '@lib/lens/graphql/generated';
@@ -37,17 +39,16 @@ import {
   optIn
 } from '@lib/lens/user-notifications';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
+import { Tooltip } from './ui/Tooltip';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { PublicRoutes } from 'models';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useSorts } from '@lib/hooks/use-sort';
 import { useDisconnect } from 'wagmi';
-import { ProfileContext } from './LensAuthenticationProvider';
 import Notifications from './Notifications';
-import PostsByList from './PostsByList';
 import SidePanelNotifications from './SidePanelNotifications';
-import { Tooltip } from './ui/Tooltip';
 
 interface SidebarProps {}
 
@@ -385,6 +386,9 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
               </Link>
             )}
         </div>
+      </div>
+      <div className="fixed bottom-0 w-full bg-transparent px-6 py-4 font-mono text-xs text-gray-300">
+        {APP_UI_VERSION}
       </div>
     </div>
   );

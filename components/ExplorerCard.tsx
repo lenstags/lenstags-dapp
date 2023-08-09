@@ -5,7 +5,7 @@ import ImageProxied from './ImageProxied';
 import ListImages from './ListImages';
 import ModalLists from './ModalLists';
 import PostIndicators from '@components/PostIndicators';
-import { PostProcessStatus } from '@lib/helpers';
+import { PostProcessStatus } from 'utils/helpers';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { Spinner } from './Spinner';
 import TurndownService from 'turndown';

@@ -15,7 +15,7 @@ import { createFollowTypedData } from '../lens/follow';
 import { lensHub } from './lens-hub';
 import { pollUntilIndexed } from '@lib/lens/graphql/has-transaction-been-indexed';
 import { proxyActionStatusRequest } from '@lib/lens/proxy-action-status';
-import { sleep } from '../helpers';
+import { sleep } from '../../utils/helpers';
 
 const proxyActionFreeFollowRequest = async (request: ProxyActionRequest) => {
   const result = await apolloClient.query({
@@ -88,7 +88,7 @@ export const followGaslessSignOnly = async (profileId: string) => {
     signature
   });
   console.log('follow with broadcast: broadcastResult', broadcastResult);
-  if (broadcastResult.__typename !== 'RelayerResult') {
+  if (broadcastResult?.__typename !== 'RelayerResult') {
     console.error('follow with broadcast: failed', broadcastResult);
     throw new Error('follow with broadcast: failed');
     // return false;
