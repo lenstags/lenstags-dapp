@@ -22,6 +22,7 @@ export const LENS_API = 'https://api.lens.dev'; // 'https://api-mum bai.lens.dev
 export const LENS_HUB_CONTRACT = '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d';
 export const LENS_PERIPHERY_CONTRACT =
   '0xeff187b4190E551FC25a7fA4dFC6cf7fDeF7194f';
+ 
 
 interface EnvConfig {
   [key: string]: string | undefined;
