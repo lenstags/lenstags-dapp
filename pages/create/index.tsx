@@ -376,15 +376,23 @@ const Create: NextPage = () => {
       const listAddressByFollowers = listFollowers.items.map(
         (follower) => follower.wallet.address
       );
-      const flag = false;
-      if (lensProfile?.name && flag) {
+      const { pubId } =
+        typeof result !== 'string' && result.pubId ? result : { pubId: '' };
+      const id = lensProfile?.id;
+      const dataSender = {
+        title,
+        pubId,
+        id
+      };
+      if (lensProfile?.name) {
         if (listAddressByFollowers.length > 1) {
           sendNotification(
             listAddressByFollowers,
             NotificationTypes.CreatedPost,
             lensProfile.name,
             NOTIFICATION_TYPE.SUBSET,
-            title
+            JSON.stringify(dataSender),
+            lensProfile.id
           );
         } else if (listAddressByFollowers.length === 1) {
           sendNotification(
@@ -392,7 +400,8 @@ const Create: NextPage = () => {
             NotificationTypes.CreatedPost,
             lensProfile.name,
             NOTIFICATION_TYPE.TARGETTED,
-            title
+            JSON.stringify(dataSender),
+            lensProfile.id
           );
         }
       }

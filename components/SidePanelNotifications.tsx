@@ -95,10 +95,9 @@ const SidePanelNotifications = forwardRef(function (
     if (!subcribed) {
       optIn(address, signer);
     }
-    if (notifications.length === 0)
-      getNotifications(address).then((res) => {
-        setNotifications(res);
-      });
+    getNotifications(address).then((res) => {
+      setNotifications(res);
+    });
     setSidebarCollapsedState({
       collapsed: true
     });
@@ -165,7 +164,7 @@ const SidePanelNotifications = forwardRef(function (
         <DoubleSidebarTitle className="flex items-center justify-center gap-2 px-6 font-serif">
           <span className="text-md w-full">Notifications</span>
         </DoubleSidebarTitle>
-        <div className="mb-2 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-4">
+        <div className="mb-2 flex h-full w-full flex-col overflow-x-scroll py-4">
           {notifications.length > 0 &&
             notifications.map((notif, index: number) => {
               return <Notifications notif={notif} key={index} />;

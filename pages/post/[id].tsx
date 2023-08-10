@@ -191,19 +191,26 @@ export default function PostDetails() {
       const newAll = [draftComment, ...allComments];
 
       /* Send Notification for target */
-      const flag = false;
+      const { metadata, id, profile } = post;
+      const { id: profileId } = profile;
+      const { name } = metadata;
+      const dataSender = {
+        name,
+        id,
+        profileId
+      };
       if (
         loggedProfile?.name &&
         lensProfile?.ownedBy &&
-        loggedProfile.id !== lensProfile.id &&
-        flag
+        loggedProfile.id !== lensProfile.id
       ) {
         sendNotification(
           lensProfile.ownedBy,
           NotificationTypes.CommentedPost,
           loggedProfile.name,
           NOTIFICATION_TYPE.TARGETTED,
-          post.metadata.title
+          JSON.stringify(dataSender),
+          loggedProfile.id
         );
       }
 
@@ -414,7 +421,7 @@ export default function PostDetails() {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     postId={postId}
-                    postTitle={post.metadata.name}
+                    post={post}
                     processStatus={handleProcessStatus}
                     ownedBy={lensProfile.ownedBy}
                   />

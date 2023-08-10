@@ -1,33 +1,27 @@
-import React, { FC, useContext, useEffect, useRef, useState } from 'react';
+import { FC, useContext, useRef, useState } from 'react';
 
+import PostIndicators from '@components/PostIndicators';
+import { hidePublication } from '@lib/lens/hide-publication';
+import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { DotWave } from '@uiball/loaders';
+import { useSnackbar } from 'material-ui-snackbar-provider';
+import moment from 'moment';
+import TurndownService from 'turndown';
+import { PostProcessStatus } from 'utils/helpers';
+import { useDisconnect } from 'wagmi';
 import ImageProxied from './ImageProxied';
+import { ProfileContext } from './LensAuthenticationProvider';
 import ListImages from './ListImages';
 import ModalLists from './ModalLists';
-import PostIndicators from '@components/PostIndicators';
-import { PostProcessStatus } from 'utils/helpers';
-import { ProfileContext } from './LensAuthenticationProvider';
+import ProfileCard from './ProfileCard';
 import { Spinner } from './Spinner';
-import TurndownService from 'turndown';
-import { deleteLensLocalStorage } from '@lib/lens/localStorage';
-import { doesFollow } from '@lib/lens/does-follow';
-import { freeUnfollow } from '@lib/lens/free-unfollow';
-import { hidePublication } from '@lib/lens/hide-publication';
-import moment from 'moment';
-import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
-import { useDisconnect } from 'wagmi';
-import { useSnackbar } from 'material-ui-snackbar-provider';
-import { followers } from '@lib/lens/followers';
-import { sendNotification } from '@lib/lens/user-notifications';
-import { NotificationTypes } from '@models/notifications.models';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 interface Props {
   post: any;
   refProp?: any;
 }
 
-const ExploreCard: FC<Props> = (props) => {
+const ExplorerCard: FC<Props> = (props) => {
   const { post } = props;
   const isList =
     post.metadata.attributes.length > 0 &&
@@ -40,11 +34,9 @@ const ExploreCard: FC<Props> = (props) => {
   const snackbar = useSnackbar();
   const [opacity, setOpacity] = useState(1);
   const [pointerEvents, setPointerEvents] = useState<any>('all');
-  const [isFollowing, setIsFollowing] = useState(post.profile.isFollowedByMe);
-  const [isDotFollowing, setIsDotFollowing] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
   const [showCard, setShowCard] = useState(false);
-  const [showUnfollow, setShowUnfollow] = useState('Following');
+
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const { disconnect } = useDisconnect();
   const fromHtml = new TurndownService();
@@ -151,63 +143,6 @@ const ExploreCard: FC<Props> = (props) => {
   // - create the post list, post.attributes = attributes [ { postSubType = 'favsList' }, ... ]
   // - get the postId, and add it to the profile.metadata
 
-  const handleFollow = async (profileId: string) => {
-    setIsDotFollowing(true);
-    if (showUnfollow === 'Unfollow') {
-      return freeUnfollow(profileId).then((r) => {
-        setIsFollowing(false);
-        setIsDotFollowing(false);
-      });
-    } else {
-      return proxyActionFreeFollow(profileId).then(async () => {
-        /* Send Notification for followers and target profile: follow to */
-        const listFollowers = await followers(lensProfile?.id);
-        const listAddressByFollowers = listFollowers.items.map(
-          (follower) => follower.wallet.address
-        );
-        const flag = false;
-        if (lensProfile?.name && flag) {
-          sendNotification(
-            post.profile.ownedBy,
-            NotificationTypes.Followed,
-            lensProfile.name,
-            NOTIFICATION_TYPE.TARGETTED
-          );
-          if (listAddressByFollowers.length > 1) {
-            sendNotification(
-              listAddressByFollowers,
-              NotificationTypes.Followed,
-              lensProfile.name,
-              NOTIFICATION_TYPE.SUBSET,
-              post.profile.name
-            );
-          } else if (listAddressByFollowers.length === 1) {
-            sendNotification(
-              [listAddressByFollowers[0]],
-              NotificationTypes.Followed,
-              lensProfile.name,
-              NOTIFICATION_TYPE.TARGETTED,
-              post.profile.name
-            );
-          }
-        }
-        setIsFollowing(true);
-        setIsDotFollowing(false);
-      });
-    }
-  };
-
-  useEffect(() => {
-    const fetchProfileFollow = () =>
-      doesFollow(post.profile.id, lensProfile?.ownedBy);
-
-    if (showCard && lensProfile?.ownedBy) {
-      fetchProfileFollow().then((r) => {
-        setIsFollowing(r.follows);
-      });
-    }
-  }, [showCard, lensProfile?.ownedBy]);
-
   return (
     <>
       <div
@@ -243,7 +178,7 @@ const ExploreCard: FC<Props> = (props) => {
               isOpen={isModalOpen}
               onClose={handleCloseModal}
               postId={postId}
-              postTitle={post.metadata.name}
+              post={post}
               processStatus={handleProcessStatus}
               ownedBy={post.profile.ownedBy}
               isList={isList}
@@ -298,96 +233,7 @@ const ExploreCard: FC<Props> = (props) => {
 
                   {/* profile hover */}
                   {showCard && (
-                    <div
-                      className="lens-post  
-                      absolute top-5 z-10 
-                     w-64 shadow-xl  duration-500 animate-in fade-in-50 "
-                    >
-                      <div className="items-center rounded p-4 font-semibold text-gray-700">
-                        <div className="flex justify-between bg-white">
-                          <a
-                            rel="noreferrer"
-                            href={`/profile/${post.profile.id}`}
-                            target="_blank"
-                          >
-                            <ImageProxied
-                              category="profile"
-                              alt={`Loading from ${post.profile.picture?.original?.url}`}
-                              height={80}
-                              width={80}
-                              className="h-14 w-14 cursor-pointer rounded-full object-cover"
-                              src={post.profile.picture?.original?.url}
-                            />
-                          </a>
-                          {isFollowing ? (
-                            <button
-                              onMouseEnter={() => setShowUnfollow('Unfollow')}
-                              onMouseLeave={() => setShowUnfollow('Following')}
-                              onClick={() => handleFollow(post.profile.id)}
-                              className=" m-2 flex items-center rounded-lg border border-solid
-                               border-black bg-transparent px-2 py-1 font-bold"
-                            >
-                              {isDotFollowing ? (
-                                <div className="mx-2">
-                                  <DotWave size={22} color="#000000" />
-                                </div>
-                              ) : (
-                                showUnfollow
-                              )}
-                            </button>
-                          ) : (
-                            ''
-                          )}
-
-                          {!isFollowing ? (
-                            <button
-                              onClick={() => handleFollow(post.profile.id)}
-                              className=" m-2 flex items-center rounded-lg border border-solid
-                               border-black bg-transparent px-2 py-1 font-bold"
-                            >
-                              {isDotFollowing ? (
-                                <div className="mx-2">
-                                  <DotWave size={22} color="#000000" />
-                                </div>
-                              ) : (
-                                'Follow'
-                              )}
-                            </button>
-                          ) : (
-                            ''
-                          )}
-                        </div>
-                        <a
-                          rel="noreferrer"
-                          href={`/profile/${post.profile.id}`}
-                          target="_blank"
-                        >
-                          <p className="text-base font-bold">
-                            {post.profile.name}
-                          </p>
-                          <p className="text-xs text-stone-500">
-                            @{post.profile.handle}
-                          </p>
-                          <p className="my-2 truncate text-ellipsis text-xs text-stone-500">
-                            {post.profile.bio}
-                          </p>
-                        </a>
-                        <div className="mt-3 flex justify-between rounded-lg bg-stone-100 px-3 py-2 font-serif">
-                          <div className="flex">
-                            <span>
-                              {post.profile.stats.totalFollowing || 0}
-                            </span>
-                            <span className="ml-1 text-sm"> Following</span>
-                          </div>
-                          <div className="flex items-baseline">
-                            <span>
-                              {post.profile.stats.totalFollowers || 0}
-                            </span>
-                            <span className="ml-1 text-sm">Followers</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <ProfileCard profile={post.profile} showCard={showCard} />
                   )}
                 </div>
 
@@ -627,4 +473,4 @@ const ExploreCard: FC<Props> = (props) => {
   );
 };
 
-export default ExploreCard;
+export default ExplorerCard;

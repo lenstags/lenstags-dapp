@@ -18,6 +18,7 @@ export const getNotifications = async (address: `0x${string}` | undefined) => {
         .catch((err) => {
             console.log('Error fetching notifications: ', err);
         });
+    console.log(fetchNotifications);
     return fetchNotifications.filter((notification: any) => notification.app === 'Nata.Social')
 }
 
@@ -38,7 +39,7 @@ const subjects: SubjectsNotifications
     [NotificationTypes.ReactionPost]: ['reacted to your post', 'reacted to a post'],
 }
 
-export const sendNotification = async (address: `0x${string}` | undefined | Array<`0x${string}` | undefined>, subject: NotificationTypes, profileName: string, target: number, titleContent?: string) => {
+export const sendNotification = async (address: `0x${string}` | undefined | Array<`0x${string}` | undefined>, subject: NotificationTypes, profileName: string, target: number, titleContent?: string, profileId?: string) => {
     let body;
     let recipients
     if (target === NOTIFICATION_TYPE.SUBSET && Array.isArray(address)) {
@@ -56,14 +57,18 @@ export const sendNotification = async (address: `0x${string}` | undefined | Arra
         identityType: 2,
         signer: _signer,
         notification: {
-            title: subject,
+            title: profileId ?? '',
             body: body,
         },
         payload: {
             title: profileName,
-            body: titleContent ? titleContent : '',
+            body: titleContent ?? ' ',
             cta: subject,
-            img: ''
+            img: '',
+            additionalMeta: {
+                type: `0+${1}`,
+                data: titleContent ?? ' ',
+            }
         },
         recipients,
         channel: `eip155:80001:${channelAddress}`,

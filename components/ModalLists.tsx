@@ -18,7 +18,7 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
-  postTitle: string;
+  post: any;
   processStatus: (status: PostProcessStatus) => void;
   ownedBy: `0x${string}`;
   isList?: boolean;
@@ -28,7 +28,7 @@ const ModalList: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   postId,
-  postTitle,
+  post,
   processStatus,
   ownedBy,
   isList
@@ -146,12 +146,19 @@ const ModalList: React.FC<ModalProps> = ({
     processStatus(PostProcessStatus.FINISHED);
 
     /* Send Notification collect post */
+    const { metadata, id, profile } = post;
+    const { id: postProfileId } = profile;
+    const { name: namePost } = metadata;
+    const dataSender = {
+      namePost,
+      id,
+      postProfileId
+    };
     const listFollowers = await followers(lensProfile?.id);
-    const listAddressByFollowers = listFollowers.items.map(
-      (follower) => follower.wallet.address
-    );
-    const flag = false;
-    if (lensProfile?.name && flag) {
+    const listAddressByFollowers = listFollowers.items
+      .map((follower) => follower.wallet.address)
+      .filter((address) => address !== ownedBy);
+    if (lensProfile?.name) {
       sendNotification(
         ownedBy,
         isList
@@ -159,7 +166,8 @@ const ModalList: React.FC<ModalProps> = ({
           : NotificationTypes.CollectedPost,
         lensProfile.name,
         NOTIFICATION_TYPE.TARGETTED,
-        postTitle
+        JSON.stringify(dataSender),
+        lensProfile.id
       );
       if (listAddressByFollowers.length > 1) {
         sendNotification(
@@ -169,7 +177,8 @@ const ModalList: React.FC<ModalProps> = ({
             : NotificationTypes.CollectedPost,
           lensProfile.name,
           NOTIFICATION_TYPE.SUBSET,
-          postTitle
+          JSON.stringify(dataSender),
+          lensProfile.id
         );
       } else if (listAddressByFollowers.length === 1) {
         sendNotification(
@@ -179,7 +188,8 @@ const ModalList: React.FC<ModalProps> = ({
             : NotificationTypes.CollectedPost,
           lensProfile.name,
           NOTIFICATION_TYPE.TARGETTED,
-          postTitle
+          JSON.stringify(dataSender),
+          lensProfile.id
         );
       }
     }
