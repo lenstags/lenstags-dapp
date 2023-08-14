@@ -3,8 +3,7 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 import { APP_NAME, envConfig } from '@lib/config';
 import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
- import { configureChains, createConfig, WagmiConfig } from 'wagmi';
- 
+import { WagmiConfig, configureChains, createConfig } from 'wagmi';
 import { polygon, polygonMumbai } from 'wagmi/chains';
 
 import { ApolloProvider } from '@apollo/client';
@@ -16,10 +15,11 @@ import TagsFilterProvider from 'components/TagsFilterProvider';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { publicProvider } from 'wagmi/providers/public';
 
-const { chains, publicClient } = configureChains(
-  [polygonMumbai],
-  [publicProvider()]
-);
+// mainnet
+const { chains, publicClient } = configureChains([polygon], [publicProvider()]);
+
+// testnet
+// const { chains, publicClient } = configureChains([polygonMumbai], [publicProvider()]);
 
 const { connectors } = getDefaultWallets({
   appName: APP_NAME,

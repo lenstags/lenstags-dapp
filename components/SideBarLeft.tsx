@@ -14,6 +14,7 @@ import {
 import React, { useContext, useEffect, useState } from 'react';
 import SidePanel, { sortBy } from './SidePanel';
 
+import { APP_UI_VERSION } from '@lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PlusSmallIcon } from '@heroicons/react/24/outline';
@@ -23,12 +24,12 @@ import { PublicRoutes } from 'models';
 import { PublicationTypes } from '@lib/lens/graphql/generated';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
+import { Tooltip } from './ui/Tooltip';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { getPublications } from '@lib/lens/get-publications';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
-import { Tooltip } from './ui/Tooltip';
 
 interface SidebarProps {}
 
@@ -177,7 +178,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
           </Link>
 
           {lensProfile && (
-            <div className="animate-in fade-in-50 duration-1000 ">
+            <div className="duration-1000 animate-in fade-in-50 ">
               {router.pathname !== PublicRoutes.MYPROFILE ? (
                 <SidePanel
                   fetchMyLists={fetchMyLists}
@@ -294,6 +295,9 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </div>
           )}
         </div>
+      </div>
+      <div className="fixed bottom-0 w-full bg-transparent px-6 py-4 font-mono text-xs text-gray-300">
+        {APP_UI_VERSION}
       </div>
     </div>
   );

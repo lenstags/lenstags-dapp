@@ -27,7 +27,7 @@ const ProfileButton = () => {
       : '/img/profilePic.png';
 
   return (
-    <div id="connectArea" className="bg-white pb-3 text-right ">
+    <div id="connectArea" className="bg-white text-right ">
       {lensProfile ? (
         <>
           <button

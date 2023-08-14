@@ -59,7 +59,7 @@ const setProfileImage = async (
       signature: signedResult.signature
     });
 
-    if (broadcastResult.__typename !== 'RelayerResult') {
+    if (broadcastResult?.__typename !== 'RelayerResult') {
       console.error(
         'set profile image url via broadcast: failed',
         broadcastResult

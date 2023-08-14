@@ -77,7 +77,7 @@ export const createPostPaid = async (
     throw new Error('Must define profileId');
   }
 
-  console.log('TU NO DEBERIAS ESTAR ACA!!');
+  console.log('This should nont run!');
   const ipfsResult = await uploadIpfs<Metadata>({
     metadata_id: uuidv4(),
     image: builtPost.image,
@@ -155,7 +155,7 @@ export const createPostPaid = async (
     signature: signedResult.signature
   });
 
-  if (broadcastResult.__typename !== 'RelayerResult') {
+  if (broadcastResult?.__typename !== 'RelayerResult') {
     console.error('create post via broadcast: failed', broadcastResult);
     throw new Error('create post via broadcast: failed');
   }

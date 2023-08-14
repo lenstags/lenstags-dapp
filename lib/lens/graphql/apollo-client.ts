@@ -7,10 +7,10 @@ import {
   from
 } from '@apollo/client/core';
 
+import { LENS_API } from '@lib/config';
 import { getFromLocalStorage } from '../localStorage';
 import { onError } from '@apollo/client/link/error';
 
-const API_URL = 'https://api-mumbai.lens.dev';
 let authenticationToken: string | null = null;
 
 export const defaultOptions: DefaultOptions = {
@@ -37,7 +37,7 @@ export const getAuthenticationToken = () => {
 };
 
 const httpLink = new HttpLink({
-  uri: API_URL,
+  uri: LENS_API,
   fetch
 });
 
