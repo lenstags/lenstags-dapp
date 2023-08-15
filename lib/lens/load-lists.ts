@@ -1,4 +1,8 @@
-import { ATTRIBUTES_LIST_KEY, PROFILE_METADATA_VERSION } from '@lib/config';
+import {
+  ATTRIBUTES_LIST_KEY,
+  PRIVATE_LIST_NAME,
+  PROFILE_METADATA_VERSION
+} from '@lib/config';
 import { AttributeData, ProfileMetadata } from './interfaces/profile-metadata';
 import { findKeyAttributeInProfile, pickPicture } from 'utils/helpers';
 
@@ -36,8 +40,8 @@ export const loadLists = async (lensProfileOld: any) => {
 // the setup of the default list
 export const createDefaultList = async (lensProfile: any) => {
   const constructedDefaultPost: IbuiltPost = {
-    name: 'My private list', // HACK should it be 'My stuff {private)?
-    content: 'My private list',
+    name: PRIVATE_LIST_NAME, // HACK should it be 'My stuff {private)?
+    content: PRIVATE_LIST_NAME + ' ...',
     locale: 'ia', // INTERLINGUA https://www.wikidata.org/wiki/Q22282939
     attributes: [
       {
@@ -145,8 +149,12 @@ export const createUserList = async (lensProfile: any, name: string) => {
 
   const constructedUserPost: IbuiltPost = {
     name,
-    content: `Hi there! This is a favList , you can see it in my profile here → <a target="_blank" rel="noopener"
-    href="https://www.nata.social/profile/${lensProfile.id}">https://www.nata.social/profile/${lensProfile.id}</a>`,
+    // content: `Hi there! This is a favList , you can see it in my profile here → <a target="_blank" rel="noopener"
+    // href="https://www.nata.social/profile/${lensProfile.id}">https://www.nata.social/profile/${lensProfile.id}</a>`,
+    content: `I have created a list called '${name}' in Nata Social. You'll be able to check it out soon!
+\n\n
+    Your bookmarks, now social.`,
+
     locale: 'en',
     attributes: [
       {

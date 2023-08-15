@@ -1,10 +1,13 @@
-import React, { FC, useContext, useRef, useState } from 'react';
+import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
+import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 
+import CollectButton from './CollectButton';
+import HoverProfileCard from './HoverProfileCard';
 import ImageProxied from './ImageProxied';
 import ListImages from './ListImages';
 import ModalLists from './ModalLists';
+import { PRIVATE_LIST_NAME } from '@lib/config';
 import PostIndicators from '@components/PostIndicators';
-import { PostProcessStatus } from 'utils/helpers';
 import { ProfileContext } from './LensAuthenticationProvider';
 import TurndownService from 'turndown';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
@@ -12,8 +15,6 @@ import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { useDisconnect } from 'wagmi';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import CollectButton from './CollectButton';
-import HoverProfileCard from './HoverProfileCard';
 
 interface Props {
   post: any;
@@ -37,13 +38,32 @@ const ExploreCard: FC<Props> = (props) => {
   const [showCard, setShowCard] = useState(false);
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const { disconnect } = useDisconnect();
+
+  // markdown conversion
+  // const fromHtml = new TurndownService();
+  // fromHtml.keep(['br', 'p', 'div']); // keep line breaks
+  // fromHtml.addRule('lineElementsToPlain', {
+  //   filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+  //   replacement: (content) => {
+  //     const trimmedContent = content.replace(/\n+$/g, '');
+  //     return trimmedContent + '\n';
+  //   }
+  // });
+
   const fromHtml = new TurndownService();
-  fromHtml.keep(['br', 'p', 'div']); // keep line breaks
+  fromHtml.keep(['br']); // solo mantén los saltos de línea
+  fromHtml.addRule('headers', {
+    filter: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    replacement: (content, node) => {
+      const level = Number(node.nodeName.charAt(1));
+      return `${'#'.repeat(level)} ${content}\n`;
+    }
+  });
+
   fromHtml.addRule('lineElementsToPlain', {
-    filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
+    filter: ['div', 'p'],
     replacement: (content) => {
-      const trimmedContent = content.replace(/\n+$/g, '');
-      return trimmedContent + '\n';
+      return content + '\n\n'; // dos saltos de línea para el formato Markdown de párrafo
     }
   });
 
@@ -361,7 +381,10 @@ const ExploreCard: FC<Props> = (props) => {
                     className="truncate text-ellipsis font-serif
                        text-sm"
                   >
-                    {post.metadata.name === 'My private list' ? '🔒 ' : ''}
+                    {post.metadata.name === PRIVATE_LIST_NAME ||
+                    post.metadata.name === 'My private list'
+                      ? '🔒 '
+                      : ''}
                     {post.metadata.name || 'untitled'}
                   </div>
                   <div
@@ -374,20 +397,14 @@ const ExploreCard: FC<Props> = (props) => {
                     {isList ? (
                       <br />
                     ) : (
-                      (
-                        <pre
-                          className="overflow-hidden whitespace-pre-wrap font-sans"
-                          style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical'
-                          }}
-                        >
-                          {fromHtml.turndown(post.metadata.content)}
-                        </pre>
-                      ) || ' '
+                      <div
+                        className="markdown-plain h-10"
+                        dangerouslySetInnerHTML={markdownToHTML(
+                          post.metadata.content || 'no-contents'
+                        )}
+                      ></div>
                     )}
-                    <style>{`
+                    {/* <style>{`
                       ::-webkit-scrollbar {
                         width: 3px;
                       }
@@ -401,7 +418,7 @@ const ExploreCard: FC<Props> = (props) => {
                       ::-webkit-scrollbar-track {
                         background-color: transparent;
                       }
-                    `}</style>
+                    `}</style> */}
                   </div>
                 </div>
               </a>

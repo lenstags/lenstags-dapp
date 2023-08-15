@@ -2,12 +2,9 @@ import {
   CreateCommentViaDispatcherDocument,
   CreatePublicCommentRequest
 } from '@lib/lens/graphql/generated';
-import {
-  Metadata,
-  PublicationMainFocus
-} from '@lib/lens/interfaces/publication';
 import { pollAndIndexComment, signCreateCommentTypedData } from './comment';
 
+import { Metadata } from '@lib/lens/interfaces/publication';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { broadcastRequest } from './broadcast';
 import { profile } from './get-profile';

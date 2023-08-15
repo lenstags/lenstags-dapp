@@ -8,6 +8,7 @@ import {
   MetadataAttribute,
   PublicationMainFocus
 } from '@lib/lens/interfaces/publication';
+import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
 import DotWave from '@uiball/loaders/dist/components/DotWave';
@@ -17,7 +18,6 @@ import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import ModalLists from 'components/ModalLists';
 import PostIndicators from 'components/PostIndicators';
-import { PostProcessStatus } from 'utils/helpers';
 import { Spinner } from 'components/Spinner';
 import TagStrip from 'components/TagStrip';
 import { commentGasless } from '@lib/lens/comment-gasless';
@@ -55,10 +55,6 @@ export default function PostDetails() {
 
   const [lists, setLists] = useState<typeList[]>(firstList);
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
-
-  function createMarkup(innerHtml: string) {
-    return { __html: innerHtml };
-  }
 
   const refreshComments = async () => {
     const comments = await getComments(ii);
@@ -411,8 +407,8 @@ export default function PostDetails() {
               )}
 
               <div
-                className=" mb-8 py-8 "
-                dangerouslySetInnerHTML={createMarkup(
+                className="markdown my-8"
+                dangerouslySetInnerHTML={markdownToHTML(
                   post.metadata.content || 'no-contents'
                 )}
               ></div>
