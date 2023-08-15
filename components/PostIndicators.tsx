@@ -1,3 +1,8 @@
+import {
+  BookmarkSquareIcon,
+  ChatBubbleLeftEllipsisIcon
+} from '@heroicons/react/24/outline';
+
 import ImageProxied from './ImageProxied';
 import React from 'react';
 
@@ -12,27 +17,13 @@ const PostIndicators: React.FC<PostIndicatorsProps> = ({
 }) => (
   <>
     <div
-      style={{ fontSize: '10px' }}
-      className="flex rounded-md bg-stone-100 px-3 py-1 font-serif"
+      style={{ fontSize: '12px' }}
+      className="flex rounded-md bg-stone-100 px-3 py-1 font-serif font-medium"
     >
-      <ImageProxied
-        category="profile"
-        src="/assets/icons/collect.svg"
-        alt="Collect"
-        title="Total amount of collects"
-        width={12}
-        height={12}
-      />
+      <BookmarkSquareIcon color="black" height={14} width={14} />
       <div className="ml-1 mr-3">{collects}</div>
 
-      <ImageProxied
-        category="profile"
-        src="/assets/icons/comments.svg"
-        alt="Comments"
-        title="Comments"
-        width={15}
-        height={12}
-      />
+      <ChatBubbleLeftEllipsisIcon color="black" height={14} width={14} />
       <div className="ml-1 ">{comments}</div>
     </div>
   </>
