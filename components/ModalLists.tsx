@@ -1,8 +1,8 @@
+import { ATTRIBUTES_LIST_KEY, PRIVATE_LIST_NAME } from '@lib/config';
 import { PostProcessStatus, findKeyAttributeInProfile } from 'utils/helpers';
 import { createUserList, typeList } from '@lib/lens/load-lists';
 import { useContext, useEffect, useState } from 'react';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import Image from 'next/image';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { addPostIdtoListId } from '@lib/lens/post';
@@ -302,24 +302,25 @@ const ListsModal: React.FC<ModalProps> = ({
                   >
                     {list.name}
                     <div className="flex items-center">
-                      {list.name === 'My private list' && (
-                        <div title="This list is private 🔒" className="mr-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 16 16"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5.3335 6V4.66667C5.3335 3.19391 6.5274 2 8.00016 2C9.47292 2 10.6668 3.19391 10.6668 4.66667V6M5.46683 14H10.5335C11.2802 14 11.6536 14 11.9388 13.8547C12.1897 13.7268 12.3937 13.5229 12.5215 13.272C12.6668 12.9868 12.6668 12.6134 12.6668 11.8667V8.13333C12.6668 7.3866 12.6668 7.01323 12.5215 6.72801C12.3937 6.47713 12.1897 6.27316 11.9388 6.14532C11.6536 6 11.2802 6 10.5335 6H5.46683C4.72009 6 4.34672 6 4.06151 6.14532C3.81063 6.27316 3.60665 6.47713 3.47882 6.72801C3.3335 7.01323 3.3335 7.3866 3.3335 8.13333V11.8667C3.3335 12.6134 3.3335 12.9868 3.47882 13.272C3.60665 13.5229 3.81063 13.7268 4.06151 13.8547C4.34672 14 4.72009 14 5.46683 14Z"
-                              stroke="#999999"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                        </div>
-                      )}
+                      {list.name === PRIVATE_LIST_NAME ||
+                        (list.name === 'My private list' && (
+                          <div title="This list is private 🔒" className="mr-2">
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.3335 6V4.66667C5.3335 3.19391 6.5274 2 8.00016 2C9.47292 2 10.6668 3.19391 10.6668 4.66667V6M5.46683 14H10.5335C11.2802 14 11.6536 14 11.9388 13.8547C12.1897 13.7268 12.3937 13.5229 12.5215 13.272C12.6668 12.9868 12.6668 12.6134 12.6668 11.8667V8.13333C12.6668 7.3866 12.6668 7.01323 12.5215 6.72801C12.3937 6.47713 12.1897 6.27316 11.9388 6.14532C11.6536 6 11.2802 6 10.5335 6H5.46683C4.72009 6 4.34672 6 4.06151 6.14532C3.81063 6.27316 3.60665 6.47713 3.47882 6.72801C3.3335 7.01323 3.3335 7.3866 3.3335 8.13333V11.8667C3.3335 12.6134 3.3335 12.9868 3.47882 13.272C3.60665 13.5229 3.81063 13.7268 4.06151 13.8547C4.34672 14 4.72009 14 5.46683 14Z"
+                                stroke="#999999"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </div>
+                        ))}
                       <button
                         key={list.key}
                         value={list.key}
