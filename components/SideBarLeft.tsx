@@ -5,28 +5,48 @@ import {
   AccordionTrigger
 } from './ui/Accordion';
 import {
+  BellIcon,
+  FolderIcon,
+  GlobeAltIcon,
+  PlusSmallIcon
+} from '@heroicons/react/24/outline';
+import {
+  BellIcon as BellIconFilled,
+  FolderIcon as FolderIconFilled,
+  GlobeAltIcon as GlobeAltIconFilled
+} from '@heroicons/react/24/solid';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
-import React, { useContext, useEffect, useState } from 'react';
-import SidePanel, { sortBy } from './SidePanel';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
+import {
+  channelAddress,
+  getNotifications,
+  getSubscriptions,
+  optIn
+} from '@lib/lens/user-notifications';
 
 import { APP_UI_VERSION } from '@lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
-import { PlusSmallIcon } from '@heroicons/react/24/outline';
+import Notifications from './Notifications';
 import PostsByList from './PostsByList';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { PublicRoutes } from 'models';
 import { PublicationTypes } from '@lib/lens/graphql/generated';
+import SidePanelNotifications from './SidePanelNotifications';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { Tooltip } from './ui/Tooltip';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { getPublications } from '@lib/lens/get-publications';
+import { getSigner } from '@lib/lens/ethers.service';
+import { getUserLists } from '@lib/lens/load-lists';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
@@ -36,11 +56,16 @@ interface SidebarProps {}
 const SideBarLeft: React.FC<SidebarProps> = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
-  const { setSidebarCollapsedState, sidebarCollapsedStateLeft } =
-    useContext(SidebarContext);
+  const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
   const [publications, setPublications] = useState<any[]>([]);
   const [sideBarSize, setSideBarSize] = useState<'3.6' | '16.6'>('16.6');
+  const [openTo, setOpenTo] = useState<
+    'my-inventory' | 'notifications' | 'none'
+  >('none');
   const [sortByValue, setSortByValue] = useState('newest');
+  const [subcribed, setSubcribed] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
+  const [loadingMyLists, setLoadingMyLists] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
   const { disconnect } = useDisconnect();
@@ -49,25 +74,8 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     disconnect();
   };
 
-  const routesCollapsed =
-    router.pathname === PublicRoutes.CREATE ||
-    router.pathname.includes(PublicRoutes.LIST) ||
-    router.pathname.includes(PublicRoutes.POST);
-
-  useEffect(() => {
-    if (router.pathname === PublicRoutes.MYPROFILE) {
-      setSidebarCollapsedState({ collapsed: false });
-      setSideBarSize('16.6');
-    } else if (routesCollapsed) {
-      setSidebarCollapsedState({ collapsed: true });
-      setSideBarSize('3.6');
-    }
-  }, [
-    router.pathname,
-    sidebarCollapsedStateLeft.collapsed,
-    setSidebarCollapsedState,
-    routesCollapsed
-  ]);
+  const triggerNotificationsRef = useRef<any>();
+  const triggerMyInventoryRef = useRef<any>();
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -79,9 +87,19 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
   const fetchMyLists = async () => {
     if (!lensProfile) return;
 
+    const parsedLists = await getUserLists(lensProfile.id);
+
+    if (!parsedLists) {
+      return;
+    }
+
     if (publications.length !== 0) return;
+    setLoadingMyLists(true);
     const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
     console.log('xxx ', res);
+
+    // FIXME
+    // return getPopulatedLists(lensProfile.id);
 
     const filteredItems = res.items.filter((item) => {
       const id = lensProfile?.id;
@@ -95,6 +113,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     });
 
     setPublications(filteredItems);
+    setLoadingMyLists(false);
   };
 
   const { sortItems } = useSorts();
@@ -103,20 +122,56 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     sortItems({ items: publications, sort: value });
   };
 
+  const handleOpenMyInventory = () => {
+    if (publications.length === 0) {
+      fetchMyLists();
+    }
+    setOpenTo('my-inventory');
+  };
+
+  useEffect(() => {
+    getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
+      const channelNataSocial =
+        res &&
+        !!res.find(
+          (item: { channel: string }) =>
+            item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
+        );
+      setSubcribed(channelNataSocial);
+    });
+  }, [lensProfile?.ownedBy]);
+
+  const signer = getSigner();
+
+  const handleOpenNotifications = () => {
+    setOpenTo('notifications');
+    if (!subcribed) {
+      optIn(lensProfile?.ownedBy, signer).then((res) => {
+        setSubcribed(true);
+      });
+    }
+    if (notifications.length === 0) {
+      getNotifications(lensProfile?.ownedBy).then((res) => {
+        setNotifications(res);
+      });
+    }
+  };
+
   return (
     <div
-      className={`bg-stone-100 sm:inline ${
+      className={`bg-stone-100  sm:inline ${
         sidebarCollapsedStateLeft.collapsed
-          ? 'col-span-1 w-24 animate-fadeRight'
+          ? 'z-[100] col-span-1 w-24 ease-in animate-in'
           : 'col-span-2 animate-fadeLeft'
       }`}
     >
-      <div className="sticky top-0 h-screen py-4">
+      <div className="pointer-events-auto sticky top-0 h-screen py-4">
         <div className="px-6 pb-6">
-          <Link href={'/'}>
+          <Link href={'/'} className="h-full">
             {!sidebarCollapsedStateLeft.collapsed ? (
               <Image
-                className="cursor-pointer"
+                data-open={!sidebarCollapsedStateLeft.collapsed}
+                className="cursor-pointer data-[open=false]:animate-fadeOutLogo"
                 src="/img/landing/nata-logo.svg"
                 alt=""
                 width={150}
@@ -124,18 +179,19 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
               />
             ) : (
               <Image
-                className="mx-auto cursor-pointer"
+                className="mx-auto cursor-pointer duration-5000 ease-in"
                 src="/img/landing/nata-isologo.svg"
                 alt=""
                 width={40}
                 height={40}
+                style={{ width: '40px', height: '40px' }}
               />
             )}
           </Link>
         </div>
         {/* menu items */}
         <div className="font-serif text-base">
-          <Link href={'/app'}>
+          <Link href={PublicRoutes.APP}>
             <Tooltip tooltip="Home">
               <div
                 className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
@@ -156,7 +212,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </Tooltip>
           </Link>
 
-          <Link href={'/app'}>
+          <Link href={PublicRoutes.APP}>
             <Tooltip tooltip="Explore">
               <div
                 className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
@@ -164,12 +220,20 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                 sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
               }`}
               >
-                <Image
-                  src="/icons/explore.svg"
-                  alt="Explore"
-                  width={20}
-                  height={20}
-                />
+                {router.pathname === PublicRoutes.APP &&
+                !sidebarCollapsedStateLeft.collapsed ? (
+                  <GlobeAltIconFilled
+                    width={22}
+                    height={22}
+                    className="text-lensBlack"
+                  />
+                ) : (
+                  <GlobeAltIcon
+                    width={22}
+                    height={22}
+                    className="text-lensBlack"
+                  />
+                )}
                 {!sidebarCollapsedStateLeft.collapsed && (
                   <span className="ml-2">Explore</span>
                 )}
@@ -177,39 +241,40 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </Tooltip>
           </Link>
 
-          {lensProfile && (
-            <div className="duration-1000 animate-in fade-in-50 ">
-              {router.pathname !== PublicRoutes.MYPROFILE ? (
-                <SidePanel
-                  fetchMyLists={fetchMyLists}
-                  publications={publications}
-                  sideBarSize={sideBarSize}
-                />
-              ) : (
+          {lensProfile && router.pathname !== PublicRoutes.MYPROFILE ? (
+            <div className="h-12 w-full duration-1000 animate-in fade-in-50">
+              <SidePanelMyInventory
+                fetchMyLists={fetchMyLists}
+                publications={publications}
+                sideBarSize={sideBarSize}
+                notificationRef={triggerNotificationsRef}
+                loadingMyLists={loadingMyLists}
+                ref={triggerMyInventoryRef}
+              />
+            </div>
+          ) : (
+            lensProfile && (
+              <div className="w-full duration-1000 animate-in fade-in-50">
                 <Accordion type="single">
                   <AccordionItem value="my-investory" className="border-0 py-0">
                     <AccordionTrigger
-                      onClick={() => {
-                        fetchMyLists();
-                      }}
-                      className="h-12 gap-1 border-l-4 px-6 hover:border-l-teal-100 hover:bg-teal-50"
+                      onClick={handleOpenMyInventory}
+                      className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
                       hiddenArrow
                     >
-                      <svg
-                        width="20"
-                        height="18"
-                        viewBox="0 0 20 18"
-                        fill="none"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M1.0625 9.6875V9C1.0625 7.86091 1.98591 6.9375 3.125 6.9375H16.875C18.0141 6.9375 18.9375 7.86091 18.9375 9V9.6875M10.9723 3.78477L9.02773 1.84023C8.76987 1.58237 8.42013 1.4375 8.05546 1.4375H3.125C1.98591 1.4375 1.0625 2.36091 1.0625 3.5V14.5C1.0625 15.6391 1.98591 16.5625 3.125 16.5625H16.875C18.0141 16.5625 18.9375 15.6391 18.9375 14.5V6.25C18.9375 5.11091 18.0141 4.1875 16.875 4.1875H11.9445C11.5799 4.1875 11.2301 4.04263 10.9723 3.78477Z"
-                          stroke="#121212"
-                          strokeWidth="1.5"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                      {openTo === 'my-inventory' ? (
+                        <FolderIconFilled
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
                         />
-                      </svg>
+                      ) : (
+                        <FolderIcon
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
+                        />
+                      )}
                       {!sidebarCollapsedStateLeft.collapsed && (
                         <span className="ml-2 text-base font-normal">
                           My inventory
@@ -248,52 +313,88 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                       />
                     </AccordionContent>
                   </AccordionItem>
-                </Accordion>
-              )}
-              <Link href={'/app'}>
-                <Tooltip tooltip="Notifications">
-                  <div
-                    className={`flex h-12 cursor-pointer items-center gap-1 border-l-4 border-l-transparent hover:border-l-teal-100 hover:bg-teal-50 ${
-                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-                    }`}
+                  <AccordionItem
+                    value="notifications"
+                    className="border-0 py-0"
                   >
-                    <Image
-                      src="/icons/notifications.svg"
-                      alt="Notifications"
-                      width={20}
-                      height={20}
-                    />
-                    {!sidebarCollapsedStateLeft.collapsed && (
-                      <span className="ml-2">Notifications</span>
-                    )}
-                  </div>
-                </Tooltip>
-              </Link>
-
-              <div className="flex px-6 py-4  ">
-                <button
-                  className={`w-full rounded-lg align-middle font-sans ${
-                    sidebarCollapsedStateLeft.collapsed
-                      ? 'h-12 w-12 text-4xl font-extralight'
-                      : 'px-4 py-2'
-                  } ${
-                    router.pathname === PublicRoutes.CREATE
-                      ? 'bg-white text-black'
-                      : 'text-white'
-                  }`}
-                  onClick={() => {
-                    router.push(PublicRoutes.CREATE);
-                  }}
-                >
-                  {sidebarCollapsedStateLeft.collapsed ? (
-                    <PlusSmallIcon />
-                  ) : (
-                    '+ Create'
-                  )}
-                </button>
+                    <AccordionTrigger
+                      onClick={handleOpenNotifications}
+                      className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
+                      hiddenArrow
+                    >
+                      {openTo === 'notifications' ? (
+                        <BellIconFilled
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
+                        />
+                      ) : (
+                        <BellIcon
+                          width={22}
+                          height={22}
+                          className="text-lensBlack"
+                        />
+                      )}
+                      {!sidebarCollapsedStateLeft.collapsed && (
+                        <span className="ml-2 text-base font-normal">
+                          Notifications
+                        </span>
+                      )}
+                    </AccordionTrigger>
+                    <AccordionContent className="flex h-full flex-col border-0 outline-none">
+                      <div className="mb-2 ml-1 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-2">
+                        {notifications.length > 0 &&
+                          notifications.map((notif, index: number) => {
+                            return <Notifications notif={notif} key={index} />;
+                          })}
+                      </div>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
               </div>
+            )
+          )}
+
+          {lensProfile && router.pathname !== PublicRoutes.MYPROFILE && (
+            <div className="h-12 w-full duration-1000 animate-in fade-in-50">
+              <SidePanelNotifications
+                ref={triggerNotificationsRef}
+                myInventoryRef={triggerMyInventoryRef}
+              />
             </div>
           )}
+
+          {lensProfile && !sidebarCollapsedStateLeft.collapsed && (
+            <div className="flex w-full items-center justify-center py-4">
+              <button
+                className={`rounded-lg align-middle font-sans ${
+                  sidebarCollapsedStateLeft.collapsed
+                    ? 'h-10 w-10 font-extralight'
+                    : 'mx-6 w-full px-4 py-2'
+                } ${
+                  router.pathname === PublicRoutes.CREATE
+                    ? 'bg-white text-black'
+                    : 'text-white'
+                }`}
+                onClick={() => {
+                  router.push(PublicRoutes.CREATE);
+                }}
+              >
+                + Create
+              </button>
+            </div>
+          )}
+          {lensProfile &&
+            router.pathname !== PublicRoutes.CREATE &&
+            sidebarCollapsedStateLeft.collapsed && (
+              <Link href={PublicRoutes.CREATE}>
+                <Tooltip tooltip="Create" className="my-4 h-10">
+                  <button className="h-10 w-10 rounded-lg bg-lensBlack">
+                    <PlusSmallIcon className="text-white" />
+                  </button>
+                </Tooltip>
+              </Link>
+            )}
         </div>
       </div>
       <div className="fixed bottom-0 w-full bg-transparent px-6 py-4 font-mono text-xs text-gray-300">

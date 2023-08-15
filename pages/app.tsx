@@ -45,6 +45,8 @@ const App: NextPage = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showReject, setShowReject] = useState(false);
   const [ready, setReady] = useState(false);
+  const [loadingFetchMore, setLoadingFetchMore] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
@@ -194,21 +196,19 @@ const App: NextPage = () => {
     return reqQuery;
   }, [tags]);
 
-  const { fetchMore, refetch, loading } = useQuery(
-    ExplorePublicationsDocument,
-    {
-      variables: {
-        request: query
-      },
-      onCompleted: (data) => {
-        if (cursor === undefined)
-          setCursor(data.explorePublications.pageInfo.next);
-      }
+  const { fetchMore } = useQuery(ExplorePublicationsDocument, {
+    variables: {
+      request: query
+    },
+    onCompleted: (data) => {
+      if (cursor === undefined)
+        setCursor(data.explorePublications.pageInfo.next);
     }
-  );
+  });
 
-  const handleLoadMore = () => {
+  const handleLoadMoreWithoutTags = useCallback(() => {
     if (!cursor) return console.log('no more results');
+    setLoadingFetchMore(true);
     fetchMore({
       variables: {
         request: {
@@ -231,11 +231,45 @@ const App: NextPage = () => {
           ...prev,
           ...res.data.explorePublications.items
         ]);
+        setLoadingFetchMore(false);
       } else {
+        setLoadingFetchMore(false);
         return console.log('no more results');
       }
     });
-  };
+  }, [cursor, fetchMore, query]);
+
+  const handleLoadMoreWithTags = useCallback(() => {
+    setLoadingFetchMore(true);
+    fetchMore({
+      variables: {
+        request: {
+          ...query,
+          cursor
+        }
+      },
+      updateQuery: (prev, { fetchMoreResult }): any => {
+        if (!fetchMoreResult) return 'no more results';
+        return {
+          explorePublications: {
+            ...fetchMoreResult.explorePublications
+          }
+        };
+      }
+    }).then((res) => {
+      if (res.data.explorePublications.items.length > 0) {
+        setCursor(res.data.explorePublications.pageInfo.next);
+        setPublications((prev) => [
+          ...prev,
+          ...res.data.explorePublications.items
+        ]);
+        setLoadingFetchMore(false);
+      } else {
+        setLoadingFetchMore(false);
+        return console.log('no more results');
+      }
+    });
+  }, [cursor, fetchMore, query]);
 
   const observer = useRef<IntersectionObserver>();
   const lastPublicationRef = useCallback(
@@ -243,21 +277,37 @@ const App: NextPage = () => {
       if (publications.length === 0) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && cursor) {
-          handleLoadMore();
+        if (entries[0].isIntersecting && cursor && tags.length === 0) {
+          handleLoadMoreWithoutTags();
+        } else if (entries[0].isIntersecting && cursor && tags.length > 0) {
+          handleLoadMoreWithTags();
         }
       });
       if (node) observer.current.observe(node);
     },
-    [cursor, publications.length]
+    [
+      cursor,
+      publications?.length,
+      tags.length,
+      handleLoadMoreWithTags,
+      handleLoadMoreWithoutTags
+    ]
   );
 
   useEffect(() => {
-    explore({ locale: 'en', tags }).then((data) => {
-      return setPublications(data.items);
-    });
-    refetch();
-  }, [tags, refetch]);
+    setLoader(true);
+    explore({ locale: 'en', tags })
+      .then((data) => {
+        setLoader(false);
+        if (!data) return setPublications([]);
+        setCursor(data.pageInfo.next);
+        return setPublications(data.items);
+      })
+      .catch((err) => {
+        console.log('ERROR ', err);
+        setLoader(false);
+      });
+  }, [tags]);
 
   if (hydrationLoading) {
     return (
@@ -504,7 +554,7 @@ const App: NextPage = () => {
         ) : (
           <>
             {/* top bar container*/}
-            <div className="h-50 top-0 z-10 w-full bg-white px-8 pt-4">
+            <div className="h-50 sticky top-0 z-10 w-full bg-white px-8 py-2 pt-4">
               {/* search bar */}
               <SearchBar />
               <TagsFilter />
@@ -589,8 +639,8 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="px-4">
-              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
+            <div className="px-4 pb-6">
+              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
                     if (publications.length === index + 1) {
@@ -607,12 +657,23 @@ const App: NextPage = () => {
                       );
                     }
                   })
-                ) : (
+                ) : loader ? (
                   <div className="my-8">
                     <Spinner h="10" w="10" />
                   </div>
+                ) : (
+                  <div className="my-8">
+                    <span className="text-lg font-medium">
+                      No results found 🤷‍♂️
+                    </span>
+                  </div>
                 )}
               </div>
+              {loadingFetchMore && (
+                <div className="mx-auto mb-10 flex w-10 items-center justify-center ">
+                  <Spinner h="10" w="10" />
+                </div>
+              )}
             </div>
           </>
         )}

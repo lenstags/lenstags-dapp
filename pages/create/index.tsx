@@ -27,6 +27,10 @@ import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { followers } from '@lib/lens/followers';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { NotificationTypes } from '@models/notifications.models';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -386,6 +390,41 @@ const Create: NextPage = () => {
       );
       console.log('POST RESULT: ', result);
       snackbar.showMessage('👌🏻 Post created successfully!');
+
+      // /* Send Notification for followers: create post */
+      const listFollowers = await followers(lensProfile?.id);
+      const listAddressByFollowers = listFollowers.items.map(
+        (follower) => follower.wallet.address
+      );
+      const { pubId } =
+        typeof result !== 'string' && result.pubId ? result : { pubId: '' };
+      const id = lensProfile?.id;
+      const dataSender = {
+        title,
+        pubId,
+        id
+      };
+      if (lensProfile?.name) {
+        if (listAddressByFollowers.length > 1) {
+          sendNotification(
+            listAddressByFollowers,
+            NotificationTypes.CreatedPost,
+            lensProfile.name,
+            NOTIFICATION_TYPE.SUBSET,
+            JSON.stringify(dataSender),
+            lensProfile.id
+          );
+        } else if (listAddressByFollowers.length === 1) {
+          sendNotification(
+            [listAddressByFollowers[0]],
+            NotificationTypes.CreatedPost,
+            lensProfile.name,
+            NOTIFICATION_TYPE.TARGETTED,
+            JSON.stringify(dataSender),
+            lensProfile.id
+          );
+        }
+      }
       await sleep(2500);
       router.push('/app');
     } catch (e: any) {

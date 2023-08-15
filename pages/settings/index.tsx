@@ -227,8 +227,12 @@ const Settings: NextPage = () => {
     if (lensProfile) {
       setLoadingDispatcher(true);
       dispatcherActive
-        ? await disable(lensProfile.id).then(() => setDispatcherActive(false))
-        : await enable(lensProfile.id).then(() => setDispatcherActive(true));
+        ? await disable(lensProfile.id)
+            .then(() => setDispatcherActive(false))
+            .finally(() => setLoadingDispatcher(false))
+        : await enable(lensProfile.id)
+            .then(() => setDispatcherActive(true))
+            .finally(() => setLoadingDispatcher(false));
     }
     return;
   };

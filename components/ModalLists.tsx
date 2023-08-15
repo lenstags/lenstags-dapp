@@ -1,27 +1,37 @@
 import { ATTRIBUTES_LIST_KEY, PRIVATE_LIST_NAME } from '@lib/config';
 import { PostProcessStatus, findKeyAttributeInProfile } from 'utils/helpers';
-import { createUserList, typeList } from '@lib/lens/load-lists';
+import { createUserList, getUserLists, typeList } from '@lib/lens/load-lists';
 import { useContext, useEffect, useState } from 'react';
 
 import Image from 'next/image';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { NotificationTypes } from '@models/index';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { addPostIdtoListId } from '@lib/lens/post';
+import { followers } from '@lib/lens/followers';
 import { freeCollect } from '@lib/lens/collect';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
+  post: any;
   processStatus: (status: PostProcessStatus) => void;
+  ownedBy: `0x${string}`;
+  isList?: boolean;
 }
 
-const ListsModal: React.FC<ModalProps> = ({
+const ModalList: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   postId,
-  processStatus
+  post,
+  processStatus,
+  ownedBy,
+  isList
 }) => {
   const snackbar = useSnackbar();
   const [valueListName, setValueListName] = useState('');
@@ -85,34 +95,8 @@ const ListsModal: React.FC<ModalProps> = ({
   };
 
   const refreshLists = async (profileId: string) => {
-    const readProfile = await queryProfile({
-      profileId
-    });
-    // const parsedLists2 = JSON.parse(
-    //   readProfile?.attributes?.find(
-    //     (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-    //   )?.value || `[]`
-    // );
-
-    const listAttributeObject = findKeyAttributeInProfile(
-      readProfile,
-      ATTRIBUTES_LIST_KEY
-    );
-    // Gives something like this:
-    // {
-    //   "displayType": "string",
-    //   "value": "[{\"name\":\"My private list\",\"key\":\"0x8904-0x0a\"}]",
-    //   "key": "list_warehouse_7"
-    // }
-    // console.log('xxxxx ', readProfile);
-    const parsedLists = listAttributeObject
-      ? JSON.parse(listAttributeObject.value)
-      : [];
-    // const hasLists =
-    // listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-
-    // console.log('listas parseadas en json', parsedLists);
-    console.log('refreshing lists ', parsedLists);
+    const parsedLists = await getUserLists(profileId);
+    console.log('💎💎💎💎 refreshing lists ', parsedLists);
 
     setSelectedList(parsedLists);
     setFilteredList(parsedLists);
@@ -133,6 +117,7 @@ const ListsModal: React.FC<ModalProps> = ({
       listId = (await createUserList(lensProfile, name!)).key;
       console.log('List created, (post) ID returned to the UI: ', listId);
     }
+    /* Send Notification For Followers a list created */
 
     console.log('****** just in case :  ', listId);
 
@@ -170,10 +155,58 @@ const ListsModal: React.FC<ModalProps> = ({
 
     snackbar.showMessage('🟩 Item added to list! 🗂️');
     processStatus(PostProcessStatus.FINISHED);
+
+    /* Send Notification collect post */
+    const { metadata, id, profile } = post;
+    const { id: postProfileId } = profile;
+    const { name: namePost } = metadata;
+    const dataSender = {
+      namePost,
+      id,
+      postProfileId
+    };
+    const listFollowers = await followers(lensProfile?.id);
+    const listAddressByFollowers = listFollowers.items
+      .map((follower) => follower.wallet.address)
+      .filter((address) => address !== ownedBy);
+    if (lensProfile?.name) {
+      sendNotification(
+        ownedBy,
+        isList
+          ? NotificationTypes.CollectedList
+          : NotificationTypes.CollectedPost,
+        lensProfile.name,
+        NOTIFICATION_TYPE.TARGETTED,
+        JSON.stringify(dataSender),
+        lensProfile.id
+      );
+      if (listAddressByFollowers.length > 1) {
+        sendNotification(
+          listAddressByFollowers,
+          isList
+            ? NotificationTypes.CollectedList
+            : NotificationTypes.CollectedPost,
+          lensProfile.name,
+          NOTIFICATION_TYPE.SUBSET,
+          JSON.stringify(dataSender),
+          lensProfile.id
+        );
+      } else if (listAddressByFollowers.length === 1) {
+        sendNotification(
+          [listAddressByFollowers[0]],
+          isList
+            ? NotificationTypes.CollectedList
+            : NotificationTypes.CollectedPost,
+          lensProfile.name,
+          NOTIFICATION_TYPE.TARGETTED,
+          JSON.stringify(dataSender),
+          lensProfile.id
+        );
+      }
+    }
     onClose();
     return;
   };
-
   // useEffect(() => {
   //   if (lensProfile) {
   //     refreshLists(lensProfile.id);
@@ -187,7 +220,7 @@ const ListsModal: React.FC<ModalProps> = ({
 
   return isOpen ? (
     <div
-      className="duration-600 fixed bottom-0 left-0 right-0 top-0 z-50 flex 
+      className="duration-600 fixed bottom-0 left-0 right-0 top-0 z-[150] flex 
      items-center justify-center bg-stone-900
        bg-opacity-60 
        opacity-100 backdrop-blur-sm animate-in fade-in-5"
@@ -403,4 +436,4 @@ const ListsModal: React.FC<ModalProps> = ({
   ) : null;
 };
 
-export default ListsModal;
+export default ModalList;

@@ -1,5 +1,5 @@
 import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
-import React, { FC, useContext, useEffect, useRef, useState } from 'react';
+import React, { FC, useContext, useRef, useState } from 'react';
 
 import CollectButton from './CollectButton';
 import HoverProfileCard from './HoverProfileCard';
@@ -8,6 +8,7 @@ import ListImages from './ListImages';
 import ModalLists from './ModalLists';
 import { PRIVATE_LIST_NAME } from '@lib/config';
 import PostIndicators from '@components/PostIndicators';
+// import ProfileCard from './ProfileCard';
 import { ProfileContext } from './LensAuthenticationProvider';
 import TurndownService from 'turndown';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
@@ -21,7 +22,7 @@ interface Props {
   refProp?: any;
 }
 
-const ExploreCard: FC<Props> = (props) => {
+const ExplorerCard: FC<Props> = (props) => {
   const { post } = props;
   const isList =
     post.metadata.attributes.length > 0 &&
@@ -36,6 +37,7 @@ const ExploreCard: FC<Props> = (props) => {
   const [pointerEvents, setPointerEvents] = useState<any>('all');
   const [isFinished, setIsFinished] = useState(false);
   const [showCard, setShowCard] = useState(false);
+
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const { disconnect } = useDisconnect();
 
@@ -196,7 +198,10 @@ const ExploreCard: FC<Props> = (props) => {
               isOpen={isModalOpen}
               onClose={handleCloseModal}
               postId={postId}
+              post={post}
               processStatus={handleProcessStatus}
+              ownedBy={post.profile.ownedBy}
+              isList={isList}
             />
 
             {/* main tab contents goes here */}
@@ -447,4 +452,4 @@ const ExploreCard: FC<Props> = (props) => {
   );
 };
 
-export default ExploreCard;
+export default ExplorerCard;

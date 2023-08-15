@@ -15,6 +15,7 @@ import {
 import { apolloClient } from '../lens/graphql/apollo-client';
 import { lensHub } from './lens-hub';
 import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
+import { broadcastRequest } from './broadcast';
 
 export const enableDispatcherWithTypedData = async (
   request: SetDispatcherRequest
@@ -53,25 +54,32 @@ export const enable = async (profileId: any) => {
   );
   console.log('set dispatcher: signature', signature);
 
+  const dataBroadcast = await broadcastRequest({
+    id: result.id,
+    signature
+  })
+
   if (!signature) {
     throw new Error('Error splitting signature');
   }
 
-  const { v, r, s } = splitSignature(signature);
+  if (dataBroadcast?.__typename === 'RelayError') {
+    const { v, r, s } = splitSignature(signature);
 
-  const tx = await lensHub.setDispatcherWithSig({
-    profileId: typedData.value.profileId,
-    dispatcher: typedData.value.dispatcher,
-    sig: {
-      v,
-      r,
-      s,
-      deadline: typedData.value.deadline
-    }
-  });
-  console.log('set dispatcher: tx hash: ', tx.hash);
-  const indexedResult = await pollUntilIndexed(tx.hash);
-  console.log('indexed! ', indexedResult);
+    const tx = await lensHub.setDispatcherWithSig({
+      profileId: typedData.value.profileId,
+      dispatcher: typedData.value.dispatcher,
+      sig: {
+        v,
+        r,
+        s,
+        deadline: typedData.value.deadline
+      }
+    });
+    console.log('set dispatcher: tx hash: ', tx.hash);
+    const indexedResult = await pollUntilIndexed(tx.hash);
+    console.log('indexed! ', indexedResult);
+  }
 };
 
 const disableDispatcherWithTypedData = async (
@@ -113,23 +121,30 @@ export const disable = async (profileId: any) => {
   );
   console.log('disable dispatcher: signature', signature);
 
+  const dataBroadcast = await broadcastRequest({
+    id: result.id,
+    signature
+  })
+
   if (!signature) {
     throw new Error('Error splitting signature');
   }
+  console.log('disable dispatcher: dataBroadcast', dataBroadcast);
+  if (dataBroadcast?.__typename === 'RelayError') {
+    const { v, r, s } = splitSignature(signature);
 
-  const { v, r, s } = splitSignature(signature);
-
-  const tx = await lensHub.setDispatcherWithSig({
-    profileId: typedData.value.profileId,
-    dispatcher: typedData.value.dispatcher,
-    sig: {
-      v,
-      r,
-      s,
-      deadline: typedData.value.deadline
-    }
-  });
-  console.log('disable dispatcher: tx hash', tx.hash);
+    const tx = await lensHub.setDispatcherWithSig({
+      profileId: typedData.value.profileId,
+      dispatcher: typedData.value.dispatcher,
+      sig: {
+        v,
+        r,
+        s,
+        deadline: typedData.value.deadline
+      }
+    });
+    console.log('disable dispatcher: tx hash', tx.hash);
+  }
 };
 
 // TODO: move to its own file
