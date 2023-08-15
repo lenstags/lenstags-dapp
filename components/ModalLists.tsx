@@ -1,18 +1,18 @@
 import { ATTRIBUTES_LIST_KEY, PRIVATE_LIST_NAME } from '@lib/config';
 import { PostProcessStatus, findKeyAttributeInProfile } from 'utils/helpers';
-import { createUserList, typeList } from '@lib/lens/load-lists';
+import { createUserList, getUserLists, typeList } from '@lib/lens/load-lists';
 import { useContext, useEffect, useState } from 'react';
 
 import Image from 'next/image';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { NotificationTypes } from '@models/index';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { addPostIdtoListId } from '@lib/lens/post';
+import { followers } from '@lib/lens/followers';
 import { freeCollect } from '@lib/lens/collect';
 import { queryProfile } from '@lib/lens/dispatcher';
-import { useSnackbar } from 'material-ui-snackbar-provider';
 import { sendNotification } from '@lib/lens/user-notifications';
-import { followers } from '@lib/lens/followers';
-import { NotificationTypes } from '@models/index';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface ModalProps {
   isOpen: boolean;
@@ -95,34 +95,8 @@ const ModalList: React.FC<ModalProps> = ({
   };
 
   const refreshLists = async (profileId: string) => {
-    const readProfile = await queryProfile({
-      profileId
-    });
-    // const parsedLists2 = JSON.parse(
-    //   readProfile?.attributes?.find(
-    //     (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-    //   )?.value || `[]`
-    // );
-
-    const listAttributeObject = findKeyAttributeInProfile(
-      readProfile,
-      ATTRIBUTES_LIST_KEY
-    );
-    // Gives something like this:
-    // {
-    //   "displayType": "string",
-    //   "value": "[{\"name\":\"My private list\",\"key\":\"0x8904-0x0a\"}]",
-    //   "key": "list_warehouse_7"
-    // }
-    // console.log('xxxxx ', readProfile);
-    const parsedLists = listAttributeObject
-      ? JSON.parse(listAttributeObject.value)
-      : [];
-    // const hasLists =
-    // listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-
-    // console.log('listas parseadas en json', parsedLists);
-    console.log('refreshing lists ', parsedLists);
+    const parsedLists = await getUserLists(profileId);
+    console.log('💎💎💎💎 refreshing lists ', parsedLists);
 
     setSelectedList(parsedLists);
     setFilteredList(parsedLists);

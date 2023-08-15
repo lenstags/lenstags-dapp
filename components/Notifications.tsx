@@ -4,15 +4,16 @@ import {
   ChatBubbleOvalLeftEllipsisIcon,
   UserPlusIcon
 } from '@heroicons/react/24/outline';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
+import ProfileCard, { ProfileProps } from './ProfileCard';
+import { useEffect, useRef, useState } from 'react';
+
+import Link from 'next/link';
 import { NotificationTypes } from '@models/notifications.models';
 import { ParsedResponseType } from '@pushprotocol/restapi';
-import { useEffect, useRef, useState } from 'react';
-import ProfileCard, { ProfileProps } from './ProfileCard';
-import { profile as getProfile } from '@lib/lens/get-profile';
-import { Profile } from '@lib/lens/graphql/generated';
-import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
-import Link from 'next/link';
+// import { Profile } from '@lib/lens/graphql/generated';
 import { PublicRoutes } from '@models/routes.model';
+import { profile as getProfile } from '@lib/lens/get-profile';
 
 interface notifToIconMapType {
   [key: string]: JSX.Element;

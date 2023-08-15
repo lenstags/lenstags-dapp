@@ -1,23 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger
 } from './ui/Accordion';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuTrigger
-} from './ui/Dropdown';
-
-import { APP_UI_VERSION } from '@lib/config';
-import PostsByList from './PostsByList';
-import { ProfileContext } from './LensAuthenticationProvider';
-import { SidebarContext } from '@context/SideBarSizeContext';
 import {
   BellIcon,
   FolderIcon,
@@ -29,26 +15,41 @@ import {
   FolderIcon as FolderIconFilled,
   GlobeAltIcon as GlobeAltIconFilled
 } from '@heroicons/react/24/solid';
-import { getSigner } from '@lib/lens/ethers.service';
-import { getPublications } from '@lib/lens/get-publications';
-import { PublicationTypes } from '@lib/lens/graphql/generated';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from './ui/Dropdown';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
 import {
   channelAddress,
   getNotifications,
   getSubscriptions,
   optIn
 } from '@lib/lens/user-notifications';
+
+import { APP_UI_VERSION } from '@lib/config';
+import Image from 'next/image';
+import Link from 'next/link';
+import Notifications from './Notifications';
+import PostsByList from './PostsByList';
+import { ProfileContext } from './LensAuthenticationProvider';
+import { PublicRoutes } from 'models';
+import { PublicationTypes } from '@lib/lens/graphql/generated';
+import SidePanelNotifications from './SidePanelNotifications';
+import { SidebarContext } from '@context/SideBarSizeContext';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { Tooltip } from './ui/Tooltip';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
-import { PublicRoutes } from 'models';
-import Image from 'next/image';
-import Link from 'next/link';
+import { getPublications } from '@lib/lens/get-publications';
+import { getSigner } from '@lib/lens/ethers.service';
+import { getUserLists } from '@lib/lens/load-lists';
+import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
-import { useDisconnect } from 'wagmi';
-import Notifications from './Notifications';
-import SidePanelNotifications from './SidePanelNotifications';
 
 interface SidebarProps {}
 
@@ -86,10 +87,19 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
   const fetchMyLists = async () => {
     if (!lensProfile) return;
 
+    const parsedLists = await getUserLists(lensProfile.id);
+
+    if (!parsedLists) {
+      return;
+    }
+
     if (publications.length !== 0) return;
     setLoadingMyLists(true);
     const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
     console.log('xxx ', res);
+
+    // FIXME
+    // return getPopulatedLists(lensProfile.id);
 
     const filteredItems = res.items.filter((item) => {
       const id = lensProfile?.id;

@@ -1,15 +1,16 @@
+import { FC, useContext, useEffect, useState } from 'react';
+import { Maybe, MediaSet, Profile } from '@lib/lens/graphql/generated';
+
+import { DotWave } from '@uiball/loaders';
+import ImageProxied from './ImageProxied';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { NotificationTypes } from '@models/notifications.models';
+import { ProfileContext } from './LensAuthenticationProvider';
 import { doesFollow } from '@lib/lens/does-follow';
-import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { followers } from '@lib/lens/followers';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
-import { Maybe, MediaSet, Profile } from '@lib/lens/graphql/generated';
+import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { sendNotification } from '@lib/lens/user-notifications';
-import { NotificationTypes } from '@models/notifications.models';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
-import { DotWave } from '@uiball/loaders';
-import { FC, useContext, useEffect, useState } from 'react';
-import ImageProxied from './ImageProxied';
-import { ProfileContext } from './LensAuthenticationProvider';
 
 export interface ProfileProps extends Profile {
   picture: Maybe<MediaSet>;
