@@ -392,10 +392,12 @@ module.exports = {
     fontFamily: {
       sans: [
         'Inter',
+        'Inter-Light',
         'Inter-Regular',
-        'Inter-Semibold',
         'Inter-Medium',
-        'Inter-Black',
+        'Inter-Semibold',
+        'Inter-Bold',
+
         'ui-sans-serif',
         'system-ui',
         '-apple-system',

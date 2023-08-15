@@ -5,6 +5,7 @@ export type Tag = {
 };
 
 export const TAGS: Tag[] = [
+  // for the value, use always - to separate words
   { color: '#ddf555', value: 'ai-ml', label: 'AI-ML' },
   { color: '#ddf555', value: 'bitcoin', label: 'Bitcoin' },
   { color: '#ddf555', value: 'daos', label: 'DAOs' },
@@ -19,7 +20,7 @@ export const TAGS: Tag[] = [
   { color: '#ddf555', value: 'health', label: 'Health' },
   { color: '#ddf555', value: 'home', label: 'Home' },
   { color: '#ddf555', value: 'latam', label: 'LATAM' },
-  { color: '#ddf555', value: 'layer 2', label: 'Layer 2' },
+  { color: '#ddf555', value: 'layer-2', label: 'Layer 2' },
   { color: '#ddf555', value: 'metaverse', label: 'Metaverse' },
   { color: '#ddf555', value: 'nature', label: 'Nature' },
   { color: '#ddf555', value: 'nft', label: 'NFT' },
