@@ -26,8 +26,11 @@ const Editor = ({ initialContent = '', onChange }: Props) => (
       buttonList: [
         ['undo', 'redo', 'formatBlock'],
         ['bold', 'underline', 'italic', 'removeFormat'],
-        ['outdent', 'indent', 'align', 'horizontalRule', 'list']
-      ]
+        ['list']
+      ],
+      formats: ['h1', 'h2', 'h3', 'p', 'blockquote', 'pre'],
+      pasteTagsWhitelist:
+        'h1|h2|h3||p|blockquote|pre|a|ul|ol|li|strong|b|u|i|em|s'
     }}
   />
 );

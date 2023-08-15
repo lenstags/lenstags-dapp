@@ -8,15 +8,10 @@ import {
 
 import { Metadata } from './interfaces/publication';
 import { MetadataDisplayType } from './interfaces/generic';
-import { Profile } from './graphql/generated';
 import { broadcastRequest } from './broadcast';
-import { builtinModules } from 'module';
 import { commentGasless } from './comment-gasless';
 import { createPostGasless } from './post-gasless';
-import { freeCollect } from './collect';
-import { getAddressFromSigner } from './ethers.service';
 import { getLastComment } from './get-publications';
-import { getPublication } from './get-publication';
 import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 import { signCreatePostTypedData } from './publication-post';
 import { uploadIpfs } from './ipfs';

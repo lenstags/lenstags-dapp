@@ -1,4 +1,8 @@
-import { APP_UI_VERSION, ATTRIBUTES_LIST_KEY } from '@lib/config';
+import {
+  APP_UI_VERSION,
+  ATTRIBUTES_LIST_KEY,
+  DEFAULT_CHAIN_ID
+} from '@lib/config';
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
@@ -10,6 +14,7 @@ import {
   useRef,
   useState
 } from 'react';
+import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
@@ -34,6 +39,7 @@ const App: NextPage = () => {
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
+  const { chain } = useNetwork();
 
   const { tags } = useContext(TagsFilterContext);
   const [showWelcome, setShowWelcome] = useState(false);
@@ -46,7 +52,80 @@ const App: NextPage = () => {
   const snackbar = useSnackbar();
   const { profile: lensProfile } = useContext(ProfileContext);
 
+  const { chains, error, isLoading, pendingChainId, switchNetwork } =
+    useSwitchNetwork({
+      chainId: DEFAULT_CHAIN_ID,
+      onError(error) {
+        console.log('Error', error);
+      },
+      onSuccess(data) {
+        console.log('Success', data);
+      }
+    });
+
+  // let provider: Web3Provider;
+
+  // const networkMap = {
+  //   POLYGON_MAINNET: {
+  //     chainId: hexValue(137), // '0x89'
+  //     chainName: 'Polygon Mainnet',
+  //     nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+  //     rpcUrls: ['https://polygon-rpc.com'],
+  //     blockExplorerUrls: ['https://www.polygonscan.com/']
+  //   },
+  //   MUMBAI_TESTNET: {
+  //     chainId: hexValue(80001), // '0x13881'
+  //     chainName: 'Polygon Mumbai Testnet',
+  //     nativeCurrency: { name: 'tMATIC', symbol: 'tMATIC', decimals: 18 },
+  //     rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+  //     blockExplorerUrls: ['https://mumbai.polygonscan.com/']
+  //   }
+  // };
+
+  // const switchChains = async (chainId: number) => {
+  //   const id: string = hexValue(chainId);
+  //   try {
+  //     await provider.send('wallet_switchEthereumChain', [{ chainId: id }]);
+  //     console.log('switched to chain', chainId);
+  //   } catch (error) {
+  //     // @ts-ignore
+  //     if (error.code === 4902) {
+  //       console.log("this network is not in the user's wallet");
+  //       await provider.send('wallet_addEthereumChain', [
+  //         chainId === 80001
+  //           ? networkMap.MUMBAI_TESTNET
+  //           : networkMap.POLYGON_MAINNET
+  //       ]);
+  //     }
+
+  //     throw error;
+  //   }
+  // };
+
+  // function normalizeChainId(chainId: string | number | bigint) {
+  //   if (typeof chainId === 'string')
+  //     return Number.parseInt(
+  //       chainId,
+  //       chainId.trim().substring(0, 2) === '0x' ? 16 : 10
+  //     );
+  //   if (typeof chainId === 'bigint') return Number(chainId);
+  //   return chainId;
+  // }
+
+  // const getChainId = async (): Promise<number> => {
+  //   return provider.send('eth_chainId', []).then(normalizeChainId);
+  // };
+
+  // const ensureCorrectChain = async () => {
+  //   const currentChainId = await getChainId();
+  //   if (currentChainId !== DEFAULT_CHAIN_ID) {
+  //     await switchChains(DEFAULT_CHAIN_ID);
+  //   }
+  // };
+
   const handleSetup = async () => {
+    // await ensureCorrectChain();
+
     const profileResult = await queryProfile({ profileId: lensProfile!.id });
     const listAttributeObject = findKeyAttributeInProfile(
       profileResult,
@@ -88,17 +167,22 @@ const App: NextPage = () => {
         if (err.code === 'ACTION_REJECTED') {
           setShowReject(true);
         } else {
-          console.log('Unknown error: ', err.code);
+          console.log('Unknown error!: ', err.code);
         }
       }
     }
   };
 
   useEffect(() => {
-    if (lensProfile?.id) {
+    if (lensProfile?.id && chain) {
+      console.log('rrrrr ', chain);
+      if (chain.id !== DEFAULT_CHAIN_ID) {
+        // switch
+        switchNetwork?.(DEFAULT_CHAIN_ID);
+      }
       handleSetup();
     }
-  }, [lensProfile]);
+  }, [lensProfile, chain]);
 
   /**
    * Infinite scroll
@@ -360,6 +444,9 @@ const App: NextPage = () => {
               animation: 'gradient 10s ease infinite'
             }}
           >
+            <div className="mt-10 font-mono">
+              {chain && <div>Connected to {chain.name}</div>}
+            </div>
             <ImageProxied
               className="mt-20"
               category="profile"
@@ -368,7 +455,6 @@ const App: NextPage = () => {
               width={200}
               height={120}
             />
-
             <style jsx>{`
               @keyframes gradient {
                 0% {

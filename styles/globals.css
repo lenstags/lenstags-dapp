@@ -82,9 +82,9 @@
 
 @layer base {
   html {
-    font-family: 'Inter-Regular', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    /* font-family: 'Inter-Regular', -apple-system, BlinkMacSystemFont, 'Segoe UI',
       Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue',
-      sans-serif;
+      sans-serif; */
     scroll-behavior: smooth;
   }
 }
@@ -114,56 +114,53 @@ h3 {
 p {
   @apply text-sm;
 }
-
+ 
 @layer base {
   @font-face {
     /* font-display: swap; */
-    font-family: 'NeutralfaceText-Bold';
-    src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Bold.woff')
-      format('woff');
+    font-family: 'Inter';
+    font-weight: 300;
+    src: url('/assets/fonts/Inter/Inter-light.ttf');
   }
 }
 
 @layer base {
   @font-face {
     /* font-display: swap; */
-    font-family: 'NeutralfaceText-Demi';
-    src: url('/assets/fonts/NeutralFaceText/NeutrafaceText-Demi.woff')
-      format('woff');
+    font-family: 'Inter';
+    font-weight: 400;
+    src: url('/assets/fonts/Inter/Inter-Regular.ttf');
   }
 }
 
 @layer base {
   @font-face {
     /* font-display: swap; */
-    font-family: 'Inter-Regular';
-    src: url('/assets/fonts/Inter/Inter-Regular.woff') format('woff');
+    font-family: 'Inter';
+    font-weight: 500;
+    src: url('/assets/fonts/Inter/Inter-Medium.ttf');
   }
 }
 
 @layer base {
   @font-face {
     /* font-display: swap; */
-    font-family: 'Inter-Black';
-    src: url('/assets/fonts/Inter/Inter-Black.woff') format('woff');
+    font-family: 'Inter';
+    font-weight: 600;
+    src: url('/assets/fonts/Inter/Inter-SemiBold.ttf');
   }
 }
 
 @layer base {
   @font-face {
     /* font-display: swap; */
-    font-family: 'Inter-Medium';
-    src: url('/assets/fonts/Inter/Inter-Medium.woff') format('woff');
+    font-family: 'Inter';
+    font-weight: 700;
+    src: url('/assets/fonts/Inter/Inter-Bold.ttf');
   }
 }
 
-@layer base {
-  @font-face {
-    /* font-display: swap; */
-    font-family: 'Inter-SemiBold';
-    src: url('/assets/fonts/Inter/Inter-SemiBold.woff') format('woff');
-  }
-}
+
 
 @layer base {
   @font-face {
@@ -334,8 +331,7 @@ figcaption {
 
 /* new ui */
 .lens-input {
-  /* @apply lens-container mb-4 h-auto w-full items-baseline; */
-  box-sizing: border-box;
+   box-sizing: border-box;
 
   /* Auto layout */
   display: flex;
@@ -361,13 +357,7 @@ figcaption {
   align-self: stretch;
   flex-grow: 0;
 }
-
-.lens-container {
-  background: #ffffff4a;
-  border: 0px solid rgba(217, 217, 217, 0.5);
-  box-shadow: 0px 3.5px 3.5px rgba(0, 0, 0, 0.107);
-  border-radius: 5px;
-}
+ 
 
 .scrollbar-hide {
   scrollbar-width: thin;
@@ -415,46 +405,7 @@ figcaption {
 .dropdown:hover .dropdown-menu {
   display: block;
 }
-
-.lens-folder-tab {
-  z-index: 5;
-  box-sizing: border-box;
-  width: 100px;
-  height: 15px;
-  background: white;
-  border: 2px solid transparent;
-  border-top-right-radius: 20px;
-  border-top-left-radius: 20px;
-  border-bottom: 0px;
-  position: relative;
-  top: 1px;
-  left: 1px;
-}
-
-.lens-folder-tab-empty {
-  z-index: 5;
-  box-sizing: border-box;
-  width: 100px;
-  height: 15px;
-  top: 1px;
-  left: 1px;
-  position: relative;
-  background: transparent;
-  border: 2px solid transparent;
-  border-top-right-radius: 20px;
-  border-top-left-radius: 20px;
-  border-bottom: 0px;
-}
-
-.lens-folder {
-  border-top-right-radius: 20px;
-  border-top-left-radius: 0px;
-  border-bottom-right-radius: 20px;
-  border-bottom-left-radius: 20px;
-  background: #ffffff;
-  border: 1px solid #f2f2f2;
-  box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.06);
-}
+ 
 
 .lens-post {
   border-radius: 20px;
@@ -608,4 +559,78 @@ figcaption {
   100% {
     transform: translate3d(-66.66%, 0, 0);
   }
+}
+
+/* custom markdown for reading view */
+.markdown > h1, 
+.markdown > h2, 
+.markdown > h3 {
+    margin-bottom: 1rem;
+}
+
+.markdown > h1 {
+    font-size: 2rem; /* ajusta el tamaño de fuente */
+}
+
+.markdown > h2 {
+    font-size: 1.5rem;
+}
+
+.markdown > p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.markdown > a {
+    color: blue; /* ajusta el color de los enlaces */
+    text-decoration: underline; /* subraya los enlaces */
+}
+
+
+
+
+/* custom markdown for reading view */
+.markdown-plain {
+  height: 2.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+
+.markdown-plain > h1, 
+.markdown-plain > h2, 
+.markdown-plain > h3,
+.markdown-plain > li,
+.markdown-plain > ul,
+.markdown-plain > ol,
+.markdown-plain > p {
+    margin: 0; 
+    padding: 0;
+    font-size: 8pt;
+    font-weight: normal;
+    line-height: 10pt;
+}
+
+.markdown-plain::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1.8rem; 
+  background: linear-gradient(to bottom, transparent, white);  
+  pointer-events: none;  
+}
+
+.markdown-plain > a {
+    color: blue;  
+    text-decoration: underline; 
+    font-style: norma 
+}
+
+code, kbd, samp, pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: rgb(233, 233, 233);
+  padding:2pt 4pt 2pt 4pt;
+  border-radius: 4pt;
 }

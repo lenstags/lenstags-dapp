@@ -18,11 +18,9 @@ import { uploadImageIpfs, uploadIpfs } from './ipfs';
 
 import { DEFAULT_METADATA_ATTRIBUTES } from './post';
 import { apolloClient } from './graphql/apollo-client';
-import { broadcastRequest } from './broadcast';
 import { getAddressFromSigner } from './ethers.service';
 import { pollUntilIndexed } from './graphql/has-transaction-been-indexed';
 import { queryProfile } from './dispatcher';
-import { signCreatePostTypedData } from './publication-post';
 import { v4 as uuidv4 } from 'uuid';
 
 const createPostViaDispatcherRequest = async (
@@ -136,9 +134,10 @@ export const createPostGasless = async (
     // TODO: createdOn: new Date().toISOString(),
     attributes: na || DEFAULT_METADATA_ATTRIBUTES,
     locale: builtPost.locale || 'en-us',
-    mainContentFocus: builtPost.image
-      ? PublicationMainFocus.IMAGE
-      : PublicationMainFocus.TEXT_ONLY,
+    mainContentFocus: PublicationMainFocus.ARTICLE,
+    //  builtPost.image
+    //   ? PublicationMainFocus.IMAGE
+    //   : PublicationMainFocus.TEXT_ONLY,
     animation_url: '',
     media: mediaResult,
     version: PUBLICATION_METADATA_VERSION,

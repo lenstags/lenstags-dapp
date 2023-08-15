@@ -1,6 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { envConfig } from 'env-config';
+import fs from 'fs';
+import path from 'path';
 
 const { AUTH_OPENAI_APIKEY, AUTH_OPENAI_ORGANIZATION } = envConfig;
 
@@ -11,10 +13,23 @@ const openaiCredentials = {
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const imageUrl = req.query.imageUrl as string;
+    let imageUrl = req.query.imageUrl as string;
+
+    if (!imageUrl) {
+      const defaultFilePath = path.join(
+        process.cwd(),
+        'public',
+        'img',
+        'post.png'
+      );
+      const defaultFileData = fs.readFileSync(defaultFilePath);
+      return res.send(defaultFileData);
+    }
+
     const requestOptions = {
       headers: {
         Authorization: `Basic ${btoa(
+          // FIXME BTOA
           `${openaiCredentials.organization}:${openaiCredentials.apiKey}`
         )}`
       }
