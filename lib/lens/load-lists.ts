@@ -312,14 +312,14 @@ export const getPopulatedLists = async (profileId: any) => {
           const data = results
             .filter((r: any) => r.status === 'fulfilled')
             .map((r: any) => ({
-              postId: r.value.postId,
-              postName: r.value.postMetadata.name,
-              postTags: r.value.postMetadata.tags
+              id: r.value.postId,
+              name: r.value.postMetadata.name,
+              tags: r.value.postMetadata.tags
             }));
 
           return {
-            listKey: results[0]?.value.listKey,
-            listName: results[0]?.value.listName,
+            id: results[0]?.value.listKey,
+            name: results[0]?.value.listName,
             posts: data
           };
         });

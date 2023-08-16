@@ -43,10 +43,10 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
   const handleAction = (value: string, item: any) => {
     switch (value) {
       case 'go':
-        router.push(`${PublicRoutes.LIST}/${item.listKey}`);
+        router.push(`${PublicRoutes.LIST}/${item.id}`);
         break;
       case 'copy':
-        const links = `${window.location.origin}${PublicRoutes.LIST}/${item.listKey}`;
+        const links = `${window.location.origin}${PublicRoutes.LIST}/${item.id}`;
         navigator.clipboard.writeText(links);
         toast({
           title: '✅ Link copied to clipboard',
@@ -54,7 +54,7 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
         });
         break;
       case 'delete':
-        handleRemove(item.listKey);
+        handleRemove(item.id);
         break;
       default:
         break;
@@ -103,9 +103,9 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
     >
       {publications?.map((list: any) => (
         <AccordionItem
-          value={list.listKey}
+          value={list.id}
           className="flex flex-col border-0 [&[data-state=open]>div]:border-l-teal-400"
-          key={list.listKey}
+          key={list.id}
         >
           <div className="group flex h-11 w-full cursor-pointer items-center justify-between gap-2 border-l-4 border-transparent px-4 hover:border-l-teal-400 hover:bg-teal-50 data-[state=open]:bg-lensPurple">
             <AccordionTrigger
@@ -114,7 +114,7 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
               onClick={() => setPosts(list.posts)}
               className="text-md ml-2 group-hover:font-bold"
             >
-              {list.listName}
+              {list.name}
             </AccordionTrigger>
             <div className="flex items-center justify-between gap-2">
               {/* {list.metadata.attributes[0].value === 'list' ? ( */}
@@ -149,15 +149,15 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
             list.posts.map((post: any) => {
               return (
                 <AccordionContent
-                  key={post.postId}
+                  key={post.id}
                   className="ml-4 flex px-4 outline-none"
                 >
                   <Link
-                    href={`${PublicRoutes.POST}/${post.postId}`}
+                    href={`${PublicRoutes.POST}/${post.id}`}
                     className="mx-4 my-2"
                   >
                     {/* {post.metadata.name} */}
-                    {post.postName}
+                    {post.name}
                   </Link>
                 </AccordionContent>
               );
