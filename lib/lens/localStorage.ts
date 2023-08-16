@@ -6,6 +6,7 @@ export type LensLocalStorage = {
   accessToken: string;
   refreshToken: string;
   profile: ProfileQuery['profile'];
+  optIn: boolean;
   // bio: string;
   // canUseRelay: boolean | undefined;
   // coverUrl: string | null;

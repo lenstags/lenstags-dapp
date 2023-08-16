@@ -36,14 +36,14 @@ const DoubleSidebarOverlay = React.forwardRef<
 DoubleSidebarOverlay.displayName = DoubleSidebarPrimitive.Overlay.displayName;
 
 const DoubleSidebarVariants = cva(
-  'fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500',
+  'fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:duration-300 data-[state=open]:duration-500',
   {
     variants: {
       side: {
         top: 'inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top',
         bottom:
           'inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
-        left: 'inset-y-0 h-full border-r sm:max-w-sm data-[state=closed]:slide-out-to-left-1/4 data-[state=open]:slide-in-from-left-[10px] data-[state=closed]:animate-fadeRight',
+        left: 'inset-y-0 ml-24 h-full border-r sm:max-w-sm data-[state=closed]:slide-out-to-left-1/4 data-[state=open]:slide-in-from-left-[10px] data-[state=closed]:animate-fadeRight',
         right:
           'inset-y-0 right-0 h-full w-3/4  border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm'
       }

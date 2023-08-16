@@ -1,29 +1,29 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
+import { ProfileQuery } from '@lib/lens/graphql/generated';
 import {
   LensLocalStorage,
   deleteLensLocalStorage,
   getFromLocalStorage,
   setLensLocalStorage
 } from '@lib/lens/localStorage';
-import { Profile, ProfileQuery } from '@lib/lens/graphql/generated';
+import { authenticate, generateChallenge } from '@lib/lens/login';
 import {
   RainbowKitAuthenticationProvider,
   createAuthenticationAdapter
 } from '@rainbow-me/rainbowkit';
-import { authenticate, generateChallenge } from '@lib/lens/login';
 import { createContext, useEffect, useState } from 'react';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
-import { AttributeData } from '@lib/lens/interfaces/profile-metadata';
-import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
-import React from 'react';
 import { getDefaultProfile } from '@lib/lens/default-profile';
-import { getProfiles } from '@lib/lens/get-profiles';
-import jwt from 'jsonwebtoken';
 import { queryProfile } from '@lib/lens/dispatcher';
-import { refresh } from '@lib/lens/refresh';
+import { getProfiles } from '@lib/lens/get-profiles';
 import { setAuthenticationToken } from '@lib/lens/graphql/apollo-client';
+import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
+import { AttributeData } from '@lib/lens/interfaces/profile-metadata';
+import { refresh } from '@lib/lens/refresh';
+import jwt from 'jsonwebtoken';
+import React from 'react';
 import { useAccount } from 'wagmi';
 
 export const ProfileContext = createContext<{
@@ -289,12 +289,17 @@ export default function LensAuthenticationProvider({
         attLists
       ];
 
+      // Suscribe to channel for notifications
+
       profil.attributes = attributesFixed;
       const lensStore: LensLocalStorage = {
         accessToken: authenticatedResult.accessToken,
         refreshToken: authenticatedResult.refreshToken,
-        profile: profil
+        profile: profil,
+        optIn: false
       };
+
+      console.log('🔴 lensStore ', lensStore);
 
       setLensLocalStorage(lensStore);
       setAuthenticated(lensStore);

@@ -25,7 +25,5 @@ export const profile = async (profileId: string) => {
 
   const profile = await getProfileRequest(request);
 
-  console.log('profile: result', profile);
-
   return profile;
 };

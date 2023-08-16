@@ -27,7 +27,7 @@ const ProfileButton = () => {
       : '/img/profilePic.png';
 
   return (
-    <div id="connectArea" className="bg-white text-right ">
+    <div id="connectArea" className="bg-white text-right">
       {lensProfile ? (
         <>
           <button
@@ -51,7 +51,7 @@ const ProfileButton = () => {
 
           {/* profile menu */}
           {profileView && (
-            <div className="absolute z-20 mt-2 w-full px-4">
+            <div className="absolute left-0 z-20 mt-2 w-full">
               <div className="flex justify-end">
                 <div className="  justify-end rounded-lg border border-black bg-white px-4 py-2">
                   <div className="my-3 flex items-center">

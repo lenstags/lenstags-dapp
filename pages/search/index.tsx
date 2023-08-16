@@ -1,19 +1,24 @@
-import { useRouter } from 'next/router';
-import { useState, useEffect } from 'react';
-import { Layout } from '@components/Layout';
 import {
-  fetchData,
-  UserSearchType,
   PublicationSearchType,
-  SearchBar
+  SearchBar,
+  UserSearchType,
+  fetchData
 } from '@components/SearchBar';
+import { useContext, useEffect, useState } from 'react';
+
+import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { Layout } from '@components/Layout';
+import ModalLists from '@components/ModalLists';
+import { PostProcessStatus } from 'utils/helpers';
+import { ProfileCard } from '@components/search/ProfileCard';
+import { ProfileContext } from '@components/LensAuthenticationProvider';
+import { ResultsCard } from '@components/search/ResultsCard';
 import { Spinner } from '@components/Spinner';
 import { TagsFilter } from '@components/TagsFilter';
-import { ResultsCard } from '@components/ui/search/ResultsCard';
-import { ProfileCard } from '@components/ui/search/ProfileCard';
-import { ArrowRightIcon } from '@heroicons/react/24/outline';
+import { useRouter } from 'next/router';
+import { useSearchResultsStore } from '@lib/hooks/use-search-results-store';
 
-interface Data {
+export interface Data {
   users: UserSearchType[];
   publications: PublicationSearchType[];
 }
@@ -22,19 +27,60 @@ const Search = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState<Data | null>(null);
   const { query } = useRouter();
+  const searchData = useSearchResultsStore();
+  const { profile: lensProfile } = useContext(ProfileContext);
+  const [isPosting, setIsPosting] = useState(false);
+  const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
-    const fetchDataFunction = async () => {
+    if (searchData.query === query.q) {
       setIsLoading(true);
-      const res = await fetchData(query.q as string, 10);
-      setData(res);
+      setData(searchData.searchResults);
       setIsLoading(false);
-    };
+    } else {
+      if (query.q) {
+        const fetchDataFunction = async () => {
+          setIsLoading(true);
+          const res = await fetchData(query.q as string, 10);
+          setData(res);
+          setIsLoading(false);
+        };
 
-    fetchDataFunction();
+        fetchDataFunction();
+      }
+    }
   }, [query.q]);
 
-  console.log(data);
+  // modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [postId, setPostId] = useState('');
+  const [post, setPost] = useState<any>(null);
+  const handleOpenModal = (postId: string, post: any) => {
+    setPostId(postId);
+    setPost(post);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleProcessStatus = (actualStatus: PostProcessStatus) => {
+    if (
+      actualStatus === PostProcessStatus.CREATING_LIST ||
+      actualStatus === PostProcessStatus.COLLECTING_POST ||
+      actualStatus === PostProcessStatus.ADDING_POST ||
+      actualStatus === PostProcessStatus.INDEXING
+    ) {
+      setIsPosting(true);
+    }
+
+    if (actualStatus === PostProcessStatus.FINISHED) {
+      setIsPosting(false);
+      setIsFinished(true);
+    }
+    // TODO error-unauthenticated//
+  };
 
   return (
     <Layout
@@ -46,20 +92,29 @@ const Search = () => {
           <SearchBar />
           <TagsFilter />
         </div>
-        <div className="flex flex-col min-w-full px-8">
+        <ModalLists
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          postId={postId}
+          processStatus={handleProcessStatus}
+          ownedBy={post?.ownedBy}
+          isList={post?.isList}
+          post={post}
+        />
+        <div className="flex min-w-full flex-col px-8">
           {isLoading ? (
-            <div className="flex min-w-full justify-center my-8">
+            <div className="my-8 flex min-w-full justify-center">
               <Spinner h="8" w="8" />
             </div>
           ) : (
             <>
               {data!.publications.length > 0 && (
-                <div className="flex flex-col min-w-full mb-10">
-                  <div className="flex justify-between items-center mb-6">
+                <div className="mb-10 flex min-w-full flex-col">
+                  <div className="mb-6 flex items-center justify-between">
                     <h2 className="font-serif text-3xl font-bold">Results</h2>
                     <div className="flex items-center font-semibold">
                       <span className="mr-2">View all</span>
-                      <ArrowRightIcon className="w-4 h-4" />
+                      <ArrowRightIcon className="h-4 w-4" />
                     </div>
                   </div>
                   <div className="flex flex-col space-y-4">
@@ -67,18 +122,22 @@ const Search = () => {
                       <ResultsCard
                         key={publication.id}
                         publication={publication}
+                        profile={lensProfile}
+                        isFinishedState={isFinished}
+                        isPostingState={isPosting}
+                        openModalHandler={handleOpenModal}
                       />
                     ))}
                   </div>
                 </div>
               )}
               {data!.users.length > 0 && (
-                <div className="flex flex-col min-w-full">
-                  <div className="flex justify-between items-center mb-6">
+                <div className="mb-10 flex min-w-full flex-col">
+                  <div className="mb-6 flex items-center justify-between">
                     <h2 className="font-serif text-3xl font-bold">Profiles</h2>
                     <div className="flex items-center font-semibold">
                       <span className="mr-2">View all</span>
-                      <ArrowRightIcon className="w-4 h-4" />
+                      <ArrowRightIcon className="h-4 w-4" />
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-y-4">

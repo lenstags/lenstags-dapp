@@ -67,7 +67,6 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       }
     },
-    animation: {},
     variants: {
       extend: {
         scrollBehavior: ['responsive', 'motion-safe', 'motion-reduce'],
@@ -89,8 +88,9 @@ module.exports = {
       bounce: 'bounce 1s infinite',
       'accordion-down': 'accordion-down 300ms cubic-bezier(0.87, 0, 0.13, 1)',
       'accordion-up': 'accordion-up 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-      fadeLeft: 'fadeLeft 300ms cubic-bezier(0.87, 0, 0.13, 1)',
-      fadeRight: 'fadeRight 300ms cubic-bezier(0.87, 0, 0.13, 1)'
+      fadeLeft: 'fadeLeft 200ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeRight: 'fadeRight 500ms cubic-bezier(0.87, 0, 0.13, 1)',
+      fadeOutLogo: 'fadeOutLogo 500ms cubic-bezier(0.87, 0, 0.13, 1)'
     },
     aria: {
       checked: 'checked="true"',
@@ -392,10 +392,12 @@ module.exports = {
     fontFamily: {
       sans: [
         'Inter',
+        'Inter-Light',
         'Inter-Regular',
-        'Inter-Semibold',
         'Inter-Medium',
-        'Inter-Black',
+        'Inter-Semibold',
+        'Inter-Bold',
+
         'ui-sans-serif',
         'system-ui',
         '-apple-system',
@@ -654,7 +656,7 @@ module.exports = {
       fadeLeft: {
         '0%': {
           opacity: '0',
-          transform: 'translateX(-20px)'
+          transform: 'translateX(-10px)'
         },
         '100%': {
           opacity: '1',
@@ -663,12 +665,20 @@ module.exports = {
       },
       fadeRight: {
         '0%': {
-          opacity: '0',
-          transform: 'translateX(20px)'
+          opacity: '1',
+          transform: 'translateX(0px)'
         },
         '100%': {
-          opacity: '1',
-          transform: 'translateX(0)'
+          opacity: '0',
+          transform: 'translateX(-20px)'
+        }
+      },
+      fadeOutLogo: {
+        '0%': {
+          opacity: '1'
+        },
+        '100%': {
+          opacity: '0'
         }
       }
     },
@@ -695,6 +705,13 @@ module.exports = {
       8: '2rem',
       9: '2.25rem',
       10: '2.5rem'
+    },
+    lineClamp: {
+      1: '1',
+      2: '2',
+      3: '3',
+      4: '4',
+      5: '5'
     },
     listStyleType: {
       none: 'none',
@@ -996,7 +1013,8 @@ module.exports = {
       300: '300ms',
       500: '500ms',
       700: '700ms',
-      1000: '1000ms'
+      1000: '1000ms',
+      5000: '5000ms'
     },
     transitionProperty: {
       none: 'none',

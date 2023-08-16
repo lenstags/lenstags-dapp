@@ -1,6 +1,15 @@
-import { ATTRIBUTES_LIST_KEY, PROFILE_METADATA_VERSION } from '@lib/config';
+import {
+  ATTRIBUTES_LIST_KEY,
+  PRIVATE_LIST_NAME,
+  PROFILE_METADATA_VERSION
+} from '@lib/config';
 import { AttributeData, ProfileMetadata } from './interfaces/profile-metadata';
 import { findKeyAttributeInProfile, pickPicture } from 'utils/helpers';
+import {
+  getComments,
+  getLastComment,
+  getLastCommentList
+} from './get-publications';
 
 import { IbuiltPost } from './interfaces/publication';
 import { MetadataDisplayType } from './interfaces/generic';
@@ -36,8 +45,8 @@ export const loadLists = async (lensProfileOld: any) => {
 // the setup of the default list
 export const createDefaultList = async (lensProfile: any) => {
   const constructedDefaultPost: IbuiltPost = {
-    name: 'My private list', // HACK should it be 'My stuff {private)?
-    content: 'My private list',
+    name: PRIVATE_LIST_NAME, // HACK should it be 'My stuff {private)?
+    content: PRIVATE_LIST_NAME + ' ...',
     locale: 'ia', // INTERLINGUA https://www.wikidata.org/wiki/Q22282939
     attributes: [
       {
@@ -145,8 +154,12 @@ export const createUserList = async (lensProfile: any, name: string) => {
 
   const constructedUserPost: IbuiltPost = {
     name,
-    content: `Hi there! This is a favList , you can see it in my profile here → <a target="_blank" rel="noopener"
-    href="https://www.nata.social/profile/${lensProfile.id}">https://www.nata.social/profile/${lensProfile.id}</a>`,
+    // content: `Hi there! This is a favList , you can see it in my profile here → <a target="_blank" rel="noopener"
+    // href="https://www.nata.social/profile/${lensProfile.id}">https://www.nata.social/profile/${lensProfile.id}</a>`,
+    content: `I have created a list called '${name}' in Nata Social. You'll be able to check it out soon!
+\n\n
+    Your bookmarks, now social.`,
+
     locale: 'en',
     attributes: [
       {
@@ -228,3 +241,68 @@ export const createUserList = async (lensProfile: any, name: string) => {
   );
   return newList;
 };
+
+export const getUserLists = async (profileId: string) => {
+  const readProfile = await queryProfile({
+    profileId
+  });
+  // const parsedLists2 = JSON.parse(
+  //   readProfile?.attributes?.find(
+  //     (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
+  //   )?.value || `[]`
+  // );
+
+  const listAttributeObject = findKeyAttributeInProfile(
+    readProfile,
+    ATTRIBUTES_LIST_KEY
+  );
+  // Gives something like this:
+  // {
+  //   "displayType": "string",
+  //   "value": "[{\"name\":\"My private list\",\"key\":\"0x8904-0x0a\"}]",
+  //   "key": "list_warehouse_7"
+  // }
+  // console.log('xxxxx ', readProfile);
+  const parsedLists = listAttributeObject
+    ? JSON.parse(listAttributeObject.value)
+    : [];
+  // const hasLists =
+  // listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
+
+  // console.log('listas parseadas en json', parsedLists);
+  return parsedLists;
+};
+
+// export const getPopulatedLists = async (profileId: any) => {
+//   const arrLists = await getUserLists(profileId);
+//   if (!arrLists) {
+//     return;
+//   }
+
+//   return arrLists.map((list: any) => {
+//     return getLastCommentList(list.key)
+//       .then((res) => {
+//         // console.log('XX> ', arrIds.metadata.tags);
+//         if (!res) {
+//           return;
+//         }
+
+//         const arrIds = res.list;
+//         const items = res.items;
+
+//         if (!items || !items.metadata) {
+//           return;
+//         }
+
+//         return Promise.allSettled(
+//           items.metadata.tags.map((id: string) => ({
+//             id,
+//             pub: getPublication(id)
+//           }))
+//         );
+//       })
+//       .then((r) => {
+//         console.log('[[[[  ', r);
+//       });
+//   });
+// };

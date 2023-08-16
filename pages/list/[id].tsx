@@ -28,7 +28,7 @@ export default function ListDetails() {
       // TODO RECURSIVE LISTS ISSUE
       console.log(oo);
       const arrIds: any = await getLastComment(id as string);
-      console.log('XX ', arrIds.metadata.tags);
+      console.log('XX< ', arrIds.metadata.tags);
 
       if (!arrIds || arrIds.length === 0) {
         return;

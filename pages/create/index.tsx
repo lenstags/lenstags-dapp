@@ -27,6 +27,10 @@ import { createPostManager } from '@lib/lens/post';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { followers } from '@lib/lens/followers';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { NotificationTypes } from '@models/notifications.models';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -41,6 +45,42 @@ type ToastContent = {
 };
 
 const fromHtml = new TurndownService();
+fromHtml.keep(['br']);
+
+fromHtml.addRule('headers', {
+  filter: ['h1', 'h2'],
+  replacement: (content, node) => {
+    if (node.nodeName === 'H1') {
+      return '# ' + content + '\n';
+    }
+    if (node.nodeName === 'H2') {
+      return '## ' + content + '\n';
+    }
+    return '';
+  }
+});
+
+fromHtml.addRule('headers', {
+  filter: ['h3', 'h4', 'h5', 'h6'],
+  replacement: (content, node) => {
+    const level = Number(node.nodeName.charAt(1));
+    return `${'#'.repeat(level)} ${content}\n`;
+  }
+});
+
+fromHtml.addRule('code', {
+  filter: ['pre'],
+  replacement: (content) => {
+    return '`' + content + '`\n';
+  }
+});
+
+fromHtml.addRule('lineElementsToPlain', {
+  filter: ['div', 'p'],
+  replacement: (content) => {
+    return content + '\n\n'; // dos saltos de línea para el formato Markdown de párrafo
+  }
+});
 
 const Create: NextPage = () => {
   const [title, setTitle] = useState('');
@@ -54,9 +94,9 @@ const Create: NextPage = () => {
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
+  const [isTagSelected, setIsTagSelected] = useState<boolean>(false);
 
   const [imageURL, setImageURL] = useState('');
-  // const [actualPanel, setActualPanel] = useState<string | null>('panelAI');
   const [imageOrigin, setImageOrigin] = useState<string | null>('panelAI');
 
   const [loading, setLoading] = useState(false);
@@ -244,25 +284,16 @@ const Create: NextPage = () => {
   };
 
   const handleChangeEditor = (content: string) => {
-    console.log('rr ', content);
-
     const existing = fromHtml.turndown(content);
-    // if (existing !== $content) {
-    //     const html = htmlFromMarkdown($content);
-    //     editor.setContent(html);
-    // }
-    // console.log(existing);
-
-    // const existing = fromHtml.turndown(textInput.innerHTML)
-    // if (existing !== $content) {
-    //     const html = htmlFromMarkdown($content);
-    //     editor.setContent(html);
-    // }
-
-    return setEditorContents(content);
+    setEditorContents(existing);
   };
 
   const handlePost = async () => {
+    if (!selectedOption || selectedOption.length === 0) {
+      snackbar.showMessage('⚠️ You forgot to select at least ONE tag!');
+      return;
+    }
+
     if (!title) {
       snackbar.showMessage('⚠️ Attention: Title is required!');
       return;
@@ -278,10 +309,10 @@ const Create: NextPage = () => {
     let imageBuffer: Buffer | null = null;
 
     imageBuffer = await getBufferFromElement(
-      imageURL ? imageURL : 'public/img/post.png'
+      imageURL
+      // imageURL ? imageURL : 'public/img/post.png'
     );
 
-    // FIXME fixmeees
     if (imageOrigin === 'panelUpload') {
       console.log('aca ', cover);
       if (cover) {
@@ -315,13 +346,6 @@ const Create: NextPage = () => {
         ? Buffer.from(generatedImage2, 'base64')
         : null;
     }
-
-    // imageBuffer = Buffer.from(generatedImage, 'base64');
-
-    // setGeneratedImage(imageBuffer);
-
-    console.log('iiii ', generatedImage);
-    // return;
 
     if (!imageBuffer) {
       const parentNode = document.getElementById('defaultImage');
@@ -366,6 +390,41 @@ const Create: NextPage = () => {
       );
       console.log('POST RESULT: ', result);
       snackbar.showMessage('👌🏻 Post created successfully!');
+
+      // /* Send Notification for followers: create post */
+      const listFollowers = await followers(lensProfile?.id);
+      const listAddressByFollowers = listFollowers.items.map(
+        (follower) => follower.wallet.address
+      );
+      const { pubId } =
+        typeof result !== 'string' && result.pubId ? result : { pubId: '' };
+      const id = lensProfile?.id;
+      const dataSender = {
+        title,
+        pubId,
+        id
+      };
+      if (lensProfile?.name) {
+        if (listAddressByFollowers.length > 1) {
+          sendNotification(
+            listAddressByFollowers,
+            NotificationTypes.CreatedPost,
+            lensProfile.name,
+            NOTIFICATION_TYPE.SUBSET,
+            JSON.stringify(dataSender),
+            lensProfile.id
+          );
+        } else if (listAddressByFollowers.length === 1) {
+          sendNotification(
+            [listAddressByFollowers[0]],
+            NotificationTypes.CreatedPost,
+            lensProfile.name,
+            NOTIFICATION_TYPE.TARGETTED,
+            JSON.stringify(dataSender),
+            lensProfile.id
+          );
+        }
+      }
       await sleep(2500);
       router.push('/app');
     } catch (e: any) {
@@ -558,7 +617,7 @@ const Create: NextPage = () => {
             /> */}
 
                 <span className="mb-4 text-xl font-medium leading-7 text-neutral-900">
-                  Choose a cover image {imageOrigin}
+                  Choose a cover image
                 </span>
 
                 <span className="mb-4 text-base font-normal leading-normal text-neutral-600">
@@ -618,7 +677,7 @@ const Create: NextPage = () => {
             {/* the editor  */}
             <div className="h-[540px] rounded-lg border border-zinc-100 p-4">
               <input
-                className=" mb-3 w-full text-xl font-bold leading-normal   text-neutral-400  outline-none"
+                className="mb-3 w-full text-xl leading-normal text-neutral-400  outline-none"
                 type="text"
                 name="title"
                 placeholder="Title"
@@ -733,8 +792,6 @@ const Create: NextPage = () => {
                   name={title + editorContents}
                   square={true}
                   variant="marble"
-                  // colors={
-                  // ['#180A29', '#49007E', '#FF005B', '#FF7D10', '#FFB238']
                   colors={[
                     '#413E4A',
                     '#73626E',

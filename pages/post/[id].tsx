@@ -8,6 +8,7 @@ import {
   MetadataAttribute,
   PublicationMainFocus
 } from '@lib/lens/interfaces/publication';
+import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
 import DotWave from '@uiball/loaders/dist/components/DotWave';
@@ -17,7 +18,6 @@ import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import ModalLists from 'components/ModalLists';
 import PostIndicators from 'components/PostIndicators';
-import { PostProcessStatus } from 'utils/helpers';
 import { Spinner } from 'components/Spinner';
 import TagStrip from 'components/TagStrip';
 import { commentGasless } from '@lib/lens/comment-gasless';
@@ -30,6 +30,9 @@ import { typeList } from '@lib/lens/load-lists';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { NotificationTypes } from '@models/notifications.models';
 
 export default function PostDetails() {
   const router = useRouter();
@@ -55,10 +58,6 @@ export default function PostDetails() {
 
   const [lists, setLists] = useState<typeList[]>(firstList);
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
-
-  function createMarkup(innerHtml: string) {
-    return { __html: innerHtml };
-  }
 
   const refreshComments = async () => {
     const comments = await getComments(ii);
@@ -186,6 +185,31 @@ export default function PostDetails() {
         }
       };
       const newAll = [draftComment, ...allComments];
+
+      /* Send Notification for target */
+      const { metadata, id, profile } = post;
+      const { id: profileId } = profile;
+      const { name } = metadata;
+      const dataSender = {
+        name,
+        id,
+        profileId
+      };
+      if (
+        loggedProfile?.name &&
+        lensProfile?.ownedBy &&
+        loggedProfile.id !== lensProfile.id
+      ) {
+        sendNotification(
+          lensProfile.ownedBy,
+          NotificationTypes.CommentedPost,
+          loggedProfile.name,
+          NOTIFICATION_TYPE.TARGETTED,
+          JSON.stringify(dataSender),
+          loggedProfile.id
+        );
+      }
+
       setAllComments(newAll);
       setIsSpinnerVisible(false);
       setComment('');
@@ -393,7 +417,9 @@ export default function PostDetails() {
                     isOpen={isModalOpen}
                     onClose={handleCloseModal}
                     postId={postId}
+                    post={post}
                     processStatus={handleProcessStatus}
+                    ownedBy={lensProfile.ownedBy}
                   />
                 </div>
               </div>
@@ -411,8 +437,8 @@ export default function PostDetails() {
               )}
 
               <div
-                className=" mb-8 py-8 "
-                dangerouslySetInnerHTML={createMarkup(
+                className="markdown my-8"
+                dangerouslySetInnerHTML={markdownToHTML(
                   post.metadata.content || 'no-contents'
                 )}
               ></div>

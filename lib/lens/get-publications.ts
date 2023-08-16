@@ -42,6 +42,33 @@ export const getLastComment = async (postId: string) => {
   return result.items.length > 0 ? result.items[0] : null;
 };
 
+export const getLastCommentList = async (postId: string) => {
+  const result = await getPublicationsRequest({
+    commentsOf: postId
+  });
+  // const p = await getPublication(postId);
+  // console.log(p);
+  // const result = await getPublicationsRequest({
+  //   // profileId: '0x4b87',
+  //   publicationTypes: [PublicationTypes.Comment],
+  //   commentsOf: '0x4b87-0x0130'
+  //   // publicationIds: [postId] // ['0x4b87-0x69'] // FIXME test later if it doesnt work
+  //   // [PublicationTypes.Post, PublicationTypes.Comment, PublicationTypes.Mirror],
+  // });
+
+  // console.log(
+  //   'post comments de ',
+  //   postId,
+  //   ': ',
+  //   result.items.filter((i) => i.__typename === 'Comment')
+  // );
+
+  // console.log('resulttt: ', result, result.items.length);
+  return result.items.length > 0
+    ? { list: postId, items: result.items[0] }
+    : null;
+};
+
 export const getComments = async (postId: string) => {
   const result = await getPublicationsRequest({
     commentsOf: postId,

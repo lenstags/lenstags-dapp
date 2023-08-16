@@ -1,6 +1,9 @@
 // @ts-ignore
 
+import { parse, setOptions } from 'marked';
+
 import { IPFS_PROXY_URL } from '../lib/config';
+import createDOMPurify from 'dompurify';
 import omitDeep from 'omit-deep';
 
 export const genericFetch = (url: string) =>
@@ -114,4 +117,16 @@ export const checkIfUrl = (value: string): boolean => {
   } catch {
     return false;
   }
+};
+
+export const markdownToHTML = (innerHtml: string): any => {
+  const dirtyHTML = parse(innerHtml);
+  const windowGlobal = typeof window !== 'undefined' && window;
+  if (!windowGlobal) {
+    throw new Error('it runs on client side only.');
+  }
+  const DOMPurify = createDOMPurify(windowGlobal);
+  const cleanHTML = DOMPurify.sanitize(dirtyHTML);
+
+  return { __html: cleanHTML };
 };

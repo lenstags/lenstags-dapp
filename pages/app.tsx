@@ -1,4 +1,9 @@
-import { APP_UI_VERSION, ATTRIBUTES_LIST_KEY } from '@lib/config';
+import {
+  APP_UI_VERSION,
+  ATTRIBUTES_LIST_KEY,
+  DEFAULT_CHAIN_ID
+} from '@lib/config';
+ 
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
@@ -10,6 +15,7 @@ import {
   useRef,
   useState
 } from 'react';
+import { useNetwork, useSwitchNetwork } from 'wagmi';
 
 import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
@@ -34,17 +40,93 @@ const App: NextPage = () => {
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
+  const { chain } = useNetwork();
 
   const { tags } = useContext(TagsFilterContext);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showReject, setShowReject] = useState(false);
   const [ready, setReady] = useState(false);
+  const [loadingFetchMore, setLoadingFetchMore] = useState(false);
+  const [loader, setLoader] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
   const { profile: lensProfile } = useContext(ProfileContext);
 
+  const { chains, error, isLoading, pendingChainId, switchNetwork } =
+    useSwitchNetwork({
+      chainId: DEFAULT_CHAIN_ID,
+      onError(error) {
+        console.log('Error', error);
+      },
+      onSuccess(data) {
+        console.log('Success', data);
+      }
+    });
+
+  // let provider: Web3Provider;
+
+  // const networkMap = {
+  //   POLYGON_MAINNET: {
+  //     chainId: hexValue(137), // '0x89'
+  //     chainName: 'Polygon Mainnet',
+  //     nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+  //     rpcUrls: ['https://polygon-rpc.com'],
+  //     blockExplorerUrls: ['https://www.polygonscan.com/']
+  //   },
+  //   MUMBAI_TESTNET: {
+  //     chainId: hexValue(80001), // '0x13881'
+  //     chainName: 'Polygon Mumbai Testnet',
+  //     nativeCurrency: { name: 'tMATIC', symbol: 'tMATIC', decimals: 18 },
+  //     rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
+  //     blockExplorerUrls: ['https://mumbai.polygonscan.com/']
+  //   }
+  // };
+
+  // const switchChains = async (chainId: number) => {
+  //   const id: string = hexValue(chainId);
+  //   try {
+  //     await provider.send('wallet_switchEthereumChain', [{ chainId: id }]);
+  //     console.log('switched to chain', chainId);
+  //   } catch (error) {
+  //     // @ts-ignore
+  //     if (error.code === 4902) {
+  //       console.log("this network is not in the user's wallet");
+  //       await provider.send('wallet_addEthereumChain', [
+  //         chainId === 80001
+  //           ? networkMap.MUMBAI_TESTNET
+  //           : networkMap.POLYGON_MAINNET
+  //       ]);
+  //     }
+
+  //     throw error;
+  //   }
+  // };
+
+  // function normalizeChainId(chainId: string | number | bigint) {
+  //   if (typeof chainId === 'string')
+  //     return Number.parseInt(
+  //       chainId,
+  //       chainId.trim().substring(0, 2) === '0x' ? 16 : 10
+  //     );
+  //   if (typeof chainId === 'bigint') return Number(chainId);
+  //   return chainId;
+  // }
+
+  // const getChainId = async (): Promise<number> => {
+  //   return provider.send('eth_chainId', []).then(normalizeChainId);
+  // };
+
+  // const ensureCorrectChain = async () => {
+  //   const currentChainId = await getChainId();
+  //   if (currentChainId !== DEFAULT_CHAIN_ID) {
+  //     await switchChains(DEFAULT_CHAIN_ID);
+  //   }
+  // };
+
   const handleSetup = async () => {
+    // await ensureCorrectChain();
+
     const profileResult = await queryProfile({ profileId: lensProfile!.id });
     const listAttributeObject = findKeyAttributeInProfile(
       profileResult,
@@ -86,17 +168,22 @@ const App: NextPage = () => {
         if (err.code === 'ACTION_REJECTED') {
           setShowReject(true);
         } else {
-          console.log('Unknown error: ', err.code);
+          console.log('Unknown error!: ', err.code);
         }
       }
     }
   };
 
   useEffect(() => {
-    if (lensProfile?.id) {
+    if (lensProfile?.id && chain) {
+      console.log('rrrrr ', chain);
+      if (chain.id !== DEFAULT_CHAIN_ID) {
+        // switch
+        switchNetwork?.(DEFAULT_CHAIN_ID);
+      }
       handleSetup();
     }
-  }, [lensProfile]);
+  }, [lensProfile, chain]);
 
   /**
    * Infinite scroll
@@ -110,21 +197,19 @@ const App: NextPage = () => {
     return reqQuery;
   }, [tags]);
 
-  const { fetchMore, refetch, loading } = useQuery(
-    ExplorePublicationsDocument,
-    {
-      variables: {
-        request: query
-      },
-      onCompleted: (data) => {
-        if (cursor === undefined)
-          setCursor(data.explorePublications.pageInfo.next);
-      }
+  const { fetchMore } = useQuery(ExplorePublicationsDocument, {
+    variables: {
+      request: query
+    },
+    onCompleted: (data) => {
+      if (cursor === undefined)
+        setCursor(data.explorePublications.pageInfo.next);
     }
-  );
+  });
 
-  const handleLoadMore = () => {
+  const handleLoadMoreWithoutTags = useCallback(() => {
     if (!cursor) return console.log('no more results');
+    setLoadingFetchMore(true);
     fetchMore({
       variables: {
         request: {
@@ -147,11 +232,45 @@ const App: NextPage = () => {
           ...prev,
           ...res.data.explorePublications.items
         ]);
+        setLoadingFetchMore(false);
       } else {
+        setLoadingFetchMore(false);
         return console.log('no more results');
       }
     });
-  };
+  }, [cursor, fetchMore, query]);
+
+  const handleLoadMoreWithTags = useCallback(() => {
+    setLoadingFetchMore(true);
+    fetchMore({
+      variables: {
+        request: {
+          ...query,
+          cursor
+        }
+      },
+      updateQuery: (prev, { fetchMoreResult }): any => {
+        if (!fetchMoreResult) return 'no more results';
+        return {
+          explorePublications: {
+            ...fetchMoreResult.explorePublications
+          }
+        };
+      }
+    }).then((res) => {
+      if (res.data.explorePublications.items.length > 0) {
+        setCursor(res.data.explorePublications.pageInfo.next);
+        setPublications((prev) => [
+          ...prev,
+          ...res.data.explorePublications.items
+        ]);
+        setLoadingFetchMore(false);
+      } else {
+        setLoadingFetchMore(false);
+        return console.log('no more results');
+      }
+    });
+  }, [cursor, fetchMore, query]);
 
   const observer = useRef<IntersectionObserver>();
   const lastPublicationRef = useCallback(
@@ -159,21 +278,37 @@ const App: NextPage = () => {
       if (publications.length === 0) return;
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting && cursor) {
-          handleLoadMore();
+        if (entries[0].isIntersecting && cursor && tags.length === 0) {
+          handleLoadMoreWithoutTags();
+        } else if (entries[0].isIntersecting && cursor && tags.length > 0) {
+          handleLoadMoreWithTags();
         }
       });
       if (node) observer.current.observe(node);
     },
-    [cursor, publications.length]
+    [
+      cursor,
+      publications?.length,
+      tags.length,
+      handleLoadMoreWithTags,
+      handleLoadMoreWithoutTags
+    ]
   );
 
   useEffect(() => {
-    explore({ locale: 'en', tags }).then((data) => {
-      return setPublications(data.items);
-    });
-    refetch();
-  }, [tags, refetch]);
+    setLoader(true);
+    explore({ locale: 'en', tags })
+      .then((data) => {
+        setLoader(false);
+        if (!data) return setPublications([]);
+        setCursor(data.pageInfo.next);
+        return setPublications(data.items);
+      })
+      .catch((err) => {
+        console.log('ERROR ', err);
+        setLoader(false);
+      });
+  }, [tags]);
 
   if (hydrationLoading) {
     return (
@@ -310,6 +445,9 @@ const App: NextPage = () => {
               animation: 'gradient 10s ease infinite'
             }}
           >
+            <div className="mt-10 font-mono">
+              {chain && <div>Connected to {chain.name}</div>}
+            </div>
             <ImageProxied
               className="mt-20"
               category="profile"
@@ -318,7 +456,6 @@ const App: NextPage = () => {
               width={200}
               height={120}
             />
-
             <style jsx>{`
               @keyframes gradient {
                 0% {
@@ -418,7 +555,7 @@ const App: NextPage = () => {
         ) : (
           <>
             {/* top bar container*/}
-            <div className="h-50 top-0 z-10 w-full bg-white px-8 pt-4">
+            <div className="h-50 sticky top-0 z-10 w-full bg-white px-8 py-2 pt-4">
               {/* search bar */}
               <SearchBar />
               <TagsFilter />
@@ -503,8 +640,8 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="px-4">
-              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6 ">
+            <div className="px-4 pb-6">
+              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
                     if (publications.length === index + 1) {
@@ -521,12 +658,23 @@ const App: NextPage = () => {
                       );
                     }
                   })
-                ) : (
+                ) : loader ? (
                   <div className="my-8">
                     <Spinner h="10" w="10" />
                   </div>
+                ) : (
+                  <div className="my-8">
+                    <span className="text-lg font-medium">
+                      No results found 🤷‍♂️
+                    </span>
+                  </div>
                 )}
               </div>
+              {loadingFetchMore && (
+                <div className="mx-auto mb-10 flex w-10 items-center justify-center ">
+                  <Spinner h="10" w="10" />
+                </div>
+              )}
             </div>
           </>
         )}

@@ -42,5 +42,5 @@ export const explore = async (filter?: IExplorePublications) => {
   }
 
   const result = await explorePublications(reqQuery);
-  return result.data.explorePublications;
+  return result.data?.explorePublications;
 };

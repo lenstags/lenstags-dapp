@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { search } from '@lib/lens/graphql/search';
 import { Spinner } from './Spinner';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { useSearchResultsStore } from '@lib/hooks/use-search-results-store';
 
 export interface UserSearchType {
   id: string;
@@ -23,18 +24,25 @@ export interface PublicationSearchType {
   profilePicture: string;
   profileName: string;
   profileHandle: string;
+  profileBio: string;
+  profileId: string;
+  profileTotalFollowers: number;
+  profileTotalFollowing: number;
   image: string;
   tags: string[];
   content: string;
   createdAt: string;
   totalAmountOfComments: number;
   totalAmountOfCollects: number;
+  hasCollectedByMe: boolean;
+  isFollowedByMe: boolean;
+  ownedBy: `0x${string}`;
 }
 
 export const fetchData = async (input: string, limit: number = 5) => {
   const res = await search(input, limit);
 
-  const resUsers = (await res.profilesData) as ProfileSearchResult;
+  const resUsers = res?.profilesData as ProfileSearchResult;
   const users = resUsers.items.map((user: any) => {
     return {
       id: user.id,
@@ -44,8 +52,7 @@ export const fetchData = async (input: string, limit: number = 5) => {
     };
   });
 
-  const resPublications =
-    (await res.publicationsData) as PublicationSearchResult;
+  const resPublications = res?.publicationsData as PublicationSearchResult;
   const publications = resPublications.items.map((publication: any) => {
     return {
       id: publication.id,
@@ -54,12 +61,19 @@ export const fetchData = async (input: string, limit: number = 5) => {
       profilePicture: publication.profile.picture.original.url,
       profileName: publication.profile.name,
       profileHandle: publication.profile.handle,
+      profileBio: publication.profile.bio,
+      profileId: publication.profile.id,
+      profileTotalFollowers: publication.profile.stats.totalFollowers,
+      profileTotalFollowing: publication.profile.stats.totalFollowing,
       image: publication.metadata.media[0]?.original.url,
       tags: publication.metadata.tags,
       content: publication.metadata.content,
       createdAt: publication.createdAt,
       totalAmountOfComments: publication.stats.totalAmountOfComments,
-      totalAmountOfCollects: publication.stats.totalAmountOfCollects
+      totalAmountOfCollects: publication.stats.totalAmountOfCollects,
+      hasCollectedByMe: publication.hasCollectedByMe,
+      isFollowedByMe: publication.profile.isFollwedByMe,
+      ownedBy: publication.profile.ownedBy
     };
   });
 
@@ -76,6 +90,7 @@ export const SearchBar = () => {
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchData = useSearchResultsStore();
 
   const handleInputText = (event: ChangeEvent<HTMLInputElement>) => {
     setInputText(event.target.value);
@@ -117,6 +132,8 @@ export const SearchBar = () => {
         const fetchAndSetUsers = async () => {
           setIsLoading(true);
           const data = await fetchData(inputText);
+          searchData.setSearchResults(data);
+          searchData.setQuery(inputText);
           setCachedUsers(data.users);
           setCachedPublications(data.publications);
           setIsLoading(false);
@@ -181,6 +198,7 @@ export const SearchBar = () => {
           )}
         </div>
       ) : (
+        inputText !== '' &&
         (cachedPublications.length > 0 || cachedUsers.length > 0) && (
           <div className="absolute z-[10000] flex flex-col rounded-md bg-stone-100 px-4 py-3 mt-2 border-black border-[1px] md:w-1/2">
             {cachedPublications.length > 0 && (

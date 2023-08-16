@@ -1,7 +1,9 @@
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
-export const APP_UI_VERSION = '0.0.17';
+ export const APP_UI_VERSION = '0.0.18';
+ 
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
+export const PRIVATE_LIST_NAME = 'Collected items';
 export const DEFAULT_IMAGE_IPFS_PROFILE =
   'Qmf1BoAdUg9UaUYafEBJN1XVSiWWi4HQuReSs5Q2ZrPMDe';
 export const DEFAULT_IMAGE_POST = '/img/post.png';
@@ -12,17 +14,18 @@ export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
 export const LENS_PERIPHERY_NAME = 'LensPeriphery';
 
 // testnet
+ // export const DEFAULT_CHAIN_ID = 80001;
 // export const LENS_API = 'https://api-mumbai.lens.dev/';
 // export const LENS_HUB_CONTRACT = '0x60Ae865ee4C725cd04353b5AAb364553f56ceF82';
 // export const LENS_PERIPHERY_CONTRACT =
 //   '0xD5037d72877808cdE7F669563e9389930AF404E8';
 
 // mainnet
+export const DEFAULT_CHAIN_ID = 137;
 export const LENS_API = 'https://api.lens.dev'; // 'https://api-mum bai.lens.dev/';
 export const LENS_HUB_CONTRACT = '0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d';
 export const LENS_PERIPHERY_CONTRACT =
   '0xeff187b4190E551FC25a7fA4dFC6cf7fDeF7194f';
- 
 
 interface EnvConfig {
   [key: string]: string | undefined;
@@ -34,7 +37,9 @@ export const envConfig: EnvConfig = {
   AUTH_OPENAI_ORGANIZATION: process.env.AUTH_OPENAI_ORGANIZATION,
   AUTH_OPENAI_APIKEY: process.env.AUTH_OPENAI_APIKEY,
   AUTH_LINKPREVIEW_KEY: process.env.AUTH_LINKPREVIEW_KEY,
-  NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID
+  NEXT_PUBLIC_WC_PROJECT_ID: process.env.NEXT_PUBLIC_WC_PROJECT_ID,
+  NEXT_PUBLIC_PUSH_PROTOCOL_KEY: process.env.NEXT_PUBLIC_PUSH_PROTOCOL_KEY,
+  NEXT_PUBLIC_PUSH_CHANNEL_ADDRESS: process.env.NEXT_PUBLIC_PUSH_CHANNEL_ADDRESS
 };
 
 export const LENS_FOLLOW_NFT_ABI = [

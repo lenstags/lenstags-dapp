@@ -1,27 +1,37 @@
+import { ATTRIBUTES_LIST_KEY, PRIVATE_LIST_NAME } from '@lib/config';
 import { PostProcessStatus, findKeyAttributeInProfile } from 'utils/helpers';
-import { createUserList, typeList } from '@lib/lens/load-lists';
+import { createUserList, getUserLists, typeList } from '@lib/lens/load-lists';
 import { useContext, useEffect, useState } from 'react';
 
-import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import Image from 'next/image';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { NotificationTypes } from '@models/index';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { addPostIdtoListId } from '@lib/lens/post';
+import { followers } from '@lib/lens/followers';
 import { freeCollect } from '@lib/lens/collect';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   postId: string;
+  post: any;
   processStatus: (status: PostProcessStatus) => void;
+  ownedBy: `0x${string}`;
+  isList?: boolean;
 }
 
-const ListsModal: React.FC<ModalProps> = ({
+const ModalList: React.FC<ModalProps> = ({
   isOpen,
   onClose,
   postId,
-  processStatus
+  post,
+  processStatus,
+  ownedBy,
+  isList
 }) => {
   const snackbar = useSnackbar();
   const [valueListName, setValueListName] = useState('');
@@ -44,41 +54,52 @@ const ListsModal: React.FC<ModalProps> = ({
 
   const [createMenu, setCreateMenu] = useState(false);
   const [selectedList, setSelectedList] = useState<typeList[]>();
+  const [filteredList, setFilteredList] = useState<typeList[]>();
 
-  const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setValueListName(event.target.value);
+  const handleChangeListNameNew = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => setValueListName(event.target.value);
+
+  const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // setValueListName(event.target.value);
+    // filter the list according to the typed value
+    if (!selectedList) {
+      return;
+    }
+    const searchText = event.target.value;
+
+    if (searchText === '') {
+      setFilteredList(selectedList);
+      return;
+    }
+
+    const filteredItems = selectedList.filter((item) =>
+      item.name?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredList(filteredItems);
+
+    // if (
+    //   !selectedList.some(
+    //     (item) => item.name?.toLowerCase() === searchText.toLowerCase()
+    //   )
+    // ) {
+    //   setShowCreate(true);
+    //   setListName(searchText);
+    // } else {
+    //   setShowCreate(false);
+    // }
+
+    // if (searchText === "") {
+    //   setShowCreate(false);
+    // }
+  };
 
   const refreshLists = async (profileId: string) => {
-    const readProfile = await queryProfile({
-      profileId
-    });
-    // const parsedLists2 = JSON.parse(
-    //   readProfile?.attributes?.find(
-    //     (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-    //   )?.value || `[]`
-    // );
-
-    const listAttributeObject = findKeyAttributeInProfile(
-      readProfile,
-      ATTRIBUTES_LIST_KEY
-    );
-    // Gives something like this:
-    // {
-    //   "displayType": "string",
-    //   "value": "[{\"name\":\"My private list\",\"key\":\"0x8904-0x0a\"}]",
-    //   "key": "list_warehouse_7"
-    // }
-    // console.log('xxxxx ', readProfile);
-    const parsedLists = listAttributeObject
-      ? JSON.parse(listAttributeObject.value)
-      : [];
-    // const hasLists =
-    // listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-
-    // console.log('listas parseadas en json', parsedLists);
-    console.log('refreshing lists ', parsedLists);
+    const parsedLists = await getUserLists(profileId);
+    console.log('💎💎💎💎 refreshing lists ', parsedLists);
 
     setSelectedList(parsedLists);
+    setFilteredList(parsedLists);
   };
 
   const handleAddPostToList = async (
@@ -96,6 +117,7 @@ const ListsModal: React.FC<ModalProps> = ({
       listId = (await createUserList(lensProfile, name!)).key;
       console.log('List created, (post) ID returned to the UI: ', listId);
     }
+    /* Send Notification For Followers a list created */
 
     console.log('****** just in case :  ', listId);
 
@@ -133,10 +155,58 @@ const ListsModal: React.FC<ModalProps> = ({
 
     snackbar.showMessage('🟩 Item added to list! 🗂️');
     processStatus(PostProcessStatus.FINISHED);
+
+    /* Send Notification collect post */
+    const { metadata, id, profile } = post;
+    const { id: postProfileId } = profile;
+    const { name: namePost } = metadata;
+    const dataSender = {
+      namePost,
+      id,
+      postProfileId
+    };
+    const listFollowers = await followers(lensProfile?.id);
+    const listAddressByFollowers = listFollowers.items
+      .map((follower) => follower.wallet.address)
+      .filter((address) => address !== ownedBy);
+    if (lensProfile?.name) {
+      sendNotification(
+        ownedBy,
+        isList
+          ? NotificationTypes.CollectedList
+          : NotificationTypes.CollectedPost,
+        lensProfile.name,
+        NOTIFICATION_TYPE.TARGETTED,
+        JSON.stringify(dataSender),
+        lensProfile.id
+      );
+      if (listAddressByFollowers.length > 1) {
+        sendNotification(
+          listAddressByFollowers,
+          isList
+            ? NotificationTypes.CollectedList
+            : NotificationTypes.CollectedPost,
+          lensProfile.name,
+          NOTIFICATION_TYPE.SUBSET,
+          JSON.stringify(dataSender),
+          lensProfile.id
+        );
+      } else if (listAddressByFollowers.length === 1) {
+        sendNotification(
+          [listAddressByFollowers[0]],
+          isList
+            ? NotificationTypes.CollectedList
+            : NotificationTypes.CollectedPost,
+          lensProfile.name,
+          NOTIFICATION_TYPE.TARGETTED,
+          JSON.stringify(dataSender),
+          lensProfile.id
+        );
+      }
+    }
     onClose();
     return;
   };
-
   // useEffect(() => {
   //   if (lensProfile) {
   //     refreshLists(lensProfile.id);
@@ -150,7 +220,7 @@ const ListsModal: React.FC<ModalProps> = ({
 
   return isOpen ? (
     <div
-      className="duration-600 fixed bottom-0 left-0 right-0 top-0 z-50 flex 
+      className="duration-600 fixed bottom-0 left-0 right-0 top-0 z-[150] flex 
      items-center justify-center bg-stone-900
        bg-opacity-60 
        opacity-100 backdrop-blur-sm animate-in fade-in-5"
@@ -191,7 +261,7 @@ const ListsModal: React.FC<ModalProps> = ({
               type="text"
               autoComplete="off"
               value={valueListName}
-              onChange={handleChangeListName}
+              onChange={handleChangeListNameNew}
               className=" w-full rounded-lg bg-gray-100 px-4 py-3 text-sm 
              text-gray-500 outline-none"
               name="tag-search-input"
@@ -208,7 +278,6 @@ const ListsModal: React.FC<ModalProps> = ({
               type="text"
               autoComplete="off"
               // value={valueListName}
-              // onChange={handleChangeListName}
               className="w-full cursor-not-allowed rounded-lg bg-gray-200 px-4 py-3 text-sm 
              text-gray-500 outline-none"
               // onKeyDown={handleKeyDown}
@@ -248,7 +317,7 @@ const ListsModal: React.FC<ModalProps> = ({
         </div>
       ) : (
         // existing list (main)
-        <div className="w-1/4 rounded-lg bg-white px-6 py-3">
+        <div className="rounded-lg  bg-white px-6 py-3 sm:w-6/12 md:w-4/12 lg:w-3/12">
           {/* title  */}
           <div className="my-4 flex items-center justify-between font-serif text-xl">
             <span>Collect into a list</span>
@@ -272,7 +341,7 @@ const ListsModal: React.FC<ModalProps> = ({
           <input
             type="text"
             autoComplete="off"
-            value={valueListName}
+            // value={valueListName}
             onChange={handleChangeListName}
             className=" w-full rounded-full bg-gray-100 px-4 py-3 text-sm 
            text-gray-500 outline-none"
@@ -284,12 +353,12 @@ const ListsModal: React.FC<ModalProps> = ({
 
           {/* the list */}
           <div
-            className="scrollbar-hisde overflow-y-asuto
-               z-10 my-4 rounded-lg
+            className="scrollbar-hisde z-10
+                my-4 h-80 overflow-y-auto rounded-lg
                 border border-gray-100"
           >
-            {selectedList &&
-              selectedList.map((list: typeList) => {
+            {filteredList &&
+              filteredList.map((list: typeList) => {
                 return (
                   <div
                     className="group flex items-center justify-between 
@@ -302,24 +371,25 @@ const ListsModal: React.FC<ModalProps> = ({
                   >
                     {list.name}
                     <div className="flex items-center">
-                      {list.name === 'My private list' && (
-                        <div title="This list is private 🔒" className="mr-2">
-                          <svg
-                            width="16"
-                            height="16"
-                            viewBox="0 0 16 16"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              d="M5.3335 6V4.66667C5.3335 3.19391 6.5274 2 8.00016 2C9.47292 2 10.6668 3.19391 10.6668 4.66667V6M5.46683 14H10.5335C11.2802 14 11.6536 14 11.9388 13.8547C12.1897 13.7268 12.3937 13.5229 12.5215 13.272C12.6668 12.9868 12.6668 12.6134 12.6668 11.8667V8.13333C12.6668 7.3866 12.6668 7.01323 12.5215 6.72801C12.3937 6.47713 12.1897 6.27316 11.9388 6.14532C11.6536 6 11.2802 6 10.5335 6H5.46683C4.72009 6 4.34672 6 4.06151 6.14532C3.81063 6.27316 3.60665 6.47713 3.47882 6.72801C3.3335 7.01323 3.3335 7.3866 3.3335 8.13333V11.8667C3.3335 12.6134 3.3335 12.9868 3.47882 13.272C3.60665 13.5229 3.81063 13.7268 4.06151 13.8547C4.34672 14 4.72009 14 5.46683 14Z"
-                              stroke="#999999"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                            />
-                          </svg>
-                        </div>
-                      )}
+                      {list.name === PRIVATE_LIST_NAME ||
+                        (list.name === 'My private list' && (
+                          <div title="This list is private 🔒" className="mr-2">
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M5.3335 6V4.66667C5.3335 3.19391 6.5274 2 8.00016 2C9.47292 2 10.6668 3.19391 10.6668 4.66667V6M5.46683 14H10.5335C11.2802 14 11.6536 14 11.9388 13.8547C12.1897 13.7268 12.3937 13.5229 12.5215 13.272C12.6668 12.9868 12.6668 12.6134 12.6668 11.8667V8.13333C12.6668 7.3866 12.6668 7.01323 12.5215 6.72801C12.3937 6.47713 12.1897 6.27316 11.9388 6.14532C11.6536 6 11.2802 6 10.5335 6H5.46683C4.72009 6 4.34672 6 4.06151 6.14532C3.81063 6.27316 3.60665 6.47713 3.47882 6.72801C3.3335 7.01323 3.3335 7.3866 3.3335 8.13333V11.8667C3.3335 12.6134 3.3335 12.9868 3.47882 13.272C3.60665 13.5229 3.81063 13.7268 4.06151 13.8547C4.34672 14 4.72009 14 5.46683 14Z"
+                                stroke="#999999"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </div>
+                        ))}
                       <button
                         key={list.key}
                         value={list.key}
@@ -366,4 +436,4 @@ const ListsModal: React.FC<ModalProps> = ({
   ) : null;
 };
 
-export default ListsModal;
+export default ModalList;
