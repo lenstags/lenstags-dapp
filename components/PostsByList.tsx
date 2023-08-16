@@ -21,11 +21,8 @@ import Link from 'next/link';
 import { PublicRoutes } from 'models';
 import { Spinner } from './Spinner';
 import { actions } from './SidePanelMyInventory';
-import { getLastComment } from '@lib/lens/get-publications';
-import { getPublication } from '@lib/lens/get-publication';
 import { hidePublication } from '@lib/lens/hide-publication';
 import { useRouter } from 'next/router';
-import { useSnackbar } from 'material-ui-snackbar-provider';
 import { useToast } from './ui/useToast';
 
 interface PostByListProps {
