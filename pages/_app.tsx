@@ -15,12 +15,8 @@ import TagsFilterProvider from 'components/TagsFilterProvider';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import { publicProvider } from 'wagmi/providers/public';
 
-// mainnet
-// const { chains, publicClient } = configureChains([polygon], [publicProvider()]);
-
-// testnet
 const { chains, publicClient } = configureChains(
-  [polygonMumbai],
+  [DEFAULT_CHAIN_ID === 80001 ? polygonMumbai : polygon],
   [publicProvider()]
 );
 

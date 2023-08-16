@@ -1,7 +1,8 @@
 import {
   APP_UI_VERSION,
   ATTRIBUTES_LIST_KEY,
-  DEFAULT_CHAIN_ID
+  DEFAULT_CHAIN_ID,
+  DEFAULT_NETWORK
 } from '@lib/config';
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
@@ -548,7 +549,9 @@ const App: NextPage = () => {
             </div>
             <div className="mt-10">
               <hr />
-              <div className="font-mono text-xs">ui v{APP_UI_VERSION}</div>
+              <div className="font-mono text-xs">
+                ui v{APP_UI_VERSION} - {DEFAULT_NETWORK}
+              </div>
             </div>
           </div>
         ) : (

@@ -14,6 +14,7 @@ import {
 import { IbuiltPost } from './interfaces/publication';
 import { MetadataDisplayType } from './interfaces/generic';
 import { createPostGasless } from './post-gasless';
+import { getPublication } from './get-publication';
 import { queryProfile } from './dispatcher';
 import { updateProfileMetadata } from '@lib/lens/update-profile-metadata-gasless';
 import { v4 as uuidv4 } from 'uuid';
@@ -269,40 +270,63 @@ export const getUserLists = async (profileId: string) => {
   // const hasLists =
   // listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
 
-  // console.log('listas parseadas en json', parsedLists);
-  return parsedLists;
+  // id sanitisation
+  return parsedLists.filter((i: any) => i.key.includes('-'));
 };
 
-// export const getPopulatedLists = async (profileId: any) => {
-//   const arrLists = await getUserLists(profileId);
-//   if (!arrLists) {
-//     return;
-//   }
+export const getPopulatedLists = async (profileId: any) => {
+  const arrLists = await getUserLists(profileId);
+  if (!arrLists) {
+    return;
+  }
 
-//   return arrLists.map((list: any) => {
-//     return getLastCommentList(list.key)
-//       .then((res) => {
-//         // console.log('XX> ', arrIds.metadata.tags);
-//         if (!res) {
-//           return;
-//         }
+  return Promise.allSettled(
+    arrLists.map((list: any) => {
+      return getLastCommentList(list.key)
+        .then((lastComment) => {
+          if (!lastComment || !lastComment.items.metadata) {
+            console.log('lastcomment null detected ', list.name);
+            return [];
+          }
 
-//         const arrIds = res.list;
-//         const items = res.items;
+          // @ts-ignore
+          const listContents = lastComment.items.metadata.tags;
+          const listName = list.name;
+          const listKey = list.key;
 
-//         if (!items || !items.metadata) {
-//           return;
-//         }
+          const postsPromises = listContents.map(async (postId: string) => {
+            return {
+              listName,
+              listKey,
+              postId,
+              postMetadata: (await getPublication(postId))?.metadata
+            };
+          });
 
-//         return Promise.allSettled(
-//           items.metadata.tags.map((id: string) => ({
-//             id,
-//             pub: getPublication(id)
-//           }))
-//         );
-//       })
-//       .then((r) => {
-//         console.log('[[[[  ', r);
-//       });
-//   });
-// };
+          return Promise.allSettled(postsPromises);
+        })
+        .then((results: any) => {
+          if (!results) {
+            return;
+          }
+          const data = results
+            .filter((r: any) => r.status === 'fulfilled')
+            .map((r: any) => ({
+              postId: r.value.postId,
+              postName: r.value.postMetadata.name,
+              postTags: r.value.postMetadata.tags
+            }));
+
+          return {
+            listKey: results[0]?.value.listKey,
+            listName: results[0]?.value.listName,
+            posts: data
+          };
+        });
+    })
+  ).then((results) =>
+    results
+      .filter((r): r is PromiseFulfilledResult<any> => r.status === 'fulfilled')
+      .map((r) => r.value)
+  );
+};
