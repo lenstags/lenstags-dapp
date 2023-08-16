@@ -114,13 +114,13 @@ h3 {
 p {
   @apply text-sm;
 }
- 
+
 @layer base {
   @font-face {
     /* font-display: swap; */
     font-family: 'Inter';
     font-weight: 300;
-    src: url('/assets/fonts/Inter/Inter-light.ttf');
+    src: url('/assets/fonts/Inter/Inter-Light.ttf');
   }
 }
 
@@ -159,8 +159,6 @@ p {
     src: url('/assets/fonts/Inter/Inter-Bold.ttf');
   }
 }
-
-
 
 @layer base {
   @font-face {
@@ -331,7 +329,7 @@ figcaption {
 
 /* new ui */
 .lens-input {
-   box-sizing: border-box;
+  box-sizing: border-box;
 
   /* Auto layout */
   display: flex;
@@ -357,7 +355,6 @@ figcaption {
   align-self: stretch;
   flex-grow: 0;
 }
- 
 
 .scrollbar-hide {
   scrollbar-width: thin;
@@ -405,7 +402,6 @@ figcaption {
 .dropdown:hover .dropdown-menu {
   display: block;
 }
- 
 
 .lens-post {
   border-radius: 20px;
@@ -562,32 +558,29 @@ figcaption {
 }
 
 /* custom markdown for reading view */
-.markdown > h1, 
-.markdown > h2, 
+.markdown > h1,
+.markdown > h2,
 .markdown > h3 {
-    margin-bottom: 1rem;
+  margin-bottom: 1rem;
 }
 
 .markdown > h1 {
-    font-size: 2rem; /* ajusta el tamaño de fuente */
+  font-size: 2rem; /* ajusta el tamaño de fuente */
 }
 
 .markdown > h2 {
-    font-size: 1.5rem;
+  font-size: 1.5rem;
 }
 
 .markdown > p {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .markdown > a {
-    color: blue; /* ajusta el color de los enlaces */
-    text-decoration: underline; /* subraya los enlaces */
+  color: blue; /* ajusta el color de los enlaces */
+  text-decoration: underline; /* subraya los enlaces */
 }
-
-
-
 
 /* custom markdown for reading view */
 .markdown-plain {
@@ -596,41 +589,44 @@ figcaption {
   position: relative;
 }
 
-
-.markdown-plain > h1, 
-.markdown-plain > h2, 
+.markdown-plain > h1,
+.markdown-plain > h2,
 .markdown-plain > h3,
 .markdown-plain > li,
 .markdown-plain > ul,
 .markdown-plain > ol,
 .markdown-plain > p {
-    margin: 0; 
-    padding: 0;
-    font-size: 8pt;
-    font-weight: normal;
-    line-height: 10pt;
+  margin: 0;
+  padding: 0;
+  font-size: 8pt;
+  font-weight: normal;
+  line-height: 10pt;
 }
 
 .markdown-plain::after {
-  content: "";
+  content: '';
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
-  height: 1.8rem; 
-  background: linear-gradient(to bottom, transparent, white);  
-  pointer-events: none;  
+  height: 1.8rem;
+  background: linear-gradient(to bottom, transparent, white);
+  pointer-events: none;
 }
 
 .markdown-plain > a {
-    color: blue;  
-    text-decoration: underline; 
-    font-style: norma 
+  color: blue;
+  text-decoration: underline;
+  font-style: norma;
 }
 
-code, kbd, samp, pre {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+code,
+kbd,
+samp,
+pre {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
   background: rgb(233, 233, 233);
-  padding:2pt 4pt 2pt 4pt;
+  padding: 2pt 4pt 2pt 4pt;
   border-radius: 4pt;
 }

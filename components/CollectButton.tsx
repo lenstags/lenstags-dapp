@@ -4,6 +4,7 @@ import { ProfileQuery } from '@lib/lens/graphql/generated';
 
 const CollectButton = ({
   profile,
+  post,
   postId,
   postHasCollectedByMe,
   isFinishedState,
@@ -11,11 +12,12 @@ const CollectButton = ({
   openModalHandler
 }: {
   profile: ProfileQuery['profile'] | null;
+  post: any;
   postId: string;
   postHasCollectedByMe: boolean;
   isFinishedState: boolean;
   isPostingState: boolean;
-  openModalHandler: (postId: string) => void;
+  openModalHandler: (postId: string, post: any) => void;
 }) => {
   return (
     <>
@@ -35,7 +37,7 @@ const CollectButton = ({
         !postHasCollectedByMe && (
           <button
             onClick={() => {
-              openModalHandler(postId);
+              openModalHandler(postId, post);
             }}
             className="rounded-lg bg-black "
           >

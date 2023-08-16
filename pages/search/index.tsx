@@ -54,8 +54,10 @@ const Search = () => {
   // modal
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postId, setPostId] = useState('');
-  const handleOpenModal = (postId: string) => {
+  const [post, setPost] = useState<any>(null);
+  const handleOpenModal = (postId: string, post: any) => {
     setPostId(postId);
+    setPost(post);
     setIsModalOpen(true);
   };
 
@@ -95,6 +97,9 @@ const Search = () => {
           onClose={handleCloseModal}
           postId={postId}
           processStatus={handleProcessStatus}
+          ownedBy={post?.ownedBy}
+          isList={post?.isList}
+          post={post}
         />
         <div className="flex min-w-full flex-col px-8">
           {isLoading ? (

@@ -101,7 +101,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     // FIXME
     // return getPopulatedLists(lensProfile.id);
 
-    const filteredItems = res.items.filter((item) => {
+    const filteredItems = res.items.filter((item: any) => {
       const id = lensProfile?.id;
       const attributes = item.metadata.attributes;
       return (

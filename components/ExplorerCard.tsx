@@ -436,6 +436,11 @@ const ExplorerCard: FC<Props> = (props) => {
                 />
                 <CollectButton
                   profile={lensProfile}
+                  post={{
+                    id: post.id,
+                    profile: post.profile,
+                    metadata: post.metadata
+                  }}
                   postId={post.id}
                   postHasCollectedByMe={post.hasCollectedByMe}
                   isFinishedState={isFinished}

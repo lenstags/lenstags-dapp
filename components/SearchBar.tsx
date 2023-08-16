@@ -36,6 +36,7 @@ export interface PublicationSearchType {
   totalAmountOfCollects: number;
   hasCollectedByMe: boolean;
   isFollowedByMe: boolean;
+  ownedBy: `0x${string}`;
 }
 
 export const fetchData = async (input: string, limit: number = 5) => {
@@ -71,7 +72,8 @@ export const fetchData = async (input: string, limit: number = 5) => {
       totalAmountOfComments: publication.stats.totalAmountOfComments,
       totalAmountOfCollects: publication.stats.totalAmountOfCollects,
       hasCollectedByMe: publication.hasCollectedByMe,
-      isFollowedByMe: publication.profile.isFollwedByMe
+      isFollowedByMe: publication.profile.isFollwedByMe,
+      ownedBy: publication.profile.ownedBy
     };
   });
 
