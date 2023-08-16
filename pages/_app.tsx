@@ -23,6 +23,8 @@ const { chains, publicClient } = configureChains([polygon], [publicProvider()]);
 //   [polygonMumbai],
 //   [publicProvider()]
 // );
+// const { chains, publicClient } = configureChains([polygonMumbai], [publicProvider()]);
+ 
 
 const { connectors } = getDefaultWallets({
   appName: APP_NAME,

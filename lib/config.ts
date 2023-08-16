@@ -1,5 +1,6 @@
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
-export const APP_UI_VERSION = '0.0.18';
+ export const APP_UI_VERSION = '0.0.18';
+ 
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
 export const PRIVATE_LIST_NAME = 'Collected items';
@@ -13,7 +14,7 @@ export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
 export const LENS_PERIPHERY_NAME = 'LensPeriphery';
 
 // testnet
-// export const DEFAULT_CHAIN_ID = 80001;
+ // export const DEFAULT_CHAIN_ID = 80001;
 // export const LENS_API = 'https://api-mumbai.lens.dev/';
 // export const LENS_HUB_CONTRACT = '0x60Ae865ee4C725cd04353b5AAb364553f56ceF82';
 // export const LENS_PERIPHERY_CONTRACT =
