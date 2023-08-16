@@ -1,3 +1,4 @@
+import { APP_UI_VERSION, DEFAULT_NETWORK } from '@lib/config';
 import {
   Accordion,
   AccordionContent,
@@ -30,8 +31,8 @@ import {
   getSubscriptions,
   optIn
 } from '@lib/lens/user-notifications';
+import { getPopulatedLists, getUserLists } from '@lib/lens/load-lists';
 
-import { APP_UI_VERSION } from '@lib/config';
 import Image from 'next/image';
 import Link from 'next/link';
 import Notifications from './Notifications';
@@ -46,7 +47,6 @@ import { Tooltip } from './ui/Tooltip';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { getPublications } from '@lib/lens/get-publications';
 import { getSigner } from '@lib/lens/ethers.service';
-import { getUserLists } from '@lib/lens/load-lists';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
@@ -95,24 +95,27 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
     if (publications.length !== 0) return;
     setLoadingMyLists(true);
-    const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
-    console.log('xxx ', res);
+
+    // no need to gather all my pubs
+    // const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
+    // console.log('xxx ', res);
 
     // FIXME
-    // return getPopulatedLists(lensProfile.id);
+    const rr = await getPopulatedLists(lensProfile.id);
+    console.log('rr ', rr);
+    // const filteredItems = res.items.filter((item: any) => {
+    //   const id = lensProfile?.id;
+    //   const attributes = item.metadata.attributes;
+    //   return (
+    //     item.profile.id === id &&
+    //     attributes?.length > 0 &&
+    //     (attributes[0].value === 'list' ||
+    //       attributes[0].value === 'privateDefaultList')
+    //   );
+    // });
 
-    const filteredItems = res.items.filter((item: any) => {
-      const id = lensProfile?.id;
-      const attributes = item.metadata.attributes;
-      return (
-        item.profile.id === id &&
-        attributes?.length > 0 &&
-        (attributes[0].value === 'list' ||
-          attributes[0].value === 'privateDefaultList')
-      );
-    });
-
-    setPublications(filteredItems);
+    // setPublications(filteredItems);
+    setPublications(rr!);
     setLoadingMyLists(false);
   };
 
@@ -388,17 +391,20 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             router.pathname !== PublicRoutes.CREATE &&
             sidebarCollapsedStateLeft.collapsed && (
               <Link href={PublicRoutes.CREATE}>
-                <Tooltip tooltip="Create" className="my-4 h-10">
-                  <button className="h-10 w-10 rounded-lg bg-lensBlack">
+                <Tooltip
+                  tooltip="Create"
+                  className="my-4 flex h-10 justify-center "
+                >
+                  <div className="h-10 w-10 self-center rounded-lg bg-black text-center">
                     <PlusSmallIcon className="text-white" />
-                  </button>
+                  </div>
                 </Tooltip>
               </Link>
             )}
         </div>
       </div>
       <div className="fixed bottom-0 w-full bg-transparent px-6 py-4 font-mono text-xs text-gray-300">
-        {APP_UI_VERSION}
+        {APP_UI_VERSION} - {DEFAULT_NETWORK}
       </div>
     </div>
   );

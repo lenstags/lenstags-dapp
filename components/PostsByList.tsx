@@ -1,15 +1,3 @@
-import { PublicRoutes } from 'models';
-import { getPublication } from '@lib/lens/get-publication';
-import { getLastComment } from '@lib/lens/get-publications';
-import {
-  LockClosedIcon,
-  LockOpenIcon,
-  EllipsisHorizontalIcon
-} from '@heroicons/react/24/outline';
-import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
-import { actions } from './SidePanelMyInventory';
-import { Spinner } from './Spinner';
 import {
   Accordion,
   AccordionContent,
@@ -22,10 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from './ui/Dropdown';
-import { useToast } from './ui/useToast';
-import { hidePublication } from '@lib/lens/hide-publication';
-import { useSnackbar } from 'material-ui-snackbar-provider';
+import {
+  EllipsisHorizontalIcon,
+  LockClosedIcon,
+  LockOpenIcon
+} from '@heroicons/react/24/outline';
+import { useCallback, useState } from 'react';
+
 import Link from 'next/link';
+import { PublicRoutes } from 'models';
+import { Spinner } from './Spinner';
+import { actions } from './SidePanelMyInventory';
+import { hidePublication } from '@lib/lens/hide-publication';
+import { useRouter } from 'next/router';
+import { useToast } from './ui/useToast';
 
 interface PostByListProps {
   publications: any;
@@ -70,29 +68,30 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
       }
     });
 
-  const handlePostByList = useCallback(
-    async (listId: any) => {
-      if (postId === listId) {
-        return;
-      }
-      setLoading(true);
-      setPostId(listId);
-      const postsId: any = await getLastComment(listId);
-      if (!postsId) {
-        setPosts([]);
-        setFetchList(true);
-        setLoading(false);
-        return;
-      }
-      const posts = await Promise.all(
-        postsId.metadata.tags.map((id: string) => getPublication(id))
-      );
-      setPosts(posts);
-      setLoading(false);
-      setFetchList(true);
-    },
-    [postId]
-  );
+  // const handlePostByList = useCallback(
+  //   async (listId: any) => {
+  //     if (postId === listId) {
+  //       return;
+  //     }
+  //     setLoading(true);
+  //     setPostId(listId);
+  //     const postsId: any = await getLastComment(listId);
+  //     if (!postsId) {
+  //       setPosts([]);
+  //       setFetchList(true);
+  //       setLoading(false);
+  //       return;
+  //     }
+  //     const posts = await Promise.all(
+  //       postsId.metadata.tags.map((id: string) => getPublication(id))
+  //     );
+  //     setPosts(posts);
+  //     setLoading(false);
+  //     setFetchList(true);
+  //   },
+  //   [postId]
+  // );
+
   return (
     <Accordion
       type="single"
@@ -108,17 +107,18 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
           <div className="group flex h-11 w-full cursor-pointer items-center justify-between gap-2 border-l-4 border-transparent px-4 hover:border-l-teal-400 hover:bg-teal-50 data-[state=open]:bg-lensPurple">
             <AccordionTrigger
               arrowLeft
-              onClick={() => handlePostByList(list.id)}
+              // onClick={() => handlePostByList(list.id)}
+              onClick={() => setPosts(list.posts)}
               className="text-md ml-2 group-hover:font-bold"
             >
-              {list.metadata.name}
+              {list.name}
             </AccordionTrigger>
             <div className="flex items-center justify-between gap-2">
-              {list.metadata.attributes[0].value === 'list' ? (
-                <LockOpenIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
-              ) : (
+              {/* {list.metadata.attributes[0].value === 'list' ? ( */}
+              <LockOpenIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
+              {/* ) : (
                 <LockClosedIcon className="h-4 w-4 text-lensBlack opacity-0  group-hover:opacity-100" />
-              )}
+              )} */}
               <DropdownMenu>
                 <DropdownMenuTrigger className="outline-none data-[state=open]:bg-teal-400">
                   <EllipsisHorizontalIcon className="h-4 w-4 text-lensBlack opacity-0 group-open:opacity-100 group-hover:opacity-100 data-[state=open]:opacity-100" />
@@ -141,23 +141,26 @@ const PostsByList = ({ publications, className }: PostByListProps) => {
             </div>
           </div>
 
-          {!loading && fetchList && posts.length > 0 ? (
-            posts.map((post: any) => {
+          {/* {!loading && fetchList && posts.length > 0 ? ( */}
+          {!loading && list.posts.length > 0 ? (
+            list.posts.map((post: any) => {
               return (
                 <AccordionContent
-                  key={post}
+                  key={post.id}
                   className="ml-4 flex px-4 outline-none"
                 >
                   <Link
                     href={`${PublicRoutes.POST}/${post.id}`}
                     className="mx-4 my-2"
                   >
-                    {post.metadata.name}
+                    {/* {post.metadata.name} */}
+                    {post.name}
                   </Link>
                 </AccordionContent>
               );
             })
-          ) : !loading && fetchList && posts.length === 0 ? (
+          ) : // ) : !loading && fetchList && posts.length === 0 ? (
+          !loading && list.posts.length === 0 ? (
             <AccordionContent className="ml-4 flex px-4">
               <span className="mx-4 my-2 text-sm text-lensBlack opacity-50">
                 No posts yet

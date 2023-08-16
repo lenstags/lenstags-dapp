@@ -17,19 +17,20 @@ import {
   MagnifyingGlassIcon,
   TextAlignBottomIcon
 } from '@radix-ui/react-icons';
-import { Ref, forwardRef, useContext, useState } from 'react';
+import { Ref, forwardRef, useContext, useEffect, useState } from 'react';
 
 import { ArrowLeftIcon } from 'lucide-react';
+import { FolderIcon } from '@heroicons/react/24/outline';
+import { FolderIcon as FolderIconFilled } from '@heroicons/react/24/solid';
 import Link from 'next/link';
 import PostsByList from './PostsByList';
 import { PublicRoutes } from 'models';
 import { SidebarContext } from '@context/SideBarSizeContext';
-import { Tooltip } from './ui/Tooltip';
-import { useRouter } from 'next/router';
-import { useSorts } from '@lib/hooks/use-sort';
-import { FolderIcon } from '@heroicons/react/24/outline';
-import { FolderIcon as FolderIconFilled } from '@heroicons/react/24/solid';
 import { Spinner } from './Spinner';
+import { Tooltip } from './ui/Tooltip';
+import { useListSorts } from '@lib/hooks/use-sort';
+import { useRouter } from 'next/router';
+
 interface SidePanelProps {
   fetchMyLists: () => void;
   publications: any;
@@ -60,9 +61,10 @@ const SidePanelMyInventory = forwardRef(function (
   ref: Ref<HTMLButtonElement> | undefined
 ) {
   const [sortByValue, setSortByValue] = useState('newest');
+  const [filteredPublications, setFilteredPublications] = useState([]);
   const [open, setOpen] = useState(false);
 
-  const { sortItems } = useSorts();
+  const { sortItems } = useListSorts();
   const handleSort = (value: string) => {
     setSortByValue(value);
     sortItems({ items: publications, sort: value });
@@ -78,12 +80,37 @@ const SidePanelMyInventory = forwardRef(function (
     setSidebarCollapsedState({
       collapsed: true
     });
-    if (publications.length === 0) fetchMyLists();
+    if (publications.length === 0) {
+      fetchMyLists();
+    }
     setTriggerBy('my-inventory');
     setOpen(true);
   };
 
+  const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) => {
+    // setValueListName(event.target.value);
+    // filter the list according to the typed value
+    if (!publications) {
+      return;
+    }
+    const searchText = event.target.value;
+
+    if (searchText === '') {
+      setFilteredPublications(publications);
+      return;
+    }
+
+    const filteredItems = publications.filter((item: any) =>
+      item.name?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredPublications(filteredItems);
+  };
+
   const router = useRouter();
+
+  useEffect(() => {
+    setFilteredPublications(publications);
+  }, [publications]);
 
   const openSidebar =
     sidebarCollapsedStateLeft.collapsed &&
@@ -175,6 +202,7 @@ const SidePanelMyInventory = forwardRef(function (
             autoComplete="off"
             className="w-full rounded-full bg-stone-100 p-2 pl-9 leading-none outline-none"
             name="tag-search-input"
+            onChange={handleChangeListName}
             id="tag-search-input"
             placeholder="Search..."
           />
@@ -209,7 +237,7 @@ const SidePanelMyInventory = forwardRef(function (
             <Spinner w="8" h="8" />
           </div>
         ) : (
-          <PostsByList publications={publications} className="pb-4" />
+          <PostsByList publications={filteredPublications} className="pb-4" />
         )}
       </DoubleSidebarContent>
     </DoubleSidebar>
