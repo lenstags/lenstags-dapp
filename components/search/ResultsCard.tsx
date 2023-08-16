@@ -20,10 +20,13 @@ export const ResultsCard = ({
   profile: ProfileQuery['profile'] | null;
   isFinishedState: boolean;
   isPostingState: boolean;
-  openModalHandler: (postId: string) => void;
+  openModalHandler: (postId: string, post: any) => void;
 }) => {
   const [showCard, setShowCard] = useState(false);
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
+  const isList =
+    publication.type.length > 0 &&
+    (publication.type === 'list' || publication.type === 'privateDefaultList');
 
   const handleMouseEnter = () => {
     timeoutId.current = setTimeout(() => {
@@ -125,7 +128,7 @@ export const ResultsCard = ({
               {publication.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="border-[1px] border-black rounded-full px-2 py-0.5 text-xs font-semibold uppercase"
+                  className="border-[1px] border-black rounded-full px-2 py-1 text-xs font-semibold uppercase"
                 >
                   {tag}
                 </span>
@@ -138,6 +141,13 @@ export const ResultsCard = ({
               />
               <CollectButton
                 profile={profile}
+                post={{
+                  id: publication.id,
+                  profile: { id: publication.profileId },
+                  metadata: { name: publication.name },
+                  isList: isList,
+                  ownedBy: publication.ownedBy
+                }}
                 postId={publication.id}
                 postHasCollectedByMe={publication.hasCollectedByMe}
                 isFinishedState={isFinishedState}
