@@ -9,13 +9,15 @@ interface Props {
   pageDescription: string;
   children: React.ReactNode;
   screen?: boolean;
+  breadcumpTitle: string;
 }
 
 export const LayoutCreate: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen
+  screen,
+  breadcumpTitle
 }) => {
   return (
     <>
@@ -68,7 +70,7 @@ export const LayoutCreate: FC<Props> = ({
         <SideBarLeft />
 
         <div className="col-span-12 col-start-2 overflow-x-clip">
-          <Topbar />
+          <Topbar breadcumpTitle={breadcumpTitle} />
           <main
             // FIXME Remove the absolute and left, when the sidebar
             // has no the fixed anymore!!!

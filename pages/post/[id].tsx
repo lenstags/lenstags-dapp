@@ -230,6 +230,7 @@ export default function PostDetails() {
         title={`${post.metadata.description} Nata Social | Post from ${lensProfile.name}`}
         pageDescription="Post"
         screen={true}
+        breadcumpTitle="Post"
       >
         <div className="w-full pb-4">
           {/* cover */}

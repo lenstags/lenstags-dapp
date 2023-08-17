@@ -545,6 +545,7 @@ const Create: NextPage = () => {
     <LayoutCreate
       title="Nata Social | Create post"
       pageDescription="Create post"
+      breadcumpTitle="Create post"
     >
       {hydrationLoading ? (
         <div className="flex w-full justify-center p-10">
