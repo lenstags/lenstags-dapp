@@ -1,4 +1,4 @@
-export const DEFAULT_NETWORK = 'testnet'; // THE ONE AND ONLY SWITCH
+export let DEFAULT_NETWORK = 'mainnet'; // THE ONE AND ONLY SWITCH
 
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
 export const APP_UI_VERSION = '0.0.18';
