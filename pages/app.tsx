@@ -7,6 +7,7 @@ import {
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
+import { findKeyAttributeInProfile, validateWhitelist } from 'utils/helpers';
 import {
   useCallback,
   useContext,
@@ -27,9 +28,9 @@ import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
+import WhitelistScreen from '@components/WhitelistScreen';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
-import { findKeyAttributeInProfile } from 'utils/helpers';
 import { useDisconnect } from 'wagmi';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';
@@ -49,6 +50,7 @@ const App: NextPage = () => {
   const [loadingFetchMore, setLoadingFetchMore] = useState(false);
   const [loader, setLoader] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
+  const [isVisibleWL, setIsVisibleWL] = useState<boolean>(false); //HEREEE
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
   const { profile: lensProfile } = useContext(ProfileContext);
@@ -175,13 +177,26 @@ const App: NextPage = () => {
   };
 
   useEffect(() => {
+    const fetchData = async (address: string, chainId: number) => {
+      await validateWhitelist(address).then((isInWL) => {
+        if (isInWL) {
+          setIsVisibleWL(false);
+          if (chainId !== DEFAULT_CHAIN_ID) {
+            // switch
+            switchNetwork?.(DEFAULT_CHAIN_ID);
+          }
+          handleSetup();
+        } else {
+          setIsVisibleWL(true);
+          deleteLensLocalStorage();
+          disconnect();
+          return;
+        }
+      });
+    };
+
     if (lensProfile?.id && chain) {
-      console.log('rrrrr ', chain);
-      if (chain.id !== DEFAULT_CHAIN_ID) {
-        // switch
-        switchNetwork?.(DEFAULT_CHAIN_ID);
-      }
-      handleSetup();
+      fetchData(lensProfile.ownedBy, chain.id);
     }
   }, [lensProfile, chain]);
 
@@ -430,8 +445,10 @@ const App: NextPage = () => {
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
-      <Layout title={'Nata Social | Home'} pageDescription={'Welcome!'}>
-        {showWelcome ? (
+      <Layout title={'Nata Social | Home'} pageDescription={'Home'}>
+        {isVisibleWL ? (
+          <WhitelistScreen />
+        ) : showWelcome ? (
           <div
             className=" duration-600 fixed 
           bottom-0 
