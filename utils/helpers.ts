@@ -130,3 +130,10 @@ export const markdownToHTML = (innerHtml: string): any => {
 
   return { __html: cleanHTML };
 };
+
+export const validateWhitelist = async (address: string) => {
+  const response = await fetch(`/api/whitelist?wallet=${address}`);
+  const data = await response.json();
+
+  return data.isWhitelisted;
+};

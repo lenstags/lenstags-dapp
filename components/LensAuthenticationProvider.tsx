@@ -1,29 +1,29 @@
 import '@rainbow-me/rainbowkit/styles.css';
 
-import { ProfileQuery } from '@lib/lens/graphql/generated';
 import {
   LensLocalStorage,
   deleteLensLocalStorage,
   getFromLocalStorage,
   setLensLocalStorage
 } from '@lib/lens/localStorage';
-import { authenticate, generateChallenge } from '@lib/lens/login';
 import {
   RainbowKitAuthenticationProvider,
   createAuthenticationAdapter
 } from '@rainbow-me/rainbowkit';
+import { authenticate, generateChallenge } from '@lib/lens/login';
 import { createContext, useEffect, useState } from 'react';
 
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
-import { getDefaultProfile } from '@lib/lens/default-profile';
-import { queryProfile } from '@lib/lens/dispatcher';
-import { getProfiles } from '@lib/lens/get-profiles';
-import { setAuthenticationToken } from '@lib/lens/graphql/apollo-client';
-import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import { AttributeData } from '@lib/lens/interfaces/profile-metadata';
-import { refresh } from '@lib/lens/refresh';
-import jwt from 'jsonwebtoken';
+import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
+import { ProfileQuery } from '@lib/lens/graphql/generated';
 import React from 'react';
+import { getDefaultProfile } from '@lib/lens/default-profile';
+import { getProfiles } from '@lib/lens/get-profiles';
+import jwt from 'jsonwebtoken';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { refresh } from '@lib/lens/refresh';
+import { setAuthenticationToken } from '@lib/lens/graphql/apollo-client';
 import { useAccount } from 'wagmi';
 
 export const ProfileContext = createContext<{
