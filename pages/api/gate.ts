@@ -14,7 +14,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
     return;
   }
 
-  const isWhitelisted = WHITELISTED_WALLETS.includes(wallet);
+  const isWhitelisted: boolean = WHITELISTED_WALLETS.includes(wallet);
   res.status(200).json({ isWhitelisted });
 };
 
