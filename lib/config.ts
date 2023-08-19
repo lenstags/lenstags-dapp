@@ -18,7 +18,7 @@ let DEFAULT_CHAIN_ID: number,
   LENS_API: string,
   LENS_HUB_CONTRACT: string,
   LENS_PERIPHERY_CONTRACT: string;
-
+// CHANNEL_ADDRESS
 if (DEFAULT_NETWORK === 'testnet') {
   DEFAULT_CHAIN_ID = 80001;
   LENS_API = 'https://api-mumbai.lens.dev/';
