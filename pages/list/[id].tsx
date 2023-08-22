@@ -24,9 +24,25 @@ import {
   TableRow
 } from '@components/ui/Table';
 import TagStrip from '@components/TagStrip';
-import { ListBulletIcon } from '@heroicons/react/24/outline';
+import { ArrowDownIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 import Pagination from '@components/Pagination';
 import Link from 'next/link';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger
+} from '@components/ui/HoverCard';
+import ProfileCard from '@components/ProfileCard';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger
+} from '@components/ui/Dropdown';
+import { PublicRoutes } from '@models/routes.model';
+import { useSorts } from '@lib/hooks/use-sort';
+import { SortBy } from '@models/sorts.model';
 
 export default function ListDetails() {
   const router = useRouter();
@@ -39,11 +55,32 @@ export default function ListDetails() {
   const [collectStatus, setCollectStatus] = useState(PostProcessStatus.IDLE);
   const [isPosting, setIsPosting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const [showProfileCard, setShowProfileCard] = useState(false);
+  const [sortName, setSortName] = useState('asc');
+  const [sortDate, setSortDate] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage, setPostsPerPage] = useState(8);
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = arrPosts.slice(indexOfFirstPost, indexOfLastPost);
+
+  const { sortItems } = useSorts();
+
+  const handleSortName = () => {
+    setSortName(sortName === 'asc' ? 'desc' : 'asc');
+    sortItems({
+      items: arrPosts,
+      sort: sortName === 'asc' ? SortBy.ALPHABETICAL : SortBy.ALPHABETICALDESC
+    });
+  };
+
+  const handleSortDate = () => {
+    setSortDate(sortDate === 'asc' ? 'desc' : 'asc');
+    sortItems({
+      items: arrPosts,
+      sort: sortDate === 'asc' ? SortBy.NEWEST : SortBy.OLDEST
+    });
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -143,25 +180,25 @@ export default function ListDetails() {
                     <span className="font-serif text-4xl font-extrabold">
                       {post.metadata.name || 'Untitled post'}
                     </span>
-                    <div className="dropdown relative inline-block cursor-pointer">
-                      <div className="items-center rounded font-semibold text-gray-700">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="items-center rounded font-semibold text-gray-700">
                         <EllipsisHorizontalIcon className="h-8 w-8" />
-                      </div>
-                      <div className="dropdown-menu absolute right-1 z-10 hidden rounded-lg  border-2 border-lensBlack text-lensBlack ">
-                        <a
-                          className="whitespace-no-wrap block rounded-t-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                          href="#"
-                        >
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        className="flex w-40 flex-col gap-1 border-lensBlack px-2"
+                        align="start"
+                      >
+                        <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
+                          Actions
+                        </DropdownMenuLabel>
+                        <DropdownMenuItem className="cursor-pointer select-none px-0 font-serif outline-none">
                           Share
-                        </a>
-                        <a
-                          className="whitespace-no-wrap block rounded-b-lg bg-lensGray px-6 py-2 hover:bg-lensGray3 hover:text-lensGray2"
-                          href="#"
-                        >
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer select-none px-0 font-serif outline-none">
                           Report
-                        </a>
-                      </div>
-                    </div>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                   <div className="flex items-center gap-2">
                     <ModalLists
@@ -173,16 +210,28 @@ export default function ListDetails() {
                       ownedBy={post.profile.ownedBy}
                       isList={true}
                     />
-                    <ImageProxied
-                      category="profile"
-                      className="h-7 w-7 rounded-full object-cover"
-                      src={post.profile.picture.original.url}
-                      alt="avatar"
-                      width={40}
-                      height={40}
-                    />
-                    <span className="font-bold">{post.profile.name}</span>
-                    <span>@{post.profile.handle}</span>
+                    <HoverCard>
+                      <HoverCardTrigger className="flex cursor-pointer gap-2">
+                        <ImageProxied
+                          category="profile"
+                          className="h-7 w-7 rounded-full object-cover"
+                          src={post.profile.picture.original.url}
+                          alt="avatar"
+                          width={40}
+                          height={40}
+                        />
+                        <span className="font-bold">{post.profile.name}</span>
+                        <span>@{post.profile.handle}</span>
+                      </HoverCardTrigger>
+                      {post.profile?.id && (
+                        <HoverCardContent align="start">
+                          <ProfileCard
+                            profile={post.profile}
+                            showCard={showProfileCard}
+                          />
+                        </HoverCardContent>
+                      )}
+                    </HoverCard>
                     <DotFilledIcon />
                     <span>{moment(post.createdAt).format('DD MMM YYYY')}</span>
                     <div className="ml-auto flex">
@@ -275,9 +324,35 @@ export default function ListDetails() {
                 <Table className="w-full">
                   <TableHeader>
                     <TableRow>
-                      <TableHead className="w-96 px-4">Name</TableHead>
+                      <TableHead className="flex w-96 items-center px-4">
+                        Name
+                        {sortName === 'asc' ? (
+                          <ArrowDownIcon
+                            className="ml-2 h-3 w-3 hover:text-black"
+                            onClick={handleSortName}
+                          />
+                        ) : (
+                          <ArrowDownIcon
+                            className="ml-2 h-3 w-3 rotate-180 transform hover:text-black"
+                            onClick={handleSortName}
+                          />
+                        )}
+                      </TableHead>
                       <TableHead className="w-20 text-center">Items</TableHead>
-                      <TableHead className="w-28 px-2">Date</TableHead>
+                      <TableHead className="flex w-28 items-center px-2">
+                        Date
+                        {sortDate === 'asc' ? (
+                          <ArrowDownIcon
+                            className="ml-2 h-3 w-3 hover:text-black"
+                            onClick={handleSortDate}
+                          />
+                        ) : (
+                          <ArrowDownIcon
+                            className="ml-2 h-3 w-3 rotate-180 transform hover:text-black"
+                            onClick={handleSortDate}
+                          />
+                        )}
+                      </TableHead>
                       <TableHead className="w-64 px-4 text-left">
                         Tags
                       </TableHead>
@@ -309,9 +384,21 @@ export default function ListDetails() {
                                   {p.metadata.name}
                                 </p>
                               </Link>
-                              <span className="font-serif text-xs">
-                                {p.profile.name}
-                              </span>
+                              <HoverCard>
+                                <HoverCardTrigger className="flex cursor-pointer flex-col">
+                                  <span className="font-serif text-xs">
+                                    {p.profile.name}
+                                  </span>
+                                </HoverCardTrigger>
+                                {p.profile?.id && (
+                                  <HoverCardContent align="start">
+                                    <ProfileCard
+                                      profile={p.profile}
+                                      showCard={showProfileCard}
+                                    />
+                                  </HoverCardContent>
+                                )}
+                              </HoverCard>
                             </div>
                           </TableCell>
                           <TableCell className="text-center">
@@ -382,9 +469,29 @@ export default function ListDetails() {
                                   </div>
                                 </div>
                               )}
-                              <div className="items-center rounded font-semibold text-gray-700">
-                                <EllipsisHorizontalIcon className="h-8 w-8" />
-                              </div>
+                              <DropdownMenu>
+                                <DropdownMenuTrigger className="items-center rounded font-semibold text-gray-700">
+                                  <EllipsisHorizontalIcon className="h-8 w-8" />
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent
+                                  className="flex w-40 flex-col gap-1 border-lensBlack px-2"
+                                  align="start"
+                                >
+                                  <DropdownMenuLabel className="select-none px-0 font-serif font-bold">
+                                    Actions
+                                  </DropdownMenuLabel>
+                                  <DropdownMenuItem
+                                    className="cursor-pointer select-none px-0 font-serif outline-none"
+                                    onClick={() => {
+                                      router.push(
+                                        `${PublicRoutes.POST}/${p.id}`
+                                      );
+                                    }}
+                                  >
+                                    Go to post
+                                  </DropdownMenuItem>
+                                </DropdownMenuContent>
+                              </DropdownMenu>
                             </div>
                           </TableCell>
                         </TableRow>

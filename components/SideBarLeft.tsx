@@ -403,7 +403,11 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )}
         </div>
       </div>
-      <div className="fixed bottom-0 w-full bg-transparent px-6 py-4 font-mono text-xs text-gray-300">
+      <div
+        className={`fixed bottom-0 bg-transparent px-6 py-4 font-mono text-xs text-gray-300 ${
+          sidebarCollapsedStateLeft.collapsed ? 'w-20' : 'w-full'
+        }`}
+      >
         {APP_UI_VERSION} - {DEFAULT_NETWORK}
       </div>
     </div>
