@@ -13,9 +13,7 @@ const TagStrip: React.FC<TagStripProps> = ({ tags, postId }) => (
       borderBottomLeftRadius: '12px',
       borderBottomRightRadius: '12px'
     }}
-    className=" scrollbar-thin scrollbar-lightgray-transparent flex items-center
-                gap-1 overflow-auto px-3 py-2
-                text-right text-xs"
+    className="scrollbar-thin scrollbar-lightgray-transparent flex items-center gap-1 overflow-auto px-3 py-2 text-right text-xs"
   >
     {tags.map((tag: string) => {
       const tagValue = `${postId}${tag}`;
@@ -28,8 +26,7 @@ const TagStrip: React.FC<TagStripProps> = ({ tags, postId }) => (
             paddingTop: '3px',
             paddingBottom: '3px'
           }}
-          className="whitespace-nowrap rounded-full
-                       border border-black bg-white px-2 font-serif font-bold tracking-wider"
+          className="whitespace-nowrap rounded-full border border-black bg-white px-2 font-serif font-bold tracking-wider"
         >
           {tag.replace('-', ' ').toUpperCase()}
         </div>

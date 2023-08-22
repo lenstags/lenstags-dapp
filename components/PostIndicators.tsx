@@ -18,7 +18,7 @@ const PostIndicators: React.FC<PostIndicatorsProps> = ({
   <>
     <div
       style={{ fontSize: '12px' }}
-      className="flex rounded-md bg-stone-100 px-3 py-1 font-serif font-medium"
+      className="flex items-center rounded-md px-3 py-1 font-serif font-medium"
     >
       <BookmarkSquareIcon color="black" height={14} width={14} />
       <div className="ml-1 mr-3">{collects}</div>
