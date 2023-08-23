@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import Script from 'next/script';
 import { Navbar } from 'components';
+import Script from 'next/script';
 import SideBarLeft from './SideBarLeft';
 import Topbar from './Topbar';
 

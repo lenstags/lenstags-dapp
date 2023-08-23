@@ -4,6 +4,10 @@ import {
   DEFAULT_CHAIN_ID,
   DEFAULT_NETWORK
 } from '@lib/config';
+import {
+  ExplorePublicationResult,
+  ExplorePublicationsDocument
+} from '@lib/lens/graphql/generated';
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
@@ -18,7 +22,6 @@ import {
 } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
-import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
@@ -314,10 +317,16 @@ const App: NextPage = () => {
     setLoader(true);
     explore({ locale: 'en', tags })
       .then((data) => {
+        const filteredPubs = data.items.filter((r) => r.profile.isFollowedByMe);
+        console.log('PUBS: ', filteredPubs);
+
         setLoader(false);
         if (!data) return setPublications([]);
         setCursor(data.pageInfo.next);
-        return setPublications(data.items);
+        // return setPublications(data.items);
+        return setPublications(
+          data.items.filter((r) => r.profile.isFollowedByMe)
+        );
       })
       .catch((err) => {
         console.log('ERROR ', err);
