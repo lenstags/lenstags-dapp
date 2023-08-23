@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const WHITELISTED_WALLETS = ['0x014FFCF34D8515535b99d6AEF654258c237168B6'];
+import { NETWORKS } from '@lib/config';
+
+const WHITELISTED_WALLETS = ['0x9D9bdFD17add8eFdDDaBE91EF94fA35F5Ad92313'];
 
 type ResponseData = {
   isWhitelisted: boolean;
@@ -14,7 +16,9 @@ const handler = (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
     return;
   }
 
-  const isWhitelisted: boolean = WHITELISTED_WALLETS.includes(wallet);
+  const isWhitelisted: boolean = NETWORKS.TESTNET
+    ? true
+    : WHITELISTED_WALLETS.includes(wallet);
   res.status(200).json({ isWhitelisted });
 };
 
