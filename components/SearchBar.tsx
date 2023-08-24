@@ -152,7 +152,7 @@ export const SearchBar = () => {
 
   return (
     <div className="relative">
-      <div className="flex justify-start items-center bg-stone-100 py-3 px-5 rounded-full border-black border-[1px] md:w-1/2">
+      <div className="flex justify-start items-center bg-stone-100 py-2 px-5 rounded-full border-black border-[1px] md:w-[30rem]">
         <MagnifyingGlassIcon className="w-5 h-5" />
         <input
           ref={inputRef}
@@ -161,7 +161,7 @@ export const SearchBar = () => {
           value={inputText}
           onChange={handleInputText}
           onBlur={() => clearInput()}
-          className="bg-stone-100 outline-none leading-none ml-2"
+          className="bg-stone-100 outline-none leading-none ml-2 w-full"
           name="tag-search-input"
           id="tag-search-input"
           onKeyDown={handleKeyDown}
