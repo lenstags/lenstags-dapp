@@ -366,7 +366,7 @@ const ListDetails: React.FC<ListDetailsProps> = ({ previousRoute }) => {
                     {currentPosts.map((p: any) => {
                       return (
                         <TableRow key={p.id}>
-                          <TableCell className="flex h-16 w-full gap-3 overflow-hidden px-4 font-medium">
+                          <TableCell className="mx-0 flex h-16 max-w-[400px] gap-3 overflow-hidden px-4 font-medium">
                             {p.metadata.attributes[0].value === 'list' ? (
                               <ListImages
                                 postId={p.id}
