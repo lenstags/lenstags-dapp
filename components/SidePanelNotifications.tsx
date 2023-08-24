@@ -92,7 +92,7 @@ const SidePanelNotifications = forwardRef(function (
 
   const signer = getSigner();
   const handleTrigger = async () => {
-    if (!subcribed) {
+    if (!subcribed && address) {
       optIn(address, signer);
     }
     getNotifications(address).then((res) => {

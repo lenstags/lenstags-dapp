@@ -42,7 +42,7 @@ export function useListSorts() {
         const timeB = new Date(b.createdAt).valueOf();
         return timeB - timeA;
       } else if (sort === SortBy.MOSTCOLLECTED) {
-        return b.stats.totalAmountOfCollects - a.stats.totalAmountOfCollects;
+        return b.collects - a.collects;
       }
 
       return 0;

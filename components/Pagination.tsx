@@ -16,9 +16,9 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
   const totalPages = Math.ceil(totalPosts / postsPerPage);
   return (
-    <div className="flex w-full items-center justify-between px-8 py-2">
+    <div className="flex w-full items-center justify-between border-t px-6 py-2 transition-colors">
       <ArrowLeftIcon
-        className="h-5 w-5 hover:cursor-pointer"
+        className="h-4 w-4 text-stone-400 hover:cursor-pointer"
         onClick={() => {
           if (currentPage > 1) {
             paginate(currentPage - 1);
@@ -26,10 +26,10 @@ const Pagination: React.FC<PaginationProps> = ({
         }}
       />
       <p className="text-base text-stone-400">
-        Page {currentPage} to {totalPages}
+        Page {currentPage} {totalPages > 1 ?? `to ${totalPages}`}
       </p>
       <ArrowRightIcon
-        className="h-5 w-5 hover:cursor-pointer"
+        className="h-4 w-4 text-stone-400 hover:cursor-pointer"
         onClick={() => {
           if (currentPage < totalPages) {
             paginate(currentPage + 1);

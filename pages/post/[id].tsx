@@ -231,6 +231,7 @@ export default function PostDetails() {
         pageDescription="Post"
         screen={true}
         breadcumpTitle="Post"
+        metadataName={post.metadata.name}
       >
         <div className="w-full pb-4">
           {/* cover */}

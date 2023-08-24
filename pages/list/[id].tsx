@@ -1,38 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import ImageProxied from 'components/ImageProxied';
-import { Layout } from 'components/Layout';
-import { getLastComment } from '@lib/lens/get-publications';
-import { getPublication } from '@lib/lens/get-publication';
-import moment from 'moment';
-import ModalLists from 'components/ModalLists';
-import { useRouter } from 'next/router';
-import { LayoutReading } from '@components/index';
-import { DotFilledIcon, DotIcon } from '@radix-ui/react-icons';
-import { EllipsisHorizontalIcon } from '@heroicons/react/24/solid';
-import { PostProcessStatus } from 'utils/helpers';
-import { DotWave } from '@uiball/loaders';
-import { Spinner } from '@components/Spinner';
-import PostIndicators from '@components/PostIndicators';
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from '@components/ui/Table';
-import TagStrip from '@components/TagStrip';
-import { ArrowDownIcon, ListBulletIcon } from '@heroicons/react/24/outline';
+import ListImages from '@components/ListImages';
 import Pagination from '@components/Pagination';
-import Link from 'next/link';
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger
-} from '@components/ui/HoverCard';
+import PostIndicators from '@components/PostIndicators';
 import ProfileCard from '@components/ProfileCard';
+import { Spinner } from '@components/Spinner';
+import TagStrip from '@components/TagStrip';
+import { LayoutReading } from '@components/index';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,11 +14,41 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from '@components/ui/Dropdown';
-import { PublicRoutes } from '@models/routes.model';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger
+} from '@components/ui/HoverCard';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@components/ui/Table';
+import { ArrowDownIcon, ListBulletIcon } from '@heroicons/react/24/outline';
+import { EllipsisHorizontalIcon } from '@heroicons/react/24/solid';
 import { useSorts } from '@lib/hooks/use-sort';
+import { getPublication } from '@lib/lens/get-publication';
+import { getLastComment } from '@lib/lens/get-publications';
+import { PublicRoutes } from '@models/routes.model';
 import { SortBy } from '@models/sorts.model';
+import { DotFilledIcon } from '@radix-ui/react-icons';
+import { DotWave } from '@uiball/loaders';
+import ImageProxied from 'components/ImageProxied';
+import ModalLists from 'components/ModalLists';
+import moment from 'moment';
+import { GetServerSideProps } from 'next';
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { PostProcessStatus } from 'utils/helpers';
 
-export default function ListDetails() {
+interface ListDetailsProps {
+  previousRoute: string;
+}
+
+const ListDetails: React.FC<ListDetailsProps> = ({ previousRoute }) => {
   const router = useRouter();
   const { id } = router.query;
   const [post, setPost] = useState<any>();
@@ -63,6 +67,7 @@ export default function ListDetails() {
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPosts = arrPosts.slice(indexOfFirstPost, indexOfLastPost);
+  const fromList = previousRoute.includes('list');
 
   const { sortItems } = useSorts();
 
@@ -153,6 +158,8 @@ export default function ListDetails() {
         title="Nata Social | View list"
         pageDescription="View list"
         breadcumpTitle="List"
+        metadataName={post.metadata.name}
+        fromList={previousRoute.includes(post.id) ? false : fromList}
       >
         <div
           className="mx-auto h-full w-9/12 text-black"
@@ -164,24 +171,17 @@ export default function ListDetails() {
           }}
         >
           {/* header */}
-          <header className="items-center">
+          <header className=" items-center">
             <div className="flex w-full justify-between">
-              <div className="flex w-full items-center gap-6">
-                <ImageProxied
-                  category="post"
-                  height={104}
-                  width={160}
-                  alt=""
-                  className="block h-auto rounded-md object-cover "
-                  src="/img/list.png"
-                />
+              <div className="flex h-40 w-full items-center gap-6">
+                <ListImages postId={post.id} className="w-96" h="h-40" />
                 <div className="flex w-full flex-col gap-4">
                   <div className="flex w-full items-center justify-between">
                     <span className="font-serif text-4xl font-extrabold">
                       {post.metadata.name || 'Untitled post'}
                     </span>
                     <DropdownMenu>
-                      <DropdownMenuTrigger className="items-center rounded font-semibold text-gray-700">
+                      <DropdownMenuTrigger className="items-center rounded font-semibold text-gray-700 outline-none">
                         <EllipsisHorizontalIcon className="h-8 w-8" />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
@@ -211,7 +211,7 @@ export default function ListDetails() {
                       isList={true}
                     />
                     <HoverCard>
-                      <HoverCardTrigger className="flex cursor-pointer gap-2">
+                      <HoverCardTrigger className="flex cursor-pointer items-center gap-2">
                         <ImageProxied
                           category="profile"
                           className="h-7 w-7 rounded-full object-cover"
@@ -234,10 +234,11 @@ export default function ListDetails() {
                     </HoverCard>
                     <DotFilledIcon />
                     <span>{moment(post.createdAt).format('DD MMM YYYY')}</span>
-                    <div className="ml-auto flex">
+                    <div className="ml-auto flex gap-2">
                       <PostIndicators
                         collects={post.stats.totalAmountOfCollects}
                         comments={post.stats.totalAmountOfComments || 0}
+                        className="bg-stone-100"
                       />
                       {(isFinished || post.hasCollectedByMe) && (
                         // && post.metadata.attributes[0].value === 'post'
@@ -307,8 +308,8 @@ export default function ListDetails() {
 
           {/* body */}
           <div className="flex">
-            <div className="w-full py-4">
-              <p className="mt-4 font-semibold">
+            <div className="mt-4 w-full rounded-lg border pt-2 transition-colors">
+              <p className="font-semibold">
                 {arrPosts && arrPosts.length > 0
                   ? ``
                   : 'The list has no items yet, have you explored our awesome content?'}
@@ -365,19 +366,31 @@ export default function ListDetails() {
                     {currentPosts.map((p: any) => {
                       return (
                         <TableRow key={p.id}>
-                          <TableCell className="flex w-full gap-3 px-4 font-medium">
-                            <ImageProxied
-                              category="post"
-                              height={40}
-                              width={50}
-                              alt=""
-                              className="block aspect-square rounded-lg object-cover"
-                              src={p.metadata.media[0]?.original.url}
-                            />
+                          <TableCell className="flex h-16 w-full gap-3 overflow-hidden px-4 font-medium">
+                            {p.metadata.attributes[0].value === 'list' ? (
+                              <ListImages
+                                postId={p.id}
+                                square
+                                className="w-[50px]"
+                                h="h-[50px]"
+                              />
+                            ) : (
+                              <ImageProxied
+                                category="post"
+                                height={40}
+                                width={50}
+                                alt=""
+                                className="block aspect-square rounded-lg object-cover"
+                                src={p.metadata.media[0]?.original.url}
+                              />
+                            )}
                             <div className="flex flex-col">
                               <Link
-                                href={`/post/${p.id}`}
-                                target="_blank"
+                                href={`${
+                                  p.metadata.attributes[0].value === 'list'
+                                    ? PublicRoutes.LIST
+                                    : PublicRoutes.POST
+                                }/${p.id}`}
                                 rel="noreferrer"
                               >
                                 <p className="line-clamp-1 font-serif text-xl font-bold">
@@ -470,7 +483,7 @@ export default function ListDetails() {
                                 </div>
                               )}
                               <DropdownMenu>
-                                <DropdownMenuTrigger className="items-center rounded font-semibold text-gray-700">
+                                <DropdownMenuTrigger className="items-center rounded font-semibold text-gray-700 outline-none">
                                   <EllipsisHorizontalIcon className="h-8 w-8" />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent
@@ -501,18 +514,37 @@ export default function ListDetails() {
                 </Table>
               </div>
               {/* Pagination */}
-              {arrPosts.length > 8 && (
-                <Pagination
-                  postsPerPage={postsPerPage}
-                  totalPosts={arrPosts.length}
-                  paginate={paginate}
-                  currentPage={currentPage}
-                />
-              )}
+
+              <Pagination
+                postsPerPage={postsPerPage}
+                totalPosts={arrPosts.length}
+                paginate={paginate}
+                currentPage={currentPage}
+              />
             </div>
           </div>
         </div>
       </LayoutReading>
     )
   );
-}
+};
+
+export default ListDetails;
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  let previousRoute = context.req.headers?.referer || undefined;
+
+  if (previousRoute !== undefined) {
+    return {
+      props: {
+        previousRoute
+      }
+    };
+  } else {
+    return {
+      props: {
+        previousRoute: ''
+      }
+    };
+  }
+};

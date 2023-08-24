@@ -293,12 +293,16 @@ export const getPopulatedLists = async (profileId: any) => {
           const listContents = lastComment.items.metadata.tags;
           const listName = list.name;
           const listKey = list.key;
+          const listCreatedAt = lastComment.items.createdAt;
+          const listCollects = lastComment.items.stats.totalAmountOfCollects;
 
           const postsPromises = listContents.map(async (postId: string) => {
             return {
               listName,
               listKey,
               postId,
+              listCreatedAt,
+              listCollects,
               postMetadata: (await getPublication(postId))?.metadata
             };
           });
@@ -314,12 +318,14 @@ export const getPopulatedLists = async (profileId: any) => {
             .map((r: any) => ({
               id: r.value.postId,
               name: r.value.postMetadata.name,
-              tags: r.value.postMetadata.tags
+              tags: r.value.postMetadata.tags,
             }));
 
           return {
             id: results[0]?.value.listKey,
             name: results[0]?.value.listName,
+            createdAt: results[0]?.value.listCreatedAt,
+            collects: results[0]?.value.listCollects,
             posts: data
           };
         });

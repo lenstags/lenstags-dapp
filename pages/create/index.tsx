@@ -15,7 +15,7 @@ import { DotWave } from '@uiball/loaders';
 import Editor from 'components/Editor';
 import { IbuiltPost } from '@lib/lens/interfaces/publication';
 import Image from 'next/image';
-import { LayoutCreate } from '@components/LayourCreate';
+import { LayoutCreate } from '@components/LayoutCreate';
 import { NextPage } from 'next';
 import { ProfileContext } from 'components';
 import { Spinner } from '@components/Spinner';

@@ -12,6 +12,8 @@ interface Props {
   children: React.ReactNode;
   screen?: boolean;
   breadcumpTitle: string;
+  metadataName: string;
+  fromList?: boolean;
 }
 
 export const LayoutReading: FC<Props> = ({
@@ -19,7 +21,9 @@ export const LayoutReading: FC<Props> = ({
   title,
   pageDescription,
   screen,
-  breadcumpTitle
+  breadcumpTitle,
+  metadataName,
+  fromList
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
@@ -101,7 +105,11 @@ export const LayoutReading: FC<Props> = ({
         <SideBarLeft />
 
         <div className="col-span-10 col-start-2 overflow-x-clip">
-          <Topbar breadcumpTitle={breadcumpTitle} />
+          <Topbar
+            breadcumpTitle={breadcumpTitle}
+            metadataName={metadataName}
+            fromList={fromList}
+          />
           <main
             // FIXME Remove the absolute and left, when the sidebar
             // has no the fixed anymore!!!
