@@ -63,7 +63,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     'my-inventory' | 'notifications' | 'none'
   >('none');
   const [sortByValue, setSortByValue] = useState('newest');
-  const [subcribed, setSubcribed] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loadingMyLists, setLoadingMyLists] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
@@ -133,24 +133,25 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
   };
 
   useEffect(() => {
-    getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
-      const channelNataSocial =
-        res &&
-        !!res.find(
-          (item: { channel: string }) =>
-            item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
-        );
-      setSubcribed(channelNataSocial);
-    });
+    lensProfile &&
+      getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
+        const channelNataSocial =
+          res &&
+          !!res.find(
+            (item: { channel: string }) =>
+              item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
+          );
+        setSubscribed(channelNataSocial);
+      });
   }, [lensProfile?.ownedBy]);
 
   const signer = getSigner();
 
   const handleOpenNotifications = () => {
     setOpenTo('notifications');
-    if (!subcribed) {
+    if (!subscribed) {
       optIn(lensProfile?.ownedBy, signer).then((res) => {
-        setSubcribed(true);
+        setSubscribed(true);
       });
     }
     if (notifications.length === 0) {

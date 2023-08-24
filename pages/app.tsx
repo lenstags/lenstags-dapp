@@ -329,9 +329,9 @@ const App: NextPage = () => {
         );
       })
       .catch((err) => {
-        console.log('ERROR ', err);
-        setLoader(false);
-      });
+        console.log('⛔️ Error fetching data', err);
+      })
+      .finally(() => setLoader(false));
   }, [tags]);
 
   if (hydrationLoading) {
