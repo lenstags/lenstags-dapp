@@ -8,7 +8,7 @@ import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import { useDisconnect } from 'wagmi';
 
-const ProfileButton = () => {
+const ProfileButton = ({ className }: { className?: string }) => {
   const { openConnectModal } = useConnectModal();
   const { profile: lensProfile } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
@@ -27,7 +27,7 @@ const ProfileButton = () => {
       : '/img/profilePic.png';
 
   return (
-    <div id="connectArea" className="bg-white text-right">
+    <div id="connectArea" className={`bg-white text-right ${className}`}>
       {lensProfile ? (
         <>
           <button

@@ -2,6 +2,7 @@ import React, { FC, useContext, useEffect, useState } from 'react';
 
 import Head from 'next/head';
 import SideBarLeft from './SideBarLeft';
+import SideBarRight from './SideBarRight';
 import { Toaster } from './ui/ToasterUI';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { useRouter } from 'next/router';
@@ -14,14 +15,12 @@ interface Props {
   title: string;
   pageDescription: string;
   children: React.ReactNode;
-  screen?: boolean;
 }
 
 export const LayoutProfile: FC<Props> = ({
   children,
   title,
-  pageDescription,
-  screen
+  pageDescription
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
@@ -122,7 +121,11 @@ export const LayoutProfile: FC<Props> = ({
       <div className="grid w-full grid-cols-12">
         <SideBarLeft />
         <main
-          className={`col-span-10 overflow-x-clip ${
+          className={`${
+            router.pathname.includes(PublicRoutes.MYPROFILE)
+              ? 'col-span-10'
+              : 'col-span-7'
+          } overflow-x-clip ${
             sidebarCollapsedStateLeft.collapsed &&
             router.pathname !== PublicRoutes.APP &&
             !router.pathname.includes(PublicRoutes.PROFILE)
@@ -132,10 +135,13 @@ export const LayoutProfile: FC<Props> = ({
         >
           <div className="flex justify-between items-center px-8 my-4">
             <SearchBar />
-            <ProfileButton />
+            {router.pathname.includes(PublicRoutes.MYPROFILE) && (
+              <ProfileButton />
+            )}
           </div>
           {children}
         </main>
+        {!router.pathname.includes(PublicRoutes.MYPROFILE) && <SideBarRight />}
         <Toaster />
       </div>
       {/* </div> */}

@@ -169,19 +169,16 @@ const MyProfile: NextPage = () => {
       : '/img/profilePic.png';
 
   const location =
-    lensProfile?.attributes.find((item: any) => item.key === 'location')[
-      'value'
-    ] || '';
+    lensProfile?.attributes.find((item: any) => item.key === 'location')
+      ?.value || '';
 
   const twitter =
-    lensProfile?.attributes.find((item: any) => item.key === 'twitter')[
-      'value'
-    ] || '';
+    lensProfile?.attributes.find((item: any) => item.key === 'twitter')
+      ?.value || '';
 
   const url =
-    lensProfile?.attributes.find((item: any) => item.key === 'website')[
-      'value'
-    ] || '';
+    lensProfile?.attributes.find((item: any) => item.key === 'website')
+      ?.value || '';
 
   let website = '';
 
@@ -196,11 +193,7 @@ const MyProfile: NextPage = () => {
   }
 
   return (
-    <LayoutProfile
-      title="Nata Social | Explore"
-      pageDescription="My profile"
-      screen={true}
-    >
+    <LayoutProfile title="Nata Social | Explore" pageDescription="My profile">
       <div className="w-full px-8">
         {/* header */}
         <div className="">
@@ -295,7 +288,7 @@ const MyProfile: NextPage = () => {
                 </span>
               </div>
             </div>
-            <div className="rounded-lg px-4 py-1 mt-6 text-center font-bold text-sm self-start border-black border-2">
+            <div className="rounded-lg px-4 py-1 mt-6 text-center font-bold text-sm self-start border-black border-2 hover:cursor-pointer">
               <Link href={'/settings'}>Edit Profile</Link>
             </div>
           </div>
