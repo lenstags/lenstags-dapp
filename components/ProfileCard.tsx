@@ -38,7 +38,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile, showCard }) => {
         setIsFollowing(r.follows);
       });
     }
-  }, [showCard, lensProfile?.ownedBy]);
+  }, [showCard, lensProfile?.ownedBy, profile.id, profile.isFollowedByMe]);
   const handleFollow = async () => {
     setIsDotFollowing(true);
     if (showUnfollow === 'Unfollow') {

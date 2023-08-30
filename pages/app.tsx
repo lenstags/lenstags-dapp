@@ -4,10 +4,9 @@ import {
   DEFAULT_CHAIN_ID,
   DEFAULT_NETWORK
 } from '@lib/config';
-import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
-import { findKeyAttributeInProfile, validateWhitelist } from 'utils/helpers';
+import { ProfileContext, TagsFilterContext } from 'components';
 import {
   useCallback,
   useContext,
@@ -16,24 +15,26 @@ import {
   useRef,
   useState
 } from 'react';
+import { findKeyAttributeInProfile, validateWhitelist } from 'utils/helpers';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
-import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
-import ExplorerCard from 'components/ExplorerCard';
-import Head from 'next/head';
-import ImageProxied from 'components/ImageProxied';
-import { Layout } from 'components/Layout';
-import type { NextPage } from 'next';
-import Script from 'next/script';
+import { useQuery } from '@apollo/client';
+import CardListView from '@components/CardListView';
 import { SearchBar } from '@components/SearchBar';
-import { Spinner } from 'components/Spinner';
-import { TagsFilter } from 'components/TagsFilter';
 import WhitelistScreen from '@components/WhitelistScreen';
+import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
-import { useDisconnect } from 'wagmi';
-import { useQuery } from '@apollo/client';
+import ImageProxied from 'components/ImageProxied';
+import { Layout } from 'components/Layout';
+import { Spinner } from 'components/Spinner';
+import { TagsFilter } from 'components/TagsFilter';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import type { NextPage } from 'next';
+import Head from 'next/head';
+import Script from 'next/script';
+import { useDisconnect } from 'wagmi';
+import CardPostView from '@components/CardPostView';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -659,13 +660,13 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="px-4 pb-6">
-              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
+            <section className="px-4 pb-6">
+              <ul className="flex flex-col flex-wrap justify-center gap-3 rounded-b-lg px-3 pb-6">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
                     if (publications.length === index + 1) {
                       return (
-                        <ExplorerCard
+                        <CardPostView
                           post={post}
                           key={index}
                           refProp={lastPublicationRef}
@@ -673,7 +674,7 @@ const App: NextPage = () => {
                       );
                     } else {
                       return (
-                        <ExplorerCard post={post} key={index} refProp={null} />
+                        <CardPostView post={post} key={index} refProp={null} />
                       );
                     }
                   })
@@ -688,13 +689,13 @@ const App: NextPage = () => {
                     </span>
                   </div>
                 )}
-              </div>
+              </ul>
               {loadingFetchMore && (
                 <div className="mx-auto mb-10 flex w-10 items-center justify-center ">
                   <Spinner h="10" w="10" />
                 </div>
               )}
-            </div>
+            </section>
           </>
         )}
       </Layout>

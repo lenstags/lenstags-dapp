@@ -42,9 +42,9 @@ export const ResultsCard = ({
   };
 
   return (
-    <div className="flex flex-col min-w-full border-4 border-stone-100 min-h-[200px] rounded-xl pt-3 pb-8 px-4">
-      <div className="flex min-w-full justify-between items-center">
-        <div className="flex items-center space-x-2 mb-4">
+    <div className="flex min-h-[200px] min-w-full flex-col rounded-xl border-4 border-stone-100 px-4 pb-8 pt-3">
+      <div className="flex min-w-full items-center justify-between">
+        <div className="mb-4 flex items-center space-x-2">
           <div
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
@@ -56,18 +56,11 @@ export const ResultsCard = ({
               width={40}
               height={40}
               src={publication.profilePicture}
-              className="w-10 h-10 rounded-full object-cover"
+              className="h-10 w-10 rounded-full object-cover"
             />
             <HoverProfileCard
               profile={profile}
-              postProfileId={publication.profileId}
-              postProfileIsFollowedByMe={publication.isFollowedByMe}
-              postProfilePicture={publication.profilePicture}
-              postProfileName={publication.profileName}
-              postProfileHandle={publication.profileHandle}
-              postProfileBio={publication.profileBio}
-              postProfileTotalFollowing={publication.profileTotalFollowing}
-              postProfileTotalFollowers={publication.profileTotalFollowers}
+              postProfile={publication}
               showCardStatus={showCard}
             />
           </div>
@@ -81,7 +74,7 @@ export const ResultsCard = ({
           id="cardMenu"
           className="dropdown relative inline-block cursor-pointer"
         >
-          <EllipsisHorizontalIcon className="w-6 h-6 mb-4" />
+          <EllipsisHorizontalIcon className="mb-4 h-6 w-6" />
           <div
             className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
           border-gray-200 
@@ -113,22 +106,22 @@ export const ResultsCard = ({
           width={400}
           height={200}
           alt="Publication picture"
-          className="max-w-[40%] min-w-[40%] max-h-[200px] rounded-xl mr-4 aspect-video object-cover"
+          className="mr-4 aspect-video max-h-[200px] min-w-[40%] max-w-[40%] rounded-xl object-cover"
         />
-        <div className="flex flex-col justify-between grow">
+        <div className="flex grow flex-col justify-between">
           <Link
             href={`${publication.type}/${publication.id}`}
             className="flex flex-col"
           >
-            <h3 className="font-bold text-xl mb-2">{publication.name}</h3>
-            <p className="text-sm mb-2">{publication.content}</p>
+            <h3 className="mb-2 text-xl font-bold">{publication.name}</h3>
+            <p className="mb-2 text-sm">{publication.content}</p>
           </Link>
-          <div className="flex justify-between my-2">
+          <div className="my-2 flex justify-between">
             <div className="flex space-x-1">
               {publication.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="border-[1px] border-black rounded-full px-2 py-1 text-xs font-semibold uppercase"
+                  className="rounded-full border-[1px] border-black px-2 py-1 text-xs font-semibold uppercase"
                 >
                   {tag}
                 </span>
