@@ -6,6 +6,9 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'http',
+        hostname: '**'
+      },
+      {
         protocol: 'https',
         hostname: '**'
       }
@@ -32,6 +35,11 @@ const nextConfig = {
           {
             key: 'Access-Control-Allow-Headers',
             value: '*'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value:
+              'connect-src *; frame-ancestors https://*.nata.social https://nata.social http://127.0.0.1:3000 localhost:3000 https://localhost:3000 https://verify.walletconnect.com'
           }
         ]
       }
