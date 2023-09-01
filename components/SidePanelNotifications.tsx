@@ -1,12 +1,5 @@
-import { Ref, forwardRef, useContext, useEffect, useState } from 'react';
-import {
-  DoubleSidebar,
-  DoubleSidebarContent,
-  DoubleSidebarTitle,
-  DoubleSidebarTrigger
-} from './ui/DoubleSidebar';
+import * as PushAPI from '@pushprotocol/restapi';
 
-import { SidebarContext } from '@context/SideBarSizeContext';
 import {
   BellIcon,
   BookOpenIcon,
@@ -14,19 +7,27 @@ import {
   ChatBubbleOvalLeftEllipsisIcon,
   UserPlusIcon
 } from '@heroicons/react/24/outline';
-import { BellIcon as BellIconFilled } from '@heroicons/react/24/solid';
-import { getSigner } from '@lib/lens/ethers.service';
+import {
+  DoubleSidebar,
+  DoubleSidebarContent,
+  DoubleSidebarTitle,
+  DoubleSidebarTrigger
+} from './ui/DoubleSidebar';
+import { Ref, forwardRef, useContext, useEffect, useState } from 'react';
 import {
   channelAddress,
   getNotifications,
   getSubscriptions,
   optIn
 } from '@lib/lens/user-notifications';
+
+import { BellIcon as BellIconFilled } from '@heroicons/react/24/solid';
 import { NotificationTypes } from '@models/notifications.models';
-import * as PushAPI from '@pushprotocol/restapi';
-import { useAccount } from 'wagmi';
 import Notifications from './Notifications';
+import { SidebarContext } from '@context/SideBarSizeContext';
 import { Tooltip } from './ui/Tooltip';
+import { getSigner } from '@lib/lens/ethers.service';
+import { useAccount } from 'wagmi';
 
 interface SidePanelProps {
   myInventoryRef: any;
@@ -71,7 +72,7 @@ const SidePanelNotifications = forwardRef(function (
   const [notifications, setNotifications] = useState<
     PushAPI.ParsedResponseType[]
   >([]);
-  const [subcribed, setSubcribed] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
   const { address } = useAccount();
 
   const {
@@ -86,13 +87,13 @@ const SidePanelNotifications = forwardRef(function (
       const channelNataSocial = !!res?.find(
         (item: { channel: string }) => item.channel === channelAddress
       );
-      setSubcribed(channelNataSocial);
+      setSubscribed(channelNataSocial);
     });
   }, [address]);
 
   const signer = getSigner();
   const handleTrigger = async () => {
-    if (!subcribed) {
+    if (!subscribed) {
       optIn(address, signer);
     }
     getNotifications(address).then((res) => {

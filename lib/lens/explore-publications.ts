@@ -8,6 +8,7 @@ import {
 
 import { LENSTAGS_SOURCE } from '@lib/config';
 import { apolloClient } from './graphql/apollo-client';
+import { getPublicationsFollowing } from './get-publications';
 
 const explorePublications = (request: ExplorePublicationRequest) => {
   return apolloClient.query({
@@ -32,13 +33,34 @@ export const reqQuery: ExplorePublicationRequest = {
   customFilters: [CustomFiltersTypes.Gardeners]
 };
 
-export const explore = async (filter?: IExplorePublications) => {
+export const explore = async (
+  filter?: IExplorePublications,
+  isExplore: boolean = false,
+  profileId?: string
+) => {
   // TODO REMOVE TAG PRIVATEPUB
   if (filter?.tags) {
     reqQuery.metadata = {
       locale: filter.locale,
       tags: { oneOf: filter.tags }
     };
+  }
+
+  if (isExplore) {
+    if (!profileId) {
+      throw 'Missing my profileId';
+    }
+    console.log('---inicio ', new Date());
+    // const ss = await getPublicationsFollowing(
+    //   [PublicationTypes.Post],
+    //   address,
+    //   reqQuery.metadata
+    // );
+
+    const ss = await getPublicationsFollowing(profileId, reqQuery.metadata);
+
+    console.log('fin ', ss);
+    return ss;
   }
 
   const result = await explorePublications(reqQuery);

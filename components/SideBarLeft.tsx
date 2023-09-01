@@ -39,21 +39,31 @@ import Notifications from './Notifications';
 import PostsByList from './PostsByList';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { PublicRoutes } from 'models';
-import { PublicationTypes } from '@lib/lens/graphql/generated';
 import SidePanelNotifications from './SidePanelNotifications';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { Tooltip } from './ui/Tooltip';
 import { deleteLensLocalStorage } from 'lib/lens/localStorage';
-import { getPublications } from '@lib/lens/get-publications';
 import { getSigner } from '@lib/lens/ethers.service';
 import { useDisconnect } from 'wagmi';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
 
-interface SidebarProps {}
+interface SidebarProps {
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
+  clearFeed: () => void;
+}
 
-const SideBarLeft: React.FC<SidebarProps> = () => {
+const SideBarLeft: React.FC<SidebarProps> = ({
+  setIsExplore,
+  isExplore,
+  setSkipExplore,
+  skipExplore,
+  clearFeed
+}) => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
   const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
@@ -63,7 +73,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     'my-inventory' | 'notifications' | 'none'
   >('none');
   const [sortByValue, setSortByValue] = useState('newest');
-  const [subcribed, setSubcribed] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loadingMyLists, setLoadingMyLists] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
@@ -76,6 +86,13 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
   const triggerNotificationsRef = useRef<any>();
   const triggerMyInventoryRef = useRef<any>();
+
+  const handleRedirect = () => {
+    isExplore === true && clearFeed();
+    setIsExplore(true);
+    setSkipExplore(false);
+    router.push(PublicRoutes.APP);
+  };
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -95,26 +112,8 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
     if (publications.length !== 0) return;
     setLoadingMyLists(true);
-
-    // no need to gather all my pubs
-    // const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
-    // console.log('xxx ', res);
-
-    // FIXME
     const rr = await getPopulatedLists(lensProfile.id);
-    console.log('rr ', rr);
-    // const filteredItems = res.items.filter((item: any) => {
-    //   const id = lensProfile?.id;
-    //   const attributes = item.metadata.attributes;
-    //   return (
-    //     item.profile.id === id &&
-    //     attributes?.length > 0 &&
-    //     (attributes[0].value === 'list' ||
-    //       attributes[0].value === 'privateDefaultList')
-    //   );
-    // });
 
-    // setPublications(filteredItems);
     setPublications(rr!);
     setLoadingMyLists(false);
   };
@@ -133,24 +132,25 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
   };
 
   useEffect(() => {
-    getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
-      const channelNataSocial =
-        res &&
-        !!res.find(
-          (item: { channel: string }) =>
-            item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
-        );
-      setSubcribed(channelNataSocial);
-    });
+    lensProfile &&
+      getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
+        const channelNataSocial =
+          res &&
+          !!res.find(
+            (item: { channel: string }) =>
+              item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
+          );
+        setSubscribed(channelNataSocial);
+      });
   }, [lensProfile?.ownedBy]);
 
   const signer = getSigner();
 
   const handleOpenNotifications = () => {
     setOpenTo('notifications');
-    if (!subcribed) {
+    if (!subscribed) {
       optIn(lensProfile?.ownedBy, signer).then((res) => {
-        setSubcribed(true);
+        setSubscribed(true);
       });
     }
     if (notifications.length === 0) {
@@ -192,58 +192,9 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )}
           </Link>
         </div>
+
         {/* menu items */}
         <div className="font-serif text-base">
-          <Link href={PublicRoutes.APP}>
-            <Tooltip tooltip="Home">
-              <div
-                className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-             hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-               sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-             }`}
-              >
-                <Image
-                  src="/icons/home.svg"
-                  alt="Home"
-                  width={20}
-                  height={20}
-                />
-                {!sidebarCollapsedStateLeft.collapsed && (
-                  <span className="ml-2">Home</span>
-                )}
-              </div>
-            </Tooltip>
-          </Link>
-
-          <Link href={PublicRoutes.APP}>
-            <Tooltip tooltip="Explore">
-              <div
-                className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-              hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-                sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-              }`}
-              >
-                {router.pathname === PublicRoutes.APP &&
-                !sidebarCollapsedStateLeft.collapsed ? (
-                  <GlobeAltIconFilled
-                    width={22}
-                    height={22}
-                    className="text-lensBlack"
-                  />
-                ) : (
-                  <GlobeAltIcon
-                    width={22}
-                    height={22}
-                    className="text-lensBlack"
-                  />
-                )}
-                {!sidebarCollapsedStateLeft.collapsed && (
-                  <span className="ml-2">Explore</span>
-                )}
-              </div>
-            </Tooltip>
-          </Link>
-
           {lensProfile && router.pathname !== PublicRoutes.MYPROFILE ? (
             <div className="h-12 w-full duration-1000 animate-in fade-in-50">
               <SidePanelMyInventory
@@ -257,6 +208,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </div>
           ) : (
             lensProfile && (
+              // my inventory
               <div className="w-full duration-1000 animate-in fade-in-50">
                 <Accordion type="single">
                   <AccordionItem value="my-investory" className="border-0 py-0">
@@ -358,6 +310,131 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )
           )}
 
+          {sidebarCollapsedStateLeft.collapsed ? (
+            <>
+              <Link
+                href={PublicRoutes.APP}
+                onClick={() => {
+                  isExplore === true && clearFeed();
+                  setIsExplore(false);
+                  setSkipExplore(true);
+                }}
+              >
+                <Tooltip tooltip="Feed">
+                  <div
+                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                    }`}
+                  >
+                    <Image
+                      src="/icons/home.svg"
+                      alt="Explore"
+                      width={20}
+                      height={20}
+                    />
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2">Feed</span>
+                    )}
+                  </div>
+                </Tooltip>
+              </Link>
+
+              <div
+                // href={PublicRoutes.APP}
+                onClick={handleRedirect}
+              >
+                <Tooltip tooltip="Explore">
+                  <div
+                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                    }`}
+                  >
+                    {router.pathname === PublicRoutes.APP &&
+                    !sidebarCollapsedStateLeft.collapsed ? (
+                      <GlobeAltIconFilled
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    ) : (
+                      <GlobeAltIcon
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    )}
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2">Explore</span>
+                    )}
+                  </div>
+                </Tooltip>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* feed no collapsed */}
+              <Tooltip tooltip="Feed">
+                <div
+                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+             hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+               sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+             }`}
+                  onClick={() => {
+                    isExplore === true && clearFeed();
+                    setIsExplore(false);
+                    setSkipExplore(true);
+                  }}
+                >
+                  <Image
+                    src="/icons/home.svg"
+                    alt="Feed"
+                    width={20}
+                    height={20}
+                  />
+                  {!sidebarCollapsedStateLeft.collapsed && (
+                    <span className="ml-2">Feed</span>
+                  )}
+                </div>
+              </Tooltip>
+
+              {/* explorer no collapsed */}
+              <Tooltip tooltip="Explore">
+                <div
+                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+              hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+              }`}
+                  onClick={() => {
+                    isExplore === false && clearFeed();
+                    setIsExplore(true);
+                    setSkipExplore(false);
+                  }}
+                >
+                  {router.pathname === PublicRoutes.APP &&
+                  !sidebarCollapsedStateLeft.collapsed ? (
+                    <GlobeAltIconFilled
+                      width={22}
+                      height={22}
+                      className="text-lensBlack"
+                    />
+                  ) : (
+                    <GlobeAltIcon
+                      width={22}
+                      height={22}
+                      className="text-lensBlack"
+                    />
+                  )}
+                  {!sidebarCollapsedStateLeft.collapsed && (
+                    <span className="ml-2">Explore</span>
+                  )}
+                </div>
+              </Tooltip>
+            </>
+          )}
+
+          {/* notifications */}
           {lensProfile && router.pathname !== PublicRoutes.MYPROFILE && (
             <div className="h-12 w-full duration-1000 animate-in fade-in-50">
               <SidePanelNotifications
