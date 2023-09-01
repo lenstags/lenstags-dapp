@@ -1,5 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { SidebarContextProvider } from './SideBarSizeContext';
+import { ViewCardContextProvider } from './ViewCardContext';
 
 export const AppContext = createContext();
 
@@ -16,7 +17,9 @@ export function AppProvider(props) {
 
   return (
     <AppContext.Provider value={{ config, updateConfig }}>
-      <SidebarContextProvider>{props.children}</SidebarContextProvider>
+      <SidebarContextProvider>
+        <ViewCardContextProvider>{props.children}</ViewCardContextProvider>
+      </SidebarContextProvider>
     </AppContext.Provider>
   );
 }

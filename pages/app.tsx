@@ -35,6 +35,10 @@ import Head from 'next/head';
 import Script from 'next/script';
 import { useDisconnect } from 'wagmi';
 import CardPostView from '@components/CardPostView';
+import CardViewButtons from '@components/CardViewButtons';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import ExplorerCard from '@components/ExplorerCard';
+import { cn } from '@lib/utils';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -55,6 +59,7 @@ const App: NextPage = () => {
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
   const { profile: lensProfile } = useContext(ProfileContext);
+  const { viewCard } = useContext(ViewCardContext);
 
   const { chains, error, isLoading, pendingChainId, switchNetwork } =
     useSwitchNetwork({
@@ -661,25 +666,71 @@ const App: NextPage = () => {
 
             {/* publications */}
             <section className="px-4 pb-6">
-              <ul className="flex flex-col flex-wrap justify-center gap-3 rounded-b-lg px-3 pb-6">
+              <CardViewButtons />
+              <ul
+                className={cn(
+                  'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
+                  viewCard !== ViewBy.CARD && 'flex-col gap-3'
+                )}
+              >
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
                     if (publications.length === index + 1) {
                       return (
-                        <CardPostView
-                          post={post}
-                          key={index}
-                          refProp={lastPublicationRef}
-                        />
+                        <>
+                          {viewCard === ViewBy.CARD && (
+                            <ExplorerCard
+                              post={post}
+                              key={index}
+                              refProp={lastPublicationRef}
+                            />
+                          )}
+                          {viewCard === ViewBy.LIST && (
+                            <CardListView
+                              post={post}
+                              key={index}
+                              refProp={lastPublicationRef}
+                            />
+                          )}
+                          {viewCard === ViewBy.POST && (
+                            <CardPostView
+                              post={post}
+                              key={index}
+                              refProp={lastPublicationRef}
+                            />
+                          )}
+                        </>
                       );
                     } else {
                       return (
-                        <CardPostView post={post} key={index} refProp={null} />
+                        <>
+                          {viewCard === ViewBy.CARD && (
+                            <ExplorerCard
+                              post={post}
+                              key={index}
+                              refProp={null}
+                            />
+                          )}
+                          {viewCard === ViewBy.LIST && (
+                            <CardListView
+                              post={post}
+                              key={index}
+                              refProp={null}
+                            />
+                          )}
+                          {viewCard === ViewBy.POST && (
+                            <CardPostView
+                              post={post}
+                              key={index}
+                              refProp={null}
+                            />
+                          )}
+                        </>
                       );
                     }
                   })
                 ) : loader ? (
-                  <div className="my-8">
+                  <div className="mx-auto my-8">
                     <Spinner h="10" w="10" />
                   </div>
                 ) : (

@@ -46,17 +46,6 @@ const CardListView: FC<Props> = (props) => {
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const { disconnect } = useDisconnect();
 
-  // markdown conversion
-  // const fromHtml = new TurndownService();
-  // fromHtml.keep(['br', 'p', 'div']); // keep line breaks
-  // fromHtml.addRule('lineElementsToPlain', {
-  //   filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-  //   replacement: (content) => {
-  //     const trimmedContent = content.replace(/\n+$/g, '');
-  //     return trimmedContent + '\n';
-  //   }
-  // });
-
   const fromHtml = new TurndownService();
   fromHtml.keep(['br']); // solo mantén los saltos de línea
   fromHtml.addRule('headers', {
@@ -121,26 +110,6 @@ const CardListView: FC<Props> = (props) => {
     disconnect();
   };
 
-  //handles debounce
-  // useEffect(() => {
-  //   const handleDebounce = setTimeout(() => {
-  //     const bounceResult = lists
-  //       .map((l: typeList) => l.name.toLowerCase())
-  //       .includes(valueListName.toLowerCase());
-
-  //     setIsListExistent(bounceResult);
-  //     const filteredList = lists.filter((l: typeList) =>
-  //       l.name.toLowerCase().includes(valueListName.toLowerCase())
-  //     );
-
-  //     setSelectedList(filteredList);
-  //   }, 300); // Adjust this timeout value to your desired delay
-
-  //   return () => {
-  //     clearTimeout(handleDebounce); // This cleanup function will clear the timeout if the component is unmounted before it can execute
-  //   };
-  // }, [valueListName]);
-
   const handleRemove = (postId: string) =>
     hidePublication(postId).then((res) => {
       snackbar.showMessage('🗑️ Post removed successfully');
@@ -148,36 +117,10 @@ const CardListView: FC<Props> = (props) => {
       setPointerEvents('none');
     });
 
-  // const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
-  //   setValueListName(event.target.value);
-
-  // const refreshLists = async (profileId: string) => {
-  //   const readProfile: ProfileQuery['profile'] = await queryProfile({
-  //     profileId
-  //   });
-  //   const parsedLists = JSON.parse(
-  //     readProfile?.attributes?.find(
-  //       (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-  //     )?.value || `[]`
-  //   );
-  //   setLists(parsedLists);
-  //   setSelectedList(parsedLists);
-  // };
-
-  // - if profile doesnt have a deflist on its profile.metadata >>>>  !profile.metadata.listArray.find(r=>r.name==='default')
-  // - create the post list, post.attributes = attributes [ { postSubType = 'favsList' }, ... ]
-  // - get the postId, and add it to the profile.metadata
-
-  const ViewCardsStyle =
-    'xs:w-11/12 sm:w-11/12 md:w-6/12 lg:w-6/12 xl:w-6/12 2xl:w-4/12 3xl:w-3/12 4xl:w-2/12';
-
   return (
     <li
       key={post.id}
-      className={cn(
-        'w-full  px-1 duration-1000 animate-in fade-in-50'
-        // ViewCardsStyle
-      )}
+      className={cn('w-full  px-1 duration-1000 animate-in fade-in-50')}
       style={{ opacity, pointerEvents }}
       ref={props?.refProp}
     >
@@ -208,7 +151,6 @@ const CardListView: FC<Props> = (props) => {
           {/* <Link > */}
           <Link
             rel="noreferrer"
-            target="_blank"
             href={isList ? `/list/${post.id}` : `/post/${post.id}`}
             className="flex h-12 items-center gap-2"
           >
@@ -236,11 +178,11 @@ const CardListView: FC<Props> = (props) => {
             </span>
           </Link>
           {/* card menu */}
-          <figure
+          <div
             id="cardMenu"
             className="dropdown absolute right-4 inline-block cursor-pointer"
           >
-            <figure className="items-center rounded py-2 font-semibold text-gray-700">
+            <div className="rotate-90 items-center rounded py-2 font-semibold text-gray-700">
               <ImageProxied
                 category="profile"
                 src="/assets/icons/dots-vertical.svg"
@@ -248,7 +190,7 @@ const CardListView: FC<Props> = (props) => {
                 width={20}
                 height={20}
               />
-            </figure>
+            </div>
 
             <div
               className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
@@ -284,7 +226,7 @@ const CardListView: FC<Props> = (props) => {
                 )}
               </p>
             </div>
-          </figure>
+          </div>
           {/* card contents */}
           <footer className="flex h-12 text-sm text-black">
             {/* profile */}
@@ -296,17 +238,16 @@ const CardListView: FC<Props> = (props) => {
               <Link
                 rel="noreferrer"
                 href={`${PublicRoutes.PROFILE}/${post.profile.id}`}
-                target="_blank"
-                className="flex h-min w-max justify-between gap-2 text-xs"
+                className="mr-2 flex h-min w-auto gap-2 text-xs"
               >
-                <span>
+                <span className="w-max">
                   {(post.profile.name || post.profile.id).trim() || '-'}
                 </span>
                 <span className="font-light text-gray-400">
                   @{post.profile.handle}
                 </span>
-                <span style={{ fontSize: 10 }} className="text-gray-500">
-                  • {moment(post.createdAt).fromNow()}
+                <span style={{ fontSize: 10 }} className="w-max text-gray-500">
+                  • {moment(post.createdAt).fromNow()} •
                 </span>
               </Link>
               <TagStrip tags={post.metadata.tags} postId={post.id} />

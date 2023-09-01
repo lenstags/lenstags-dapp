@@ -5,9 +5,11 @@ import { freeUnfollow } from '@lib/lens/free-unfollow';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { PublicRoutes } from '@models/routes.model';
 import { DotWave } from '@uiball/loaders';
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { ProfileProps } from './ProfileCard';
 import { PublicationSearchType } from './SearchBar';
+import { ProfileContext } from './LensAuthenticationProvider';
+import Link from 'next/link';
 
 interface HoverProfileCardProps {
   profile: ProfileQuery['profile'] | null;
@@ -35,6 +37,7 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
     profileTotalFollowing,
     profileTotalFollowers
   } = postProfile;
+  const { profile: lensProfile } = useContext(ProfileContext);
   const [isDotFollowing, setIsDotFollowing] = useState(false);
   const [isFollowing, setIsFollowing] = useState(isFollowedByMe);
   const [showUnfollow, setShowUnfollow] = useState('Following');
@@ -67,18 +70,10 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
   return (
     <>
       {showCardStatus && (
-        <div
-          className="lens-post
-                      absolute top-5 z-10
-                     w-64 shadow-xl  duration-500 animate-in fade-in-50 "
-        >
+        <div className="lens-post absolute top-5 z-10 w-64 shadow-xl  duration-500 animate-in fade-in-50 ">
           <div className="items-center rounded p-4 font-semibold text-gray-700">
             <div className="flex justify-between bg-white">
-              <a
-                rel="noreferrer"
-                href={`${PublicRoutes.PROFILE}/${id}`}
-                target="_blank"
-              >
+              <Link rel="noreferrer" href={`${PublicRoutes.PROFILE}/${id}`}>
                 <ImageProxied
                   category="profile"
                   alt={`Loading from ${
@@ -89,14 +84,13 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
                   className="h-14 w-14 cursor-pointer rounded-full object-cover"
                   src={picture?.original.url || profilePicture}
                 />
-              </a>
-              {isFollowing ? (
+              </Link>
+              {isFollowing && lensProfile ? (
                 <button
                   onMouseEnter={() => setShowUnfollow('Unfollow')}
                   onMouseLeave={() => setShowUnfollow('Following')}
                   onClick={() => handleFollow(id)}
-                  className=" m-2 flex items-center rounded-lg border border-solid
-                               border-black bg-transparent px-2 py-1 font-bold"
+                  className="m-2 flex items-center rounded-lg border border-solid border-black bg-transparent px-2 py-1 font-bold"
                 >
                   {isDotFollowing ? (
                     <div className="mx-2">
@@ -110,11 +104,10 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
                 ''
               )}
 
-              {!isFollowing ? (
+              {!isFollowing && lensProfile ? (
                 <button
                   onClick={() => handleFollow(id)}
-                  className=" m-2 flex items-center rounded-lg border border-solid
-                               border-black bg-transparent px-2 py-1 font-bold"
+                  className=" m-2 flex items-center rounded-lg border border-solid border-black bg-transparent px-2 py-1 font-bold"
                 >
                   {isDotFollowing ? (
                     <div className="mx-2">
@@ -128,11 +121,7 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
                 ''
               )}
             </div>
-            <a
-              rel="noreferrer"
-              href={`${PublicRoutes.PROFILE}/${id}`}
-              target="_blank"
-            >
+            <Link rel="noreferrer" href={`${PublicRoutes.PROFILE}/${id}`}>
               <p className="text-base font-bold">{name || profileName}</p>
               <p className="text-xs text-stone-500">
                 @{handle || profileHandle}
@@ -140,7 +129,7 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
               <p className="my-2 truncate text-ellipsis text-xs text-stone-500">
                 {bio || profileBio}
               </p>
-            </a>
+            </Link>
             <div className="mt-3 flex justify-between rounded-lg bg-stone-100 px-3 py-2 font-serif">
               <div className="flex">
                 <span>

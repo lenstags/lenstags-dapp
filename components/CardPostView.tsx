@@ -44,17 +44,6 @@ const CardPostView: FC<Props> = (props) => {
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const { disconnect } = useDisconnect();
 
-  // markdown conversion
-  // const fromHtml = new TurndownService();
-  // fromHtml.keep(['br', 'p', 'div']); // keep line breaks
-  // fromHtml.addRule('lineElementsToPlain', {
-  //   filter: ['div', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-  //   replacement: (content) => {
-  //     const trimmedContent = content.replace(/\n+$/g, '');
-  //     return trimmedContent + '\n';
-  //   }
-  // });
-
   const fromHtml = new TurndownService();
   fromHtml.keep(['br']); // solo mantén los saltos de línea
   fromHtml.addRule('headers', {
@@ -119,55 +108,12 @@ const CardPostView: FC<Props> = (props) => {
     disconnect();
   };
 
-  //handles debounce
-  // useEffect(() => {
-  //   const handleDebounce = setTimeout(() => {
-  //     const bounceResult = lists
-  //       .map((l: typeList) => l.name.toLowerCase())
-  //       .includes(valueListName.toLowerCase());
-
-  //     setIsListExistent(bounceResult);
-  //     const filteredList = lists.filter((l: typeList) =>
-  //       l.name.toLowerCase().includes(valueListName.toLowerCase())
-  //     );
-
-  //     setSelectedList(filteredList);
-  //   }, 300); // Adjust this timeout value to your desired delay
-
-  //   return () => {
-  //     clearTimeout(handleDebounce); // This cleanup function will clear the timeout if the component is unmounted before it can execute
-  //   };
-  // }, [valueListName]);
-
   const handleRemove = (postId: string) =>
     hidePublication(postId).then((res) => {
       snackbar.showMessage('🗑️ Post removed successfully');
       setOpacity(0.3);
       setPointerEvents('none');
     });
-
-  // const handleChangeListName = (event: React.ChangeEvent<HTMLInputElement>) =>
-  //   setValueListName(event.target.value);
-
-  // const refreshLists = async (profileId: string) => {
-  //   const readProfile: ProfileQuery['profile'] = await queryProfile({
-  //     profileId
-  //   });
-  //   const parsedLists = JSON.parse(
-  //     readProfile?.attributes?.find(
-  //       (attribute) => attribute.key === ATTRIBUTES_LIST_KEY
-  //     )?.value || `[]`
-  //   );
-  //   setLists(parsedLists);
-  //   setSelectedList(parsedLists);
-  // };
-
-  // - if profile doesnt have a deflist on its profile.metadata >>>>  !profile.metadata.listArray.find(r=>r.name==='default')
-  // - create the post list, post.attributes = attributes [ { postSubType = 'favsList' }, ... ]
-  // - get the postId, and add it to the profile.metadata
-
-  const ViewCardsStyle =
-    'xs:w-11/12 sm:w-11/12 md:w-6/12 lg:w-6/12 xl:w-6/12 2xl:w-4/12 3xl:w-3/12 4xl:w-2/12';
 
   return (
     <li
@@ -223,10 +169,9 @@ const CardPostView: FC<Props> = (props) => {
                 />
               </div>
 
-              <a
+              <Link
                 rel="noreferrer"
                 href={`/profile/${post.profile.id}`}
-                target="_blank"
                 className="flex items-center justify-between gap-2 px-2 text-xs"
               >
                 <span>
@@ -238,7 +183,7 @@ const CardPostView: FC<Props> = (props) => {
                 <span style={{ fontSize: 10 }} className="text-gray-500">
                   • {moment(post.createdAt).fromNow()}
                 </span>
-              </a>
+              </Link>
 
               {/* profile hover */}
               <HoverProfileCard
@@ -253,7 +198,7 @@ const CardPostView: FC<Props> = (props) => {
               id="cardMenu"
               className="dropdown relative inline-block cursor-pointer"
             >
-              <div className="items-center rounded py-2 font-semibold text-gray-700">
+              <div className="rotate-90 items-center rounded py-2 font-semibold text-gray-700">
                 <ImageProxied
                   category="profile"
                   src="/assets/icons/dots-vertical.svg"
@@ -263,11 +208,7 @@ const CardPostView: FC<Props> = (props) => {
                 />
               </div>
 
-              <div
-                className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
-                       border-gray-200 
-                      bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 "
-              >
+              <div className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2 border-gray-200 bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 ">
                 <p className="">
                   <span
                     className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
@@ -304,7 +245,6 @@ const CardPostView: FC<Props> = (props) => {
           <figure className="flex w-full gap-4">
             <Link
               rel="noreferrer"
-              target="_blank"
               href={isList ? `/list/${post.id}` : `/post/${post.id}`}
               className="min-w-fit"
             >
