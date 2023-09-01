@@ -1,12 +1,23 @@
 import {
+  APP_NAME,
   APP_UI_VERSION,
   ATTRIBUTES_LIST_KEY,
   DEFAULT_CHAIN_ID,
-  DEFAULT_NETWORK
+  DEFAULT_NETWORK,
+  LENSTAGS_SOURCE
 } from '@lib/config';
+import {
+  CustomFiltersTypes,
+  ExplorePublicationsDocument,
+  FeedEventItemType,
+  FeedRequest,
+  PaginatedFeedResult,
+  ProfileFeedDocument,
+  PublicationSortCriteria,
+  PublicationTypes
+} from '@lib/lens/graphql/generated';
 import { ProfileContext, TagsFilterContext } from 'components';
 import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
-import { explore, reqQuery } from '@lib/lens/explore-publications';
 import { findKeyAttributeInProfile, validateWhitelist } from 'utils/helpers';
 import {
   useCallback,
@@ -18,7 +29,6 @@ import {
 } from 'react';
 import { useNetwork, useSwitchNetwork } from 'wagmi';
 
-import { ExplorePublicationsDocument } from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
@@ -31,6 +41,7 @@ import { TagsFilter } from 'components/TagsFilter';
 import WhitelistScreen from '@components/WhitelistScreen';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
+import { reqQuery } from '@lib/lens/explore-publications';
 import { useDisconnect } from 'wagmi';
 import { useQuery } from '@apollo/client';
 import { useSnackbar } from 'material-ui-snackbar-provider';
@@ -47,10 +58,12 @@ const App: NextPage = () => {
   const [showWelcome, setShowWelcome] = useState(false);
   const [showReject, setShowReject] = useState(false);
   const [ready, setReady] = useState(false);
+  const [isExplore, setIsExplore] = useState(false);
+  const [skipExplore, setSkipExplore] = useState(true);
   const [loadingFetchMore, setLoadingFetchMore] = useState(false);
   const [loader, setLoader] = useState(false);
   const [cursor, setCursor] = useState<string | undefined>(undefined);
-  const [isVisibleWL, setIsVisibleWL] = useState<boolean>(false); //HEREEE
+  const [isVisibleWL, setIsVisibleWL] = useState<boolean>(false);
   const { disconnect } = useDisconnect();
   const snackbar = useSnackbar();
   const { profile: lensProfile } = useContext(ProfileContext);
@@ -65,66 +78,6 @@ const App: NextPage = () => {
         console.log('Success', data);
       }
     });
-
-  // let provider: Web3Provider;
-
-  // const networkMap = {
-  //   POLYGON_MAINNET: {
-  //     chainId: hexValue(137), // '0x89'
-  //     chainName: 'Polygon Mainnet',
-  //     nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
-  //     rpcUrls: ['https://polygon-rpc.com'],
-  //     blockExplorerUrls: ['https://www.polygonscan.com/']
-  //   },
-  //   MUMBAI_TESTNET: {
-  //     chainId: hexValue(80001), // '0x13881'
-  //     chainName: 'Polygon Mumbai Testnet',
-  //     nativeCurrency: { name: 'tMATIC', symbol: 'tMATIC', decimals: 18 },
-  //     rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
-  //     blockExplorerUrls: ['https://mumbai.polygonscan.com/']
-  //   }
-  // };
-
-  // const switchChains = async (chainId: number) => {
-  //   const id: string = hexValue(chainId);
-  //   try {
-  //     await provider.send('wallet_switchEthereumChain', [{ chainId: id }]);
-  //     console.log('switched to chain', chainId);
-  //   } catch (error) {
-  //     // @ts-ignore
-  //     if (error.code === 4902) {
-  //       console.log("this network is not in the user's wallet");
-  //       await provider.send('wallet_addEthereumChain', [
-  //         chainId === 80001
-  //           ? networkMap.MUMBAI_TESTNET
-  //           : networkMap.POLYGON_MAINNET
-  //       ]);
-  //     }
-
-  //     throw error;
-  //   }
-  // };
-
-  // function normalizeChainId(chainId: string | number | bigint) {
-  //   if (typeof chainId === 'string')
-  //     return Number.parseInt(
-  //       chainId,
-  //       chainId.trim().substring(0, 2) === '0x' ? 16 : 10
-  //     );
-  //   if (typeof chainId === 'bigint') return Number(chainId);
-  //   return chainId;
-  // }
-
-  // const getChainId = async (): Promise<number> => {
-  //   return provider.send('eth_chainId', []).then(normalizeChainId);
-  // };
-
-  // const ensureCorrectChain = async () => {
-  //   const currentChainId = await getChainId();
-  //   if (currentChainId !== DEFAULT_CHAIN_ID) {
-  //     await switchChains(DEFAULT_CHAIN_ID);
-  //   }
-  // };
 
   const handleSetup = async () => {
     // await ensureCorrectChain();
@@ -176,6 +129,7 @@ const App: NextPage = () => {
     }
   };
 
+  // whitelist validation
   useEffect(() => {
     const fetchData = async (address: string, chainId: number) => {
       await validateWhitelist(address).then((isInWL) => {
@@ -200,92 +154,222 @@ const App: NextPage = () => {
     }
   }, [lensProfile, chain]);
 
+  const clearFeed = () => setPublications([]);
+  // main query definitions
+
+  const resExplore = useQuery(ExplorePublicationsDocument, {
+    variables: {
+      request: {
+        sortCriteria: PublicationSortCriteria.Latest,
+        noRandomize: true,
+        sources: [LENSTAGS_SOURCE],
+        limit: 30,
+        publicationTypes: [PublicationTypes.Post],
+        customFilters: [CustomFiltersTypes.Gardeners],
+        metadata: {
+          locale: 'en',
+          tags: { oneOf: tags }
+        }
+      }
+    },
+    skip: skipExplore // when true is skipped
+  });
+
+  const resFollowing = useQuery(ProfileFeedDocument, {
+    variables: {
+      request: {
+        profileId: lensProfile?.id,
+        sources: [APP_NAME],
+        feedEventItemTypes: [FeedEventItemType.Post],
+        metadata: {
+          locale: 'en',
+          tags: { oneOf: tags }
+        }
+      }
+    },
+    skip: !skipExplore
+  });
+
+  const {
+    fetchMore,
+    data,
+    loading,
+    error: apolloError
+  } = isExplore ? resExplore : resFollowing;
+
+  useEffect(() => {
+    setPublications([]);
+    if (loading) {
+      setLoader(true);
+    }
+
+    if (!loading && !apolloError && data) {
+      setLoader(false);
+
+      if (!data || typeof data === 'undefined') {
+        return setPublications([]);
+      }
+
+      if (isExplore && data) {
+        // @ts-ignore
+        const t = data.explorePublications;
+        setCursor(t.pageInfo.next);
+        return setPublications(t.items);
+      }
+
+      // @ts-ignore
+      const t = data.feed;
+      const newRes: PaginatedFeedResult = {
+        items: t.items.map((r: any) => r.root),
+        pageInfo: t.pageInfo,
+        __typename: t.__typename
+      };
+      setCursor(newRes.pageInfo.next);
+      return setPublications(newRes.items);
+    }
+
+    if (apolloError) {
+      setLoader(false);
+      console.log('⛔️ Error fetching data', apolloError);
+    }
+  }, [loading, apolloError, data, isExplore, tags, lensProfile]);
+
   /**
    * Infinite scroll
    */
-  const query = useMemo(() => {
-    if (!tags) return reqQuery;
-    reqQuery.metadata = {
+  const reqQueryFeed: FeedRequest = {
+    profileId: lensProfile?.id,
+    sources: [APP_NAME],
+    feedEventItemTypes: [FeedEventItemType.Post]
+  };
+
+  const query2 = useMemo(() => {
+    const finalReq = isExplore ? reqQuery : reqQueryFeed;
+    if (!tags) {
+      return finalReq;
+    }
+
+    finalReq.metadata = {
       locale: 'en',
       tags: { oneOf: tags }
     };
-    return reqQuery;
-  }, [tags]);
 
-  const { fetchMore } = useQuery(ExplorePublicationsDocument, {
-    variables: {
-      request: query
-    },
-    onCompleted: (data) => {
-      if (cursor === undefined)
-        setCursor(data.explorePublications.pageInfo.next);
+    if (!isExplore && lensProfile) {
+      // @ts-ignore
+      finalReq.profileId = lensProfile.id;
     }
-  });
+    return finalReq;
+  }, [tags, isExplore, lensProfile]);
 
   const handleLoadMoreWithoutTags = useCallback(() => {
-    if (!cursor) return console.log('no more results');
+    if (!cursor) {
+      return console.log('no more results');
+    }
     setLoadingFetchMore(true);
     fetchMore({
       variables: {
         request: {
-          ...query,
+          ...query2,
           cursor
         }
       },
       updateQuery: (prev, { fetchMoreResult }): any => {
-        if (!fetchMoreResult) return 'no more results';
-        return {
+        if (!fetchMoreResult) {
+          return 'no more results';
+        }
+
+        const feedResult = {
+          explorePublicationsResult: {
+            ...fetchMoreResult.feed
+          }
+        };
+
+        const explorePublicationsResult = {
           explorePublications: {
+            // @ts-ignore
             ...fetchMoreResult.explorePublications
           }
         };
+
+        return isExplore ? explorePublicationsResult : feedResult;
       }
     }).then((res) => {
-      if (res.data.explorePublications.items.length > 0) {
-        setCursor(res.data.explorePublications.pageInfo.next);
-        setPublications((prev) => [
-          ...prev,
-          ...res.data.explorePublications.items
-        ]);
+      const t = res.data;
+      // @ts-ignore
+      if (t.explorePublications?.items.length > 0 || t.feed?.items.length > 0) {
+        if (isExplore) {
+          const newRes = {
+            // @ts-ignore
+            items: t.explorePublications.items,
+            // @ts-ignore
+            pageInfo: t.explorePublications.pageInfo,
+            // @ts-ignore
+            __typename: t.explorePublications.__typename
+          };
+          setCursor(newRes.pageInfo.next);
+          setPublications((prev) => [...prev, ...newRes.items]);
+        } else {
+          const newRes = {
+            items: t.feed.items.map((r: any) => r.root),
+            pageInfo: t.feed.pageInfo,
+            __typename: t.feed.__typename
+          };
+          setCursor(newRes.pageInfo.next);
+          setPublications((prev) => [...prev, ...newRes.items]);
+        }
         setLoadingFetchMore(false);
       } else {
         setLoadingFetchMore(false);
         return console.log('no more results');
       }
     });
-  }, [cursor, fetchMore, query]);
+  }, [cursor, fetchMore, query2, isExplore]);
 
   const handleLoadMoreWithTags = useCallback(() => {
     setLoadingFetchMore(true);
+
     fetchMore({
       variables: {
         request: {
-          ...query,
+          ...query2,
           cursor
         }
       },
       updateQuery: (prev, { fetchMoreResult }): any => {
-        if (!fetchMoreResult) return 'no more results';
-        return {
+        if (!fetchMoreResult) {
+          return 'no more results';
+        }
+
+        const feedResult = {
+          feed: {
+            ...fetchMoreResult.feed
+          }
+        };
+
+        const explorePublicationsResult = {
           explorePublications: {
+            // @ts-ignore
             ...fetchMoreResult.explorePublications
           }
         };
+
+        return isExplore ? explorePublicationsResult : feedResult;
       }
     }).then((res) => {
-      if (res.data.explorePublications.items.length > 0) {
-        setCursor(res.data.explorePublications.pageInfo.next);
-        setPublications((prev) => [
-          ...prev,
-          ...res.data.explorePublications.items
-        ]);
+      if (
+        // @ts-ignore
+        res.data.explorePublications?.items.length > 0 ||
+        res.data.feed?.items.length > 0
+      ) {
+        setCursor(res.data.feed.pageInfo.next);
+        setPublications((prev) => [...prev, ...res.data.feed.items]);
         setLoadingFetchMore(false);
       } else {
         setLoadingFetchMore(false);
         return console.log('no more results');
       }
     });
-  }, [cursor, fetchMore, query]);
+  }, [cursor, fetchMore, query2]);
 
   const observer = useRef<IntersectionObserver>();
   const lastPublicationRef = useCallback(
@@ -310,21 +394,6 @@ const App: NextPage = () => {
     ]
   );
 
-  useEffect(() => {
-    setLoader(true);
-    explore({ locale: 'en', tags })
-      .then((data) => {
-        setLoader(false);
-        if (!data) return setPublications([]);
-        setCursor(data.pageInfo.next);
-        return setPublications(data.items);
-      })
-      .catch((err) => {
-        console.log('ERROR ', err);
-        setLoader(false);
-      });
-  }, [tags]);
-
   if (hydrationLoading) {
     return (
       <div className="flex">
@@ -335,9 +404,7 @@ const App: NextPage = () => {
     );
   }
 
-  const handleWelcomeClick = () => {
-    setShowWelcome(false);
-  };
+  const handleWelcomeClick = () => setShowWelcome(false);
 
   // content filtering
   // const fetchMyCollects = async () => {
@@ -445,7 +512,15 @@ const App: NextPage = () => {
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
-      <Layout title={'Nata Social | Home'} pageDescription={'Home'}>
+      <Layout
+        title={'Nata Social | Home'}
+        pageDescription={'Home'}
+        setIsExplore={setIsExplore}
+        isExplore={isExplore}
+        setSkipExplore={setSkipExplore}
+        skipExplore={skipExplore}
+        clearFeed={clearFeed}
+      >
         {isVisibleWL ? (
           <WhitelistScreen />
         ) : showWelcome ? (
@@ -463,7 +538,11 @@ const App: NextPage = () => {
             }}
           >
             <div className="mt-10 font-mono">
-              {chain && <div>Connected to {chain.name}</div>}
+              {chain && (
+                <div>
+                  Connected to {chain.name}-{chain.id}
+                </div>
+              )}
             </div>
             <ImageProxied
               className="mt-20"
@@ -489,7 +568,7 @@ const App: NextPage = () => {
             <div className="  h-full w-2/3 max-w-xl content-center items-center justify-center py-20 text-center font-mono">
               <p className=" mb-6 text-center font-sans text-4xl ">Welcome!</p>
               <p className="py-6 text-justify font-serif text-lg">
-                This platform is an <b>Alpha</b> release
+                This platform is an <b>Beta</b> release
                 <i> (fresh out of the oven)</i>, meaning that some unexpected
                 behaviour may occur. We appreciate your understanding and
                 encourage you to report any issues you encounter.
@@ -660,6 +739,8 @@ const App: NextPage = () => {
 
             {/* publications */}
             <div className="px-4 pb-6">
+              {isExplore ? 'true' : 'false'}
+
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
@@ -684,7 +765,7 @@ const App: NextPage = () => {
                 ) : (
                   <div className="my-8">
                     <span className="text-lg font-medium">
-                      No results found 🤷‍♂️
+                      No results found 💤
                     </span>
                   </div>
                 )}

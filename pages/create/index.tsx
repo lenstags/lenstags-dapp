@@ -8,15 +8,15 @@ import React, {
 import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
 import Avatar from 'boring-avatars';
-import CollapsiblePanels from 'components/Panels';
 import CreatableSelect from 'react-select/creatable';
 import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import { DotWave } from '@uiball/loaders';
 import Editor from 'components/Editor';
 import { IbuiltPost } from '@lib/lens/interfaces/publication';
-import Image from 'next/image';
 import { LayoutCreate } from '@components/LayoutCreate';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
 import { NextPage } from 'next';
+import { NotificationTypes } from '@models/notifications.models';
 import { ProfileContext } from 'components';
 import { Spinner } from '@components/Spinner';
 import { TAGS } from '@lib/lens/tags';
@@ -24,13 +24,11 @@ import Toast from '../../components/Toast';
 import TurndownService from 'turndown';
 import _ from 'lodash';
 import { createPostManager } from '@lib/lens/post';
+import { followers } from '@lib/lens/followers';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import { followers } from '@lib/lens/followers';
-import { sendNotification } from '@lib/lens/user-notifications';
-import { NotificationTypes } from '@models/notifications.models';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -95,6 +93,8 @@ const Create: NextPage = () => {
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
   const [isTagSelected, setIsTagSelected] = useState<boolean>(false);
+  const [isExplore, setIsExplore] = useState(false);
+  const [skipExplore, setSkipExplore] = useState(true);
 
   const [imageURL, setImageURL] = useState('');
   const [imageOrigin, setImageOrigin] = useState<string | null>('panelAI');
@@ -546,6 +546,11 @@ const Create: NextPage = () => {
       title="Nata Social | Create post"
       pageDescription="Create post"
       breadcumpTitle="Create post"
+      setIsExplore={setIsExplore}
+      isExplore={isExplore}
+      setSkipExplore={setSkipExplore}
+      skipExplore={skipExplore}
+      clearFeed={() => true}
     >
       {hydrationLoading ? (
         <div className="flex w-full justify-center p-10">

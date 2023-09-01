@@ -1,8 +1,8 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import Script from 'next/script';
 import { Navbar } from 'components';
+import Script from 'next/script';
 import SideBarLeft from './SideBarLeft';
 import Topbar from './Topbar';
 
@@ -14,6 +14,11 @@ interface Props {
   breadcumpTitle: string;
   metadataName: string;
   fromList?: boolean;
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
+  clearFeed: () => void;
 }
 
 export const LayoutReading: FC<Props> = ({
@@ -23,7 +28,12 @@ export const LayoutReading: FC<Props> = ({
   screen,
   breadcumpTitle,
   metadataName,
-  fromList
+  fromList,
+  setIsExplore,
+  isExplore,
+  setSkipExplore,
+  skipExplore,
+  clearFeed
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
@@ -102,8 +112,13 @@ export const LayoutReading: FC<Props> = ({
       ></Script>
 
       <div className="grid w-full grid-cols-12">
-        <SideBarLeft />
-
+        <SideBarLeft
+          setIsExplore={setIsExplore}
+          isExplore={isExplore}
+          setSkipExplore={setSkipExplore}
+          skipExplore={skipExplore}
+          clearFeed={clearFeed}
+        />
         <div className="col-span-10 col-start-2 overflow-x-clip">
           <Topbar
             breadcumpTitle={breadcumpTitle}
