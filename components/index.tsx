@@ -9,3 +9,4 @@ export * from './Layout';
 export * from './LayoutReading';
 export * from './ModalLists';
 export * from './explore';
+export * from './LayoutProfile';
