@@ -1,26 +1,36 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 
 import Head from 'next/head';
+import { PublicRoutes } from 'models';
+import Script from 'next/script';
 import SideBarLeft from './SideBarLeft';
 import SideBarRight from './SideBarRight';
-import { Toaster } from './ui/ToasterUI';
 import { SidebarContext } from '@context/SideBarSizeContext';
+import { Toaster } from './ui/ToasterUI';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
-import { PublicRoutes } from 'models';
 
 interface Props {
   title: string;
   pageDescription: string;
   children: React.ReactNode;
   screen?: boolean;
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
+  clearFeed: () => void;
 }
 
 export const Layout: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen
+  screen,
+  setIsExplore,
+  isExplore,
+  setSkipExplore,
+  skipExplore,
+  clearFeed
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
@@ -119,7 +129,13 @@ export const Layout: FC<Props> = ({
             <Navbar />
           </nav> */}
       <div className="grid  w-full grid-cols-12">
-        <SideBarLeft />
+        <SideBarLeft
+          setIsExplore={setIsExplore}
+          isExplore={isExplore}
+          setSkipExplore={setSkipExplore}
+          skipExplore={skipExplore}
+          clearFeed={clearFeed}
+        />
         <main
           className={`col-span-7 overflow-x-clip ${
             sidebarCollapsedStateLeft.collapsed &&

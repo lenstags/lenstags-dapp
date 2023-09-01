@@ -4,7 +4,7 @@ const SideBarRight = () => {
   return (
     <div className="right-0 col-span-3 hidden pr-4 sm:inline">
       <div className="sticky top-0 py-4">
-        <ProfileButton />
+        <ProfileButton className="mb-3" />
 
         {/* top creators */}
         <div className="mt-2 rounded-t-lg bg-stone-200 py-4 pr-4">

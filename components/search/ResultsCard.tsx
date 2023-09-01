@@ -1,13 +1,14 @@
-import { PublicationSearchType } from '@components/SearchBar';
-import ImageProxied from '@components/ImageProxied';
-import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
-import moment from 'moment';
-import PostIndicators from '@components/PostIndicators';
-import Link from 'next/link';
-import CollectButton from '@components/CollectButton';
-import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { useRef, useState } from 'react';
+
+import CollectButton from '@components/CollectButton';
+import { EllipsisHorizontalIcon } from '@heroicons/react/24/outline';
 import HoverProfileCard from '@components/HoverProfileCard';
+import ImageProxied from '@components/ImageProxied';
+import Link from 'next/link';
+import PostIndicators from '@components/PostIndicators';
+import { ProfileQuery } from '@lib/lens/graphql/generated';
+import { PublicationSearchType } from '@components/SearchBar';
+import moment from 'moment';
 
 export const ResultsCard = ({
   publication,

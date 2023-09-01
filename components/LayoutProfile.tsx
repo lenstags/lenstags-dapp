@@ -1,44 +1,35 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useContext, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import { Navbar } from 'components';
-import Script from 'next/script';
 import SideBarLeft from './SideBarLeft';
-import Topbar from './Topbar';
+import SideBarRight from './SideBarRight';
+import { Toaster } from './ui/ToasterUI';
+import { SidebarContext } from '@context/SideBarSizeContext';
+import { useRouter } from 'next/router';
+import Script from 'next/script';
+import { PublicRoutes } from 'models';
+import { SearchBar } from './SearchBar';
+import ProfileButton from './ProfileButton';
 
 interface Props {
   title: string;
   pageDescription: string;
   children: React.ReactNode;
-  screen?: boolean;
-  breadcumpTitle: string;
-  metadataName: string;
-  fromList?: boolean;
-  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
-  isExplore: boolean;
-  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
-  skipExplore: boolean;
-  clearFeed: () => void;
 }
 
-export const LayoutReading: FC<Props> = ({
+export const LayoutProfile: FC<Props> = ({
   children,
   title,
-  pageDescription,
-  screen,
-  breadcumpTitle,
-  metadataName,
-  fromList,
-  setIsExplore,
-  isExplore,
-  setSkipExplore,
-  skipExplore,
-  clearFeed
+  pageDescription
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
+
+  const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
+
+  const router = useRouter();
 
   if (hydrationLoading) {
     return (
@@ -111,31 +102,53 @@ export const LayoutReading: FC<Props> = ({
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
+      {/* <div style="
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+  
+  background-image: url('ruta/de/la/imagen.jpg'); background-repeat: no-repeat; background-size: cover; z-index: -1;"></div> */}
+      {/* <div
+      // style={{
+      //   backgroundImage: 'url(/img/app-background.svg)',
+      //   backgroundSize: 'cover',
+      //   backgroundRepeat: 'no-repeat',
+      //   backgroundPosition: 'center'
+      // }}
+      > */}
+      {/* <div className="flex"> */}
+      {/* <nav>
+            <Navbar />
+          </nav> */}
       <div className="grid w-full grid-cols-12">
-        <SideBarLeft
-          setIsExplore={setIsExplore}
-          isExplore={isExplore}
-          setSkipExplore={setSkipExplore}
-          skipExplore={skipExplore}
-          clearFeed={clearFeed}
-        />
-        <div className="col-span-10 col-start-2 overflow-x-clip">
-          <Topbar
-            breadcumpTitle={breadcumpTitle}
-            metadataName={metadataName}
-            fromList={fromList}
-          />
-          <main
-            // FIXME Remove the absolute and left, when the sidebar
-            // has no the fixed anymore!!!
-            // plus adjust to use w-10/12
-            // style={{ left: '16.666667%', width: '75.6667%' }}
-            className="w-full pt-20"
-          >
-            {children}
-          </main>
-        </div>
+        <SideBarLeft />
+        <main
+          className={`${
+            router.pathname.includes(PublicRoutes.MYPROFILE)
+              ? 'col-span-10'
+              : 'col-span-7'
+          } overflow-x-clip ${
+            sidebarCollapsedStateLeft.collapsed &&
+            router.pathname !== PublicRoutes.APP &&
+            !router.pathname.includes(PublicRoutes.PROFILE)
+              ? 'col-start-2 col-end-10'
+              : 'col-start-3'
+          }`}
+        >
+          <div className="flex justify-between items-center px-8 my-4">
+            <SearchBar />
+            {router.pathname.includes(PublicRoutes.MYPROFILE) && (
+              <ProfileButton />
+            )}
+          </div>
+          {children}
+        </main>
+        {!router.pathname.includes(PublicRoutes.MYPROFILE) && <SideBarRight />}
+        <Toaster />
       </div>
+      {/* </div> */}
+      {/* </div> */}
+      {/* <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}> */}
+      {/* <main className="mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
+      {/* <main className="z-0 mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
     </>
   );
 };
