@@ -9,6 +9,7 @@ interface Props {
   pageDescription: string;
   children: React.ReactNode;
   screen?: boolean;
+  breadcumpTitle: string;
   setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
   isExplore: boolean;
   setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,6 +22,7 @@ export const LayoutCreate: FC<Props> = ({
   title,
   pageDescription,
   screen,
+  breadcumpTitle,
   setIsExplore,
   isExplore,
   setSkipExplore,
@@ -83,7 +85,7 @@ export const LayoutCreate: FC<Props> = ({
           clearFeed={clearFeed}
         />
         <div className="col-span-12 col-start-2 overflow-x-clip">
-          <Topbar />
+          <Topbar breadcumpTitle={breadcumpTitle} />
           <main
             // FIXME Remove the absolute and left, when the sidebar
             // has no the fixed anymore!!!

@@ -13,8 +13,8 @@ import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import { DotWave } from '@uiball/loaders';
 import Editor from 'components/Editor';
 import { IbuiltPost } from '@lib/lens/interfaces/publication';
-import { LayoutCreate } from '@components/LayourCreate';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { LayoutCreate } from '@components/LayoutCreate';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
 import { NextPage } from 'next';
 import { NotificationTypes } from '@models/notifications.models';
 import { ProfileContext } from 'components';
@@ -545,6 +545,7 @@ const Create: NextPage = () => {
     <LayoutCreate
       title="Nata Social | Create post"
       pageDescription="Create post"
+      breadcumpTitle="Create post"
       setIsExplore={setIsExplore}
       isExplore={isExplore}
       setSkipExplore={setSkipExplore}
