@@ -9,13 +9,23 @@ interface Props {
   pageDescription: string;
   children: React.ReactNode;
   screen?: boolean;
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
+  clearFeed: () => void;
 }
 
 export const LayoutCreate: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen
+  screen,
+  setIsExplore,
+  isExplore,
+  setSkipExplore,
+  skipExplore,
+  clearFeed
 }) => {
   return (
     <>
@@ -65,8 +75,13 @@ export const LayoutCreate: FC<Props> = ({
       ></script>
 
       <div className="grid w-full grid-cols-12">
-        <SideBarLeft />
-
+        <SideBarLeft
+          setIsExplore={setIsExplore}
+          isExplore={isExplore}
+          setSkipExplore={setSkipExplore}
+          skipExplore={skipExplore}
+          clearFeed={clearFeed}
+        />
         <div className="col-span-12 col-start-2 overflow-x-clip">
           <Topbar />
           <main

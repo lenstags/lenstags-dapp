@@ -404,9 +404,7 @@ const App: NextPage = () => {
     );
   }
 
-  const handleWelcomeClick = () => {
-    setShowWelcome(false);
-  };
+  const handleWelcomeClick = () => setShowWelcome(false);
 
   // content filtering
   // const fetchMyCollects = async () => {
@@ -741,6 +739,8 @@ const App: NextPage = () => {
 
             {/* publications */}
             <div className="px-4 pb-6">
+              {isExplore ? 'true' : 'false'}
+
               <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
