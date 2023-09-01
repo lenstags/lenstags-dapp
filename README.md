@@ -12,6 +12,7 @@ Powered by Lens 🌿
 
 ## 🤖 Stack
 
+- Node 18
 - NextJS
 - TypeScript
 - TailwindCSS

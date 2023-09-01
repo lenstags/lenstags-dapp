@@ -25,6 +25,7 @@ interface Props {
 const ExplorerCard: FC<Props> = (props) => {
   const { post } = props;
   const isList =
+    post.metadata &&
     post.metadata.attributes.length > 0 &&
     (post.metadata.attributes[0].value === 'list' ||
       post.metadata.attributes[0].value === 'privateDefaultList');
@@ -200,7 +201,7 @@ const ExplorerCard: FC<Props> = (props) => {
               postId={postId}
               post={post}
               processStatus={handleProcessStatus}
-              ownedBy={post.profile.ownedBy}
+              ownedBy={post.profile?.ownedBy}
               isList={isList}
             />
 
@@ -219,7 +220,7 @@ const ExplorerCard: FC<Props> = (props) => {
                     <div className="items-center rounded font-semibold text-gray-700">
                       <ImageProxied
                         category="profile"
-                        alt={`Pic from ${post.profile.picture?.original?.url}`}
+                        alt={`Pic from ${post.profile?.picture?.original?.url}`}
                         height={40}
                         width={40}
                         className="h-8 w-8 cursor-pointer rounded-full object-cover"
@@ -256,7 +257,7 @@ const ExplorerCard: FC<Props> = (props) => {
                     profile={lensProfile}
                     postProfileId={post.profile.id}
                     postProfileIsFollowedByMe={post.profile.isFollowedByMe}
-                    postProfilePicture={post.profile.picture.original.url}
+                    postProfilePicture={post.profile.picture?.original.url}
                     postProfileName={post.profile.name}
                     postProfileHandle={post.profile.handle}
                     postProfileBio={post.profile.bio}

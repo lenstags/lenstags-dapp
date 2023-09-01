@@ -103,6 +103,7 @@ export const optIn = async (address: `0x${string}` | undefined, signer: any) => 
 
 
 export const getSubscriptions = async (address: `0x${string}` | undefined) => {
+    if (!address) return
     const fetchSubscriptions = await PushAPI.user
         .getSubscriptions({
             user: `eip155:80001:${address}`,
