@@ -9,6 +9,7 @@ import { polygon, polygonMumbai } from 'wagmi/chains';
 import { ApolloProvider } from '@apollo/client';
 import type { AppProps } from 'next/app';
 import { AppProvider } from 'context/AppContext';
+import { ExploreProvider } from 'context/ExploreContext';
 import LensAuthenticationProvider from 'components/LensAuthenticationProvider';
 import { SnackbarProvider } from 'material-ui-snackbar-provider';
 import TagsFilterProvider from 'components/TagsFilterProvider';
@@ -43,9 +44,11 @@ function MyApp({ Component, pageProps }: AppProps) {
                 chains={chains}
                 initialChain={DEFAULT_CHAIN_ID}
               >
-                <TagsFilterProvider>
-                  <Component {...pageProps} />
-                </TagsFilterProvider>
+                <ExploreProvider>
+                  <TagsFilterProvider>
+                    <Component {...pageProps} />
+                  </TagsFilterProvider>
+                </ExploreProvider>
               </RainbowKitProvider>
             </AppProvider>
           </ApolloProvider>

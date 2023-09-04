@@ -18,7 +18,6 @@ interface Props {
   isExplore: boolean;
   setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
   skipExplore: boolean;
-  clearFeed: () => void;
 }
 
 export const Layout: FC<Props> = ({
@@ -29,8 +28,7 @@ export const Layout: FC<Props> = ({
   setIsExplore,
   isExplore,
   setSkipExplore,
-  skipExplore,
-  clearFeed
+  skipExplore
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
@@ -134,7 +132,7 @@ export const Layout: FC<Props> = ({
           isExplore={isExplore}
           setSkipExplore={setSkipExplore}
           skipExplore={skipExplore}
-          clearFeed={clearFeed}
+          // clearFeed={clearFeed}
         />
         <main
           className={`col-span-7 overflow-x-clip ${

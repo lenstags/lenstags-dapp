@@ -117,7 +117,6 @@ export const LayoutReading: FC<Props> = ({
           isExplore={isExplore}
           setSkipExplore={setSkipExplore}
           skipExplore={skipExplore}
-          clearFeed={clearFeed}
         />
         <div className="col-span-10 col-start-2 overflow-x-clip">
           <Topbar
