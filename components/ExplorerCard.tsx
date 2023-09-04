@@ -10,11 +10,13 @@ import { PRIVATE_LIST_NAME } from '@lib/config';
 import PostIndicators from '@components/PostIndicators';
 // import ProfileCard from './ProfileCard';
 import { ProfileContext } from './LensAuthenticationProvider';
+import { PublicRoutes } from '@models/routes.model';
 import TurndownService from 'turndown';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { useDisconnect } from 'wagmi';
+import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface Props {
@@ -38,7 +40,7 @@ const ExplorerCard: FC<Props> = (props) => {
   const [pointerEvents, setPointerEvents] = useState<any>('all');
   const [isFinished, setIsFinished] = useState(false);
   const [showCard, setShowCard] = useState(false);
-
+  const router = useRouter();
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const { disconnect } = useDisconnect();
 
@@ -115,6 +117,7 @@ const ExplorerCard: FC<Props> = (props) => {
   const handleDisconnect = () => {
     deleteLensLocalStorage();
     disconnect();
+    router.push(PublicRoutes.APP);
   };
 
   //handles debounce

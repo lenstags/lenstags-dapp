@@ -42,9 +42,8 @@ import SidePanelNotifications from './SidePanelNotifications';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { Tooltip } from './ui/Tooltip';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { getSigner } from '@lib/lens/ethers.service';
-import { useDisconnect } from 'wagmi';
+import { useExplore } from '@context/ExploreContext';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
 
@@ -53,18 +52,13 @@ interface SidebarProps {
   isExplore: boolean;
   setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
   skipExplore: boolean;
-  clearFeed: () => void;
 }
 
-const SideBarLeft: React.FC<SidebarProps> = ({
-  setIsExplore,
-  isExplore,
-  setSkipExplore,
-  skipExplore,
-  clearFeed
-}) => {
+const SideBarLeft: React.FC<SidebarProps> = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
+  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
+
   const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
   const [publications, setPublications] = useState<any[]>([]);
   const [sideBarSize, setSideBarSize] = useState<'3.6' | '16.6'>('16.6');
@@ -77,17 +71,11 @@ const SideBarLeft: React.FC<SidebarProps> = ({
   const [loadingMyLists, setLoadingMyLists] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
-  const { disconnect } = useDisconnect();
-  const handleDisconnect = () => {
-    deleteLensLocalStorage();
-    disconnect();
-  };
-
   const triggerNotificationsRef = useRef<any>();
   const triggerMyInventoryRef = useRef<any>();
 
   const handleRedirect = () => {
-    isExplore === true && clearFeed();
+    // isExplore && clearFeed();
     setIsExplore(true);
     setSkipExplore(false);
     router.push(PublicRoutes.APP);
@@ -194,6 +182,135 @@ const SideBarLeft: React.FC<SidebarProps> = ({
 
         {/* menu items */}
         <div className="font-serif text-base">
+          {sidebarCollapsedStateLeft.collapsed ? (
+            <>
+              {lensProfile && (
+                <Link
+                  href={PublicRoutes.APP}
+                  onClick={() => {
+                    // isExplore === true && clearFeed();
+                    setIsExplore(false);
+                    setSkipExplore(true);
+                  }}
+                >
+                  <Tooltip tooltip="Feed">
+                    <div
+                      className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                    }`}
+                    >
+                      <Image
+                        src="/icons/home.svg"
+                        alt="Explore"
+                        width={20}
+                        height={20}
+                      />
+                      {!sidebarCollapsedStateLeft.collapsed && (
+                        <span className="ml-2">Feed</span>
+                      )}
+                    </div>
+                  </Tooltip>
+                </Link>
+              )}
+              <div
+                // href={PublicRoutes.APP}
+                onClick={handleRedirect}
+              >
+                <Tooltip tooltip="Explore">
+                  <div
+                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                    }`}
+                  >
+                    {router.pathname === PublicRoutes.APP &&
+                    !sidebarCollapsedStateLeft.collapsed ? (
+                      <GlobeAltIconFilled
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    ) : (
+                      <GlobeAltIcon
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    )}
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2">Explore</span>
+                    )}
+                  </div>
+                </Tooltip>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* feed collapsed */}
+              {lensProfile && (
+                <Tooltip tooltip="Feed">
+                  <div
+                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                  hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                    sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                  }`}
+                    onClick={() => {
+                      // isExplore === true && clearFeed();
+                      setIsExplore(false);
+                      setSkipExplore(true);
+                      router.push(PublicRoutes.APP);
+                    }}
+                  >
+                    <Image
+                      src="/icons/home.svg"
+                      alt="Feed"
+                      width={20}
+                      height={20}
+                    />
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2">Feed</span>
+                    )}
+                  </div>
+                </Tooltip>
+              )}
+
+              {/* explorer collapsed */}
+              <Tooltip tooltip="Explore">
+                <div
+                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+              hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+              }`}
+                  onClick={() => {
+                    // isExplore === false && clearFeed();
+                    setIsExplore(true);
+                    setSkipExplore(false);
+                    router.push(PublicRoutes.APP);
+                  }}
+                >
+                  {router.pathname === PublicRoutes.APP &&
+                  !sidebarCollapsedStateLeft.collapsed ? (
+                    <GlobeAltIconFilled
+                      width={22}
+                      height={22}
+                      className="text-black"
+                    />
+                  ) : (
+                    <GlobeAltIcon
+                      width={22}
+                      height={22}
+                      className="text-black"
+                    />
+                  )}
+                  {!sidebarCollapsedStateLeft.collapsed && (
+                    <span className="ml-2">Explore</span>
+                  )}
+                </div>
+              </Tooltip>
+            </>
+          )}
+
           {lensProfile && router.pathname !== PublicRoutes.MYPROFILE ? (
             <div className="h-12 w-full duration-1000 animate-in fade-in-50">
               <SidePanelMyInventory
@@ -307,130 +424,6 @@ const SideBarLeft: React.FC<SidebarProps> = ({
                 </Accordion>
               </div>
             )
-          )}
-
-          {sidebarCollapsedStateLeft.collapsed ? (
-            <>
-              <Link
-                href={PublicRoutes.APP}
-                onClick={() => {
-                  isExplore === true && clearFeed();
-                  setIsExplore(false);
-                  setSkipExplore(true);
-                }}
-              >
-                <Tooltip tooltip="Feed">
-                  <div
-                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-                    }`}
-                  >
-                    <Image
-                      src="/icons/home.svg"
-                      alt="Explore"
-                      width={20}
-                      height={20}
-                    />
-                    {!sidebarCollapsedStateLeft.collapsed && (
-                      <span className="ml-2">Feed</span>
-                    )}
-                  </div>
-                </Tooltip>
-              </Link>
-
-              <div
-                // href={PublicRoutes.APP}
-                onClick={handleRedirect}
-              >
-                <Tooltip tooltip="Explore">
-                  <div
-                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-                    }`}
-                  >
-                    {router.pathname === PublicRoutes.APP &&
-                    !sidebarCollapsedStateLeft.collapsed ? (
-                      <GlobeAltIconFilled
-                        width={22}
-                        height={22}
-                        className="text-lensBlack"
-                      />
-                    ) : (
-                      <GlobeAltIcon
-                        width={22}
-                        height={22}
-                        className="text-lensBlack"
-                      />
-                    )}
-                    {!sidebarCollapsedStateLeft.collapsed && (
-                      <span className="ml-2">Explore</span>
-                    )}
-                  </div>
-                </Tooltip>
-              </div>
-            </>
-          ) : (
-            <>
-              {/* feed no collapsed */}
-              <Tooltip tooltip="Feed">
-                <div
-                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-             hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-               sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-             }`}
-                  onClick={() => {
-                    isExplore === true && clearFeed();
-                    setIsExplore(false);
-                    setSkipExplore(true);
-                  }}
-                >
-                  <Image
-                    src="/icons/home.svg"
-                    alt="Feed"
-                    width={20}
-                    height={20}
-                  />
-                  {!sidebarCollapsedStateLeft.collapsed && (
-                    <span className="ml-2">Feed</span>
-                  )}
-                </div>
-              </Tooltip>
-
-              {/* explorer no collapsed */}
-              <Tooltip tooltip="Explore">
-                <div
-                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-              hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-                sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-              }`}
-                  onClick={() => {
-                    isExplore === false && clearFeed();
-                    setIsExplore(true);
-                    setSkipExplore(false);
-                  }}
-                >
-                  {router.pathname === PublicRoutes.APP &&
-                  !sidebarCollapsedStateLeft.collapsed ? (
-                    <GlobeAltIconFilled
-                      width={22}
-                      height={22}
-                      className="text-lensBlack"
-                    />
-                  ) : (
-                    <GlobeAltIcon
-                      width={22}
-                      height={22}
-                      className="text-lensBlack"
-                    />
-                  )}
-                  {!sidebarCollapsedStateLeft.collapsed && (
-                    <span className="ml-2">Explore</span>
-                  )}
-                </div>
-              </Tooltip>
-            </>
           )}
 
           {/* notifications */}

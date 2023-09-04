@@ -45,11 +45,12 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   try {
     if (graphQLErrors) {
       console.log('DETECTION: ', graphQLErrors);
-      graphQLErrors.forEach(({ message, locations, path }) =>
+      graphQLErrors.forEach(({ message, locations, path }) => {
         console.log(
           `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-        )
-      );
+        );
+        console.log(' Location: ', locations, path);
+      });
     }
 
     if (networkError) {

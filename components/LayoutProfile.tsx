@@ -1,26 +1,35 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 
 import Head from 'next/head';
+import ProfileButton from './ProfileButton';
+import { PublicRoutes } from 'models';
+import Script from 'next/script';
+import { SearchBar } from './SearchBar';
 import SideBarLeft from './SideBarLeft';
 import SideBarRight from './SideBarRight';
-import { Toaster } from './ui/ToasterUI';
 import { SidebarContext } from '@context/SideBarSizeContext';
+import { Toaster } from './ui/ToasterUI';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
-import { PublicRoutes } from 'models';
-import { SearchBar } from './SearchBar';
-import ProfileButton from './ProfileButton';
 
 interface Props {
   title: string;
   pageDescription: string;
   children: React.ReactNode;
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
+  // clearFeed: () => void;
 }
 
 export const LayoutProfile: FC<Props> = ({
   children,
   title,
-  pageDescription
+  pageDescription,
+  setIsExplore,
+  isExplore,
+  setSkipExplore,
+  skipExplore
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
@@ -119,7 +128,12 @@ export const LayoutProfile: FC<Props> = ({
             <Navbar />
           </nav> */}
       <div className="grid w-full grid-cols-12">
-        <SideBarLeft />
+        <SideBarLeft
+          setIsExplore={setIsExplore}
+          isExplore={isExplore}
+          setSkipExplore={setSkipExplore}
+          skipExplore={skipExplore}
+        />
         <main
           className={`${
             router.pathname.includes(PublicRoutes.MYPROFILE)
@@ -133,7 +147,7 @@ export const LayoutProfile: FC<Props> = ({
               : 'col-start-3'
           }`}
         >
-          <div className="flex justify-between items-center px-8 my-4">
+          <div className="my-4 flex items-center justify-between px-8">
             <SearchBar />
             {router.pathname.includes(PublicRoutes.MYPROFILE) && (
               <ProfileButton />

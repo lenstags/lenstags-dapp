@@ -550,7 +550,6 @@ const Create: NextPage = () => {
       isExplore={isExplore}
       setSkipExplore={setSkipExplore}
       skipExplore={skipExplore}
-      clearFeed={() => true}
     >
       {hydrationLoading ? (
         <div className="flex w-full justify-center p-10">
@@ -757,29 +756,7 @@ const Create: NextPage = () => {
                     </div>
                   </div>
                 </div>
-                {/* 
-                <div className="mb-4 w-full">
-                  <CollapsiblePanels
-                    panels={panels}
-                    onActivePanelChange={handleActivePanelChange}
-                  />
-                </div> */}
               </div>
-              {/* abstract */}
-              {/*
-                <button
-                  className="ml-2 flex w-2/12 items-center justify-center whitespace-nowrap rounded-md
-                bg-black p-2 text-center font-serif text-xs text-white"
-                  onClick={handleGenerateTLDR}
-                >
-                  GENERATE TLDR
-                  {loadingTLDR && (
-                    <div className="ml-2">
-                      <DotWave size={22} color="#FFFFFF" />
-                    </div>
-                  )}
-                </button>
-              </div> */}
 
               {/* hidden default image DO NOT REMOVE */}
               <div

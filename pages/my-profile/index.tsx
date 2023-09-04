@@ -1,23 +1,25 @@
 import { LayoutProfile, ProfileContext, TagsFilter } from 'components';
+import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { Profile, PublicationTypes } from '@lib/lens/graphql/generated';
 import { useContext, useEffect, useState } from 'react';
 
 import { APP_NAME } from '@lib/config';
 import ExplorerCard from 'components/ExplorerCard';
+import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
 import { NextPage } from 'next';
-import Image from 'next/image';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
-import { MapPinIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { useExplore } from '@context/ExploreContext';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [tab, setTab] = useState<any>('all');
   const [lensProfile, setProfile] = useState<any>();
+  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
   // const { tags } = useContext(TagsFilterContext);
   const [tags, setTags] = useState<string[]>([]);
@@ -193,7 +195,14 @@ const MyProfile: NextPage = () => {
   }
 
   return (
-    <LayoutProfile title="Nata Social | Explore" pageDescription="My profile">
+    <LayoutProfile
+      title="Nata Social | Explore"
+      pageDescription="My profile"
+      setIsExplore={setIsExplore}
+      isExplore={isExplore}
+      setSkipExplore={setSkipExplore}
+      skipExplore={skipExplore}
+    >
       <div className="w-full px-8">
         {/* header */}
         <div className="">
@@ -205,30 +214,30 @@ const MyProfile: NextPage = () => {
             }}
             className="min-h-[25vh] rounded-xl"
           ></div>
-          <div className="flex justify-between items-center">
-            <div className="mb-4 flex flex-col max-w-[50%]">
+          <div className="flex items-center justify-between">
+            <div className="mb-4 flex max-w-[50%] flex-col">
               <ImageProxied
-                className="h-32 w-32 -mt-16 ml-4 rounded-full border-4 border-white object-cover"
+                className="-mt-16 ml-4 h-32 w-32 rounded-full border-4 border-white object-cover"
                 category="profile"
                 height={144}
                 width={144}
                 src={pictureUrl}
                 alt="avatar"
               />
-              <div className="flex items-center mt-2">
-                <span className="mb-1 text-2xl font-bold mr-1">
+              <div className="mt-2 flex items-center">
+                <span className="mb-1 mr-1 text-2xl font-bold">
                   {lensProfile?.name}
                 </span>
-                <span className="mb-0.5 font-normal text-gray-600 text-lg">
+                <span className="mb-0.5 text-lg font-normal text-gray-600">
                   @{lensProfile?.handle}
                 </span>
               </div>
-              <p className="font-medium mt-1">{lensProfile?.bio}</p>
-              <div className="flex space-x-3 mt-4">
+              <p className="mt-1 font-medium">{lensProfile?.bio}</p>
+              <div className="mt-4 flex space-x-3">
                 {location !== '' && (
                   <div className="flex items-center">
-                    <MapPinIcon className="w-4 h-4" />
-                    <span className="text-[#4D4D4D] ml-1 font-medium text-sm">
+                    <MapPinIcon className="h-4 w-4" />
+                    <span className="ml-1 text-sm font-medium text-[#4D4D4D]">
                       {location}
                     </span>
                   </div>
@@ -237,10 +246,10 @@ const MyProfile: NextPage = () => {
                   <>
                     <span>᛫</span>
                     <div className="flex items-center">
-                      <LinkIcon className="w-4 h-4" />
+                      <LinkIcon className="h-4 w-4" />
                       <Link
                         href={url}
-                        className="text-[#008BFF] ml-1 font-medium text-sm"
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
                       >
                         {website}
                       </Link>
@@ -259,7 +268,7 @@ const MyProfile: NextPage = () => {
                       />
                       <Link
                         href={`https://twitter.com/${twitter}`}
-                        className="text-[#008BFF] ml-1 font-medium text-sm"
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
                       >
                         @{twitter}
                       </Link>
@@ -267,7 +276,7 @@ const MyProfile: NextPage = () => {
                   </>
                 )}
               </div>
-              <div className="flex bg-[#F8F8F8] rounded-lg self-start py-2 px-3 space-x-4 mt-4">
+              <div className="mt-4 flex space-x-4 self-start rounded-lg bg-[#F8F8F8] px-3 py-2">
                 <span className="text-sm">
                   <span className="text-base font-medium">
                     {lensProfile?.stats.totalFollowing}
@@ -288,7 +297,7 @@ const MyProfile: NextPage = () => {
                 </span>
               </div>
             </div>
-            <div className="rounded-lg px-4 py-1 mt-6 text-center font-bold text-sm self-start border-black border-2 hover:cursor-pointer">
+            <div className="mt-6 self-start rounded-lg border-2 border-black px-4 py-1 text-center text-sm font-bold hover:cursor-pointer">
               <Link href={'/settings'}>Edit Profile</Link>
             </div>
           </div>
