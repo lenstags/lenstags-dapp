@@ -726,6 +726,7 @@ const Home: NextPage = () => {
                 <Image
                   width={140}
                   height={50}
+                  // style={{ maxHeight: '50px' }}
                   className="m-2"
                   src="/img/landing/lens.svg"
                   alt=""
