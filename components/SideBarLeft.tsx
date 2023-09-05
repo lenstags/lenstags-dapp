@@ -57,7 +57,7 @@ interface SidebarProps {
 const SideBarLeft: React.FC<SidebarProps> = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
-  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
+  const { setIsExplore, setSkipExplore } = useExplore();
 
   const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
   const [publications, setPublications] = useState<any[]>([]);
@@ -213,10 +213,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                   </Tooltip>
                 </Link>
               )}
-              <div
-                // href={PublicRoutes.APP}
-                onClick={handleRedirect}
-              >
+              <div onClick={handleRedirect}>
                 <Tooltip tooltip="Explore">
                   <div
                     className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent

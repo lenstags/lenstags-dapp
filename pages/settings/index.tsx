@@ -246,13 +246,12 @@ const Settings: NextPage = () => {
       setSkipExplore={setSkipExplore}
       skipExplore={skipExplore}
     >
-      <div className="flex w-full">sddsd</div>
       {hydrationLoading ? (
         <div className="flex w-full justify-center p-10">
           <Spinner h="10" w="10" />
         </div>
       ) : (
-        <div className="flex w-full bg-red-500">
+        <div className="flex w-full ">
           <div className="w-8/12 ">
             <h1 className="py-2 font-serif font-bold">Settings</h1>
 
@@ -445,7 +444,8 @@ const Settings: NextPage = () => {
                 // >
                 <button
                   onClick={handleClickSave}
-                  className="rounded-lg px-4  py-2 align-middle font-serif font-bold text-white"
+                  className="rounded-lg px-4 
+                  py-2 align-middle font-serif font-bold text-white"
                 >
                   SAVE
                 </button>

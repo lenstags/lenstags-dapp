@@ -1,6 +1,7 @@
+import { createContext, useEffect, useState } from 'react';
+
 import { PublicRoutes } from 'models';
 import { useRouter } from 'next/router';
-import { createContext, useEffect, useState } from 'react';
 
 export interface SidebarCollapsedState {
   collapsed: boolean;
@@ -42,7 +43,8 @@ export const SidebarContextProvider: React.FC<{
   const routesCollapsed = [
     PublicRoutes.CREATE,
     PublicRoutes.LIST,
-    PublicRoutes.POST
+    PublicRoutes.POST,
+    PublicRoutes.SETTINGS
   ];
 
   const router = useRouter();

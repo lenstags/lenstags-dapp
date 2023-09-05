@@ -4,15 +4,10 @@ import React, { useContext, useEffect, useState } from 'react';
 
 import { AppContext } from 'context/AppContext';
 import Image from 'next/image';
-import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { PublicRoutes } from '@models/routes.model';
-import { TagsFilter } from './TagsFilter';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useDisconnect } from 'wagmi';
-import { useRouter } from 'next/router';
+import useDisconnector from '@lib/hooks/useDisconnector';
 
 export const Navbar = () => {
   // const asyncFunc = async () => {
@@ -24,16 +19,10 @@ export const Navbar = () => {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const { authenticationStatus } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
-  const router = useRouter();
 
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
-  const { disconnect } = useDisconnect();
-  const handleDisconnect = () => {
-    deleteLensLocalStorage();
-    disconnect();
-    router.push(PublicRoutes.APP);
-  };
+  const { handleDisconnect } = useDisconnector();
 
   // const { tags } = useContext(TagsFilterContext);
   const { profile: lensProfile } = useContext(ProfileContext);
