@@ -1,14 +1,13 @@
-import { useDisconnect, useSwitchNetwork } from 'wagmi';
-
 import { DEFAULT_CHAIN_ID } from '@lib/config';
-import { deleteLensLocalStorage } from '@lib/lens/localStorage';
+import useDisconnector from './useDisconnector';
 import useHandleSetup from './useHandleSetup';
 import { useState } from 'react';
+import { useSwitchNetwork } from 'wagmi';
 import { validateWhitelist } from 'utils/helpers';
 
 const useCheckWhitelist = (lensProfile: any) => {
-  const { disconnect } = useDisconnect();
   const [isVisibleWL, setIsVisibleWL] = useState<boolean>(false);
+  const { handleDisconnect } = useDisconnector();
   const { showWelcome, setShowWelcome, showReject, welcomeReady, handleSetup } =
     useHandleSetup(lensProfile);
 
@@ -33,8 +32,7 @@ const useCheckWhitelist = (lensProfile: any) => {
         handleSetup();
       } else {
         setIsVisibleWL(true);
-        deleteLensLocalStorage();
-        disconnect();
+        handleDisconnect();
       }
     });
   };

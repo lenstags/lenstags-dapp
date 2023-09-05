@@ -68,8 +68,6 @@ const App: NextPage = () => {
     }
   }, [lensProfile, chain, checkWhitelist]);
 
-  const clearFeed = () => setPublications([]);
-
   /*
    * main query definitions
    */

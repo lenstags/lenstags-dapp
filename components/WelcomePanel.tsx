@@ -3,8 +3,7 @@ import React, { FC } from 'react';
 
 import ImageProxied from './ImageProxied';
 import { Spinner } from './Spinner';
-import { deleteLensLocalStorage } from '@lib/lens/localStorage';
-import { useDisconnect } from 'wagmi';
+import useDisconnector from '@lib/hooks/useDisconnector';
 import useHandleSetup from '@lib/hooks/useHandleSetup';
 
 interface Props {
@@ -20,6 +19,7 @@ const WhitelistScreen: FC<Props> = ({
   //   welcomeReady,
   //   setShowWelcome
 }) => {
+  const { handleDisconnect } = useDisconnector();
   const {
     showWelcome,
     setShowWelcome,
@@ -28,7 +28,6 @@ const WhitelistScreen: FC<Props> = ({
     welcomeReady,
     handleSetup
   } = useHandleSetup(lensProfile);
-  const { disconnect } = useDisconnect();
 
   return (
     <div
@@ -123,7 +122,6 @@ const WhitelistScreen: FC<Props> = ({
               <button
                 onClick={() => {
                   setShowReject(false);
-
                   handleSetup();
                 }}
                 className="rounded-lg bg-black px-6 py-1 text-white"
@@ -132,10 +130,9 @@ const WhitelistScreen: FC<Props> = ({
               </button>
               <button
                 onClick={() => {
-                  deleteLensLocalStorage();
-                  disconnect();
                   setShowReject(false);
                   setShowWelcome(false);
+                  handleDisconnect();
                 }}
                 className="rounded-lg  border border-solid border-black 
                       bg-transparent px-6 py-1"
