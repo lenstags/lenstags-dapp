@@ -17,6 +17,7 @@ import React, { useEffect, useRef } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Autoplay } from 'swiper';
 
+import { DEFAULT_NATA_DOMAIN } from '@lib/config';
 import Head from 'next/head';
 import Image from 'next/image';
 import { LayoutLanding } from 'components/LayoutLanding';
@@ -103,7 +104,7 @@ const Home: NextPage = () => {
       name: 'BROWSER PLUGIN',
       icon: '/img/landing/icon-extension.svg',
       description: 'Seamless integration on every browser.',
-      soon: true
+      soon: false
     }
   ];
 
@@ -355,13 +356,22 @@ const Home: NextPage = () => {
               <p className="mt-8 font-serif md:text-xl">
                 Discover and manage the best resources.
               </p>
+              <a href={DEFAULT_NATA_DOMAIN} target="_blank" rel="noreferrer">
+                <button className=" mt-8 rounded-full border border-solid border-black  bg-black px-6 py-3 font-serif text-white">
+                  EXPLORE
+                </button>
+              </a>
+
               <a
                 href="https://tally.so/r/mVjz7J"
                 target="_blank"
                 rel="noreferrer"
               >
-                <button className=" mt-8 rounded-full bg-black px-6 py-3 font-serif text-white">
-                  JOIN THE WAITLIST
+                <button
+                  className="ml-4 mt-8 rounded-full border border-solid border-black bg-transparent
+                 px-6 py-3 font-serif text-black"
+                >
+                  GET THE EXTENSION
                 </button>
               </a>
             </div>
@@ -684,17 +694,30 @@ const Home: NextPage = () => {
                 width={500}
                 height={300}
                 className="mb-10"
-                src="/img/landing/extension.svg"
+                src="/img/landing/extension.png"
                 alt=""
               />
 
-              <div className="ml-10  ">
+              <div className="ml-10">
                 <p className="z-1 mb-6 text-3xl font-bold">
                   Save content on the fly.
                 </p>
                 <p>
                   Collect articles and links easily on your favorite browser.
                 </p>
+
+                <a
+                  href="https://chrome.google.com/webstore/detail/bfapefejfnlaieleojmkclbmibpckmmb/preview?hl=es&authuser=3"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <button
+                    className="mt-8 rounded-full border border-solid border-black bg-black
+                 px-6 py-3 font-serif text-white"
+                  >
+                    GET THE EXTENSION
+                  </button>
+                </a>
               </div>
             </div>
           </div>
@@ -726,7 +749,7 @@ const Home: NextPage = () => {
                 <Image
                   width={140}
                   height={50}
-                  className="m-2"
+                  className="m-2 max-h-16"
                   src="/img/landing/lens.svg"
                   alt=""
                 />

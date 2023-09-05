@@ -1,19 +1,20 @@
 import { LayoutProfile, ProfileContext, TagsFilter } from 'components';
+import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { useContext, useEffect, useState } from 'react';
 
+import { DotWave } from '@uiball/loaders';
 import ExplorerCard from 'components/ExplorerCard';
-import ImageProxied from 'components/ImageProxied';
-import { NextPage } from 'next';
-import Link from 'next/link';
 import Image from 'next/image';
+import ImageProxied from 'components/ImageProxied';
+import Link from 'next/link';
+import { NextPage } from 'next';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
-import { queryProfile } from '@lib/lens/dispatcher';
-import { useRouter } from 'next/router';
-import { MapPinIcon, LinkIcon } from '@heroicons/react/24/outline';
-import { DotWave } from '@uiball/loaders';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { useExplore } from '@context/ExploreContext';
+import { useRouter } from 'next/router';
 
 const OtherProfile: NextPage = () => {
   const router = useRouter();
@@ -24,7 +25,7 @@ const OtherProfile: NextPage = () => {
   const [isFollowing, setIsFollowing] = useState(lensProfile?.isFollowedByMe);
   const [showUnfollow, setShowUnfollow] = useState('Following');
   const [isDotFollowing, setIsDotFollowing] = useState(false);
-
+  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
   const handleFollow = async (profileId: string) => {
     setIsDotFollowing(true);
     if (showUnfollow === 'Unfollow') {
@@ -66,9 +67,11 @@ const OtherProfile: NextPage = () => {
       //   }
 
       //   if (contentType === 'created') {
-      setPublications(
-        data.items.filter((r: any) => r.profile.id === lensProfile?.id)
-      );
+      if (data.__typename === 'ExplorePublicationResult') {
+        setPublications(
+          data.items.filter((r: any) => r.profile.id === lensProfile?.id)
+        );
+      }
       return;
       //   }
     });
@@ -107,7 +110,14 @@ const OtherProfile: NextPage = () => {
 
   explore({ locale: 'en', tags });
   return (
-    <LayoutProfile title="Nata Social | Explore" pageDescription="Profile">
+    <LayoutProfile
+      title="Nata Social | Explore"
+      pageDescription="Profile"
+      setIsExplore={setIsExplore}
+      isExplore={isExplore}
+      setSkipExplore={setSkipExplore}
+      skipExplore={skipExplore}
+    >
       <div className="w-full px-8">
         {/* header */}
         <div className="">
@@ -119,30 +129,30 @@ const OtherProfile: NextPage = () => {
             }}
             className="min-h-[25vh] rounded-xl"
           ></div>
-          <div className="flex justify-between items-center">
-            <div className="mb-4 flex flex-col max-w-[50%]">
+          <div className="flex items-center justify-between">
+            <div className="mb-4 flex max-w-[50%] flex-col">
               <ImageProxied
-                className="h-32 w-32 -mt-16 ml-4 rounded-full border-4 border-white object-cover"
+                className="-mt-16 ml-4 h-32 w-32 rounded-full border-4 border-white object-cover"
                 category="profile"
                 height={144}
                 width={144}
                 src={pictureUrl}
                 alt="avatar"
               />
-              <div className="flex items-center mt-2">
-                <span className="mb-1 text-2xl font-bold mr-1">
+              <div className="mt-2 flex items-center">
+                <span className="mb-1 mr-1 text-2xl font-bold">
                   {lensProfile?.name}
                 </span>
-                <span className="mb-0.5 font-normal text-gray-600 text-lg">
+                <span className="mb-0.5 text-lg font-normal text-gray-600">
                   @{lensProfile?.handle}
                 </span>
               </div>
-              <p className="font-medium mt-1">{lensProfile?.bio}</p>
-              <div className="flex space-x-3 mt-4">
+              <p className="mt-1 font-medium">{lensProfile?.bio}</p>
+              <div className="mt-4 flex space-x-3">
                 {location !== '' && (
                   <div className="flex items-center">
-                    <MapPinIcon className="w-4 h-4" />
-                    <span className="text-[#4D4D4D] ml-1 font-medium text-sm">
+                    <MapPinIcon className="h-4 w-4" />
+                    <span className="ml-1 text-sm font-medium text-[#4D4D4D]">
                       {location}
                     </span>
                   </div>
@@ -151,10 +161,10 @@ const OtherProfile: NextPage = () => {
                   <>
                     <span>᛫</span>
                     <div className="flex items-center">
-                      <LinkIcon className="w-4 h-4" />
+                      <LinkIcon className="h-4 w-4" />
                       <Link
                         href={url}
-                        className="text-[#008BFF] ml-1 font-medium text-sm"
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
                       >
                         {website}
                       </Link>
@@ -173,7 +183,7 @@ const OtherProfile: NextPage = () => {
                       />
                       <Link
                         href={`https://twitter.com/${twitter}`}
-                        className="text-[#008BFF] ml-1 font-medium text-sm"
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
                       >
                         @{twitter}
                       </Link>
@@ -181,7 +191,7 @@ const OtherProfile: NextPage = () => {
                   </>
                 )}
               </div>
-              <div className="flex bg-[#F8F8F8] rounded-lg self-start py-2 px-3 space-x-4 mt-4">
+              <div className="mt-4 flex space-x-4 self-start rounded-lg bg-[#F8F8F8] px-3 py-2">
                 <span className="text-sm">
                   <span className="text-base font-medium">
                     {lensProfile?.stats.totalFollowing}
@@ -207,7 +217,7 @@ const OtherProfile: NextPage = () => {
                 onMouseEnter={() => setShowUnfollow('Unfollow')}
                 onMouseLeave={() => setShowUnfollow('Following')}
                 onClick={() => handleFollow(lensProfile.id)}
-                className="rounded-lg px-4 py-1 mt-6 text-center font-bold text-sm self-start border-black border-2 hover:cursor-pointer"
+                className="mt-6 self-start rounded-lg border-2 border-black px-4 py-1 text-center text-sm font-bold hover:cursor-pointer"
               >
                 {isDotFollowing ? (
                   <div className="mx-2">
@@ -221,7 +231,7 @@ const OtherProfile: NextPage = () => {
             {!isFollowing && (
               <div
                 onClick={() => handleFollow(lensProfile.id)}
-                className="rounded-lg px-4 py-1 mt-6 text-center font-bold text-sm self-start border-black border-2 hover:cursor-pointer"
+                className="mt-6 self-start rounded-lg border-2 border-black px-4 py-1 text-center text-sm font-bold hover:cursor-pointer"
               >
                 {isDotFollowing ? (
                   <div className="mx-2">
