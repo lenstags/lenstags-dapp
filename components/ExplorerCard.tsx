@@ -11,10 +11,9 @@ import PostIndicators from '@components/PostIndicators';
 // import ProfileCard from './ProfileCard';
 import { ProfileContext } from './LensAuthenticationProvider';
 import TurndownService from 'turndown';
-import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
-import { useDisconnect } from 'wagmi';
+import useDisconnector from '@lib/hooks/useDisconnector';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 
 interface Props {
@@ -38,9 +37,9 @@ const ExplorerCard: FC<Props> = (props) => {
   const [pointerEvents, setPointerEvents] = useState<any>('all');
   const [isFinished, setIsFinished] = useState(false);
   const [showCard, setShowCard] = useState(false);
+  const { handleDisconnect } = useDisconnector();
 
   const timeoutId = useRef<NodeJS.Timeout | null>(null);
-  const { disconnect } = useDisconnect();
 
   // markdown conversion
   // const fromHtml = new TurndownService();
@@ -110,11 +109,6 @@ const ExplorerCard: FC<Props> = (props) => {
       setIsFinished(true);
     }
     // TODO error-unauthenticated//
-  };
-
-  const handleDisconnect = () => {
-    deleteLensLocalStorage();
-    disconnect();
   };
 
   //handles debounce

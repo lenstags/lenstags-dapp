@@ -4,20 +4,14 @@ import Image from 'next/image';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useDisconnect } from 'wagmi';
+import useDisconnector from '@lib/hooks/useDisconnector';
 
 const ProfileButton = ({ className }: { className?: string }) => {
   const { openConnectModal } = useConnectModal();
   const { profile: lensProfile } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
-  const { disconnect } = useDisconnect();
-
-  const handleDisconnect = () => {
-    deleteLensLocalStorage();
-    disconnect();
-  };
+  const { handleDisconnect } = useDisconnector();
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'

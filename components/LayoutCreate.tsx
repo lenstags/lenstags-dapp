@@ -14,7 +14,6 @@ interface Props {
   isExplore: boolean;
   setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
   skipExplore: boolean;
-  clearFeed: () => void;
 }
 
 export const LayoutCreate: FC<Props> = ({
@@ -26,8 +25,7 @@ export const LayoutCreate: FC<Props> = ({
   setIsExplore,
   isExplore,
   setSkipExplore,
-  skipExplore,
-  clearFeed
+  skipExplore
 }) => {
   return (
     <>
@@ -82,7 +80,6 @@ export const LayoutCreate: FC<Props> = ({
           isExplore={isExplore}
           setSkipExplore={setSkipExplore}
           skipExplore={skipExplore}
-          clearFeed={clearFeed}
         />
         <div className="col-span-12 col-start-2 overflow-x-clip">
           <Topbar breadcumpTitle={breadcumpTitle} />

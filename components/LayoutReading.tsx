@@ -1,10 +1,10 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
-import { Navbar } from 'components';
 import Script from 'next/script';
 import SideBarLeft from './SideBarLeft';
 import Topbar from './Topbar';
+import { useExplore } from '@context/ExploreContext';
 
 interface Props {
   title: string;
@@ -14,11 +14,6 @@ interface Props {
   breadcumpTitle: string;
   metadataName: string;
   fromList?: boolean;
-  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
-  isExplore: boolean;
-  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
-  skipExplore: boolean;
-  clearFeed: () => void;
 }
 
 export const LayoutReading: FC<Props> = ({
@@ -28,14 +23,10 @@ export const LayoutReading: FC<Props> = ({
   screen,
   breadcumpTitle,
   metadataName,
-  fromList,
-  setIsExplore,
-  isExplore,
-  setSkipExplore,
-  skipExplore,
-  clearFeed
+  fromList
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
+  const { isExplore, setIsExplore, setSkipExplore, skipExplore } = useExplore();
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
@@ -117,7 +108,6 @@ export const LayoutReading: FC<Props> = ({
           isExplore={isExplore}
           setSkipExplore={setSkipExplore}
           skipExplore={skipExplore}
-          clearFeed={clearFeed}
         />
         <div className="col-span-10 col-start-2 overflow-x-clip">
           <Topbar

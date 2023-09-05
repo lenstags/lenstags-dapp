@@ -6,6 +6,7 @@ export enum NETWORKS {
 export let DEFAULT_NETWORK = NETWORKS.TESTNET; // THE ONE AND ONLY SWITCH
 export const IS_TESTNET = DEFAULT_NETWORK;
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
+export const DEFAULT_NATA_DOMAIN = 'https://dev.nata.social/app';
 export const APP_UI_VERSION = '0.0.19';
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
