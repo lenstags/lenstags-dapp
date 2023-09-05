@@ -2,7 +2,10 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 import { NETWORKS } from '@lib/config';
 
-const WHITELISTED_WALLETS = ['0x9D9bdFD17add8eFdDDaBE91EF94fA35F5Ad92313'];
+const WHITELISTED_WALLETS = [
+  '0x9D9bdFD17add8eFdDDaBE91EF94fA35F5Ad92313',
+  '0xB405b3E6494CAc9a88660362Ee19C38E955E2C6E'
+];
 
 type ResponseData = {
   isWhitelisted: boolean;

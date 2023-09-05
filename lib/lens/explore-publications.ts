@@ -8,6 +8,7 @@ import {
 
 import { LENSTAGS_SOURCE } from '@lib/config';
 import { apolloClient } from './graphql/apollo-client';
+import { SortingValuesType } from '@components/SortingOptions';
 
 const explorePublications = (request: ExplorePublicationRequest) => {
   return apolloClient.query({
@@ -20,6 +21,7 @@ const explorePublications = (request: ExplorePublicationRequest) => {
 
 export interface IExplorePublications {
   locale: string;
+  sortingValues: SortingValuesType;
   tags?: string[];
 }
 
@@ -40,6 +42,8 @@ export const explore = async (filter?: IExplorePublications) => {
       tags: { oneOf: filter.tags }
     };
   }
+
+  reqQuery.sortCriteria = filter?.sortingValues.sort!;
 
   const result = await explorePublications(reqQuery);
   return result.data?.explorePublications;

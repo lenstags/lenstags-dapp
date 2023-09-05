@@ -8,6 +8,8 @@ import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
+import { SortingValuesType } from '@components/SortingOptions';
+import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 
 const OtherProfile: NextPage = () => {
   const router = useRouter();
@@ -15,6 +17,11 @@ const OtherProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [contentType, setContentType] = useState<any>('all');
   const [lensProfile, setProfile] = useState<any>();
+  const [sortingValues, setSortingValues] = useState<SortingValuesType>({
+    date: 'all',
+    sort: PublicationSortCriteria.Latest,
+    by: 'all'
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +40,7 @@ const OtherProfile: NextPage = () => {
   //   const lensProfile = useContext(ProfileContext);
 
   useEffect(() => {
-    explore({ locale: 'en', tags }).then((data) => {
+    explore({ locale: 'en', sortingValues, tags }).then((data) => {
       //   if (contentType === 'collected') {
       //     setPublications(
       //       data.items.filter((r) => r.profile.id !== lensProfile?.id)
@@ -43,12 +50,12 @@ const OtherProfile: NextPage = () => {
 
       //   if (contentType === 'created') {
       setPublications(
-        data.items.filter((r) => r.profile.id === lensProfile?.id)
+        data.items.filter((r: any) => r.profile.id === lensProfile?.id)
       );
       return;
       //   }
     });
-  }, [lensProfile?.id, tags]);
+  }, [lensProfile?.id, tags, sortingValues]);
 
   const pictureUrl =
     lensProfile?.picture?.__typename === 'MediaSet'
@@ -57,7 +64,7 @@ const OtherProfile: NextPage = () => {
       ? lensProfile?.picture.uri
       : '/img/profilePic.png';
 
-  explore({ locale: 'en', tags });
+  //explore({ locale: 'en', tags });
   return (
     <Layout
       title="Nata Social | Explore"
