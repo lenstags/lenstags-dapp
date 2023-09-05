@@ -72,8 +72,6 @@ const App: NextPage = () => {
    * main query definitions
    */
 
-  console.log('skipExplore ', skipExplore);
-  console.log('isExplore ', isExplore);
   const resExplore = useQuery(ExplorePublicationsDocument, {
     variables: {
       request: {

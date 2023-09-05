@@ -15,6 +15,7 @@ import { ProfileContext } from '@components/LensAuthenticationProvider';
 import { ResultsCard } from '@components/search/ResultsCard';
 import { Spinner } from '@components/Spinner';
 import { TagsFilter } from '@components/TagsFilter';
+import { useExplore } from '@context/ExploreContext';
 import { useRouter } from 'next/router';
 import { useSearchResultsStore } from '@lib/hooks/use-search-results-store';
 
@@ -31,6 +32,7 @@ const Search = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const [isPosting, setIsPosting] = useState(false);
   const [isFinished, setIsFinished] = useState(false);
+  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
   useEffect(() => {
     if (searchData.query === query.q) {
@@ -86,6 +88,10 @@ const Search = () => {
     <Layout
       title={`Nata Social | Search results for "${query.q}"`}
       pageDescription={'Search results'}
+      setIsExplore={setIsExplore}
+      isExplore={isExplore}
+      setSkipExplore={setSkipExplore}
+      skipExplore={skipExplore}
     >
       <>
         <div className="h-50 top-0 z-10 w-full bg-white px-8 pt-4">
