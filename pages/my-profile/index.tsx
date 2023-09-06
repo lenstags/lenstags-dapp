@@ -1,7 +1,7 @@
 import { LayoutProfile, ProfileContext, TagsFilter } from 'components';
 import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { Profile, PublicationTypes } from '@lib/lens/graphql/generated';
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 
 import { APP_NAME } from '@lib/config';
 import ExplorerCard from 'components/ExplorerCard';
@@ -14,11 +14,18 @@ import { explore } from '@lib/lens/explore-publications';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
+import CardViewButtons from '@components/CardViewButtons';
+import { cn } from '@lib/utils';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import CardListView from '@components/CardListView';
+import CardPostView from '@components/CardPostView';
+import { Spinner } from '@components/Spinner';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [tab, setTab] = useState<any>('all');
   const [lensProfile, setProfile] = useState<any>();
+  const [loader, setLoader] = useState(false);
   const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
   // const { tags } = useContext(TagsFilterContext);
@@ -26,6 +33,7 @@ const MyProfile: NextPage = () => {
 
   // const lp = useContext(ProfileContext);
   const { profile: lp } = useContext(ProfileContext);
+  const { viewCard } = useContext(ViewCardContext);
 
   // set profile
   useEffect(() => {
@@ -64,8 +72,8 @@ const MyProfile: NextPage = () => {
     if (!lensProfile) {
       return;
     }
-
     const fetchMyPosts = async () => {
+      setLoader(true);
       const res = await getPublications(
         [PublicationTypes.Post],
         lensProfile.id
@@ -82,10 +90,12 @@ const MyProfile: NextPage = () => {
       });
 
       setPublications(filteredItems);
+      setLoader(false);
       // TODO PAGINATION CURSOR
     };
 
     const fetchMyLists = async () => {
+      setLoader(true);
       const res = await getPublications(
         [PublicationTypes.Post],
         lensProfile.id
@@ -109,7 +119,7 @@ const MyProfile: NextPage = () => {
       if (!lp) {
         return;
       }
-
+      setLoader(true);
       const res = await getPublications(
         [PublicationTypes.Post],
         undefined,
@@ -118,10 +128,12 @@ const MyProfile: NextPage = () => {
       console.log('RES ', res);
       // TODO LENS ISSUE: APPID MISMATCHES SOURCES PARAM
       setPublications(res.items.filter((i: any) => i.appId === APP_NAME)); // TODO PAGINATION CURSOR
+      setLoader(false);
     };
 
     const fetchAll = async () => {
       // my pubs+lists
+      setLoader(true);
       const myPublications = await getPublications(
         [PublicationTypes.Post],
         lensProfile.id
@@ -144,6 +156,7 @@ const MyProfile: NextPage = () => {
       );
 
       setPublications(mergedArray); // TODO PAGINATION CURSOR
+      setLoader(false);
     };
 
     if (tab === 'myposts') {
@@ -303,9 +316,8 @@ const MyProfile: NextPage = () => {
           </div>
         </div>
 
-        <div className=" mx-4 py-6 sm:mx-6 ">
-          <div className="flex space-x-2 text-sm text-black">
-            <button
+        <CardViewButtons />
+        {/* <button
               onClick={() => setTab('all')}
               className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
             >
@@ -335,20 +347,41 @@ const MyProfile: NextPage = () => {
               <div className="flex">
                 <span className="">My lists</span>
               </div>
-            </button>
-          </div>
-        </div>
+            </button> */}
       </div>
 
       {/* contents */}
       <div className="  w-full px-8">
-        <div className="  flex flex-wrap  ">
-          {publications
-            ? publications.map((post, index) => (
-                <ExplorerCard post={post} key={index} />
-              ))
-            : null}
-        </div>
+        <ul
+          className={cn(
+            'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
+            viewCard !== ViewBy.CARD && 'flex-col gap-3'
+          )}
+        >
+          {publications.length > 0 ? (
+            publications.map((post, index) => {
+              return (
+                <>
+                  {viewCard === ViewBy.CARD && (
+                    <ExplorerCard post={post} key={index} />
+                  )}
+                  {viewCard === ViewBy.LIST && (
+                    <CardListView post={post} key={index} />
+                  )}
+                  {viewCard === ViewBy.POST && (
+                    <CardPostView post={post} key={index} />
+                  )}
+                </>
+              );
+            })
+          ) : loader ? (
+            <div className="mx-auto my-8">
+              <Spinner h="10" w="10" />
+            </div>
+          ) : (
+            <div className="my-8">No results found 💤</div>
+          )}
+        </ul>
       </div>
     </LayoutProfile>
   );

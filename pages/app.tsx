@@ -76,14 +76,14 @@ const App: NextPage = () => {
   /*
    * main query definitions
    */
-
+  const limitPosts = 30;
   const resExplore = useQuery(ExplorePublicationsDocument, {
     variables: {
       request: {
         sortCriteria: PublicationSortCriteria.Latest,
         noRandomize: true,
         sources: [LENSTAGS_SOURCE],
-        limit: 30,
+        limit: limitPosts,
         publicationTypes: [PublicationTypes.Post],
         customFilters: [CustomFiltersTypes.Gardeners],
         metadata: {
@@ -443,7 +443,7 @@ const App: NextPage = () => {
               >
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
-                    if (publications.length === index + 1) {
+                    if (publications.length - 15 === index) {
                       return (
                         <>
                           {viewCard === ViewBy.CARD && (
