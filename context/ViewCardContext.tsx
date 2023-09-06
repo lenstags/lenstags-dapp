@@ -40,6 +40,9 @@ export const ViewCardContextProvider: React.FC<{
         cardView: viewCard
       });
     }
+    if (lensStorage && lensStorage.cardView) {
+      setViewCard(lensStorage.cardView);
+    }
   }, [viewCard]);
 
   return (
