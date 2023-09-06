@@ -1,9 +1,9 @@
 export enum NETWORKS {
-  TESTNET,
-  MAINNET
+  TESTNET='testnet',
+  MAINNET='mainnet'
 }
 
-export let DEFAULT_NETWORK = NETWORKS.MAINNET; // THE ONE AND ONLY SWITCH
+export let DEFAULT_NETWORK = 'testnet'; // THE ONE AND ONLY SWITCH
 export const IS_TESTNET = DEFAULT_NETWORK;
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
 export const DEFAULT_NATA_DOMAIN = 'https://dev.nata.social/app';
