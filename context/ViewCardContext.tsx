@@ -28,22 +28,19 @@ export const ViewCardContext = createContext<ViewCardContext>({
 export const ViewCardContextProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
+  const lensStorage = getFromLocalStorage();
   const [viewCard, setViewCard] = useState<ViewCardProps['viewCard']>(
-    ViewBy.CARD
+    lensStorage && lensStorage.cardView ? lensStorage.cardView : ViewBy.CARD
   );
 
   useEffect(() => {
-    const lensStorage = getFromLocalStorage();
     if (lensStorage) {
       setLensLocalStorage({
         ...lensStorage,
         cardView: viewCard
       });
     }
-    if (lensStorage && lensStorage.cardView) {
-      setViewCard(lensStorage.cardView);
-    }
-  }, [viewCard]);
+  }, [viewCard, lensStorage]);
 
   return (
     <ViewCardContext.Provider value={{ viewCard, setViewCard }}>
