@@ -223,7 +223,6 @@ const ExplorerCard: FC<Props> = (props) => {
                         width={40}
                         className="h-8 w-8 cursor-pointer rounded-full object-cover"
                         src={getPictureUrl(post.profile)}
-                        // src={getPictureUrl(post.profile.picture?.original?.url}
                       />
                     </div>
                   </div>
@@ -253,7 +252,6 @@ const ExplorerCard: FC<Props> = (props) => {
                     postProfileId={post.profile.id}
                     postProfileIsFollowedByMe={post.profile.isFollowedByMe}
                     postProfilePicture={getPictureUrl(post.profile)}
-                    // postProfilePicture={post.profile.picture?.original.url}
                     postProfileName={post.profile.name}
                     postProfileHandle={post.profile.handle}
                     postProfileBio={post.profile.bio}

@@ -9,7 +9,7 @@ import {
   MetadataAttribute,
   PublicationMainFocus
 } from '@lib/lens/interfaces/publication';
-import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
+import { PostProcessStatus, getPictureUrl, markdownToHTML } from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
 import { Comment } from '@lib/lens/graphql/generated';
@@ -306,11 +306,11 @@ export default function PostDetails() {
                 <div className="items-center rounded font-semibold text-gray-700">
                   <ImageProxied
                     category="profile"
-                    alt={`Pic from ${post.profile.picture?.original?.url}`}
+                    alt={`Pic from ${post.profile.handle}`}
                     height={24}
                     width={24}
                     className="h-8 w-8 cursor-pointer rounded-full object-cover"
-                    src={post.profile.picture?.original?.url}
+                    src={getPictureUrl(post.profile)}
                   />
                 </div>
 
@@ -520,12 +520,11 @@ export default function PostDetails() {
                         <div className=" flex items-center">
                           <ImageProxied
                             category="profile"
-                            // title={`Loading from ${c.profile.picture?.original?.url}`}
-                            alt="Profile"
+                            alt={`Pic from ${singleComment.profile.handle}`}
                             height={40}
                             width={40}
                             className="mr-2 h-8 w-8 cursor-pointer  rounded-full object-cover"
-                            src={pic}
+                            src={getPictureUrl(singleComment.profile)}
                           />
                           <div className="">
                             <div className="text-sm">
