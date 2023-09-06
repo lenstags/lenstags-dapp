@@ -11,6 +11,7 @@ import Link from 'next/link';
 import { NextPage } from 'next';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
+import { getPictureUrl } from 'utils/helpers';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
@@ -34,13 +35,6 @@ const MyProfile: NextPage = () => {
 
       const profileResult = await queryProfile({ profileId: lp.id });
       if (!profileResult) return;
-
-      const pic =
-        profileResult.picture?.__typename === 'MediaSet'
-          ? profileResult.picture?.original.url
-          : profileResult.picture?.__typename === 'NftImage'
-          ? profileResult.picture.uri
-          : '/img/profilePic.png';
 
       // setPictureUrl(pic);
       setProfile(profileResult);
@@ -163,13 +157,6 @@ const MyProfile: NextPage = () => {
     }
   }, [tab, lensProfile?.id, tags]);
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
-
   const location =
     lensProfile?.attributes.find((item: any) => item.key === 'location')
       ?.value || '';
@@ -221,7 +208,7 @@ const MyProfile: NextPage = () => {
                 category="profile"
                 height={144}
                 width={144}
-                src={pictureUrl}
+                src={getPictureUrl(lensProfile)}
                 alt="avatar"
               />
               <div className="mt-2 flex items-center">

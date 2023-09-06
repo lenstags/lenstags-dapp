@@ -11,6 +11,7 @@ import { NextPage } from 'next';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
+import { getPictureUrl } from 'utils/helpers';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
@@ -77,13 +78,6 @@ const OtherProfile: NextPage = () => {
     });
   }, [lensProfile?.id, tags]);
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
-
   const location =
     lensProfile?.attributes.find((item: any) => item.key === 'location')
       ?.value || '';
@@ -136,7 +130,7 @@ const OtherProfile: NextPage = () => {
                 category="profile"
                 height={144}
                 width={144}
-                src={pictureUrl}
+                src={getPictureUrl(lensProfile)}
                 alt="avatar"
               />
               <div className="mt-2 flex items-center">

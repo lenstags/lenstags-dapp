@@ -1,4 +1,5 @@
 import {
+  Comment,
   FeedEventItemType,
   FeedRequest,
   PaginatedFeedResult,
@@ -103,7 +104,12 @@ export const getComments = async (postId: string) => {
   // );
 
   // console.log('resulttt: ', result, result.items.length);
-  return result.items;
+
+  // FIXME for paginated results
+  const allComments = result.items.filter(
+    (i) => i.__typename === 'Comment'
+  ) as Array<Comment>;
+  return allComments;
 };
 
 export const getPublications = async (

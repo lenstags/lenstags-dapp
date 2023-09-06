@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 
 import React, { useContext, useEffect, useState } from 'react';
@@ -6,6 +7,7 @@ import { AppContext } from 'context/AppContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
+import { getPictureUrl } from 'utils/helpers';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useDisconnector from '@lib/hooks/useDisconnector';
 
@@ -26,14 +28,6 @@ export const Navbar = () => {
 
   // const { tags } = useContext(TagsFilterContext);
   const { profile: lensProfile } = useContext(ProfileContext);
-
-  // TODO: TEST THIS FOR NFT URI
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
 
   const toggleDarkMode = () => {
     updateConfig({ isDarkMode: !config.isDarkMode });
@@ -114,9 +108,10 @@ export const Navbar = () => {
               <div className="flex items-center">
                 <img
                   className="mx-1 h-7 w-7 rounded-full"
-                  src={pictureUrl}
+                  src={getPictureUrl(lensProfile)}
                   alt="avatar"
                 />
+
                 <div>@{lensProfile?.handle}</div>
               </div>
             </button>
