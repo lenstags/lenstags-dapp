@@ -137,10 +137,21 @@ export const validateWhitelist = async (address: string): Promise<boolean> => {
   return data.isWhitelisted as boolean;
 };
 
+const getUrl = (media: any, defaultUrl: string) => {
+  if (!media) {
+    return;
+  }
+  return media?.__typename === 'MediaSet'
+    ? media.original.url
+    : media?.__typename === 'NftImage'
+    ? media.uri
+    : defaultUrl;
+};
+
 export const getPictureUrl = (lensProfile: any) => {
-  return lensProfile?.picture?.__typename === 'MediaSet'
-    ? lensProfile?.picture.original.url
-    : lensProfile?.picture?.__typename === 'NftImage'
-    ? lensProfile?.picture.uri
-    : DEFAULT_IMAGE_PROFILE;
+  return getUrl(lensProfile?.picture, DEFAULT_IMAGE_PROFILE);
+};
+
+export const getCoverPictureUrl = (lensProfile: any) => {
+  return getUrl(lensProfile?.coverPicture, DEFAULT_IMAGE_PROFILE);
 };

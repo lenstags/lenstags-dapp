@@ -110,29 +110,12 @@ export const Layout: FC<Props> = ({
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
-      {/* <div style="
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-  
-  background-image: url('ruta/de/la/imagen.jpg'); background-repeat: no-repeat; background-size: cover; z-index: -1;"></div> */}
-      {/* <div
-      // style={{
-      //   backgroundImage: 'url(/img/app-background.svg)',
-      //   backgroundSize: 'cover',
-      //   backgroundRepeat: 'no-repeat',
-      //   backgroundPosition: 'center'
-      // }}
-      > */}
-      {/* <div className="flex"> */}
-      {/* <nav>
-            <Navbar />
-          </nav> */}
       <div className="grid  w-full grid-cols-12">
         <SideBarLeft
           setIsExplore={setIsExplore}
           isExplore={isExplore}
           setSkipExplore={setSkipExplore}
           skipExplore={skipExplore}
-          // clearFeed={clearFeed}
         />
         <main
           className={`col-span-7 overflow-x-clip ${
@@ -148,11 +131,6 @@ export const Layout: FC<Props> = ({
         <SideBarRight />
         <Toaster />
       </div>
-      {/* </div> */}
-      {/* </div> */}
-      {/* <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}> */}
-      {/* <main className="mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
-      {/* <main className="z-0 mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
     </>
   );
 };

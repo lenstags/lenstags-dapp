@@ -1,26 +1,21 @@
-import { LayoutProfile, ProfileContext, TagsFilter } from 'components';
+import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
+import { LayoutProfile, ProfileContext } from 'components';
 import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
-import { Profile, PublicationTypes } from '@lib/lens/graphql/generated';
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { APP_NAME } from '@lib/config';
-import ExplorerCard from 'components/ExplorerCard';
 import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
 import { NextPage } from 'next';
-import { TagsFilterContext } from 'components';
-import { explore } from '@lib/lens/explore-publications';
-import { getPictureUrl } from 'utils/helpers';
+import { PublicationTypes } from '@lib/lens/graphql/generated';
+import { Spinner } from '@components/Spinner';
+import { cn } from '@lib/utils';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
-import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
-import { cn } from '@lib/utils';
-import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
-import CardListView from '@components/CardListView';
-import CardPostView from '@components/CardPostView';
-import { Spinner } from '@components/Spinner';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -208,7 +203,7 @@ const MyProfile: NextPage = () => {
         <div className="">
           <div
             style={{
-              backgroundImage: `url('${lensProfile?.coverPicture?.original?.url}')`,
+              backgroundImage: `url('${getCoverPictureUrl(lensProfile)}')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
