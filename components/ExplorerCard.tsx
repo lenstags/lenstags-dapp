@@ -1,4 +1,8 @@
-import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
+import {
+  PostProcessStatus,
+  getPictureUrl,
+  markdownToHTML
+} from 'utils/helpers';
 import React, { FC, useContext, useRef, useState } from 'react';
 
 import CollectButton from './CollectButton';
@@ -218,7 +222,8 @@ const ExplorerCard: FC<Props> = (props) => {
                         height={40}
                         width={40}
                         className="h-8 w-8 cursor-pointer rounded-full object-cover"
-                        src={post.profile.picture?.original?.url}
+                        src={getPictureUrl(post.profile)}
+                        // src={getPictureUrl(post.profile.picture?.original?.url}
                       />
                     </div>
                   </div>
@@ -247,7 +252,8 @@ const ExplorerCard: FC<Props> = (props) => {
                     profile={lensProfile}
                     postProfileId={post.profile.id}
                     postProfileIsFollowedByMe={post.profile.isFollowedByMe}
-                    postProfilePicture={post.profile.picture?.original.url}
+                    postProfilePicture={getPictureUrl(post.profile)}
+                    // postProfilePicture={post.profile.picture?.original.url}
                     postProfileName={post.profile.name}
                     postProfileHandle={post.profile.handle}
                     postProfileBio={post.profile.bio}

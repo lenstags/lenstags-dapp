@@ -43,7 +43,6 @@ const App: NextPage = () => {
   }, []);
   const { chain } = useNetwork();
   const { tags } = useContext(TagsFilterContext);
-  // const [skipExplore, setSkipExplore] = useState(true);
   const [loadingFetchMore, setLoadingFetchMore] = useState(false);
   const [loader, setLoader] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -111,15 +110,6 @@ const App: NextPage = () => {
     loading,
     error: apolloError
   } = isExplore ? resExplore : resFollowing;
-
-  // useEffect(() => {
-  //   console.log(' isExplore ', isExplore);
-  // }, []);
-
-  // Opcional: Si deseas que isExplore se actualice cuando lensProfile cambie
-  // useEffect(() => {
-
-  // }, [lensProfile]);
 
   // Primer useEffect para manejar la actualización de 'publications' y 'cursor'
   useEffect(() => {
