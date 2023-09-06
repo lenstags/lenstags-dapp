@@ -9,6 +9,7 @@ import { ProfileContext } from './LensAuthenticationProvider';
 import { doesFollow } from '@lib/lens/does-follow';
 import { followers } from '@lib/lens/followers';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
+import { getPictureUrl } from 'utils/helpers';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { sendNotification } from '@lib/lens/user-notifications';
 
@@ -94,11 +95,11 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile, showCard }) => {
           <a rel="noreferrer" href={`/profile/${profile.id}`}>
             <ImageProxied
               category="profile"
-              alt={`Loading from ${profile.picture?.original?.url}`}
+              alt={`Loading from ${profile.handle}`}
               height={80}
               width={80}
               className="h-14 w-14 cursor-pointer rounded-full object-cover"
-              src={profile.picture?.original?.url}
+              src={getPictureUrl(profile)}
             />
           </a>
           {isFollowing ? (

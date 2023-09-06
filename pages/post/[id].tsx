@@ -1,6 +1,7 @@
 import {
   APP_NAME,
   ATTRIBUTES_LIST_KEY,
+  DEFAULT_IMAGE_PROFILE,
   PUBLICATION_METADATA_VERSION
 } from '@lib/config';
 import { LayoutReading, ProfileContext } from 'components';
@@ -500,6 +501,17 @@ export default function PostDetails() {
                 {/* other comments */}
                 {allComments &&
                   allComments.map((singleComment: Comment) => {
+                    let pic: string;
+                    const pictureType =
+                      singleComment.profile.picture?.__typename;
+                    if (pictureType === 'MediaSet') {
+                      pic = singleComment.profile.picture?.original?.url;
+                    } else if (pictureType === 'NftImage') {
+                      pic = singleComment.profile.picture?.uri;
+                    } else {
+                      pic = DEFAULT_IMAGE_PROFILE;
+                    }
+
                     return (
                       <div
                         key={singleComment.id}
@@ -513,7 +525,7 @@ export default function PostDetails() {
                             height={40}
                             width={40}
                             className="mr-2 h-8 w-8 cursor-pointer  rounded-full object-cover"
-                            src={singleComment.profile.picture?.original?.url}
+                            src={pic}
                           />
                           <div className="">
                             <div className="text-sm">
