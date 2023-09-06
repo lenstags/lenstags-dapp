@@ -61,14 +61,7 @@ export const ResultsCard = ({
             />
             <HoverProfileCard
               profile={profile}
-              postProfileId={publication.profileId}
-              postProfileIsFollowedByMe={publication.isFollowedByMe}
-              postProfilePicture={publication.profilePicture}
-              postProfileName={publication.profileName}
-              postProfileHandle={publication.profileHandle}
-              postProfileBio={publication.profileBio}
-              postProfileTotalFollowing={publication.profileTotalFollowing}
-              postProfileTotalFollowers={publication.profileTotalFollowers}
+              postProfile={publication}
               showCardStatus={showCard}
             />
           </div>

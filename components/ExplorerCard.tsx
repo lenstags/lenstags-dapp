@@ -249,18 +249,7 @@ const ExplorerCard: FC<Props> = (props) => {
                   {/* profile hover */}
                   <HoverProfileCard
                     profile={lensProfile}
-                    postProfileId={post.profile.id}
-                    postProfileIsFollowedByMe={post.profile.isFollowedByMe}
-                    postProfilePicture={getPictureUrl(post.profile)}
-                    postProfileName={post.profile.name}
-                    postProfileHandle={post.profile.handle}
-                    postProfileBio={post.profile.bio}
-                    postProfileTotalFollowing={
-                      post.profile.stats.totalFollowing
-                    }
-                    postProfileTotalFollowers={
-                      post.profile.stats.totalFollowers
-                    }
+                    postProfile={post.profile}
                     showCardStatus={showCard}
                   />
                 </div>

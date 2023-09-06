@@ -13,7 +13,7 @@ const TagStrip: React.FC<TagStripProps> = ({ tags, postId }) => (
       borderBottomLeftRadius: '12px',
       borderBottomRightRadius: '12px'
     }}
-    className="scrollbar-thin scrollbar-lightgray-transparent flex items-center gap-1 overflow-auto px-3 py-2 text-right text-xs"
+    className="scrollbar-thin scrollbar-lightgray-transparent flex w-full items-center gap-1 overflow-auto py-2 text-right text-xs"
   >
     {tags.map((tag: string) => {
       const tagValue = `${postId}${tag}`;

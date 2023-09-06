@@ -9,7 +9,7 @@ import {
   PublicationSortCriteria,
   PublicationTypes
 } from '@lib/lens/graphql/generated';
-import { ProfileContext, TagsFilterContext } from 'components';
+import { ProfileContext, TagsFilter, TagsFilterContext } from 'components';
 import {
   useCallback,
   useContext,
@@ -19,21 +19,25 @@ import {
   useState
 } from 'react';
 
+import { useQuery } from '@apollo/client';
+import CardListView from '@components/CardListView';
+import CardPostView from '@components/CardPostView';
+import CardViewButtons from '@components/CardViewButtons';
 import CustomHead from '@components/CustomHead';
-import ExplorerCard from 'components/ExplorerCard';
-import { Layout } from 'components/Layout';
-import type { NextPage } from 'next';
-import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
-import { Spinner } from 'components/Spinner';
-import { TagsFilter } from 'components/TagsFilter';
 import WelcomePanel from '@components/WelcomePanel';
 import WhitelistScreen from '@components/WhitelistScreen';
-import { reqQuery } from '@lib/lens/explore-publications';
-import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
 import { useExplore } from '@context/ExploreContext';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
+import { reqQuery } from '@lib/lens/explore-publications';
+import { cn } from '@lib/utils';
+import ExplorerCard from 'components/ExplorerCard';
+import { Layout } from 'components/Layout';
+import { Spinner } from 'components/Spinner';
+import type { NextPage } from 'next';
+import Script from 'next/script';
 import { useNetwork } from 'wagmi';
-import { useQuery } from '@apollo/client';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -48,6 +52,7 @@ const App: NextPage = () => {
   const [finished, setFinished] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const { profile: lensProfile } = useContext(ProfileContext);
+  const { viewCard } = useContext(ViewCardContext);
   const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
   const {
@@ -70,14 +75,14 @@ const App: NextPage = () => {
   /*
    * main query definitions
    */
-
+  const limitPosts = 30;
   const resExplore = useQuery(ExplorePublicationsDocument, {
     variables: {
       request: {
         sortCriteria: PublicationSortCriteria.Latest,
         noRandomize: true,
         sources: [LENSTAGS_SOURCE],
-        limit: 30,
+        limit: limitPosts,
         publicationTypes: [PublicationTypes.Post],
         customFilters: [CustomFiltersTypes.Gardeners],
         metadata: {
@@ -374,10 +379,8 @@ const App: NextPage = () => {
 
   if (hydrationLoading) {
     return (
-      <div className="flex">
-        <div className="my-8 justify-center">
-          <Spinner h="10" w="10" />
-        </div>
+      <div className="my-8 flex justify-center">
+        <Spinner h="10" w="10" />
       </div>
     );
   }
@@ -420,42 +423,85 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="px-4 pb-6">
-              {/* is explore? : {isExplore ? 'true' : 'false'}
-              <br />
-              skipExplore: {skipExplore ? 'true' : 'false'} */}
-              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
+            <section className="px-4 pb-6">
+              <CardViewButtons />
+              <ul
+                className={cn(
+                  'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
+                  viewCard !== ViewBy.CARD && 'flex-col gap-3'
+                )}
+              >
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
-                    if (publications.length === index + 1) {
+                    if (publications.length - 15 === index) {
                       return (
-                        <ExplorerCard
-                          post={post}
-                          key={index}
-                          refProp={lastPublicationRef}
-                        />
+                        <>
+                          {viewCard === ViewBy.CARD && (
+                            <ExplorerCard
+                              post={post}
+                              key={index}
+                              refProp={lastPublicationRef}
+                            />
+                          )}
+                          {viewCard === ViewBy.LIST && (
+                            <CardListView
+                              post={post}
+                              key={index}
+                              refProp={lastPublicationRef}
+                            />
+                          )}
+                          {viewCard === ViewBy.POST && (
+                            <CardPostView
+                              post={post}
+                              key={index}
+                              refProp={lastPublicationRef}
+                            />
+                          )}
+                        </>
                       );
                     } else {
                       return (
-                        <ExplorerCard post={post} key={index} refProp={null} />
+                        <>
+                          {viewCard === ViewBy.CARD && (
+                            <ExplorerCard
+                              post={post}
+                              key={index}
+                              refProp={null}
+                            />
+                          )}
+                          {viewCard === ViewBy.LIST && (
+                            <CardListView
+                              post={post}
+                              key={index}
+                              refProp={null}
+                            />
+                          )}
+                          {viewCard === ViewBy.POST && (
+                            <CardPostView
+                              post={post}
+                              key={index}
+                              refProp={null}
+                            />
+                          )}
+                        </>
                       );
                     }
                   })
                 ) : loader ? (
-                  <div className="my-8">
+                  <div className="mx-auto my-8">
                     <Spinner h="10" w="10" />
                   </div>
                 ) : (
                   <div className="my-8">No results found 💤</div>
                 )}
-              </div>
+              </ul>
               {loadingFetchMore && (
                 <div className="mx-auto mb-10 flex w-10 items-center justify-center ">
                   <Spinner h="10" w="10" />
                 </div>
               )}
               {finished && <div className="my-8">No more results 🍃.</div>}
-            </div>
+            </section>
           </>
         )}
       </Layout>
