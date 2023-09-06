@@ -2,7 +2,11 @@ import '../styles/globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 
 import { APP_NAME, DEFAULT_CHAIN_ID, envConfig } from '@lib/config';
-import { RainbowKitProvider, getDefaultWallets } from '@rainbow-me/rainbowkit';
+import {
+  RainbowKitProvider,
+  getDefaultWallets,
+  lightTheme
+} from '@rainbow-me/rainbowkit';
 import { WagmiConfig, configureChains, createConfig } from 'wagmi';
 import { polygon, polygonMumbai } from 'wagmi/chains';
 
@@ -41,6 +45,13 @@ function MyApp({ Component, pageProps }: AppProps) {
           <ApolloProvider client={apolloClient}>
             <AppProvider>
               <RainbowKitProvider
+                theme={lightTheme({
+                  accentColor: 'black',
+                  accentColorForeground: 'white',
+                  borderRadius: 'small',
+                  fontStack: 'system',
+                  overlayBlur: 'small'
+                })}
                 chains={chains}
                 initialChain={DEFAULT_CHAIN_ID}
               >

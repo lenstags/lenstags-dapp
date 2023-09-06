@@ -3,11 +3,12 @@ import {
   ProfileSearchResult,
   PublicationSearchResult
 } from '@lib/lens/graphql/generated';
-import { useRouter } from 'next/router';
+
 import Link from 'next/link';
-import { search } from '@lib/lens/graphql/search';
-import { Spinner } from './Spinner';
 import { MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { Spinner } from './Spinner';
+import { search } from '@lib/lens/graphql/search';
+import { useRouter } from 'next/router';
 import { useSearchResultsStore } from '@lib/hooks/use-search-results-store';
 
 export interface UserSearchType {
@@ -152,8 +153,8 @@ export const SearchBar = () => {
 
   return (
     <div className="relative">
-      <div className="flex justify-start items-center bg-stone-100 py-2 px-5 rounded-full border-black border-[1px] md:w-[30rem]">
-        <MagnifyingGlassIcon className="w-5 h-5" />
+      <div className="flex items-center justify-start rounded-full border-[1px] border-black bg-stone-100 px-5 py-2 md:w-[30rem]">
+        <MagnifyingGlassIcon className="h-5 w-5" />
         <input
           ref={inputRef}
           type="text"
@@ -161,7 +162,7 @@ export const SearchBar = () => {
           value={inputText}
           onChange={handleInputText}
           onBlur={() => clearInput()}
-          className="bg-stone-100 outline-none leading-none ml-2 w-full"
+          className="ml-2 w-full bg-stone-100 leading-none outline-none"
           name="tag-search-input"
           id="tag-search-input"
           onKeyDown={handleKeyDown}
@@ -190,7 +191,7 @@ export const SearchBar = () => {
       {inputText !== '' &&
       cachedPublications.length === 0 &&
       cachedUsers.length === 0 ? (
-        <div className="absolute z-[10000] flex justify-center rounded-md bg-stone-100 px-4 py-3 mt-2 border-black border-[1px] md:w-1/2">
+        <div className="absolute z-[10000] mt-2 flex justify-center rounded-md border-[1px] border-black bg-stone-100 px-4 py-3 md:w-1/2">
           {isLoading ? (
             <Spinner w="4" h="4" />
           ) : (
@@ -200,9 +201,9 @@ export const SearchBar = () => {
       ) : (
         inputText !== '' &&
         (cachedPublications.length > 0 || cachedUsers.length > 0) && (
-          <div className="absolute z-[10000] flex flex-col rounded-md bg-stone-100 px-4 py-3 mt-2 border-black border-[1px] md:w-1/2">
+          <div className="absolute z-[10000] mt-2 flex flex-col rounded-md border-[1px] border-black bg-stone-100 px-4 py-3 md:w-1/2">
             {cachedPublications.length > 0 && (
-              <div className="flex flex-col mb-1">
+              <div className="mb-1 flex flex-col">
                 <span className="font-semibold">Recommended</span>
                 <ul>
                   {cachedPublications
@@ -210,8 +211,6 @@ export const SearchBar = () => {
                       <Link
                         key={publication.id}
                         href={`/${publication.type}/${publication.id}`}
-                        /* rel="noopener noreferrer"
-                    target="_blank" */
                         onMouseDown={(e) => e.preventDefault()}
                         onTouchStart={(e) => e.preventDefault()}
                       >
@@ -233,8 +232,6 @@ export const SearchBar = () => {
                       <Link
                         key={user.id}
                         href={`/profile/${user.id}`}
-                        /* rel="noopener noreferrer"
-                    target="_blank" */
                         onMouseDown={(e) => e.preventDefault()}
                         onTouchStart={(e) => e.preventDefault()}
                       >

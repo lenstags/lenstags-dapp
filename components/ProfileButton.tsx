@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
+import { getPictureUrl } from 'utils/helpers';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
 import useDisconnector from '@lib/hooks/useDisconnector';
 
@@ -12,13 +13,6 @@ const ProfileButton = ({ className }: { className?: string }) => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
   const { handleDisconnect } = useDisconnector();
-
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
 
   return (
     <div id="connectArea" className={`bg-white text-right ${className}`}>
@@ -34,7 +28,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
               <ImageProxied
                 category="profile"
                 className="mx-1 h-7 w-7 rounded-full object-cover"
-                src={pictureUrl}
+                src={getPictureUrl(lensProfile)}
                 alt="avatar"
                 width={40}
                 height={40}
@@ -52,7 +46,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
                     <ImageProxied
                       category="profile"
                       className="mx-1 h-7 w-7 rounded-full object-cover"
-                      src={pictureUrl}
+                      src={getPictureUrl(lensProfile)}
                       alt="avatar"
                       width={40}
                       height={40}

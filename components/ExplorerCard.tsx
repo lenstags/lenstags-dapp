@@ -1,4 +1,8 @@
-import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
+import {
+  PostProcessStatus,
+  getPictureUrl,
+  markdownToHTML
+} from 'utils/helpers';
 import React, { FC, useContext, useRef, useState } from 'react';
 
 import CollectButton from './CollectButton';
