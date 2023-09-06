@@ -501,17 +501,7 @@ export default function PostDetails() {
                 {/* other comments */}
                 {allComments &&
                   allComments.map((singleComment: Comment) => {
-                    let pic: string;
-                    const pictureType =
-                      singleComment.profile.picture?.__typename;
-                    if (pictureType === 'MediaSet') {
-                      pic = singleComment.profile.picture?.original?.url;
-                    } else if (pictureType === 'NftImage') {
-                      pic = singleComment.profile.picture?.uri;
-                    } else {
-                      pic = DEFAULT_IMAGE_PROFILE;
-                    }
-
+               
                     return (
                       <div
                         key={singleComment.id}
