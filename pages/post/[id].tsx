@@ -1,6 +1,7 @@
 import {
   APP_NAME,
   ATTRIBUTES_LIST_KEY,
+  DEFAULT_IMAGE_PROFILE,
   PUBLICATION_METADATA_VERSION
 } from '@lib/config';
 import { LayoutReading, ProfileContext } from 'components';
@@ -8,15 +9,18 @@ import {
   MetadataAttribute,
   PublicationMainFocus
 } from '@lib/lens/interfaces/publication';
-import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
+import { PostProcessStatus, getPictureUrl, markdownToHTML } from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
+import { Comment } from '@lib/lens/graphql/generated';
 import DotWave from '@uiball/loaders/dist/components/DotWave';
 import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import { Metadata } from '@lib/lens/interfaces/publication';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
 import ModalLists from 'components/ModalLists';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
+import { NotificationTypes } from '@models/notifications.models';
 import PostIndicators from 'components/PostIndicators';
 import { Spinner } from 'components/Spinner';
 import TagStrip from 'components/TagStrip';
@@ -26,19 +30,16 @@ import { getPublication } from '@lib/lens/get-publication';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
 import { typeList } from '@lib/lens/load-lists';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
-import { sendNotification } from '@lib/lens/user-notifications';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
-import { NotificationTypes } from '@models/notifications.models';
 
 export default function PostDetails() {
   const router = useRouter();
   const { id } = router.query;
   const { profile: loggedProfile } = useContext(ProfileContext);
-  const ii: string = id as string;
 
   const [post, setPost] = useState<any>();
   const [lensProfile, setProfile] = useState<any>();
@@ -60,10 +61,13 @@ export default function PostDetails() {
   const [selectedList, setSelectedList] = useState<typeList[]>(lists);
 
   const refreshComments = async () => {
-    const comments = await getComments(ii);
-    setAllComments(comments);
-    setIsSpinnerVisible(false);
-    setComment('');
+    if (id) {
+      const comments = await getComments(id as string);
+
+      setAllComments(comments);
+      setIsSpinnerVisible(false);
+      setComment('');
+    }
   };
 
   // modal
@@ -133,13 +137,6 @@ export default function PostDetails() {
     fetchData().catch(console.error);
   }, [id]);
 
-  const profileUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
-
   const handleComment = (comment: any) => {
     if (!comment) {
       return;
@@ -165,7 +162,11 @@ export default function PostDetails() {
     };
 
     //TODO: use with no gasless too
-    return commentGasless(loggedProfile?.id, ii, commentMetadata).then(() => {
+    return commentGasless(
+      loggedProfile?.id,
+      id as string,
+      commentMetadata
+    ).then(() => {
       const currentDate = new Date();
       const formattedDate = currentDate.toISOString();
 
@@ -305,11 +306,11 @@ export default function PostDetails() {
                 <div className="items-center rounded font-semibold text-gray-700">
                   <ImageProxied
                     category="profile"
-                    alt={`Pic from ${post.profile.picture?.original?.url}`}
+                    alt={`Pic from ${post.profile.handle}`}
                     height={24}
                     width={24}
                     className="h-8 w-8 cursor-pointer rounded-full object-cover"
-                    src={post.profile.picture?.original?.url}
+                    src={getPictureUrl(post.profile)}
                   />
                 </div>
 
@@ -499,35 +500,50 @@ export default function PostDetails() {
                 </div>
                 {/* other comments */}
                 {allComments &&
-                  allComments.map((c: any) => {
+                  allComments.map((singleComment: Comment) => {
+                    let pic: string;
+                    const pictureType =
+                      singleComment.profile.picture?.__typename;
+                    if (pictureType === 'MediaSet') {
+                      pic = singleComment.profile.picture?.original?.url;
+                    } else if (pictureType === 'NftImage') {
+                      pic = singleComment.profile.picture?.uri;
+                    } else {
+                      pic = DEFAULT_IMAGE_PROFILE;
+                    }
+
                     return (
                       <div
-                        key={c.id}
+                        key={singleComment.id}
                         className=" mb-2 rounded-xl bg-stone-100 px-4 py-2"
                       >
                         <div className=" flex items-center">
                           <ImageProxied
                             category="profile"
-                            // title={`Loading from ${c.profile.picture?.original?.url}`}
-                            alt="Profile"
+                            alt={`Pic from ${singleComment.profile.handle}`}
                             height={40}
                             width={40}
                             className="mr-2 h-8 w-8 cursor-pointer  rounded-full object-cover"
-                            src={c.profile.picture?.original?.url}
+                            src={getPictureUrl(singleComment.profile)}
                           />
                           <div className="">
-                            <div className="text-sm">{c.profile.name}</div>
+                            <div className="text-sm">
+                              {singleComment.profile.name}
+                            </div>
                             <div className="flex text-gray-400">
-                              <div className="text-xs">{c.profile.handle}</div>
                               <div className="text-xs">
-                                &nbsp;• {moment(c.createdAt).fromNow()}
+                                {singleComment.profile.handle}
+                              </div>
+                              <div className="text-xs">
+                                &nbsp;•{' '}
+                                {moment(singleComment.createdAt).fromNow()}
                               </div>
                             </div>
                           </div>
                         </div>
 
                         <div className="ml-10 mt-2 text-sm">
-                          {c.metadata.content}
+                          {singleComment.metadata.content}
                         </div>
                       </div>
                     );

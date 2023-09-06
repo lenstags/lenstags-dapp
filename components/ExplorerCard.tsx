@@ -1,4 +1,8 @@
-import { PostProcessStatus, markdownToHTML } from 'utils/helpers';
+import {
+  PostProcessStatus,
+  getPictureUrl,
+  markdownToHTML
+} from 'utils/helpers';
 import React, { FC, useContext, useRef, useState } from 'react';
 
 import CollectButton from './CollectButton';
@@ -218,16 +222,12 @@ const ExplorerCard: FC<Props> = (props) => {
                         height={40}
                         width={40}
                         className="h-8 w-8 cursor-pointer rounded-full object-cover"
-                        src={post.profile.picture?.original?.url}
+                        src={getPictureUrl(post.profile)}
                       />
                     </div>
                   </div>
 
-                  <a
-                    rel="noreferrer"
-                    href={`/profile/${post.profile.id}`}
-                    target="_blank"
-                  >
+                  <a rel="noreferrer" href={`/profile/${post.profile.id}`}>
                     <div className="flex justify-between">
                       <div className="pl-2 align-baseline text-xs">
                         <div className="flex">
@@ -309,7 +309,6 @@ const ExplorerCard: FC<Props> = (props) => {
               {/* <Link > */}
               <a
                 rel="noreferrer"
-                target="_blank"
                 href={isList ? `/list/${post.id}` : `/post/${post.id}`}
               >
                 {isList ? (
