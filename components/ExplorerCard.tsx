@@ -223,11 +223,7 @@ const ExplorerCard: FC<Props> = (props) => {
                     </div>
                   </div>
 
-                  <a
-                    rel="noreferrer"
-                    href={`/profile/${post.profile.id}`}
-                    target="_blank"
-                  >
+                  <a rel="noreferrer" href={`/profile/${post.profile.id}`}>
                     <div className="flex justify-between">
                       <div className="pl-2 align-baseline text-xs">
                         <div className="flex">
@@ -320,7 +316,6 @@ const ExplorerCard: FC<Props> = (props) => {
               {/* <Link > */}
               <a
                 rel="noreferrer"
-                target="_blank"
                 href={isList ? `/list/${post.id}` : `/post/${post.id}`}
               >
                 {isList ? (
