@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
-import ImageProxied from '@components/ImageProxied';
+import { useEffect, useState } from 'react';
+
 import { DotWave } from '@uiball/loaders';
+import ImageProxied from '@components/ImageProxied';
+import { ProfileQuery } from '@lib/lens/graphql/generated';
+import { doesFollow } from '@lib/lens/does-follow';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
-import { doesFollow } from '@lib/lens/does-follow';
-import { ProfileQuery } from '@lib/lens/graphql/generated';
 
 const HoverProfileCard = ({
   profile,
@@ -65,15 +66,11 @@ const HoverProfileCard = ({
         <div
           className="lens-post  
                       absolute top-5 z-10 
-                     w-64 shadow-xl  animate-in fade-in-50 duration-500 "
+                     w-64 shadow-xl  duration-500 animate-in fade-in-50 "
         >
           <div className="items-center rounded p-4 font-semibold text-gray-700">
             <div className="flex justify-between bg-white">
-              <a
-                rel="noreferrer"
-                href={`/profile/${postProfileId}`}
-                target="_blank"
-              >
+              <a rel="noreferrer" href={`/profile/${postProfileId}`}>
                 <ImageProxied
                   category="profile"
                   alt={`Loading from ${postProfilePicture}`}
@@ -121,11 +118,7 @@ const HoverProfileCard = ({
                 ''
               )}
             </div>
-            <a
-              rel="noreferrer"
-              href={`/profile/${postProfileId}`}
-              target="_blank"
-            >
+            <a rel="noreferrer" href={`/profile/${postProfileId}`}>
               <p className="text-base font-bold">{postProfileName}</p>
               <p className="text-xs text-stone-500">@{postProfileHandle}</p>
               <p className="my-2 truncate text-ellipsis text-xs text-stone-500">
