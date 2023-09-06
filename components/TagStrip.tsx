@@ -7,12 +7,12 @@ interface TagStripProps {
 
 const TagStrip: React.FC<TagStripProps> = ({ tags, postId }) => (
   <div
-    // style={{
-    //   background: 'rgba(248, 248, 248, 0.70)',
-    //   backdropFilter: 'blur(7px)',
-    //   borderBottomLeftRadius: '12px',
-    //   borderBottomRightRadius: '12px'
-    // }}
+    style={{
+      background: 'rgba(248, 248, 248, 0.70)',
+      backdropFilter: 'blur(7px)',
+      borderBottomLeftRadius: '12px',
+      borderBottomRightRadius: '12px'
+    }}
     className="scrollbar-thin scrollbar-lightgray-transparent flex w-full items-center gap-1 overflow-auto py-2 text-right text-xs"
   >
     {tags.map((tag: string) => {
