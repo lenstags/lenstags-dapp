@@ -1,5 +1,6 @@
 import { LayoutProfile, ProfileContext, TagsFilter } from 'components';
 import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
 import { DotWave } from '@uiball/loaders';
@@ -11,7 +12,6 @@ import { NextPage } from 'next';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
-import { getPictureUrl } from 'utils/helpers';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
@@ -117,7 +117,7 @@ const OtherProfile: NextPage = () => {
         <div className="">
           <div
             style={{
-              backgroundImage: `url('${lensProfile?.coverPicture?.original?.url}')`,
+              backgroundImage: `url('${getCoverPictureUrl(lensProfile)}')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}

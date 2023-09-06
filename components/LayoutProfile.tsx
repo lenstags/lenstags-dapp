@@ -19,7 +19,6 @@ interface Props {
   isExplore: boolean;
   setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
   skipExplore: boolean;
-  // clearFeed: () => void;
 }
 
 export const LayoutProfile: FC<Props> = ({
@@ -111,22 +110,6 @@ export const LayoutProfile: FC<Props> = ({
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
-      {/* <div style="
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-  
-  background-image: url('ruta/de/la/imagen.jpg'); background-repeat: no-repeat; background-size: cover; z-index: -1;"></div> */}
-      {/* <div
-      // style={{
-      //   backgroundImage: 'url(/img/app-background.svg)',
-      //   backgroundSize: 'cover',
-      //   backgroundRepeat: 'no-repeat',
-      //   backgroundPosition: 'center'
-      // }}
-      > */}
-      {/* <div className="flex"> */}
-      {/* <nav>
-            <Navbar />
-          </nav> */}
       <div className="grid w-full grid-cols-12">
         <SideBarLeft
           setIsExplore={setIsExplore}
@@ -158,11 +141,6 @@ export const LayoutProfile: FC<Props> = ({
         {!router.pathname.includes(PublicRoutes.MYPROFILE) && <SideBarRight />}
         <Toaster />
       </div>
-      {/* </div> */}
-      {/* </div> */}
-      {/* <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}> */}
-      {/* <main className="mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
-      {/* <main className="z-0 mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
     </>
   );
 };
