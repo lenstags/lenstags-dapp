@@ -1,5 +1,8 @@
 import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import { useContext } from 'react';
+import ExplorerCard from './ExplorerCard';
+import CardListView from './CardListView';
+import CardPostView from './CardPostView';
 
 const buttons = [
   {
@@ -15,6 +18,16 @@ const buttons = [
     view: ViewBy.POST
   }
 ];
+
+export interface CardViewTypeProps {
+  [key: string]: (props: any) => JSX.Element;
+}
+
+export const CardViewsMap: CardViewTypeProps = {
+  [ViewBy.CARD]: (props) => <ExplorerCard {...props} />,
+  [ViewBy.LIST]: (props) => <CardListView {...props} />,
+  [ViewBy.POST]: (props) => <CardPostView {...props} />
+};
 
 const CardViewButtons = () => {
   const { viewCard, setViewCard } = useContext(ViewCardContext);

@@ -14,7 +14,7 @@ import { explore } from '@lib/lens/explore-publications';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
-import CardViewButtons from '@components/CardViewButtons';
+import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import { cn } from '@lib/utils';
 import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import CardListView from '@components/CardListView';
@@ -360,19 +360,10 @@ const MyProfile: NextPage = () => {
         >
           {publications.length > 0 ? (
             publications.map((post, index) => {
-              return (
-                <>
-                  {viewCard === ViewBy.CARD && (
-                    <ExplorerCard post={post} key={index} />
-                  )}
-                  {viewCard === ViewBy.LIST && (
-                    <CardListView post={post} key={index} />
-                  )}
-                  {viewCard === ViewBy.POST && (
-                    <CardPostView post={post} key={index} />
-                  )}
-                </>
-              );
+              return CardViewsMap[viewCard]({
+                post,
+                key: index
+              });
             })
           ) : loader ? (
             <div className="mx-auto my-8">

@@ -1,4 +1,8 @@
-import React, { createContext, useState } from 'react';
+import {
+  getFromLocalStorage,
+  setLensLocalStorage
+} from '@lib/lens/localStorage';
+import React, { createContext, useState, useEffect } from 'react';
 export const ViewBy = {
   LIST: 'list',
   CARD: 'card',
@@ -27,6 +31,16 @@ export const ViewCardContextProvider: React.FC<{
   const [viewCard, setViewCard] = useState<ViewCardProps['viewCard']>(
     ViewBy.CARD
   );
+
+  useEffect(() => {
+    const lensStorage = getFromLocalStorage();
+    if (lensStorage) {
+      setLensLocalStorage({
+        ...lensStorage,
+        cardView: viewCard
+      });
+    }
+  }, [viewCard]);
 
   return (
     <ViewCardContext.Provider value={{ viewCard, setViewCard }}>

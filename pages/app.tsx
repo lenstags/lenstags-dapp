@@ -20,9 +20,7 @@ import {
 } from 'react';
 
 import { useQuery } from '@apollo/client';
-import CardListView from '@components/CardListView';
-import CardPostView from '@components/CardPostView';
-import CardViewButtons from '@components/CardViewButtons';
+import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import CustomHead from '@components/CustomHead';
 import { SearchBar } from '@components/SearchBar';
 import WelcomePanel from '@components/WelcomePanel';
@@ -32,7 +30,6 @@ import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
 import { reqQuery } from '@lib/lens/explore-publications';
 import { cn } from '@lib/utils';
-import ExplorerCard from 'components/ExplorerCard';
 import { Layout } from 'components/Layout';
 import { Spinner } from 'components/Spinner';
 import type { NextPage } from 'next';
@@ -443,59 +440,14 @@ const App: NextPage = () => {
               >
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
-                    if (publications.length - 15 === index) {
-                      return (
-                        <>
-                          {viewCard === ViewBy.CARD && (
-                            <ExplorerCard
-                              post={post}
-                              key={index}
-                              refProp={lastPublicationRef}
-                            />
-                          )}
-                          {viewCard === ViewBy.LIST && (
-                            <CardListView
-                              post={post}
-                              key={index}
-                              refProp={lastPublicationRef}
-                            />
-                          )}
-                          {viewCard === ViewBy.POST && (
-                            <CardPostView
-                              post={post}
-                              key={index}
-                              refProp={lastPublicationRef}
-                            />
-                          )}
-                        </>
-                      );
-                    } else {
-                      return (
-                        <>
-                          {viewCard === ViewBy.CARD && (
-                            <ExplorerCard
-                              post={post}
-                              key={index}
-                              refProp={null}
-                            />
-                          )}
-                          {viewCard === ViewBy.LIST && (
-                            <CardListView
-                              post={post}
-                              key={index}
-                              refProp={null}
-                            />
-                          )}
-                          {viewCard === ViewBy.POST && (
-                            <CardPostView
-                              post={post}
-                              key={index}
-                              refProp={null}
-                            />
-                          )}
-                        </>
-                      );
-                    }
+                    return CardViewsMap[viewCard]({
+                      post,
+                      key: index,
+                      refProp:
+                        publications.length - 15 === index
+                          ? lastPublicationRef
+                          : null
+                    });
                   })
                 ) : loader ? (
                   <div className="mx-auto my-8">
