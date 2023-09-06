@@ -81,13 +81,6 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     router.push(PublicRoutes.APP);
   };
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
-
   const fetchMyLists = async () => {
     if (!lensProfile) return;
 
