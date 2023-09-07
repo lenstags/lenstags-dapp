@@ -43,6 +43,7 @@ const useCheckWhitelist = (lensProfile: any) => {
     showReject,
     welcomeReady,
     isVisibleWL,
+    setIsVisibleWL,
     setShowWelcome,
     handleSetup
   };

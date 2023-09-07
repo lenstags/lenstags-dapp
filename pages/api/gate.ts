@@ -43,7 +43,7 @@ const handler = (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
   }
 
   const isWhitelisted: boolean = NETWORKS.TESTNET
-    ? true
+    ? true //  WHITELISTED_WALLETS.includes(wallet) //
     : WHITELISTED_WALLETS.includes(wallet);
   res.status(200).json({ isWhitelisted });
 };
