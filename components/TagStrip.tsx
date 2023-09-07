@@ -8,7 +8,6 @@ interface TagStripProps {
 const TagStrip: React.FC<TagStripProps> = ({ tags, postId }) => (
   <div
     style={{
-      background: 'rgba(248, 248, 248, 0.70)',
       backdropFilter: 'blur(7px)',
       borderBottomLeftRadius: '12px',
       borderBottomRightRadius: '12px'

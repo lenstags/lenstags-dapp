@@ -29,7 +29,6 @@ const useHandleSetup = (lensProfile: any) => {
 
     const hasLists =
       listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-    console.log('>>> hasLists ', hasLists);
 
     const dispatcherEnabled = profileResult
       ? profileResult.dispatcher?.canUseRelay || false

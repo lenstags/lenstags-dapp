@@ -1,3 +1,4 @@
+import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
 import React, {
   ChangeEvent,
   useContext,
@@ -7,27 +8,26 @@ import React, {
 } from 'react';
 import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
-import { LayoutCreate } from '@components/LayoutCreate';
-import { Spinner } from '@components/Spinner';
-import { queryProfile } from '@lib/lens/dispatcher';
-import { followers } from '@lib/lens/followers';
-import { IbuiltPost } from '@lib/lens/interfaces/publication';
-import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
-import { TAGS } from '@lib/lens/tags';
-import { sendNotification } from '@lib/lens/user-notifications';
-import { NotificationTypes } from '@models/notifications.models';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
-import { DotWave } from '@uiball/loaders';
 import Avatar from 'boring-avatars';
-import { ProfileContext } from 'components';
-import Editor from 'components/Editor';
-import _ from 'lodash';
-import { useSnackbar } from 'material-ui-snackbar-provider';
-import { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import CreatableSelect from 'react-select/creatable';
-import TurndownService from 'turndown';
+import { DotWave } from '@uiball/loaders';
+import Editor from 'components/Editor';
+import { IbuiltPost } from '@lib/lens/interfaces/publication';
+import { LayoutCreate } from '@components/LayoutCreate';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
+import { NextPage } from 'next';
+import { NotificationTypes } from '@models/notifications.models';
+import { ProfileContext } from 'components';
+import { Spinner } from '@components/Spinner';
+import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
+import TurndownService from 'turndown';
+import _ from 'lodash';
+import { followers } from '@lib/lens/followers';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { useRouter } from 'next/router';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -253,9 +253,6 @@ const Create: NextPage = () => {
     if (data) {
       setImageURL(data.image as string);
       setImageOrigin('panelLink');
-
-      console.log('ssss ', data.image);
-
       // setGeneratedImage(data.image as string);
       setIsLoaded(true);
     } else {

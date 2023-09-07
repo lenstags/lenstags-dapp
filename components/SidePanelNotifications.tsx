@@ -166,7 +166,7 @@ const SidePanelNotifications = forwardRef(function (
           <span className="text-md w-full">Notifications</span>
         </DoubleSidebarTitle>
         <div className="mb-2 flex h-full w-full flex-col overflow-x-scroll py-4">
-          {notifications.length > 0 &&
+          {notifications?.length > 0 &&
             notifications.map((notif, index: number) => {
               return <Notifications notif={notif} key={index} />;
             })}

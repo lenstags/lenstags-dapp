@@ -226,11 +226,7 @@ const ExplorerCard: FC<Props> = (props) => {
                   </div>
                 </div>
 
-                <a
-                  rel="noreferrer"
-                  href={`/profile/${post.profile.id}`}
-                  target="_blank"
-                >
+                <a rel="noreferrer" href={`/profile/${post.profile.id}`}>
                   <div className="flex justify-between">
                     <div className="pl-2 align-baseline text-xs">
                       <div className="flex">
@@ -312,7 +308,6 @@ const ExplorerCard: FC<Props> = (props) => {
             {/* <Link > */}
             <a
               rel="noreferrer"
-              target="_blank"
               href={isList ? `/list/${post.id}` : `/post/${post.id}`}
             >
               {isList ? (
@@ -419,7 +414,11 @@ const ExplorerCard: FC<Props> = (props) => {
             <div className=" flex w-full items-center justify-between text-xs">
               <PostIndicators
                 collects={post.stats.totalAmountOfCollects}
-                comments={post.stats.totalAmountOfComments || 0}
+                comments={
+                  !isList
+                    ? post.stats.totalAmountOfComments || 0
+                    : parseInt(post.stats.totalAmountOfComments) - 1
+                }
               />
               <CollectButton
                 profile={lensProfile}
