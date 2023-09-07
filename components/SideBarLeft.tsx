@@ -1,3 +1,10 @@
+import { APP_UI_VERSION, DEFAULT_NETWORK } from '@lib/config';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from './ui/Accordion';
 import {
   BellIcon,
   FolderIcon,
@@ -9,21 +16,6 @@ import {
   FolderIcon as FolderIconFilled,
   GlobeAltIcon as GlobeAltIconFilled
 } from '@heroicons/react/24/solid';
-import { APP_UI_VERSION, DEFAULT_NETWORK } from '@lib/config';
-import { getPopulatedLists, getUserLists } from '@lib/lens/load-lists';
-import {
-  getNotifications,
-  getSubscriptions,
-  optIn
-} from '@lib/lens/user-notifications';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from './ui/Accordion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,21 +23,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
+import {
+  getNotifications,
+  getSubscriptions,
+  optIn
+} from '@lib/lens/user-notifications';
+import { getPopulatedLists, getUserLists } from '@lib/lens/load-lists';
 
-import { useExplore } from '@context/ExploreContext';
-import { SidebarContext } from '@context/SideBarSizeContext';
-import { useSorts } from '@lib/hooks/use-sort';
-import { getSigner } from '@lib/lens/ethers.service';
-import { TextAlignBottomIcon } from '@radix-ui/react-icons';
-import { PublicRoutes } from 'models';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { ProfileContext } from './LensAuthenticationProvider';
 import Notifications from './Notifications';
 import PostsByList from './PostsByList';
+import { ProfileContext } from './LensAuthenticationProvider';
+import { PublicRoutes } from 'models';
 import SidePanelNotifications from './SidePanelNotifications';
+import { SidebarContext } from '@context/SideBarSizeContext';
+import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { Tooltip } from './ui/Tooltip';
+import { getSigner } from '@lib/lens/ethers.service';
+import { useExplore } from '@context/ExploreContext';
+import { useRouter } from 'next/router';
+import { useSorts } from '@lib/hooks/use-sort';
 
 interface SidebarProps {
   setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -133,7 +133,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
         setSubscribed(true);
       });
     }
-    if (notifications.length === 0) {
+    if (notifications?.length === 0) {
       getNotifications(lensProfile?.ownedBy).then((res) => {
         setNotifications(res);
       });
@@ -404,7 +404,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                     </AccordionTrigger>
                     <AccordionContent className="flex h-full flex-col border-0 outline-none">
                       <div className="mb-2 ml-1 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-2">
-                        {notifications.length > 0 &&
+                        {notifications?.length > 0 &&
                           notifications.map((notif, index: number) => {
                             return <Notifications notif={notif} key={index} />;
                           })}

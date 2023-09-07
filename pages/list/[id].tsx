@@ -1,12 +1,4 @@
-import { useEffect, useState } from 'react';
-
-import ListImages from '@components/ListImages';
-import Pagination from '@components/Pagination';
-import PostIndicators from '@components/PostIndicators';
-import ProfileCard from '@components/ProfileCard';
-import { Spinner } from '@components/Spinner';
-import TagStrip from '@components/TagStrip';
-import { LayoutReading } from '@components/index';
+import { ArrowDownIcon, ListBulletIcon } from '@heroicons/react/24/outline';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,22 +19,30 @@ import {
   TableHeader,
   TableRow
 } from '@components/ui/Table';
-import { ArrowDownIcon, ListBulletIcon } from '@heroicons/react/24/outline';
-import { EllipsisHorizontalIcon } from '@heroicons/react/24/solid';
-import { useSorts } from '@lib/hooks/use-sort';
-import { getPublication } from '@lib/lens/get-publication';
-import { getLastComment } from '@lib/lens/get-publications';
-import { PublicRoutes } from '@models/routes.model';
-import { SortBy } from '@models/sorts.model';
+import { useEffect, useState } from 'react';
+
 import { DotFilledIcon } from '@radix-ui/react-icons';
 import { DotWave } from '@uiball/loaders';
-import ImageProxied from 'components/ImageProxied';
-import ModalLists from 'components/ModalLists';
-import moment from 'moment';
+import { EllipsisHorizontalIcon } from '@heroicons/react/24/solid';
 import { GetServerSideProps } from 'next';
+import ImageProxied from 'components/ImageProxied';
+import { LayoutReading } from '@components/index';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import ListImages from '@components/ListImages';
+import ModalLists from 'components/ModalLists';
+import Pagination from '@components/Pagination';
+import PostIndicators from '@components/PostIndicators';
 import { PostProcessStatus } from 'utils/helpers';
+import ProfileCard from '@components/ProfileCard';
+import { PublicRoutes } from '@models/routes.model';
+import { SortBy } from '@models/sorts.model';
+import { Spinner } from '@components/Spinner';
+import TagStrip from '@components/TagStrip';
+import { getLastComment } from '@lib/lens/get-publications';
+import { getPublication } from '@lib/lens/get-publication';
+import moment from 'moment';
+import { useRouter } from 'next/router';
+import { useSorts } from '@lib/hooks/use-sort';
 
 interface ListDetailsProps {
   previousRoute: string;
@@ -237,7 +237,9 @@ const ListDetails: React.FC<ListDetailsProps> = ({ previousRoute }) => {
                     <div className="ml-auto flex gap-2">
                       <PostIndicators
                         collects={post.stats.totalAmountOfCollects}
-                        comments={post.stats.totalAmountOfComments || 0}
+                        comments={(
+                          parseInt(post.stats.totalAmountOfComments) - 1
+                        ).toString()}
                         className="bg-stone-100"
                       />
                       {(isFinished || post.hasCollectedByMe) && (
@@ -427,7 +429,9 @@ const ListDetails: React.FC<ListDetailsProps> = ({ previousRoute }) => {
                             <div className="flex w-full items-center justify-between gap-4 px-4">
                               <PostIndicators
                                 collects={p.stats.totalAmountOfCollects}
-                                comments={p.stats.totalAmountOfComments || 0}
+                                comments={(
+                                  parseInt(p.stats.totalAmountOfComments) - 1
+                                ).toString()}
                               />
                               {(isFinished || p.hasCollectedByMe) && (
                                 // && p.metadata.attributes[0].value === 'post'

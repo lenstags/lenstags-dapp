@@ -9,7 +9,11 @@ import {
   MetadataAttribute,
   PublicationMainFocus
 } from '@lib/lens/interfaces/publication';
-import { PostProcessStatus, getPictureUrl, markdownToHTML } from 'utils/helpers';
+import {
+  PostProcessStatus,
+  getPictureUrl,
+  markdownToHTML
+} from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
 import { Comment } from '@lib/lens/graphql/generated';
@@ -174,8 +178,7 @@ export default function PostDetails() {
         id: uuidv4(),
         profile: {
           picture: {
-            // @ts-ignore
-            original: { url: profileUrl }
+            original: { url: getPictureUrl(post.profile) }
           },
           name: loggedProfile?.name,
           handle: loggedProfile?.handle
