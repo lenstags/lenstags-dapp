@@ -396,7 +396,7 @@ const Create: NextPage = () => {
       );
       const { pubId } =
         typeof result !== 'string' && result.pubId ? result : { pubId: '' };
-      const id = lensProfile?.id;
+      const id = `${lensProfile?.id}-${pubId}`;
       const dataSender = {
         title,
         pubId,
