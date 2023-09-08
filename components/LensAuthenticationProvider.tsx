@@ -299,8 +299,6 @@ export default function LensAuthenticationProvider({
         optIn: false
       };
 
-      console.log('🔴 lensStore ', lensStore);
-
       setLensLocalStorage(lensStore);
       setAuthenticated(lensStore);
       return Boolean(true);
