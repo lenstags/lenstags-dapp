@@ -8,7 +8,6 @@ interface TagStripProps {
 const TagStrip: React.FC<TagStripProps> = ({ tags, postId }) => (
   <div
     style={{
-      background: 'rgba(248, 248, 248, 0.70)',
       backdropFilter: 'blur(7px)',
       borderBottomLeftRadius: '12px',
       borderBottomRightRadius: '12px'
@@ -26,7 +25,7 @@ const TagStrip: React.FC<TagStripProps> = ({ tags, postId }) => (
             paddingTop: '3px',
             paddingBottom: '3px'
           }}
-          className="whitespace-nowrap rounded-full border border-black bg-white px-2 font-serif font-bold tracking-wider"
+          className="whitespace-nowrap rounded-full border border-black bg-gray-50 px-2 font-serif font-bold tracking-wider"
         >
           {tag.replace('-', ' ').toUpperCase()}
         </div>

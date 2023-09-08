@@ -10,7 +10,6 @@ import { PRIVATE_LIST_NAME } from '@lib/config';
 import PostIndicators from '@components/PostIndicators';
 // import ProfileCard from './ProfileCard';
 import { ProfileContext } from './LensAuthenticationProvider';
-import TurndownService from 'turndown';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
@@ -19,6 +18,7 @@ import { useSnackbar } from 'material-ui-snackbar-provider';
 import { cn } from '@lib/utils';
 import Link from 'next/link';
 import TagStrip from './TagStrip';
+import TurndownService from 'turndown';
 
 interface Props {
   post: any;
@@ -297,7 +297,6 @@ const CardPostView: FC<Props> = (props) => {
             <div className="flex w-full flex-col justify-between">
               <Link
                 rel="noreferrer"
-                target="_blank"
                 href={isList ? `/list/${post.id}` : `/post/${post.id}`}
                 className="w-full"
               >
@@ -347,7 +346,11 @@ const CardPostView: FC<Props> = (props) => {
                 <div className="flex w-min items-center text-xs">
                   <PostIndicators
                     collects={post.stats.totalAmountOfCollects}
-                    comments={post.stats.totalAmountOfComments || 0}
+                    comments={
+                      isList
+                        ? (post.stats.totalAmountOfComments - 1).toString() || 0
+                        : post.stats.totalAmountOfComments || 0
+                    }
                   />
                   <CollectButton
                     profile={lensProfile}

@@ -9,6 +9,7 @@ import { ProfileContext } from './LensAuthenticationProvider';
 import { doesFollow } from '@lib/lens/does-follow';
 import { followers } from '@lib/lens/followers';
 import { freeUnfollow } from '@lib/lens/free-unfollow';
+import { getPictureUrl } from 'utils/helpers';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { sendNotification } from '@lib/lens/user-notifications';
 
@@ -91,14 +92,14 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile, showCard }) => {
     <div className="lens-post absolute z-[200] w-64 shadow-xl duration-500 animate-in fade-in-50">
       <div className="items-center rounded p-4 font-semibold text-gray-700">
         <div className="flex justify-between bg-white">
-          <a rel="noreferrer" href={`/profile/${profile.id}`} target="_blank">
+          <a rel="noreferrer" href={`/profile/${profile.id}`}>
             <ImageProxied
               category="profile"
-              alt={`Loading from ${profile.picture?.original?.url}`}
+              alt={`Loading from ${profile.handle}`}
               height={80}
               width={80}
               className="h-14 w-14 cursor-pointer rounded-full object-cover"
-              src={profile.picture?.original?.url}
+              src={getPictureUrl(profile)}
             />
           </a>
           {isFollowing ? (
@@ -139,7 +140,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile, showCard }) => {
             ''
           )}
         </div>
-        <a rel="noreferrer" href={`/profile/${profile.id}`} target="_blank">
+        <a rel="noreferrer" href={`/profile/${profile.id}`}>
           <p className="text-base font-bold">{profile.name}</p>
           <p className="text-xs text-stone-500">@{profile.handle}</p>
           <p className="my-2 truncate text-ellipsis text-xs text-stone-500">

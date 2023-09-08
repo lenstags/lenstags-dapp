@@ -131,7 +131,11 @@ export const ResultsCard = ({
             <div className="flex space-x-2">
               <PostIndicators
                 collects={publication.totalAmountOfCollects.toString()}
-                comments={publication.totalAmountOfComments.toString()}
+                comments={
+                  isList
+                    ? (publication.totalAmountOfComments - 1).toString()
+                    : publication.totalAmountOfComments.toString()
+                }
               />
               <CollectButton
                 profile={profile}

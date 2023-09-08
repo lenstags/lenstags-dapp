@@ -1,5 +1,6 @@
 import { LayoutProfile, ProfileContext, TagsFilter } from 'components';
 import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
 import { DotWave } from '@uiball/loaders';
@@ -77,13 +78,6 @@ const OtherProfile: NextPage = () => {
     });
   }, [lensProfile?.id, tags]);
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
-
   const location =
     lensProfile?.attributes.find((item: any) => item.key === 'location')
       ?.value || '';
@@ -123,7 +117,7 @@ const OtherProfile: NextPage = () => {
         <div className="">
           <div
             style={{
-              backgroundImage: `url('${lensProfile?.coverPicture?.original?.url}')`,
+              backgroundImage: `url('${getCoverPictureUrl(lensProfile)}')`,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
@@ -136,7 +130,7 @@ const OtherProfile: NextPage = () => {
                 category="profile"
                 height={144}
                 width={144}
-                src={pictureUrl}
+                src={getPictureUrl(lensProfile)}
                 alt="avatar"
               />
               <div className="mt-2 flex items-center">

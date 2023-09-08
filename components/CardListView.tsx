@@ -255,7 +255,13 @@ const CardListView: FC<Props> = (props) => {
               <div className="ml-auto flex h-min w-auto items-center justify-between text-xs">
                 <PostIndicators
                   collects={post.stats.totalAmountOfCollects}
-                  comments={post.stats.totalAmountOfComments || 0}
+                  comments={
+                    isList
+                      ? (
+                          parseInt(post.stats.totalAmountOfComments) - 1
+                        ).toString()
+                      : post.stats.totalAmountOfComments
+                  }
                 />
                 <CollectButton
                   profile={lensProfile}

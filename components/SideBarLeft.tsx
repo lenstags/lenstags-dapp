@@ -81,13 +81,6 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     router.push(PublicRoutes.APP);
   };
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
-
   const fetchMyLists = async () => {
     if (!lensProfile) return;
 
@@ -140,7 +133,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
         setSubscribed(true);
       });
     }
-    if (notifications.length === 0) {
+    if (notifications?.length === 0) {
       getNotifications(lensProfile?.ownedBy).then((res) => {
         setNotifications(res);
       });
@@ -411,7 +404,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                     </AccordionTrigger>
                     <AccordionContent className="flex h-full flex-col border-0 outline-none">
                       <div className="mb-2 ml-1 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-2">
-                        {notifications.length > 0 &&
+                        {notifications?.length > 0 &&
                           notifications.map((notif, index: number) => {
                             return <Notifications notif={notif} key={index} />;
                           })}

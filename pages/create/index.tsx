@@ -253,9 +253,6 @@ const Create: NextPage = () => {
     if (data) {
       setImageURL(data.image as string);
       setImageOrigin('panelLink');
-
-      console.log('ssss ', data.image);
-
       // setGeneratedImage(data.image as string);
       setIsLoaded(true);
     } else {
