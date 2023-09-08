@@ -1,5 +1,9 @@
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
-import { Squares2X2Icon } from '@heroicons/react/24/outline';
+import {
+  Squares2X2Icon,
+  QueueListIcon,
+  RectangleStackIcon
+} from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 
@@ -9,6 +13,18 @@ export interface SortingValuesType {
   by: string;
 }
 
+enum ViewBy {
+  CARD = 'CARD',
+  VIEW = 'VIEW',
+  POST = 'POST'
+}
+
+enum Filter {
+  ALL = 'ALL',
+  LISTS = 'LISTS',
+  POSTS = 'POSTS'
+}
+
 export const SortingOptions = ({
   sortingValues,
   setSortingValues
@@ -16,10 +32,31 @@ export const SortingOptions = ({
   sortingValues: SortingValuesType;
   setSortingValues: ({}: SortingValuesType) => void;
 }) => {
-  const [showOptions, setShowOptions] = useState(false);
+  const [showSortingOptions, setShowSortingOptions] = useState(false);
   const [localValues, setLocalValues] = useState(sortingValues);
+  const [viewCard, setViewCard] = useState<ViewBy>(ViewBy.CARD);
+  const [showViewOptions, setShowViewOptions] = useState(false);
+  const [filterOptions, setFilterOptions] = useState<Filter>(Filter.ALL);
 
-  const handleOptionClick = (group: string, value: string) => {
+  const Pill = () => {
+    switch (viewCard) {
+      case ViewBy.CARD:
+        return <Squares2X2Icon className="w-6 h-6" />;
+      case ViewBy.POST:
+        return <QueueListIcon className="w-6 h-6" />;
+      case ViewBy.VIEW:
+        return <RectangleStackIcon className="w-6 h-6" />;
+    }
+  };
+
+  const handleViewOptionClick = (view: ViewBy) => {
+    setViewCard(view);
+    setTimeout(() => {
+      setShowViewOptions(false);
+    }, 200);
+  };
+
+  const handleSortingOptionClick = (group: string, value: string) => {
     setLocalValues({
       ...localValues,
       [group]: value
@@ -28,61 +65,126 @@ export const SortingOptions = ({
 
   const handleApplyClick = () => {
     setSortingValues(localValues);
-    setShowOptions(false);
+    setShowSortingOptions(false);
   };
 
   return (
     <div className="flex flex-col">
-      <div className="mt-2 flex justify-between rounded-t-lg  py-2">
-        <div className="flex  gap-1  font-sans font-medium tracking-wide">
+      <div className="mt-2 flex justify-between rounded-t-lg min-h-[3rem]">
+        <div className="flex gap-1 font-sans font-medium tracking-wide items-center">
           <button
-            // onClick={fetchContentAll}
-            className="rounded-lg border
+            onClick={() => setFilterOptions(Filter.ALL)}
+            className={`rounded-lg border
           border-solid border-black px-4 py-1 align-middle 
-          text-white font-semibold"
+          font-semibold ${
+            filterOptions === Filter.ALL
+              ? 'bg-black text-white'
+              : 'bg-white text-black'
+          }`}
           >
             All
           </button>
 
           <button
-            // onClick={openConnectModal}
-            className="rounded-lg
-          border border-solid border-black bg-white px-4 py-1
-          align-middle text-black font-semibold"
+            onClick={() => setFilterOptions(Filter.LISTS)}
+            className={`rounded-lg
+          border border-solid border-black px-4 py-1
+          align-middle font-semibold ${
+            filterOptions === Filter.LISTS
+              ? 'bg-black text-white'
+              : 'bg-white text-black'
+          }`}
           >
             Lists
           </button>
 
           <button
-            // onClick={openConnectModal}
-            className="rounded-lg
-          border border-solid border-black bg-white px-4 py-1
-          align-middle text-black font-semibold"
+            onClick={() => setFilterOptions(Filter.POSTS)}
+            className={`rounded-lg
+          border border-solid border-black px-4 py-1
+          align-middle font-semibold ${
+            filterOptions === Filter.POSTS
+              ? 'bg-black text-white'
+              : 'bg-white text-black'
+          }`}
           >
             Posts
           </button>
         </div>
-        <div className="flex gap-1  font-sans font-medium tracking-wide">
+        <div className="flex gap-1 items-center font-sans font-medium tracking-wide">
           <button
-            onClick={() => setShowOptions(!showOptions)}
-            className="py-1 px-1.5 rounded-lg
+            onClick={() => setShowSortingOptions(!showSortingOptions)}
+            className={`py-1 px-1.5 rounded-lg
+          border-black border border-solid 
+          ${showSortingOptions ? 'bg-black' : 'bg-white'}`}
+          >
+            {showSortingOptions ? (
+              <AdjustmentsHorizontalIcon className="text-white w-6 h-6" />
+            ) : (
+              <AdjustmentsHorizontalIcon className="text-black w-6 h-6" />
+            )}
+          </button>
+          {showViewOptions ? (
+            <div className="flex space-x-2 py-1 px-1.5 shadow rounded-lg">
+              {viewCard === ViewBy.CARD ? (
+                <button
+                  className="bg-black text-white py-1 px-1.5 rounded-lg"
+                  onClick={() => handleViewOptionClick(ViewBy.CARD)}
+                >
+                  <Squares2X2Icon className="w-6 h-6" />
+                </button>
+              ) : (
+                <button
+                  className="bg-white text-black py-1 px-1.5"
+                  onClick={() => handleViewOptionClick(ViewBy.CARD)}
+                >
+                  <Squares2X2Icon className="w-6 h-6" />
+                </button>
+              )}
+              {viewCard === ViewBy.POST ? (
+                <button
+                  className="bg-black text-white py-1 px-1.5 rounded-lg"
+                  onClick={() => handleViewOptionClick(ViewBy.POST)}
+                >
+                  <QueueListIcon className="w-6 h-6" />
+                </button>
+              ) : (
+                <button
+                  className="bg-white text-black py-1 px-1.5"
+                  onClick={() => handleViewOptionClick(ViewBy.POST)}
+                >
+                  <QueueListIcon className="w-6 h-6" />
+                </button>
+              )}
+              {viewCard === ViewBy.VIEW ? (
+                <button
+                  className="bg-black text-white py-1 px-1.5 rounded-lg"
+                  onClick={() => handleViewOptionClick(ViewBy.VIEW)}
+                >
+                  <RectangleStackIcon className="w-6 h-6" />
+                </button>
+              ) : (
+                <button
+                  className="bg-white text-black py-1 px-1.5"
+                  onClick={() => handleViewOptionClick(ViewBy.VIEW)}
+                >
+                  <RectangleStackIcon className="w-6 h-6" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowViewOptions(true)}
+              className="py-1 px-1.5 rounded-lg
           border-black border border-solid 
           bg-white"
-          >
-            <AdjustmentsHorizontalIcon className="w-6 h-6" />
-          </button>
-
-          <button
-            // onClick={openConnectModal}
-            className="py-1 px-1.5 rounded-lg
-          border-black border border-solid 
-          bg-white"
-          >
-            <Squares2X2Icon className="w-6 h-6" />
-          </button>
+            >
+              <Pill />
+            </button>
+          )}
         </div>
       </div>
-      {showOptions && (
+      {showSortingOptions && (
         <div className="flex flex-col bg-[#F8F8F8] rounded-lg border border-black py-4 px-6 my-2">
           <div className="flex space-x-40">
             <div className="flex flex-col space-y-1">
@@ -96,12 +198,12 @@ export const SortingOptions = ({
                   value="today"
                   id="dateToday"
                   checked={localValues.date === 'today'}
-                  onChange={() => handleOptionClick('date', 'today')}
+                  onChange={() => handleSortingOptionClick('date', 'today')}
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
-                  onClick={() => handleOptionClick('date', 'today')}
+                  onClick={() => handleSortingOptionClick('date', 'today')}
                 ></div>
                 <label htmlFor="dateToday" className="ml-1.5 text-xs">
                   Today
@@ -114,12 +216,12 @@ export const SortingOptions = ({
                   value="lastWeek"
                   id="dateLastWeek"
                   checked={localValues.date === 'lastWeek'}
-                  onChange={() => handleOptionClick('date', 'lastWeek')}
+                  onChange={() => handleSortingOptionClick('date', 'lastWeek')}
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
-                  onClick={() => handleOptionClick('date', 'lastWeek')}
+                  onClick={() => handleSortingOptionClick('date', 'lastWeek')}
                 ></div>
                 <label htmlFor="dateWeek" className="ml-1.5 text-xs">
                   Last Week
@@ -132,12 +234,12 @@ export const SortingOptions = ({
                   value="lastMonth"
                   id="dateLastMonth"
                   checked={localValues.date === 'lastMonth'}
-                  onChange={() => handleOptionClick('date', 'lastMonth')}
+                  onChange={() => handleSortingOptionClick('date', 'lastMonth')}
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
-                  onClick={() => handleOptionClick('date', 'lastMonth')}
+                  onClick={() => handleSortingOptionClick('date', 'lastMonth')}
                 ></div>
                 <label htmlFor="dateLastMonth" className="ml-1.5 text-xs">
                   Last Month
@@ -150,12 +252,12 @@ export const SortingOptions = ({
                   value="all"
                   id="dateAll"
                   checked={localValues.date === 'all'}
-                  onChange={() => handleOptionClick('date', 'all')}
+                  onChange={() => handleSortingOptionClick('date', 'all')}
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
-                  onClick={() => handleOptionClick('date', 'all')}
+                  onClick={() => handleSortingOptionClick('date', 'all')}
                 ></div>
                 <label htmlFor="dateAll" className="ml-1.5 text-xs">
                   All
@@ -174,14 +276,20 @@ export const SortingOptions = ({
                   id="sortNewest"
                   checked={localValues.sort === PublicationSortCriteria.Latest}
                   onChange={() =>
-                    handleOptionClick('sort', PublicationSortCriteria.Latest)
+                    handleSortingOptionClick(
+                      'sort',
+                      PublicationSortCriteria.Latest
+                    )
                   }
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
                   onClick={() =>
-                    handleOptionClick('sort', PublicationSortCriteria.Latest)
+                    handleSortingOptionClick(
+                      'sort',
+                      PublicationSortCriteria.Latest
+                    )
                   }
                 ></div>
                 <label htmlFor="sortNewest" className="ml-1.5 text-xs">
@@ -198,7 +306,7 @@ export const SortingOptions = ({
                     localValues.sort === PublicationSortCriteria.TopCollected
                   }
                   onChange={() =>
-                    handleOptionClick(
+                    handleSortingOptionClick(
                       'sort',
                       PublicationSortCriteria.TopCollected
                     )
@@ -208,7 +316,7 @@ export const SortingOptions = ({
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
                   onClick={() =>
-                    handleOptionClick(
+                    handleSortingOptionClick(
                       'sort',
                       PublicationSortCriteria.TopCollected
                     )
@@ -228,7 +336,7 @@ export const SortingOptions = ({
                     localValues.sort === PublicationSortCriteria.TopCommented
                   }
                   onChange={() =>
-                    handleOptionClick(
+                    handleSortingOptionClick(
                       'sort',
                       PublicationSortCriteria.TopCommented
                     )
@@ -238,7 +346,7 @@ export const SortingOptions = ({
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
                   onClick={() =>
-                    handleOptionClick(
+                    handleSortingOptionClick(
                       'sort',
                       PublicationSortCriteria.TopCommented
                     )
@@ -258,12 +366,12 @@ export const SortingOptions = ({
                   value="all"
                   id="byAll"
                   checked={localValues.by === 'all'}
-                  onChange={() => handleOptionClick('by', 'all')}
+                  onChange={() => handleSortingOptionClick('by', 'all')}
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
-                  onClick={() => handleOptionClick('by', 'all')}
+                  onClick={() => handleSortingOptionClick('by', 'all')}
                 ></div>
                 <label htmlFor="byAll" className="ml-1.5 text-xs">
                   All
@@ -276,12 +384,12 @@ export const SortingOptions = ({
                   value="curators"
                   id="byCurators"
                   checked={localValues.by === 'curators'}
-                  onChange={() => handleOptionClick('by', 'curators')}
+                  onChange={() => handleSortingOptionClick('by', 'curators')}
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
-                  onClick={() => handleOptionClick('by', 'curators')}
+                  onClick={() => handleSortingOptionClick('by', 'curators')}
                 ></div>
                 <label htmlFor="byCurators" className="ml-1.5 text-xs">
                   Curators
@@ -294,12 +402,12 @@ export const SortingOptions = ({
                   value="projects"
                   id="byProjects"
                   checked={localValues.by === 'projects'}
-                  onChange={() => handleOptionClick('by', 'projects')}
+                  onChange={() => handleSortingOptionClick('by', 'projects')}
                   className="peer sr-only"
                 />
                 <div
                   className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
-                  onClick={() => handleOptionClick('by', 'projects')}
+                  onClick={() => handleSortingOptionClick('by', 'projects')}
                 ></div>
                 <label htmlFor="byProjects" className="ml-1.5 text-xs">
                   Projects
