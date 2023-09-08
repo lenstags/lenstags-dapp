@@ -1,7 +1,5 @@
-import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import { LayoutProfile, ProfileContext } from 'components';
 import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
-import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
 import { useContext, useEffect, useRef, useState } from 'react';
 
@@ -11,11 +9,15 @@ import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
 import { NextPage } from 'next';
 import { PublicationTypes } from '@lib/lens/graphql/generated';
-import { Spinner } from '@components/Spinner';
-import { cn } from '@lib/utils';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
+import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
+import { cn } from '@lib/utils';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import CardListView from '@components/CardListView';
+import CardPostView from '@components/CardPostView';
+import { Spinner } from '@components/Spinner';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);

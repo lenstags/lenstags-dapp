@@ -1,5 +1,4 @@
 import { APP_NAME, LENSTAGS_SOURCE } from '@lib/config';
-import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import {
   CustomFiltersTypes,
   ExplorePublicationsDocument,
@@ -11,7 +10,6 @@ import {
   PublicationTypes
 } from '@lib/lens/graphql/generated';
 import { ProfileContext, TagsFilter, TagsFilterContext } from 'components';
-import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import {
   useCallback,
   useContext,
@@ -21,20 +19,22 @@ import {
   useState
 } from 'react';
 
+import { useQuery } from '@apollo/client';
+import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import CustomHead from '@components/CustomHead';
-import { Layout } from 'components/Layout';
-import type { NextPage } from 'next';
-import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
-import { Spinner } from 'components/Spinner';
 import WelcomePanel from '@components/WelcomePanel';
 import WhitelistScreen from '@components/WhitelistScreen';
-import { cn } from '@lib/utils';
-import { reqQuery } from '@lib/lens/explore-publications';
-import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
 import { useExplore } from '@context/ExploreContext';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
+import { reqQuery } from '@lib/lens/explore-publications';
+import { cn } from '@lib/utils';
+import { Layout } from 'components/Layout';
+import { Spinner } from 'components/Spinner';
+import type { NextPage } from 'next';
+import Script from 'next/script';
 import { useNetwork } from 'wagmi';
-import { useQuery } from '@apollo/client';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);

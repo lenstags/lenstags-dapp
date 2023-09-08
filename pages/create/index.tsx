@@ -1,4 +1,3 @@
-import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
 import React, {
   ChangeEvent,
   useContext,
@@ -8,26 +7,27 @@ import React, {
 } from 'react';
 import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
-import Avatar from 'boring-avatars';
-import CreatableSelect from 'react-select/creatable';
-import { DotWave } from '@uiball/loaders';
-import Editor from 'components/Editor';
-import { IbuiltPost } from '@lib/lens/interfaces/publication';
 import { LayoutCreate } from '@components/LayoutCreate';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
-import { NextPage } from 'next';
-import { NotificationTypes } from '@models/notifications.models';
-import { ProfileContext } from 'components';
 import { Spinner } from '@components/Spinner';
-import { TAGS } from '@lib/lens/tags';
-import Toast from '../../components/Toast';
-import TurndownService from 'turndown';
-import _ from 'lodash';
-import { followers } from '@lib/lens/followers';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { followers } from '@lib/lens/followers';
+import { IbuiltPost } from '@lib/lens/interfaces/publication';
+import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
+import { TAGS } from '@lib/lens/tags';
 import { sendNotification } from '@lib/lens/user-notifications';
-import { useRouter } from 'next/router';
+import { NotificationTypes } from '@models/notifications.models';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
+import { DotWave } from '@uiball/loaders';
+import Avatar from 'boring-avatars';
+import { ProfileContext } from 'components';
+import Editor from 'components/Editor';
+import _ from 'lodash';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import CreatableSelect from 'react-select/creatable';
+import TurndownService from 'turndown';
+import Toast from '../../components/Toast';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -393,7 +393,7 @@ const Create: NextPage = () => {
       );
       const { pubId } =
         typeof result !== 'string' && result.pubId ? result : { pubId: '' };
-      const id = lensProfile?.id;
+      const id = `${lensProfile?.id}-${pubId}`;
       const dataSender = {
         title,
         pubId,

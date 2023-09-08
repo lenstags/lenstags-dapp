@@ -4,7 +4,6 @@ import ExplorerCard from './ExplorerCard';
 import CardListView from './CardListView';
 import CardPostView from './CardPostView';
 
-
 const buttons = [
   {
     name: 'All',
@@ -19,7 +18,6 @@ const buttons = [
     view: ViewBy.POST
   }
 ];
-
 
 export interface CardViewTypeProps {
   [key: string]: (props: any) => JSX.Element;
