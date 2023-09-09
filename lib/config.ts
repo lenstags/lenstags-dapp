@@ -3,22 +3,22 @@ export enum NETWORKS {
   MAINNET = 'mainnet'
 }
 
-export const DEFAULT_NETWORK = NETWORKS.TESTNET; // THE ONE AND ONLY SWITCH
+export const DEFAULT_NETWORK = NETWORKS.TESTNET;
 
-export const CONFIG = {
-  APP_NAME: 'lenstags_alpha_0.0.2.7',
-  DEFAULT_NATA_DOMAIN: 'https://dev.nata.social/app',
-  APP_UI_VERSION: '0.0.2',
-  DEFAULT_IMAGE_PROFILE: '/img/profilePic.png',
-  PRIVATE_LIST_NAME: 'Collected items',
-  DEFAULT_IMAGE_IPFS_PROFILE: 'Qmf1BoAdUg9UaUYafEBJN1XVSiWWi4HQuReSs5Q2ZrPMDe',
-  DEFAULT_IMAGE_POST: '/img/post.png',
-  ATTRIBUTES_LIST_KEY: 'list_warehouse_7',
-  PROFILE_METADATA_VERSION: '1.0.0',
-  PUBLICATION_METADATA_VERSION: '2.0.0',
-  IPFS_PROXY_URL: 'https://lens.infura-ipfs.io/ipfs/',
-  LENS_PERIPHERY_NAME: 'LensPeriphery'
-};
+export const APP_NAME = 'lenstags_alpha_0.0.2.7';
+export const DEFAULT_NATA_DOMAIN = 'https://dev.nata.social/app';
+export const APP_UI_VERSION = '0.0.2';
+export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
+export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
+export const PRIVATE_LIST_NAME = 'Collected items';
+export const DEFAULT_IMAGE_IPFS_PROFILE =
+  'Qmf1BoAdUg9UaUYafEBJN1XVSiWWi4HQuReSs5Q2ZrPMDe';
+export const DEFAULT_IMAGE_POST = '/img/post.png';
+export const ATTRIBUTES_LIST_KEY = 'list_warehouse_7';
+export const PROFILE_METADATA_VERSION = '1.0.0';
+export const PUBLICATION_METADATA_VERSION = '2.0.0';
+export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
+export const LENS_PERIPHERY_NAME = 'LensPeriphery';
 
 const NETWORK_CONFIG = {
   [NETWORKS.TESTNET]: {
@@ -42,7 +42,11 @@ export const {
   LENS_PERIPHERY_CONTRACT
 } = NETWORK_CONFIG[DEFAULT_NETWORK];
 
-export const envConfig = {
+interface EnvConfig {
+  [key: string]: string | undefined;
+}
+
+export const envConfig: EnvConfig = {
   INFURA_PROJECT_ID: process.env.INFURA_PROJECT_ID,
   INFURA_SECRET: process.env.INFURA_SECRET,
   AUTH_OPENAI_ORGANIZATION: process.env.AUTH_OPENAI_ORGANIZATION,
