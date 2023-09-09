@@ -1,4 +1,15 @@
 import {
+  APP_UI_VERSION,
+  DEFAULT_NETWORK,
+  ENABLE_NOTIFICATIONS
+} from '@lib/config';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
+} from './ui/Accordion';
+import {
   BellIcon,
   FolderIcon,
   GlobeAltIcon,
@@ -9,21 +20,6 @@ import {
   FolderIcon as FolderIconFilled,
   GlobeAltIcon as GlobeAltIconFilled
 } from '@heroicons/react/24/solid';
-import { APP_UI_VERSION, DEFAULT_NETWORK } from '@lib/config';
-import { getPopulatedLists, getUserLists } from '@lib/lens/load-lists';
-import {
-  getNotifications,
-  getSubscriptions,
-  optIn
-} from '@lib/lens/user-notifications';
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger
-} from './ui/Accordion';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,21 +27,29 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from './ui/Dropdown';
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
+import {
+  getNotifications,
+  getSubscriptions,
+  optIn
+} from '@lib/lens/user-notifications';
+import { getPopulatedLists, getUserLists } from '@lib/lens/load-lists';
 
-import { useExplore } from '@context/ExploreContext';
-import { SidebarContext } from '@context/SideBarSizeContext';
-import { useSorts } from '@lib/hooks/use-sort';
-import { getSigner } from '@lib/lens/ethers.service';
-import { TextAlignBottomIcon } from '@radix-ui/react-icons';
-import { PublicRoutes } from 'models';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
-import { ProfileContext } from './LensAuthenticationProvider';
 import Notifications from './Notifications';
 import PostsByList from './PostsByList';
+import { ProfileContext } from './LensAuthenticationProvider';
+import { PublicRoutes } from 'models';
 import SidePanelNotifications from './SidePanelNotifications';
+import { SidebarContext } from '@context/SideBarSizeContext';
+import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { Tooltip } from './ui/Tooltip';
+import { getSigner } from '@lib/lens/ethers.service';
+import { useExplore } from '@context/ExploreContext';
+import { useRouter } from 'next/router';
+import { useSorts } from '@lib/hooks/use-sort';
 
 interface SidebarProps {
   setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -416,15 +420,17 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )
           )}
 
-          {/* notifications */}
-          {lensProfile && router.pathname !== PublicRoutes.MYPROFILE && (
-            <div className="h-12 w-full duration-1000 animate-in fade-in-50">
-              <SidePanelNotifications
-                ref={triggerNotificationsRef}
-                myInventoryRef={triggerMyInventoryRef}
-              />
-            </div>
-          )}
+          {/* notifications to be enabled*/}
+          {ENABLE_NOTIFICATIONS &&
+            lensProfile &&
+            router.pathname !== PublicRoutes.MYPROFILE && (
+              <div className="h-12 w-full duration-1000 animate-in fade-in-50">
+                <SidePanelNotifications
+                  ref={triggerNotificationsRef}
+                  myInventoryRef={triggerMyInventoryRef}
+                />
+              </div>
+            )}
 
           {lensProfile && !sidebarCollapsedStateLeft.collapsed && (
             <div className="flex w-full items-center justify-center py-4">

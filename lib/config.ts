@@ -19,6 +19,7 @@ export const PROFILE_METADATA_VERSION = '1.0.0';
 export const PUBLICATION_METADATA_VERSION = '2.0.0';
 export const IPFS_PROXY_URL = 'https://lens.infura-ipfs.io/ipfs/';
 export const LENS_PERIPHERY_NAME = 'LensPeriphery';
+export const ENABLE_NOTIFICATIONS = false;
 
 const NETWORK_CONFIG = {
   [NETWORKS.TESTNET]: {
