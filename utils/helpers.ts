@@ -134,7 +134,7 @@ export const markdownToHTML = (innerHtml: string): any => {
 export const validateWhitelist = async (address: string): Promise<boolean> => {
   const response = await fetch(`/api/gate?wallet=${address}`);
   const data = await response.json();
-  console.log('data ', data);
+  console.log('validateWhitelist data: ', data);
   return data.isWhitelisted as boolean;
 };
 
