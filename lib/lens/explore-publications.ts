@@ -2,6 +2,7 @@ import {
   CustomFiltersTypes,
   ExplorePublicationRequest,
   ExplorePublicationsDocument,
+  PublicationContentWarning,
   PublicationSortCriteria,
   PublicationTypes
 } from './graphql/generated';
@@ -42,7 +43,14 @@ export const explore = async (
   if (filter?.tags) {
     reqQuery.metadata = {
       locale: filter.locale,
-      tags: { oneOf: filter.tags }
+      tags: { oneOf: filter.tags },
+      contentWarning: {
+        includeOneOf: [
+          PublicationContentWarning.Nsfw,
+          PublicationContentWarning.Sensitive,
+          PublicationContentWarning.Sensitive
+        ]
+      }
     };
   }
 

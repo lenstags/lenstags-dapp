@@ -24,6 +24,7 @@ export interface IbuiltPost {
   attributes: MetadataAttribute[];
   image?: Buffer | null; // single image
   imageMimeType?: string | null;
+  contentWarning?: PublicationContentWarning;
 }
 
 // contract

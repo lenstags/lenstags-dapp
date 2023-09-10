@@ -7,6 +7,7 @@ import {
   FeedRequest,
   PaginatedFeedResult,
   ProfileFeedDocument,
+  PublicationContentWarning,
   PublicationSortCriteria,
   PublicationTypes
 } from '@lib/lens/graphql/generated';
@@ -85,7 +86,14 @@ const App: NextPage = () => {
         customFilters: [CustomFiltersTypes.Gardeners],
         metadata: {
           locale: 'en',
-          tags: { oneOf: tags }
+          tags: { oneOf: tags },
+          contentWarning: {
+            includeOneOf: [
+              PublicationContentWarning.Nsfw,
+              PublicationContentWarning.Sensitive,
+              PublicationContentWarning.Sensitive
+            ]
+          }
         }
       }
     },
@@ -100,7 +108,14 @@ const App: NextPage = () => {
         feedEventItemTypes: [FeedEventItemType.Post],
         metadata: {
           locale: 'en',
-          tags: { oneOf: tags }
+          tags: { oneOf: tags },
+          contentWarning: {
+            includeOneOf: [
+              PublicationContentWarning.Nsfw,
+              PublicationContentWarning.Sensitive,
+              PublicationContentWarning.Sensitive
+            ]
+          }
         }
       }
     },
@@ -216,7 +231,14 @@ const App: NextPage = () => {
 
     finalReq.metadata = {
       locale: 'en',
-      tags: { oneOf: tags }
+      tags: { oneOf: tags },
+      contentWarning: {
+        includeOneOf: [
+          PublicationContentWarning.Nsfw,
+          PublicationContentWarning.Sensitive,
+          PublicationContentWarning.Sensitive
+        ]
+      }
     };
 
     if (!isExplore && lensProfile) {
