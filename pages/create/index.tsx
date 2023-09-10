@@ -1,3 +1,8 @@
+import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
+import {
+  IbuiltPost,
+  PublicationContentWarning
+} from '@lib/lens/interfaces/publication';
 import React, {
   ChangeEvent,
   useContext,
@@ -7,27 +12,25 @@ import React, {
 } from 'react';
 import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
-import { LayoutCreate } from '@components/LayoutCreate';
-import { Spinner } from '@components/Spinner';
-import { queryProfile } from '@lib/lens/dispatcher';
-import { followers } from '@lib/lens/followers';
-import { IbuiltPost } from '@lib/lens/interfaces/publication';
-import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
-import { TAGS } from '@lib/lens/tags';
-import { sendNotification } from '@lib/lens/user-notifications';
-import { NotificationTypes } from '@models/notifications.models';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
-import { DotWave } from '@uiball/loaders';
 import Avatar from 'boring-avatars';
-import { ProfileContext } from 'components';
-import Editor from 'components/Editor';
-import _ from 'lodash';
-import { useSnackbar } from 'material-ui-snackbar-provider';
-import { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import CreatableSelect from 'react-select/creatable';
-import TurndownService from 'turndown';
+import { DotWave } from '@uiball/loaders';
+import Editor from 'components/Editor';
+import { LayoutCreate } from '@components/LayoutCreate';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
+import { NextPage } from 'next';
+import { NotificationTypes } from '@models/notifications.models';
+import { ProfileContext } from 'components';
+import { Spinner } from '@components/Spinner';
+import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
+import TurndownService from 'turndown';
+import _ from 'lodash';
+import { followers } from '@lib/lens/followers';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { useRouter } from 'next/router';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -88,6 +91,7 @@ const Create: NextPage = () => {
   const [sourceUrl, setSourceUrl] = useState('');
   const [toast, setToast] = useState<ToastContent>({});
   const [isToastVisible, setToastVisible] = useState(false);
+  const [isNSFW, setIsNSFW] = useState(false);
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
@@ -371,7 +375,8 @@ const Create: NextPage = () => {
       locale: 'en',
       image: imageBuffer || null,
       imageMimeType: 'image/jpeg',
-      tags: selectedOption.map((r) => r['value'])
+      tags: selectedOption.map((r) => r['value']),
+      contentWarning: isNSFW ? PublicationContentWarning.NSFW : undefined
       // TODO: GET FILTER ARRAY FROM THE UI
       // title: title,
       // todo: image?: Buffer[]
@@ -749,6 +754,23 @@ const Create: NextPage = () => {
                         />
                       )}
                     </div>
+                  </div>
+                </div>
+
+                {/* NSFW switch  */}
+                <div className="mb-4 items-center px-4 py-2">
+                  <div className="mb-1 flex ">
+                    This post contains sensitive content
+                    <input
+                      checked={isNSFW}
+                      onChange={() => setIsNSFW(!isNSFW)}
+                      type="checkbox"
+                      className="form-checkbox ml-2 h-5 w-5"
+                      style={{
+                        backgroundColor: isNSFW ? 'purple' : '',
+                        borderColor: isNSFW ? 'purple' : 'gray'
+                      }}
+                    />
                   </div>
                 </div>
               </div>
