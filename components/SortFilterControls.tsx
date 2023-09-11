@@ -19,24 +19,27 @@ enum ViewBy {
   POST = 'POST'
 }
 
-enum Filter {
+export enum Filter {
   ALL = 'ALL',
   LISTS = 'LISTS',
   POSTS = 'POSTS'
 }
 
-export const SortingOptions = ({
+export const SortFilterControls = ({
   sortingValues,
-  setSortingValues
+  setSortingValues,
+  filterValue,
+  setFilterValue
 }: {
   sortingValues: SortingValuesType;
   setSortingValues: ({}: SortingValuesType) => void;
+  filterValue: Filter;
+  setFilterValue: (Filter: Filter) => void;
 }) => {
   const [showSortingOptions, setShowSortingOptions] = useState(false);
   const [localValues, setLocalValues] = useState(sortingValues);
   const [viewCard, setViewCard] = useState<ViewBy>(ViewBy.CARD);
   const [showViewOptions, setShowViewOptions] = useState(false);
-  const [filterOptions, setFilterOptions] = useState<Filter>(Filter.ALL);
 
   const Pill = () => {
     switch (viewCard) {
@@ -73,11 +76,11 @@ export const SortingOptions = ({
       <div className="mt-2 flex justify-between rounded-t-lg min-h-[3rem]">
         <div className="flex gap-1 font-sans font-medium tracking-wide items-center">
           <button
-            onClick={() => setFilterOptions(Filter.ALL)}
+            onClick={() => setFilterValue(Filter.ALL)}
             className={`rounded-lg border
           border-solid border-black px-4 py-1 align-middle 
           font-semibold ${
-            filterOptions === Filter.ALL
+            filterValue === Filter.ALL
               ? 'bg-black text-white'
               : 'bg-white text-black'
           }`}
@@ -86,11 +89,11 @@ export const SortingOptions = ({
           </button>
 
           <button
-            onClick={() => setFilterOptions(Filter.LISTS)}
+            onClick={() => setFilterValue(Filter.LISTS)}
             className={`rounded-lg
           border border-solid border-black px-4 py-1
           align-middle font-semibold ${
-            filterOptions === Filter.LISTS
+            filterValue === Filter.LISTS
               ? 'bg-black text-white'
               : 'bg-white text-black'
           }`}
@@ -99,11 +102,11 @@ export const SortingOptions = ({
           </button>
 
           <button
-            onClick={() => setFilterOptions(Filter.POSTS)}
+            onClick={() => setFilterValue(Filter.POSTS)}
             className={`rounded-lg
           border border-solid border-black px-4 py-1
           align-middle font-semibold ${
-            filterOptions === Filter.POSTS
+            filterValue === Filter.POSTS
               ? 'bg-black text-white'
               : 'bg-white text-black'
           }`}

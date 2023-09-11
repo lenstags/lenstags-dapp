@@ -31,7 +31,11 @@ import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
 import { Spinner } from 'components/Spinner';
 import { TagsFilter } from 'components/TagsFilter';
-import { SortingOptions, SortingValuesType } from '@components/SortingOptions';
+import {
+  Filter,
+  SortFilterControls,
+  SortingValuesType
+} from '@components/SortFilterControls';
 import WhitelistScreen from '@components/WhitelistScreen';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
@@ -63,6 +67,7 @@ const App: NextPage = () => {
     sort: PublicationSortCriteria.Latest,
     by: 'all'
   });
+  const [filterValue, setFilterValue] = useState<Filter>(Filter.ALL);
 
   const { chains, error, isLoading, pendingChainId, switchNetwork } =
     useSwitchNetwork({
@@ -321,7 +326,7 @@ const App: NextPage = () => {
 
   useEffect(() => {
     setLoader(true);
-    explore({ locale: 'en', sortingValues, tags })
+    explore({ locale: 'en', sortingValues, filterValue, tags })
       .then((data) => {
         setLoader(false);
         if (!data) return setPublications([]);
@@ -332,7 +337,7 @@ const App: NextPage = () => {
         console.log('ERROR ', err);
         setLoader(false);
       });
-  }, [tags, sortingValues]);
+  }, [tags, sortingValues, filterValue]);
 
   if (hydrationLoading) {
     return (
@@ -589,9 +594,11 @@ const App: NextPage = () => {
               <TagsFilter />
 
               {/* view options */}
-              <SortingOptions
+              <SortFilterControls
                 sortingValues={sortingValues}
                 setSortingValues={setSortingValues}
+                filterValue={filterValue}
+                setFilterValue={setFilterValue}
               />
             </div>
 

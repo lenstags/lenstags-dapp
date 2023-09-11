@@ -8,7 +8,7 @@ import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useRouter } from 'next/router';
-import { SortingValuesType } from '@components/SortingOptions';
+import { SortingValuesType } from '@components/SortFilterControls';
 import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 
 const OtherProfile: NextPage = () => {

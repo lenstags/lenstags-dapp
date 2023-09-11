@@ -8,7 +8,7 @@ import {
 
 import { LENSTAGS_SOURCE } from '@lib/config';
 import { apolloClient } from './graphql/apollo-client';
-import { SortingValuesType } from '@components/SortingOptions';
+import { Filter, SortingValuesType } from '@components/SortFilterControls';
 
 const explorePublications = (request: ExplorePublicationRequest) => {
   return apolloClient.query({
@@ -22,6 +22,7 @@ const explorePublications = (request: ExplorePublicationRequest) => {
 export interface IExplorePublications {
   locale: string;
   sortingValues: SortingValuesType;
+  filterValue: Filter;
   tags?: string[];
 }
 
@@ -35,6 +36,13 @@ export const reqQuery: ExplorePublicationRequest = {
 };
 
 export const explore = async (filter?: IExplorePublications) => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const lastWeek = new Date(today);
+  lastWeek.setDate(today.getDate() - 7);
+  const lastMonth = new Date(today);
+  lastMonth.setDate(today.getDate() - 30);
+
   // TODO REMOVE TAG PRIVATEPUB
   if (filter?.tags) {
     reqQuery.metadata = {
@@ -46,5 +54,69 @@ export const explore = async (filter?: IExplorePublications) => {
   reqQuery.sortCriteria = filter?.sortingValues.sort!;
 
   const result = await explorePublications(reqQuery);
-  return result.data?.explorePublications;
+  const resultObject = result.data?.explorePublications;
+  const publications = resultObject.items;
+  let filteredItems = [];
+  let sortedItems = [];
+  let newResultObject = {};
+
+  switch (filter?.filterValue) {
+    case 'LISTS':
+      filteredItems = publications.filter(
+        (publication: any) =>
+          publication.metadata.attributes[0].value === 'list'
+      );
+      break;
+    case 'POSTS':
+      filteredItems = publications.filter(
+        (publication: any) =>
+          publication.metadata.attributes[0].value === 'post'
+      );
+      break;
+    default:
+      filteredItems = publications;
+  }
+
+  switch (filter?.sortingValues.date) {
+    case 'today':
+      sortedItems = filteredItems.filter((publication: any) => {
+        const date = new Date(publication.createdAt);
+        date.setHours(0, 0, 0, 0);
+        return date >= today;
+      });
+      newResultObject = {
+        ...resultObject,
+        items: sortedItems
+      };
+      break;
+    case 'lastWeek':
+      sortedItems = filteredItems.filter((publication: any) => {
+        const date = new Date(publication.createdAt);
+        date.setHours(0, 0, 0, 0);
+        return date >= lastWeek;
+      });
+      newResultObject = {
+        ...resultObject,
+        items: sortedItems
+      };
+      break;
+    case 'lastMonth':
+      sortedItems = filteredItems.filter((publication: any) => {
+        const date = new Date(publication.createdAt);
+        date.setHours(0, 0, 0, 0);
+        return date >= lastMonth;
+      });
+      newResultObject = {
+        ...resultObject,
+        items: sortedItems
+      };
+      break;
+    default:
+      newResultObject = {
+        ...resultObject,
+        items: filteredItems
+      };
+  }
+
+  return newResultObject as typeof resultObject;
 };
