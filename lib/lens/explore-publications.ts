@@ -2,7 +2,6 @@ import {
   CustomFiltersTypes,
   ExplorePublicationRequest,
   ExplorePublicationsDocument,
-  PublicationContentWarning,
   PublicationSortCriteria,
   PublicationTypes
 } from './graphql/generated';
@@ -43,14 +42,14 @@ export const explore = async (
   if (filter?.tags) {
     reqQuery.metadata = {
       locale: filter.locale,
-      tags: { oneOf: filter.tags },
-      contentWarning: {
-        includeOneOf: [
-          PublicationContentWarning.Nsfw,
-          PublicationContentWarning.Sensitive,
-          PublicationContentWarning.Sensitive
-        ]
-      }
+      tags: { oneOf: filter.tags }
+      // contentWarning: {
+      //   includeOneOf: [
+      //     PublicationContentWarning.Nsfw,
+      //     PublicationContentWarning.Sensitive,
+      //     PublicationContentWarning.Spoiler
+      //   ]
+      // }
     };
   }
 
@@ -58,7 +57,7 @@ export const explore = async (
     if (!profileId) {
       throw 'Missing my profileId';
     }
-    console.log('---inicio ', new Date());
+
     // const ss = await getPublicationsFollowing(
     //   [PublicationTypes.Post],
     //   address,

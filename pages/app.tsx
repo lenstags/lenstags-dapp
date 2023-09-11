@@ -3,6 +3,7 @@ import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import {
   CustomFiltersTypes,
   ExplorePublicationsDocument,
+  ExplorePublicationsQuery,
   FeedEventItemType,
   FeedRequest,
   PaginatedFeedResult,
@@ -43,6 +44,7 @@ const App: NextPage = () => {
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
+
   const { chain } = useNetwork();
   const { tags } = useContext(TagsFilterContext);
   const [loadingFetchMore, setLoadingFetchMore] = useState(false);
@@ -69,7 +71,7 @@ const App: NextPage = () => {
     if (lensProfile?.id && chain) {
       checkWhitelist(lensProfile.ownedBy, chain.id);
     }
-  }, [lensProfile, chain, checkWhitelist]);
+  }, [lensProfile, chain]); // removed checkWhitelist!
 
   /*
    * main query definitions
@@ -86,14 +88,15 @@ const App: NextPage = () => {
         customFilters: [CustomFiltersTypes.Gardeners],
         metadata: {
           locale: 'en',
-          tags: { oneOf: tags },
-          contentWarning: {
-            includeOneOf: [
-              PublicationContentWarning.Nsfw,
-              PublicationContentWarning.Sensitive,
-              PublicationContentWarning.Sensitive
-            ]
-          }
+          tags: { oneOf: tags }
+          // FIXME this is not working as Lens said...
+          // contentWarning: {
+          //   includeOneOf: [
+          //     PublicationContentWarning.Nsfw
+          //     // PublicationContentWarning.Sensitive
+          //     // PublicationContentWarning.Spoiler
+          //   ]
+          // }
         }
       }
     },
@@ -108,14 +111,14 @@ const App: NextPage = () => {
         feedEventItemTypes: [FeedEventItemType.Post],
         metadata: {
           locale: 'en',
-          tags: { oneOf: tags },
-          contentWarning: {
-            includeOneOf: [
-              PublicationContentWarning.Nsfw,
-              PublicationContentWarning.Sensitive,
-              PublicationContentWarning.Sensitive
-            ]
-          }
+          tags: { oneOf: tags }
+          // contentWarning: {
+          //   includeOneOf: [
+          //     PublicationContentWarning.Nsfw,
+          //     PublicationContentWarning.Sensitive,
+          //     PublicationContentWarning.Spoiler
+          //   ]
+          // }
         }
       }
     },
@@ -167,7 +170,7 @@ const App: NextPage = () => {
     }
   }, [apolloError]);
 
-  // useEffect(() => {
+  // use/Effect(() => {
   //   setPublications([]); // cleans data
 
   //   if (data) {
@@ -196,19 +199,19 @@ const App: NextPage = () => {
   //   }
   // }, [data, isExplore, tags]);
 
-  // useEffect(() => {
+  // use/Effect(() => {
   //   setLoader(loading);
   // }, [loading, resExplore]);
 
-  // useEffect(() => {
+  // use/Effect(() => {
   //   setLoader(loading);
   // }, [data]);
 
-  // useEffect(() => {
+  // use/Effect(() => {
   //   setLoader(loading);
   // }, [loading]);
 
-  // useEffect(() => {
+  // use/Effect(() => {
   //   if (apolloError) {
   //     console.log('⛔️ ⛔️ ⛔️ Error fetching data', apolloError);
   //   }
@@ -231,14 +234,14 @@ const App: NextPage = () => {
 
     finalReq.metadata = {
       locale: 'en',
-      tags: { oneOf: tags },
-      contentWarning: {
-        includeOneOf: [
-          PublicationContentWarning.Nsfw,
-          PublicationContentWarning.Sensitive,
-          PublicationContentWarning.Sensitive
-        ]
-      }
+      tags: { oneOf: tags }
+      // contentWarning: {
+      //   includeOneOf: [
+      //     PublicationContentWarning.Nsfw,
+      //     PublicationContentWarning.Sensitive,
+      //     PublicationContentWarning.Spoiler
+      //   ]
+      // }
     };
 
     if (!isExplore && lensProfile) {
