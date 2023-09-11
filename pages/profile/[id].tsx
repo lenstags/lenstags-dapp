@@ -58,6 +58,7 @@ const OtherProfile: NextPage = () => {
   const { tags } = useContext(TagsFilterContext);
   //   const lensProfile = useContext(ProfileContext);
 
+  // TODO USE NSFW FILTERS!
   useEffect(() => {
     explore({ locale: 'en', tags }).then((data) => {
       //   if (contentType === 'collected') {
