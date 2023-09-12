@@ -429,9 +429,10 @@ const App: NextPage = () => {
           <WhitelistScreen setIsVisibleWL={setIsVisibleWL} />
         ) : showWelcome ? (
           <WelcomePanel
+            lensProfile={lensProfile}
             chain={chain}
-            welcomeReady={welcomeReady}
-            setShowWelcome={setShowWelcome}
+            welcomeReady={welcomeReady} // para adentro
+            setShowWelcome={setShowWelcome} // para que desde adentro mande modificacion
           />
         ) : (
           <>

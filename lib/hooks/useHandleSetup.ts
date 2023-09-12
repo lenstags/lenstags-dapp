@@ -1,15 +1,19 @@
-import { useEffect, useState } from 'react';
-
 import { ATTRIBUTES_LIST_KEY } from '@lib/config';
 import { createDefaultList } from '@lib/lens/load-lists';
 import { enable } from '@lib/lens/enable-dispatcher';
 import { findKeyAttributeInProfile } from 'utils/helpers';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { useState } from 'react';
 
-const useHandleSetup = (lensProfile: any) => {
+const useHandleSetup = (
+  lensProfile: any,
+  showReject?: any,
+  setShowReject?: any
+) => {
   const [showWelcome, setShowWelcome] = useState(false);
-  const [showReject, setShowReject] = useState(false);
+  // const [showReject, setShowReject] = useState(false);
+
   const [welcomeReady, setWelcomeReady] = useState(false);
   const snackbar = useSnackbar();
 
@@ -25,7 +29,7 @@ const useHandleSetup = (lensProfile: any) => {
       profileResult,
       ATTRIBUTES_LIST_KEY
     );
-    console.log('profileResult ', profileResult);
+    console.log('aca profileResult ', profileResult);
 
     const hasLists =
       listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
@@ -58,6 +62,7 @@ const useHandleSetup = (lensProfile: any) => {
         setWelcomeReady(true);
       } catch (err: any) {
         if (err.code === 'ACTION_REJECTED') {
+          console.log('Si');
           setShowReject(true);
         } else {
           console.log('Unknown error!: ', err.code);
@@ -66,11 +71,12 @@ const useHandleSetup = (lensProfile: any) => {
     }
   };
 
-  useEffect(() => {
-    if (lensProfile) {
-      handleSetup();
-    }
-  }, [lensProfile]);
+  // useEffect(() => {
+  //   if (lensProfile) {
+  //     console.log('de mas? holiii');
+  //     handleSetup();
+  //   }
+  // }, [lensProfile]);
 
   return {
     showWelcome,

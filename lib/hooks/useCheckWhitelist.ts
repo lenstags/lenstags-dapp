@@ -8,7 +8,7 @@ import { validateWhitelist } from 'utils/helpers';
 const useCheckWhitelist = (lensProfile: any) => {
   const [isVisibleWL, setIsVisibleWL] = useState<boolean>(false);
   const { handleDisconnect } = useDisconnector();
-  const { showWelcome, setShowWelcome, showReject, welcomeReady, handleSetup } =
+  const { showWelcome, setShowWelcome, welcomeReady, handleSetup } =
     useHandleSetup(lensProfile);
 
   const { chains, error, isLoading, pendingChainId, switchNetwork } =
@@ -40,7 +40,6 @@ const useCheckWhitelist = (lensProfile: any) => {
   return {
     checkWhitelist,
     showWelcome,
-    showReject,
     welcomeReady,
     isVisibleWL,
     setIsVisibleWL,
