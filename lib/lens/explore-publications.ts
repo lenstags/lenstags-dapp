@@ -43,6 +43,13 @@ export const explore = async (
     reqQuery.metadata = {
       locale: filter.locale,
       tags: { oneOf: filter.tags }
+      // contentWarning: {
+      //   includeOneOf: [
+      //     PublicationContentWarning.Nsfw,
+      //     PublicationContentWarning.Sensitive,
+      //     PublicationContentWarning.Spoiler
+      //   ]
+      // }
     };
   }
 
@@ -50,7 +57,7 @@ export const explore = async (
     if (!profileId) {
       throw 'Missing my profileId';
     }
-    console.log('---inicio ', new Date());
+
     // const ss = await getPublicationsFollowing(
     //   [PublicationTypes.Post],
     //   address,

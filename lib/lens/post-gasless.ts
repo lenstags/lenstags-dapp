@@ -41,7 +41,7 @@ const post = async (createPostRequest: CreatePublicPostRequest) => {
   const profileResult = await queryProfile({
     profileId: createPostRequest.profileId
   });
-  console.log('*** profi ', profileResult);
+
   if (!profileResult) {
     throw new Error('Could not find profile');
   }
@@ -141,10 +141,9 @@ export const createPostGasless = async (
     animation_url: '',
     media: mediaResult,
     version: PUBLICATION_METADATA_VERSION,
-    appId: APP_NAME.toLocaleLowerCase()
+    appId: APP_NAME.toLocaleLowerCase(),
+    contentWarning: builtPost.contentWarning
   });
-
-  // console.log('create post: ipfs result', ipfsResult);
 
   const createPostRequest = {
     profileId,

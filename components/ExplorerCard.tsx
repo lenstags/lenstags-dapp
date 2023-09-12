@@ -35,6 +35,8 @@ const ExplorerCard: FC<Props> = (props) => {
     (post.metadata.attributes[0].value === 'list' ||
       post.metadata.attributes[0].value === 'privateDefaultList');
 
+  // console.log('Test post content: ', post);
+
   const { profile: lensProfile } = useContext(ProfileContext);
   const [openReconnect, setOpenReconnect] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
@@ -211,11 +213,11 @@ const ExplorerCard: FC<Props> = (props) => {
                   <div className="items-center rounded font-semibold text-gray-700">
                     <ImageProxied
                       category="profile"
-                      alt={`Pic from ${post.profile?.picture?.original?.url}`}
+                      alt={`Pic of ${post.profile?.handle}`}
                       height={40}
                       width={40}
                       className="h-8 w-8 cursor-pointer rounded-full object-cover"
-                      src={post.profile.picture?.original?.url}
+                      src={getPictureUrl(post.profile)}
                     />
                   </div>
                 </div>
@@ -349,7 +351,7 @@ const ExplorerCard: FC<Props> = (props) => {
                   height={200}
                   priority={true}
                   alt=""
-                  className=" h-28 w-full rounded-lg object-cover duration-1000 animate-in fade-in-50"
+                  className={`h-28 w-full rounded-lg object-cover duration-1000 animate-in fade-in-50`}
                   src={post.metadata.media[0]?.original.url}
                 />
               )}

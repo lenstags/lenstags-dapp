@@ -1,4 +1,9 @@
 import {
+  APP_UI_VERSION,
+  DEFAULT_NETWORK,
+  ENABLE_NOTIFICATIONS
+} from '@lib/config';
+import {
   BellIcon,
   FolderIcon,
   GlobeAltIcon,
@@ -9,7 +14,6 @@ import {
   FolderIcon as FolderIconFilled,
   GlobeAltIcon as GlobeAltIconFilled
 } from '@heroicons/react/24/solid';
-import { APP_UI_VERSION, DEFAULT_NETWORK } from '@lib/config';
 import { getPopulatedLists, getUserLists } from '@lib/lens/load-lists';
 import {
   getNotifications,
@@ -414,15 +418,17 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )
           )}
 
-          {/* notifications */}
-          {lensProfile && router.pathname !== PublicRoutes.MYPROFILE && (
-            <div className="h-12 w-full duration-1000 animate-in fade-in-50">
-              <SidePanelNotifications
-                ref={triggerNotificationsRef}
-                myInventoryRef={triggerMyInventoryRef}
-              />
-            </div>
-          )}
+          {/* notifications to be enabled*/}
+          {ENABLE_NOTIFICATIONS &&
+            lensProfile &&
+            router.pathname !== PublicRoutes.MYPROFILE && (
+              <div className="h-12 w-full duration-1000 animate-in fade-in-50">
+                <SidePanelNotifications
+                  ref={triggerNotificationsRef}
+                  myInventoryRef={triggerMyInventoryRef}
+                />
+              </div>
+            )}
 
           {lensProfile && !sidebarCollapsedStateLeft.collapsed && (
             <div className="flex w-full items-center justify-center py-4">
