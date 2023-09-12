@@ -32,7 +32,9 @@ const ExplorerCard: FC<Props> = (props) => {
     post.metadata.attributes.length > 0 &&
     (post.metadata.attributes[0].value === 'list' ||
       post.metadata.attributes[0].value === 'privateDefaultList');
-  console.log('Test post content: ', post);
+
+  // console.log('Test post content: ', post);
+
   const { profile: lensProfile } = useContext(ProfileContext);
   const [openReconnect, setOpenReconnect] = useState(false);
   const [isPosting, setIsPosting] = useState(false);

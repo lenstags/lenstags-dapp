@@ -4,38 +4,41 @@ import React, { FC, useState } from 'react';
 import Image from 'next/image';
 import { Spinner } from './Spinner';
 import useDisconnector from '@lib/hooks/useDisconnector';
-
-// import useHandleSetup from '@lib/hooks/useHandleSetup';
+import useHandleSetup from '@lib/hooks/useHandleSetup';
 
 interface Props {
+  lensProfile: any;
   chain: any;
   welcomeReady: boolean;
   setShowWelcome: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const WhitelistScreen: FC<Props> = ({
+const WelcomePanel: FC<Props> = ({
+  lensProfile,
   chain,
   welcomeReady,
   setShowWelcome
 }) => {
   const { handleDisconnect } = useDisconnector();
+
   const [showHelp, setShowHelp] = useState(false);
   const [showReject, setShowReject] = useState(false);
-  // const {
-  //   // setShowWelcome,
-  //   setShowReject,
-  //   showReject,
-  //   // welcomeReady,
-  //   handleSetup
-  // } = useHandleSetup(lensProfile);
+  const {
+    // setShowWelcome,
+    // setShowReject,
+    // showReject
+    // welcomeReady
+    handleSetup
+  } = useHandleSetup(lensProfile);
+  // , showReject, setShowReject);
 
   return (
     <section
       className="duration-600 fixed bottom-0 left-0
           right-0 
           top-0 z-50
-          flex h-full w-full flex-col items-center justify-center bg-yellow-200 font-serif
-          "
+          flex h-full w-full flex-col items-center justify-center bg-yellow-200
+          font-serif"
       style={{
         backgroundImage:
           'linear-gradient(45deg, white, #B0FCE6, white, #F58FA1)',
@@ -159,7 +162,7 @@ const WhitelistScreen: FC<Props> = ({
                 <button
                   onClick={() => {
                     setShowReject(false);
-                    // handleSetup();
+                    handleSetup();
                   }}
                   className="rounded-lg bg-black px-6 py-1 text-white"
                 >
@@ -190,4 +193,4 @@ const WhitelistScreen: FC<Props> = ({
   );
 };
 
-export default WhitelistScreen;
+export default WelcomePanel;
