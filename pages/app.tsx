@@ -419,12 +419,14 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <section className="px-4 pb-6">
+            <section className="flex flex-col gap-2 px-8 pb-6">
               <CardViewButtons />
               <ul
                 className={cn(
-                  'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
-                  viewCard !== ViewBy.CARD && 'flex-col gap-3'
+                  'w-full rounded-b-lg pb-6',
+                  viewCard !== ViewBy.CARD
+                    ? 'flex flex-col gap-3'
+                    : 'grid grid-cols-3 gap-5'
                 )}
               >
                 {publications.length > 0 ? (

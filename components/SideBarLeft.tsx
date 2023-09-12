@@ -402,13 +402,11 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                         </span>
                       )}
                     </AccordionTrigger>
-                    <AccordionContent className="flex h-full flex-col border-0 outline-none">
-                      <div className="mb-2 ml-1 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-2">
-                        {notifications?.length > 0 &&
-                          notifications.map((notif, index: number) => {
-                            return <Notifications notif={notif} key={index} />;
-                          })}
-                      </div>
+                    <AccordionContent className="flex max-h-[550px] flex-col border-0 outline-none">
+                      {notifications?.length > 0 &&
+                        notifications.map((notif, index: number) => {
+                          return <Notifications notif={notif} key={index} />;
+                        })}
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>

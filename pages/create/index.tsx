@@ -28,6 +28,15 @@ import { useRouter } from 'next/router';
 import CreatableSelect from 'react-select/creatable';
 import TurndownService from 'turndown';
 import Toast from '../../components/Toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@components/ui/Dialog';
+import ExplorerCard from '@components/ExplorerCard';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -94,6 +103,7 @@ const Create: NextPage = () => {
   const [isTagSelected, setIsTagSelected] = useState<boolean>(false);
   const [isExplore, setIsExplore] = useState(false);
   const [skipExplore, setSkipExplore] = useState(true);
+  const [post, setPost] = useState<any>();
 
   const [imageURL, setImageURL] = useState('');
   const [imageOrigin, setImageOrigin] = useState<string | null>('panelAI');
@@ -227,6 +237,36 @@ const Create: NextPage = () => {
           `data:image/png;base64,${imageBuffer.toString('base64')}`
         );
         setEditorContents(data.description as string);
+        console.log('i2: ', imageBuffer);
+        setPost({
+          attributes: DEFAULT_METADATA_ATTRIBUTES,
+          name: data.title as string,
+          abstract: '',
+          content: data.description as string,
+          link: event.target.value,
+          locale: 'en',
+          image: imageBuffer,
+          imageMimeType: 'image/jpeg',
+          tags: [],
+          profile: lensProfile,
+          metadata: {
+            attributes: DEFAULT_METADATA_ATTRIBUTES,
+            name: data.title as string,
+            content: data.description as string,
+            image: data.image as string,
+            media: [
+              {
+                original: {
+                  url: data.image as string
+                }
+              }
+            ]
+          },
+          stats: {
+            totalAmountOfCollects: 0,
+            totalAmountOfComments: 0
+          }
+        });
       } else {
         console.log('No link preview');
       }
@@ -536,6 +576,8 @@ const Create: NextPage = () => {
     }
   ];
 
+  console.log(post);
+
   return (
     <LayoutCreate
       title="Nata Social | Create post"
@@ -725,32 +767,47 @@ const Create: NextPage = () => {
 
                 {/* tags  */}
                 <div className="mb-4 items-center px-4 py-2">
-                  <div className="mb-1">Select your tags</div>
-                  <div className="w-full">
-                    <div className="w-full rounded-lg border bg-stone-50 ">
-                      {typeof window !== 'undefined' && (
-                        <CreatableSelect
-                          styles={{
-                            control: (baseStyles, state) => ({
-                              ...baseStyles,
-                              boxShadow: 'none',
-                              margin: '2px',
-                              borderColor: 'transparent',
-                              '&:hover': {
-                                borderColor: 'transparent'
-                              }
-                            })
-                          }}
-                          placeholder="Choose 1 tag minimum"
-                          menuPortalTarget={document.querySelector('body')}
-                          isMulti
-                          onChange={handleTagsChange}
-                          options={TAGS}
-                        />
-                      )}
-                    </div>
+                  <label className="mb-1">Select your tags</label>
+                  <div className="w-full rounded-lg border bg-stone-50 ">
+                    {typeof window !== 'undefined' && (
+                      <CreatableSelect
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            boxShadow: 'none',
+                            margin: '2px',
+                            borderColor: 'transparent',
+                            '&:hover': {
+                              borderColor: 'transparent'
+                            }
+                          })
+                        }}
+                        placeholder="Choose 1 tag minimum"
+                        menuPortalTarget={document.querySelector('body')}
+                        isMulti
+                        onChange={handleTagsChange}
+                        options={TAGS}
+                      />
+                    )}
                   </div>
                 </div>
+                {/* preview */}
+                <Dialog>
+                  <DialogTrigger
+                    className="mb-4 ml-4 items-center px-8 py-1"
+                    style={{ border: '2px solid #000' }}
+                  >
+                    Preview
+                  </DialogTrigger>
+                  <DialogContent className="z-50 flex min-w-[1000px] flex-col gap-8">
+                    <DialogHeader>
+                      <DialogTitle>Preview mode</DialogTitle>
+                    </DialogHeader>
+                    <article className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto w-96">
+                      <ExplorerCard post={post} refProp={null} />
+                    </article>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {/* hidden default image DO NOT REMOVE */}

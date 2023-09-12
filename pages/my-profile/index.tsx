@@ -1,4 +1,9 @@
-import { LayoutProfile, ProfileContext } from 'components';
+import {
+  LayoutProfile,
+  ProfileContext,
+  TagsFilter,
+  TagsFilterContext
+} from 'components';
 import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -26,8 +31,7 @@ const MyProfile: NextPage = () => {
   const [loader, setLoader] = useState(false);
   const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
-  // const { tags } = useContext(TagsFilterContext);
-  const [tags, setTags] = useState<string[]>([]);
+  const { tags } = useContext(TagsFilterContext);
 
   // const lp = useContext(ProfileContext);
   const { profile: lp } = useContext(ProfileContext);
@@ -145,9 +149,30 @@ const MyProfile: NextPage = () => {
         (a: any, b: any) => (a.some((o: any) => o.id === b.id) ? a : [...a, b]),
         []
       );
-
-      setPublications(mergedArray); // TODO PAGINATION CURSOR
-      setLoader(false);
+      if (tags.length > 0) {
+        const filteredItems = mergedArray.filter((item: any) => {
+          return item.metadata.tags.some((tag: any) => {
+            return tags.includes(tag);
+          });
+        });
+        setPublications(
+          filteredItems.sort((a: any, b: any) => {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          })
+        );
+        setLoader(false);
+      } else {
+        setPublications(
+          mergedArray.sort((a: any, b: any) => {
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          })
+        );
+        setLoader(false);
+      }
     };
 
     if (tab === 'myposts') {
@@ -200,7 +225,7 @@ const MyProfile: NextPage = () => {
       setSkipExplore={setSkipExplore}
       skipExplore={skipExplore}
     >
-      <div className="w-full px-8">
+      <div className="mb-4 flex w-full flex-col gap-4 px-8">
         {/* header */}
         <div className="">
           <div
@@ -212,7 +237,7 @@ const MyProfile: NextPage = () => {
             className="min-h-[25vh] rounded-xl"
           ></div>
           <div className="flex items-center justify-between">
-            <div className="mb-4 flex max-w-[50%] flex-col">
+            <div className="flex max-w-[50%] flex-col">
               <ImageProxied
                 className="-mt-16 ml-4 h-32 w-32 rounded-full border-4 border-white object-cover"
                 category="profile"
@@ -299,65 +324,34 @@ const MyProfile: NextPage = () => {
             </div>
           </div>
         </div>
-
+        <TagsFilter className="mt-0" />
         <CardViewButtons />
-        {/* <button
-              onClick={() => setTab('all')}
-              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
-            >
-              All
-            </button>
-
-            <button
-              onClick={() => setTab('myposts')}
-              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
-            >
-              My posts
-            </button>
-
-            <button
-              onClick={() => setTab('mycollects')}
-              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
-            >
-              <div className="flex">
-                <span className="">Collected</span>
-              </div>
-            </button>
-
-            <button
-              onClick={() => setTab('mylists')}
-              className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
-            >
-              <div className="flex">
-                <span className="">My lists</span>
-              </div>
-            </button> */}
       </div>
 
       {/* contents */}
-      <div className="  w-full px-8">
-        <ul
-          className={cn(
-            'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
-            viewCard !== ViewBy.CARD && 'flex-col gap-3'
-          )}
-        >
-          {publications.length > 0 ? (
-            publications.map((post, index) => {
-              return CardViewsMap[viewCard]({
-                post,
-                key: index
-              });
-            })
-          ) : loader ? (
-            <div className="mx-auto my-8">
-              <Spinner h="10" w="10" />
-            </div>
-          ) : (
-            <div className="my-8">No results found 💤</div>
-          )}
-        </ul>
-      </div>
+      <ul
+        className={cn(
+          'w-full rounded-b-lg px-8 pb-6',
+          viewCard !== ViewBy.CARD
+            ? 'flex flex-col gap-3'
+            : 'grid grid-cols-3 gap-5 2xl:grid-cols-4'
+        )}
+      >
+        {publications.length > 0 ? (
+          publications.map((post, index) => {
+            return CardViewsMap[viewCard]({
+              post,
+              key: index
+            });
+          })
+        ) : loader ? (
+          <div className="mx-auto my-8">
+            <Spinner h="10" w="10" />
+          </div>
+        ) : (
+          <div className="my-8">No results found 💤</div>
+        )}
+      </ul>
     </LayoutProfile>
   );
 };

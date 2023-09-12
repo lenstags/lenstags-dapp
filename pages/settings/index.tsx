@@ -26,6 +26,7 @@ import { uploadImageIpfs } from '@lib/lens/ipfs';
 import { useExplore } from '@context/ExploreContext';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
+import Image from 'next/image';
 
 export const updateLocalStorageProfile = (profileId: string) =>
   queryProfile({ profileId })
@@ -251,216 +252,191 @@ const Settings: NextPage = () => {
           <Spinner h="10" w="10" />
         </div>
       ) : (
-        <div className="flex w-full ">
-          <div className="w-8/12 ">
-            <h1 className="py-2 font-serif font-bold">Settings</h1>
+        <article className="flex w-full justify-between">
+          <section className="flex w-8/12 flex-col gap-6 font-sans text-sm">
+            <h1 className="font-serif font-bold">Profile</h1>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Profile image</label>
 
-            <p className="px-6 py-4 font-serif">Profile</p>
+              <ImageProxied
+                category="profile"
+                className="w-10 rounded-full object-cover"
+                src={pictureUrl}
+                alt="User profile picture"
+                width={70}
+                height={70}
+              />
+              <FileInput handleImageChange={handlePictureChange} />
+            </div>
 
-            <div className="font-sans text-sm">
-              <div className="mx-6 my-4">
-                <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">Handle</div>
-                  <div className="col-span-4 rounded-sm  px-3 py-2 font-mono text-xs text-gray-400">
-                    {profileValues.handle} (Id {profileValues.id})
-                  </div>
-                </div>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Cover image</label>
 
-                <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">Name</div>
-                  <div className="col-span-10">
-                    <input
-                      // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm text-gray-600 outline-none"
-                      className="lens-input"
-                      type="text"
-                      name="name"
-                      id="name"
-                      defaultValue={profileValues?.name || ''}
-                      onChange={(e) =>
-                        setProfileValues({
-                          ...profileValues,
-                          name: e.target.value
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+              {coverUrlBase64 && (
+                <Image
+                  className="w-10 rounded-lg object-cover"
+                  src={coverUrlBase64}
+                  alt="User cover picture"
+                  width={100}
+                  height={100}
+                />
+              )}
+              <FileInput handleImageChange={handleCoverChange} />
+            </div>
 
-                <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">
-                    {/* <span className="">Bio</span> */}
-                    Bio
-                  </div>
-                  <div className="col-span-10">
-                    <input
-                      // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
-                      className="lens-input"
-                      type="text"
-                      name="bio"
-                      id="bio"
-                      defaultValue={profileValues?.bio}
-                      onChange={(e) =>
-                        setProfileValues({
-                          ...profileValues,
-                          bio: e.target.value
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Handle</label>
+              <span className="w-full rounded-lg border border-gray-100  px-4 py-3 font-mono text-xs text-gray-400">
+                {profileValues.handle} (Id {profileValues.id})
+              </span>
+            </div>
 
-                <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">
-                    {/* <span className="">Location</span> */}
-                    Location
-                  </div>
-                  <div className="col-span-10">
-                    <input
-                      // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
-                      className="lens-input"
-                      type="text"
-                      name="location"
-                      id="location"
-                      defaultValue={
-                        profileValues?.attributes?.find(
-                          (attribute: AttributeData) =>
-                            attribute.key === 'location'
-                        )?.value
-                      }
-                      onChange={(e) =>
-                        setProfileValues({
-                          ...profileValues,
-                          location: e.target.value
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Name</label>
+              <input
+                className="w-full rounded-lg bg-gray-100 px-4 py-3 focus:outline-none"
+                type="text"
+                name="name"
+                placeholder="Name"
+                id="name"
+                defaultValue={profileValues?.name || ''}
+                onChange={(e) =>
+                  setProfileValues({
+                    ...profileValues,
+                    name: e.target.value
+                  })
+                }
+              />
+            </div>
 
-                <div className="mb-4 grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">
-                    {/* <span className="">Website</span> */}
-                    Website
-                  </div>
-                  <div className="col-span-10">
-                    <input
-                      // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
-                      className="lens-input"
-                      type="text"
-                      name="website"
-                      defaultValue={
-                        profileValues?.attributes?.find(
-                          (attribute: AttributeData) =>
-                            attribute.key === 'website'
-                        )?.value
-                      }
-                      id="name"
-                      onChange={(e) =>
-                        setProfileValues({
-                          ...profileValues,
-                          website: e.target.value
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">
-                    {/* <span className="">Twitter</span> */}
-                    Twitter
-                  </div>
-                  <div className="col-span-10">
-                    <input
-                      // className="w-full rounded border-2 border-gray-300 bg-white px-3 py-2 text-sm  text-gray-600 outline-none"
-                      className="lens-input"
-                      type="text"
-                      name="twitter"
-                      id="twitter"
-                      defaultValue={
-                        profileValues?.attributes?.find(
-                          (attribute: AttributeData) =>
-                            attribute.key === 'twitter'
-                        )?.value
-                      }
-                      onChange={(e) =>
-                        setProfileValues({
-                          ...profileValues,
-                          twitter: e.target.value
-                        })
-                      }
-                    />
-                  </div>
-                </div>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Bio</label>
+              <textarea
+                className="w-full rounded-lg bg-gray-100 px-4 py-3 focus:outline-none"
+                name="bio"
+                id="bio"
+                placeholder="Tell the world about yourself"
+                defaultValue={profileValues?.bio}
+                onChange={(e) =>
+                  setProfileValues({
+                    ...profileValues,
+                    bio: e.target.value
+                  })
+                }
+              />
+            </div>
 
-                {/* <div className="grid grid-cols-12 items-center gap-4"> */}
-                <div className=" grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">Profile pic</div>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Website</label>
+              <input
+                className="w-full rounded-lg bg-gray-100 px-4 py-3 focus:outline-none"
+                type="text"
+                name="website"
+                placeholder="https://www.loremipsum.com"
+                defaultValue={
+                  profileValues?.attributes?.find(
+                    (attribute: AttributeData) => attribute.key === 'website'
+                  )?.value
+                }
+                id="name"
+                onChange={(e) =>
+                  setProfileValues({
+                    ...profileValues,
+                    website: e.target.value
+                  })
+                }
+              />
+            </div>
 
-                  <div className="col-span-3">
-                    <div className="px-6 py-4">
-                      <ImageProxied
-                        category="profile"
-                        className="ml-6 rounded-full object-cover"
-                        src={pictureUrl}
-                        alt="User profile picture"
-                        width={70}
-                        height={70}
-                      />
-                    </div>
-                  </div>
-                  <FileInput handleImageChange={handlePictureChange} />
-                </div>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Twitter</label>
+              <input
+                className="w-full rounded-lg bg-gray-100 px-4 py-3 focus:outline-none"
+                type="text"
+                name="twitter"
+                id="twitter"
+                placeholder="https://twitter.com/name"
+                defaultValue={
+                  profileValues?.attributes?.find(
+                    (attribute: AttributeData) => attribute.key === 'twitter'
+                  )?.value
+                }
+                onChange={(e) =>
+                  setProfileValues({
+                    ...profileValues,
+                    twitter: e.target.value
+                  })
+                }
+              />
+            </div>
 
-                <div className=" grid grid-cols-12 items-center gap-4">
-                  <div className="col-span-2">Cover</div>
-
-                  <FileInput handleImageChange={handleCoverChange} />
-                </div>
-
-                {coverUrlBase64 && (
-                  <div className="col-span-5">
-                    <div className="w-full px-6 py-4">
-                      <img
-                        // TODO use crop on coming version
-                        className="w-full rounded-lg"
-                        src={coverUrlBase64}
-                        alt="User cover picture"
-                        // width={100}
-                        // height={100}
-                        // objectFit="cover"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
+            <div className="flex items-center gap-4">
+              <label className="w-24">Location</label>
+              <input
+                className="w-full rounded-lg bg-gray-100 px-4 py-3 focus:outline-none"
+                type="text"
+                name="location"
+                id="location"
+                placeholder="Where you are"
+                defaultValue={
+                  profileValues?.attributes?.find(
+                    (attribute: AttributeData) => attribute.key === 'location'
+                  )?.value
+                }
+                onChange={(e) =>
+                  setProfileValues({
+                    ...profileValues,
+                    location: e.target.value
+                  })
+                }
+              />
             </div>
 
             <div className="flex justify-end py-4">
               {!saving ? (
-                // <button
-                //   onClick={handleClickSave}
-                //   className="flex items-center  rounded-lg border-2 border-solid
-                //    border-black bg-lensPurple px-4 py-2 text-xl text-white"
-                // >
                 <button
                   onClick={handleClickSave}
                   className="rounded-lg px-4 
                   py-2 align-middle font-serif font-bold text-white"
                 >
-                  SAVE
+                  Save changes
                 </button>
               ) : (
                 <span
-                  className="flex items-center  rounded-lg border-2 border-solid border-gray-500
-                 bg-gray-400 px-4 py-2 text-xl text-white"
+                  className="text-md flex select-none items-center rounded-lg border
+                 border-solid border-gray-500 bg-gray-400 px-4 py-2 text-white"
                 >
                   <Spinner h="5" w="5" />
                   <span className="ml-2">Saving</span>
                 </span>
               )}
             </div>
-          </div>
-        </div>
+          </section>
+          <aside className="flex h-max w-2/12 flex-col rounded-lg border font-sans text-sm">
+            <h2 className="bg-gray-200 px-4 py-2 font-serif font-bold">
+              Dispatcher
+            </h2>
+            <p className="my-5 px-4">
+              You can enable dispatcher to interact with Nata without signing
+              any transaction.
+            </p>
+            <button
+              onClick={handleClickDispatcher}
+              className="mb-5 ml-4 w-max px-6 py-2 text-white"
+              style={{
+                backgroundColor: dispatcherActive ? '#D44333' : '#121400'
+              }}
+            >
+              {loadingDispatcher ? (
+                <Spinner h="5" w="5" />
+              ) : dispatcherActive ? (
+                'Disable'
+              ) : (
+                'Enable'
+              )}
+            </button>
+          </aside>
+        </article>
       )}
     </LayoutCreate>
   );

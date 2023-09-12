@@ -19,6 +19,7 @@ import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import useDisconnector from '@lib/hooks/useDisconnector';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import Link from 'next/link';
 
 interface Props {
   post: any;
@@ -26,6 +27,7 @@ interface Props {
 }
 
 const ExplorerCard: FC<Props> = (props) => {
+  console.log('props', props);
   const { post } = props;
   const isList =
     post.metadata &&
@@ -90,6 +92,7 @@ const ExplorerCard: FC<Props> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postId, setPostId] = useState('');
   const handleOpenModal = (postId: string) => {
+    if (!postId) return;
     setPostId(postId);
     setIsModalOpen(true);
   };
@@ -165,16 +168,7 @@ const ExplorerCard: FC<Props> = (props) => {
   return (
     <div
       key={post.id}
-      className=" w-full px-1 duration-1000 animate-in
-          fade-in-50
-          xs:w-11/12
-          sm:w-11/12
-          md:w-6/12
-          lg:w-6/12
-          xl:w-6/12
-          2xl:w-4/12
-          3xl:w-3/12
-          4xl:w-2/12"
+      className="col-auto w-full duration-1000 animate-in fade-in-50"
       style={{ opacity, pointerEvents, height: '310px' }}
       ref={props?.refProp}
     >
@@ -226,7 +220,7 @@ const ExplorerCard: FC<Props> = (props) => {
                   </div>
                 </div>
 
-                <a rel="noreferrer" href={`/profile/${post.profile.id}`}>
+                <Link rel="noreferrer" href={`/profile/${post.profile.id}`}>
                   <div className="flex justify-between">
                     <div className="pl-2 align-baseline text-xs">
                       <div className="flex">
@@ -243,7 +237,7 @@ const ExplorerCard: FC<Props> = (props) => {
                       </p>
                     </div>
                   </div>
-                </a>
+                </Link>
 
                 {/* profile hover */}
                 <HoverProfileCard
@@ -268,40 +262,42 @@ const ExplorerCard: FC<Props> = (props) => {
                   />
                 </div>
 
-                <div
-                  className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
+                {post.id && (
+                  <div
+                    className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
                        border-gray-200 
                       bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 "
-                >
-                  <p className="">
-                    <span
-                      className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                      // href="#"
-                    >
-                      Share
-                    </span>
-                  </p>
-
-                  <p className="">
-                    <a
-                      className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
-                      href="#"
-                    >
-                      Report
-                    </a>
-                  </p>
-
-                  <p className="">
-                    {lensProfile && post.profile.id === lensProfile.id && (
+                  >
+                    <p className="">
                       <span
-                        className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
-                        onClick={() => handleRemove(post.id)}
+                        className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
+                        // href="#"
                       >
-                        Remove
+                        Share
                       </span>
-                    )}
-                  </p>
-                </div>
+                    </p>
+
+                    <p className="">
+                      <a
+                        className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
+                        href="#"
+                      >
+                        Report
+                      </a>
+                    </p>
+
+                    <p className="">
+                      {lensProfile && post.profile.id === lensProfile.id && (
+                        <span
+                          className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
+                          onClick={() => handleRemove(post.id)}
+                        >
+                          Remove
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -309,6 +305,7 @@ const ExplorerCard: FC<Props> = (props) => {
             <a
               rel="noreferrer"
               href={isList ? `/list/${post.id}` : `/post/${post.id}`}
+              className={`${post.id ?? 'pointer-events-none'}`}
             >
               {isList ? (
                 <div>
