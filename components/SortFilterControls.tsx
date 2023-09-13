@@ -27,7 +27,7 @@ export const SortFilterControls = ({
   setFilterValue
 }: {
   sortingValues: SortingValuesType;
-  setSortingValues: ({}: SortingValuesType) => void;
+  setSortingValues: (values: SortingValuesType) => void;
   filterValue: Filter;
   setFilterValue: (Filter: Filter) => void;
 }) => {

@@ -67,7 +67,8 @@ export const explore = async (
     };
   }
 
-  reqQuery.sortCriteria = filter?.sortingValues.sort!;
+  reqQuery.sortCriteria =
+    filter?.sortingValues.sort ?? PublicationSortCriteria.Latest;
   if (isExplore) {
     if (!profileId) {
       throw 'Missing my profileId';
