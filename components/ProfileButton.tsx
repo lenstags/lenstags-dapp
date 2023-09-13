@@ -4,30 +4,18 @@ import Image from 'next/image';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
+import { getPictureUrl } from 'utils/helpers';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useDisconnect } from 'wagmi';
+import useDisconnector from '@lib/hooks/useDisconnector';
 
-const ProfileButton = () => {
+const ProfileButton = ({ className }: { className?: string }) => {
   const { openConnectModal } = useConnectModal();
   const { profile: lensProfile } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
-  const { disconnect } = useDisconnect();
-
-  const handleDisconnect = () => {
-    deleteLensLocalStorage();
-    disconnect();
-  };
-
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
+  const { handleDisconnect } = useDisconnector();
 
   return (
-    <div id="connectArea" className="bg-white text-right">
+    <div id="connectArea" className={`bg-white text-right ${className}`}>
       {lensProfile ? (
         <>
           <button
@@ -40,7 +28,7 @@ const ProfileButton = () => {
               <ImageProxied
                 category="profile"
                 className="mx-1 h-7 w-7 rounded-full object-cover"
-                src={pictureUrl}
+                src={getPictureUrl(lensProfile)}
                 alt="avatar"
                 width={40}
                 height={40}
@@ -58,7 +46,7 @@ const ProfileButton = () => {
                     <ImageProxied
                       category="profile"
                       className="mx-1 h-7 w-7 rounded-full object-cover"
-                      src={pictureUrl}
+                      src={getPictureUrl(lensProfile)}
                       alt="avatar"
                       width={40}
                       height={40}

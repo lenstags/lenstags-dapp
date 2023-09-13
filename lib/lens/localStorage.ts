@@ -1,3 +1,4 @@
+import { ViewBy } from '@context/ViewCardContext';
 import { ProfileQuery } from './graphql/generated';
 
 const LS_LENS_STORE = 'lens_store';
@@ -7,6 +8,7 @@ export type LensLocalStorage = {
   refreshToken: string;
   profile: ProfileQuery['profile'];
   optIn: boolean;
+  cardView?: typeof ViewBy.LIST | typeof ViewBy.POST | typeof ViewBy.CARD;
   // bio: string;
   // canUseRelay: boolean | undefined;
   // coverUrl: string | null;

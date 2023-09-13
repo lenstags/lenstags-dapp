@@ -27,4 +27,5 @@ const ImageProxied: React.FC<imageProxiedProps> = (props) => {
 
   return <Image {...newProps} />;
 };
+
 export default ImageProxied;

@@ -1,17 +1,15 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable jsx-a11y/role-supports-aria-props */
 
 import React, { useContext, useEffect, useState } from 'react';
 
 import { AppContext } from 'context/AppContext';
 import Image from 'next/image';
-import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { TagsFilter } from './TagsFilter';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
+import { getPictureUrl } from 'utils/helpers';
 import { useConnectModal } from '@rainbow-me/rainbowkit';
-import { useDisconnect } from 'wagmi';
-import { useRouter } from 'next/router';
+import useDisconnector from '@lib/hooks/useDisconnector';
 
 export const Navbar = () => {
   // const asyncFunc = async () => {
@@ -23,30 +21,17 @@ export const Navbar = () => {
   const [showMobileNav, setShowMobileNav] = useState(false);
   const { authenticationStatus } = useContext(ProfileContext);
   const [profileView, setProfileView] = useState(false);
+
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
-  const { disconnect } = useDisconnect();
-  const handleDisconnect = () => {
-    deleteLensLocalStorage();
-    disconnect();
-  };
+  const { handleDisconnect } = useDisconnector();
 
   // const { tags } = useContext(TagsFilterContext);
   const { profile: lensProfile } = useContext(ProfileContext);
 
-  // TODO: TEST THIS FOR NFT URI
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
-
   const toggleDarkMode = () => {
     updateConfig({ isDarkMode: !config.isDarkMode });
   };
-
-  const router = useRouter();
 
   return (
     <div className="fixed top-0 z-50 flex w-full ">
@@ -123,9 +108,10 @@ export const Navbar = () => {
               <div className="flex items-center">
                 <img
                   className="mx-1 h-7 w-7 rounded-full"
-                  src={pictureUrl}
+                  src={getPictureUrl(lensProfile)}
                   alt="avatar"
                 />
+
                 <div>@{lensProfile?.handle}</div>
               </div>
             </button>

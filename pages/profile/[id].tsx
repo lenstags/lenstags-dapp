@@ -1,14 +1,22 @@
-import { Layout, ProfileContext, TagsFilter } from 'components';
+import { LayoutProfile, ProfileContext, TagsFilter } from 'components';
+import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
 import { useContext, useEffect, useState } from 'react';
 
+import { DotWave } from '@uiball/loaders';
 import ExplorerCard from 'components/ExplorerCard';
+import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
+import Link from 'next/link';
 import { NextPage } from 'next';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
+import { freeUnfollow } from '@lib/lens/free-unfollow';
+import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { useExplore } from '@context/ExploreContext';
 import { useRouter } from 'next/router';
-import { SortingValuesType } from '@components/SortFilterControls';
+import { Filter, SortingValuesType } from '@components/SortFilterControls';
 import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 
 const OtherProfile: NextPage = () => {
@@ -22,6 +30,25 @@ const OtherProfile: NextPage = () => {
     sort: PublicationSortCriteria.Latest,
     by: 'all'
   });
+  const [filterValue, setFilterValue] = useState<Filter>(Filter.ALL);
+  const [isFollowing, setIsFollowing] = useState(lensProfile?.isFollowedByMe);
+  const [showUnfollow, setShowUnfollow] = useState('Following');
+  const [isDotFollowing, setIsDotFollowing] = useState(false);
+  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
+  const handleFollow = async (profileId: string) => {
+    setIsDotFollowing(true);
+    if (showUnfollow === 'Unfollow') {
+      return freeUnfollow(profileId).then((r) => {
+        setIsFollowing(false);
+        setIsDotFollowing(false);
+      });
+    } else {
+      return proxyActionFreeFollow(profileId).then(() => {
+        setIsFollowing(true);
+        setIsDotFollowing(false);
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -39,8 +66,9 @@ const OtherProfile: NextPage = () => {
   const { tags } = useContext(TagsFilterContext);
   //   const lensProfile = useContext(ProfileContext);
 
+  // TODO USE NSFW FILTERS!
   useEffect(() => {
-    explore({ locale: 'en', sortingValues, tags }).then((data) => {
+    explore({ locale: 'en', sortingValues, filterValue, tags }).then((data) => {
       //   if (contentType === 'collected') {
       //     setPublications(
       //       data.items.filter((r) => r.profile.id !== lensProfile?.id)
@@ -49,65 +77,174 @@ const OtherProfile: NextPage = () => {
       //   }
 
       //   if (contentType === 'created') {
-      setPublications(
-        data.items.filter((r: any) => r.profile.id === lensProfile?.id)
-      );
+      if (data.__typename === 'ExplorePublicationResult') {
+        setPublications(
+          data.items.filter((r: any) => r.profile.id === lensProfile?.id)
+        );
+      }
       return;
       //   }
     });
   }, [lensProfile?.id, tags, sortingValues]);
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
+  const location =
+    lensProfile?.attributes.find((item: any) => item.key === 'location')
+      ?.value || '';
+
+  const twitter =
+    lensProfile?.attributes.find((item: any) => item.key === 'twitter')
+      ?.value || '';
+
+  const url =
+    lensProfile?.attributes.find((item: any) => item.key === 'website')
+      ?.value || '';
+
+  let website = '';
+
+  if (url !== '') {
+    try {
+      const parsedURL = new URL(url);
+
+      website = parsedURL.hostname.replace(/^www\./, '');
+    } catch (e) {
+      website = url;
+    }
+  }
 
   //explore({ locale: 'en', tags });
   return (
-    <Layout
+    <LayoutProfile
       title="Nata Social | Explore"
       pageDescription="Profile"
-      screen={true}
+      setIsExplore={setIsExplore}
+      isExplore={isExplore}
+      setSkipExplore={setSkipExplore}
+      skipExplore={skipExplore}
     >
-      <div className="w-full px-6">
+      <div className="w-full px-8">
         {/* header */}
-        <div
-          style={{
-            backgroundImage: `linear-gradient(to bottom, transparent, white), url('${lensProfile?.coverPicture?.original?.url}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-          className="pt-40"
-        >
-          <div className="flex items-center px-6">
-            <ImageProxied
-              className="h-32 w-32 rounded-full border-2 border-white object-cover"
-              category="profile"
-              height={144}
-              width={144}
-              src={pictureUrl}
-              alt="avatar"
-            />
-            <div className="ml-6">
-              <p className="mb-1 text-2xl font-semibold">{lensProfile?.name}</p>
-              <p className="mb-2 text-sm font-light">@{lensProfile?.handle}</p>
-              <p>{lensProfile?.bio}</p>
-
-              <div className="my-2 flex text-xs">
-                <div className=" rounded-lg bg-black px-3 py-1 text-center text-white">
-                  ...
-                </div>
+        <div className="">
+          <div
+            style={{
+              backgroundImage: `url('${getCoverPictureUrl(lensProfile)}')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+            className="min-h-[25vh] rounded-xl"
+          ></div>
+          <div className="flex items-center justify-between">
+            <div className="mb-4 flex max-w-[50%] flex-col">
+              <ImageProxied
+                className="-mt-16 ml-4 h-32 w-32 rounded-full border-4 border-white object-cover"
+                category="profile"
+                height={144}
+                width={144}
+                src={getPictureUrl(lensProfile)}
+                alt="avatar"
+              />
+              <div className="mt-2 flex items-center">
+                <span className="mb-1 mr-1 text-2xl font-bold">
+                  {lensProfile?.name}
+                </span>
+                <span className="mb-0.5 text-lg font-normal text-gray-600">
+                  @{lensProfile?.handle}
+                </span>
               </div>
-
-              <p className="mb-2 text-sm">Owned by: {lensProfile?.ownedBy}</p>
-              <div className=" flex cursor-pointer space-x-8 text-xs ">
-                <p> Followers: {lensProfile?.stats?.totalFollowers} </p>
-                <p> Following: {lensProfile?.stats?.totalFollowing} </p>
-                <p> Publications: {lensProfile?.stats?.totalPublications}</p>
+              <p className="mt-1 font-medium">{lensProfile?.bio}</p>
+              <div className="mt-4 flex space-x-3">
+                {location !== '' && (
+                  <div className="flex items-center">
+                    <MapPinIcon className="h-4 w-4" />
+                    <span className="ml-1 text-sm font-medium text-[#4D4D4D]">
+                      {location}
+                    </span>
+                  </div>
+                )}
+                {website !== '' && (
+                  <>
+                    <span>᛫</span>
+                    <div className="flex items-center">
+                      <LinkIcon className="h-4 w-4" />
+                      <Link
+                        href={url}
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
+                      >
+                        {website}
+                      </Link>
+                    </div>
+                  </>
+                )}
+                {twitter !== '' && (
+                  <>
+                    <span>᛫</span>
+                    <div className="flex items-center">
+                      <Image
+                        src="/icons/x-twitter.svg"
+                        alt="Twitter icon"
+                        height={16}
+                        width={16}
+                      />
+                      <Link
+                        href={`https://twitter.com/${twitter}`}
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
+                      >
+                        @{twitter}
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="mt-4 flex space-x-4 self-start rounded-lg bg-[#F8F8F8] px-3 py-2">
+                <span className="text-sm">
+                  <span className="text-base font-medium">
+                    {lensProfile?.stats.totalFollowing}
+                  </span>{' '}
+                  Following
+                </span>
+                <span className="text-sm">
+                  <span className="text-base font-medium">
+                    {lensProfile?.stats.totalFollowers}
+                  </span>{' '}
+                  Followers
+                </span>
+                <span className="text-sm">
+                  <span className="text-base font-medium">
+                    {lensProfile?.stats.totalCollects}
+                  </span>{' '}
+                  Collects
+                </span>
               </div>
             </div>
+            {isFollowing && (
+              <div
+                onMouseEnter={() => setShowUnfollow('Unfollow')}
+                onMouseLeave={() => setShowUnfollow('Following')}
+                onClick={() => handleFollow(lensProfile.id)}
+                className="mt-6 self-start rounded-lg border-2 border-black px-4 py-1 text-center text-sm font-bold hover:cursor-pointer"
+              >
+                {isDotFollowing ? (
+                  <div className="mx-2">
+                    <DotWave size={22} color="#000000" />
+                  </div>
+                ) : (
+                  showUnfollow
+                )}
+              </div>
+            )}
+            {!isFollowing && (
+              <div
+                onClick={() => handleFollow(lensProfile.id)}
+                className="mt-6 self-start rounded-lg border-2 border-black px-4 py-1 text-center text-sm font-bold hover:cursor-pointer"
+              >
+                {isDotFollowing ? (
+                  <div className="mx-2">
+                    <DotWave size={22} color="#000000" />
+                  </div>
+                ) : (
+                  'Follow'
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -140,7 +277,7 @@ const OtherProfile: NextPage = () => {
             : null}
         </div>
       </div>
-    </Layout>
+    </LayoutProfile>
   );
 };
 

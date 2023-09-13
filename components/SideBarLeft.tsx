@@ -1,4 +1,8 @@
-import { APP_UI_VERSION, DEFAULT_NETWORK } from '@lib/config';
+import {
+  APP_UI_VERSION,
+  DEFAULT_NETWORK,
+  ENABLE_NOTIFICATIONS
+} from '@lib/config';
 import {
   Accordion,
   AccordionContent,
@@ -26,7 +30,6 @@ import {
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import SidePanelMyInventory, { sortBy } from './SidePanelMyInventory';
 import {
-  channelAddress,
   getNotifications,
   getSubscriptions,
   optIn
@@ -39,23 +42,27 @@ import Notifications from './Notifications';
 import PostsByList from './PostsByList';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { PublicRoutes } from 'models';
-import { PublicationTypes } from '@lib/lens/graphql/generated';
 import SidePanelNotifications from './SidePanelNotifications';
 import { SidebarContext } from '@context/SideBarSizeContext';
 import { TextAlignBottomIcon } from '@radix-ui/react-icons';
 import { Tooltip } from './ui/Tooltip';
-import { deleteLensLocalStorage } from 'lib/lens/localStorage';
-import { getPublications } from '@lib/lens/get-publications';
 import { getSigner } from '@lib/lens/ethers.service';
-import { useDisconnect } from 'wagmi';
+import { useExplore } from '@context/ExploreContext';
 import { useRouter } from 'next/router';
 import { useSorts } from '@lib/hooks/use-sort';
 
-interface SidebarProps {}
+interface SidebarProps {
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
+}
 
 const SideBarLeft: React.FC<SidebarProps> = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
+  const { setIsExplore, setSkipExplore } = useExplore();
+
   const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
   const [publications, setPublications] = useState<any[]>([]);
   const [sideBarSize, setSideBarSize] = useState<'3.6' | '16.6'>('16.6');
@@ -63,26 +70,20 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
     'my-inventory' | 'notifications' | 'none'
   >('none');
   const [sortByValue, setSortByValue] = useState('newest');
-  const [subcribed, setSubcribed] = useState(false);
+  const [subscribed, setSubscribed] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [loadingMyLists, setLoadingMyLists] = useState(false);
   // const { profile, setProfile } = useContext(ProfileContext);
   // const [profile, setProfile] = useState(false);
-  const { disconnect } = useDisconnect();
-  const handleDisconnect = () => {
-    deleteLensLocalStorage();
-    disconnect();
-  };
-
   const triggerNotificationsRef = useRef<any>();
   const triggerMyInventoryRef = useRef<any>();
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
+  const handleRedirect = () => {
+    // isExplore && clearFeed();
+    setIsExplore(true);
+    setSkipExplore(false);
+    router.push(PublicRoutes.APP);
+  };
 
   const fetchMyLists = async () => {
     if (!lensProfile) return;
@@ -95,26 +96,8 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
 
     if (publications.length !== 0) return;
     setLoadingMyLists(true);
-
-    // no need to gather all my pubs
-    // const res = await getPublications([PublicationTypes.Post], lensProfile?.id);
-    // console.log('xxx ', res);
-
-    // FIXME
     const rr = await getPopulatedLists(lensProfile.id);
-    console.log('rr ', rr);
-    // const filteredItems = res.items.filter((item: any) => {
-    //   const id = lensProfile?.id;
-    //   const attributes = item.metadata.attributes;
-    //   return (
-    //     item.profile.id === id &&
-    //     attributes?.length > 0 &&
-    //     (attributes[0].value === 'list' ||
-    //       attributes[0].value === 'privateDefaultList')
-    //   );
-    // });
 
-    // setPublications(filteredItems);
     setPublications(rr!);
     setLoadingMyLists(false);
   };
@@ -133,27 +116,28 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
   };
 
   useEffect(() => {
-    getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
-      const channelNataSocial =
-        res &&
-        !!res.find(
-          (item: { channel: string }) =>
-            item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
-        );
-      setSubcribed(channelNataSocial);
-    });
+    lensProfile &&
+      getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
+        const channelNataSocial =
+          res &&
+          !!res.find(
+            (item: { channel: string }) =>
+              item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
+          );
+        setSubscribed(channelNataSocial);
+      });
   }, [lensProfile?.ownedBy]);
 
   const signer = getSigner();
 
   const handleOpenNotifications = () => {
     setOpenTo('notifications');
-    if (!subcribed) {
+    if (!subscribed) {
       optIn(lensProfile?.ownedBy, signer).then((res) => {
-        setSubcribed(true);
+        setSubscribed(true);
       });
     }
-    if (notifications.length === 0) {
+    if (notifications?.length === 0) {
       getNotifications(lensProfile?.ownedBy).then((res) => {
         setNotifications(res);
       });
@@ -192,57 +176,134 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )}
           </Link>
         </div>
+
         {/* menu items */}
         <div className="font-serif text-base">
-          <Link href={PublicRoutes.APP}>
-            <Tooltip tooltip="Home">
-              <div
-                className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
-             hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
-               sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
-             }`}
-              >
-                <Image
-                  src="/icons/home.svg"
-                  alt="Home"
-                  width={20}
-                  height={20}
-                />
-                {!sidebarCollapsedStateLeft.collapsed && (
-                  <span className="ml-2">Home</span>
-                )}
+          {sidebarCollapsedStateLeft.collapsed ? (
+            <>
+              {lensProfile && (
+                <Link
+                  href={PublicRoutes.APP}
+                  onClick={() => {
+                    // isExplore === true && clearFeed();
+                    setIsExplore(false);
+                    setSkipExplore(true);
+                  }}
+                >
+                  <Tooltip tooltip="Feed">
+                    <div
+                      className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                    }`}
+                    >
+                      <Image
+                        src="/icons/home.svg"
+                        alt="Explore"
+                        width={20}
+                        height={20}
+                      />
+                      {!sidebarCollapsedStateLeft.collapsed && (
+                        <span className="ml-2">Feed</span>
+                      )}
+                    </div>
+                  </Tooltip>
+                </Link>
+              )}
+              <div onClick={handleRedirect}>
+                <Tooltip tooltip="Explore">
+                  <div
+                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                    hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                      sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                    }`}
+                  >
+                    {router.pathname === PublicRoutes.APP &&
+                    !sidebarCollapsedStateLeft.collapsed ? (
+                      <GlobeAltIconFilled
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    ) : (
+                      <GlobeAltIcon
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    )}
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2">Explore</span>
+                    )}
+                  </div>
+                </Tooltip>
               </div>
-            </Tooltip>
-          </Link>
+            </>
+          ) : (
+            <>
+              {/* feed collapsed */}
+              {lensProfile && (
+                <Tooltip tooltip="Feed">
+                  <div
+                    className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+                  hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
+                    sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
+                  }`}
+                    onClick={() => {
+                      // isExplore === true && clearFeed();
+                      setIsExplore(false);
+                      setSkipExplore(true);
+                      router.push(PublicRoutes.APP);
+                    }}
+                  >
+                    <Image
+                      src="/icons/home.svg"
+                      alt="Feed"
+                      width={20}
+                      height={20}
+                    />
+                    {!sidebarCollapsedStateLeft.collapsed && (
+                      <span className="ml-2">Feed</span>
+                    )}
+                  </div>
+                </Tooltip>
+              )}
 
-          <Link href={PublicRoutes.APP}>
-            <Tooltip tooltip="Explore">
-              <div
-                className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
+              {/* explorer collapsed */}
+              <Tooltip tooltip="Explore">
+                <div
+                  className={`flex h-12 w-full cursor-pointer items-center gap-1 border-l-4 border-l-transparent
               hover:border-l-teal-100 hover:bg-teal-50 focus:border-l-teal-400 focus:font-bold active:font-bold ${
                 sidebarCollapsedStateLeft.collapsed ? 'px-8' : 'px-6'
               }`}
-              >
-                {router.pathname === PublicRoutes.APP &&
-                !sidebarCollapsedStateLeft.collapsed ? (
-                  <GlobeAltIconFilled
-                    width={22}
-                    height={22}
-                    className="text-lensBlack"
-                  />
-                ) : (
-                  <GlobeAltIcon
-                    width={22}
-                    height={22}
-                    className="text-lensBlack"
-                  />
-                )}
-                {!sidebarCollapsedStateLeft.collapsed && (
-                  <span className="ml-2">Explore</span>
-                )}
-              </div>
-            </Tooltip>
-          </Link>
+                  onClick={() => {
+                    // isExplore === false && clearFeed();
+                    setIsExplore(true);
+                    setSkipExplore(false);
+                    router.push(PublicRoutes.APP);
+                  }}
+                >
+                  {router.pathname === PublicRoutes.APP &&
+                  !sidebarCollapsedStateLeft.collapsed ? (
+                    <GlobeAltIconFilled
+                      width={22}
+                      height={22}
+                      className="text-black"
+                    />
+                  ) : (
+                    <GlobeAltIcon
+                      width={22}
+                      height={22}
+                      className="text-black"
+                    />
+                  )}
+                  {!sidebarCollapsedStateLeft.collapsed && (
+                    <span className="ml-2">Explore</span>
+                  )}
+                </div>
+              </Tooltip>
+            </>
+          )}
 
           {lensProfile && router.pathname !== PublicRoutes.MYPROFILE ? (
             <div className="h-12 w-full duration-1000 animate-in fade-in-50">
@@ -257,6 +318,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             </div>
           ) : (
             lensProfile && (
+              // my inventory
               <div className="w-full duration-1000 animate-in fade-in-50">
                 <Accordion type="single">
                   <AccordionItem value="my-investory" className="border-0 py-0">
@@ -346,7 +408,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                     </AccordionTrigger>
                     <AccordionContent className="flex h-full flex-col border-0 outline-none">
                       <div className="mb-2 ml-1 flex h-full w-full flex-col gap-2 overflow-x-scroll px-6 py-2">
-                        {notifications.length > 0 &&
+                        {notifications?.length > 0 &&
                           notifications.map((notif, index: number) => {
                             return <Notifications notif={notif} key={index} />;
                           })}
@@ -358,14 +420,17 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )
           )}
 
-          {lensProfile && router.pathname !== PublicRoutes.MYPROFILE && (
-            <div className="h-12 w-full duration-1000 animate-in fade-in-50">
-              <SidePanelNotifications
-                ref={triggerNotificationsRef}
-                myInventoryRef={triggerMyInventoryRef}
-              />
-            </div>
-          )}
+          {/* notifications to be enabled*/}
+          {ENABLE_NOTIFICATIONS &&
+            lensProfile &&
+            router.pathname !== PublicRoutes.MYPROFILE && (
+              <div className="h-12 w-full duration-1000 animate-in fade-in-50">
+                <SidePanelNotifications
+                  ref={triggerNotificationsRef}
+                  myInventoryRef={triggerMyInventoryRef}
+                />
+              </div>
+            )}
 
           {lensProfile && !sidebarCollapsedStateLeft.collapsed && (
             <div className="flex w-full items-center justify-center py-4">
@@ -403,7 +468,11 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
             )}
         </div>
       </div>
-      <div className="fixed bottom-0 w-full bg-transparent px-6 py-4 font-mono text-xs text-gray-300">
+      <div
+        className={`fixed bottom-0 bg-transparent px-6 py-4 font-mono text-xs text-gray-300 ${
+          sidebarCollapsedStateLeft.collapsed ? 'w-20' : 'w-full'
+        }`}
+      >
         {APP_UI_VERSION} - {DEFAULT_NETWORK}
       </div>
     </div>

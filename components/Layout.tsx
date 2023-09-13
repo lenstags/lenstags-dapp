@@ -1,26 +1,34 @@
 import React, { FC, useContext, useEffect, useState } from 'react';
 
 import Head from 'next/head';
+import { PublicRoutes } from 'models';
+import Script from 'next/script';
 import SideBarLeft from './SideBarLeft';
 import SideBarRight from './SideBarRight';
-import { Toaster } from './ui/ToasterUI';
 import { SidebarContext } from '@context/SideBarSizeContext';
+import { Toaster } from './ui/ToasterUI';
 import { useRouter } from 'next/router';
-import Script from 'next/script';
-import { PublicRoutes } from 'models';
 
 interface Props {
   title: string;
   pageDescription: string;
   children: React.ReactNode;
   screen?: boolean;
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
 }
 
 export const Layout: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen
+  screen,
+  setIsExplore,
+  isExplore,
+  setSkipExplore,
+  skipExplore
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
   useEffect(() => {
@@ -102,24 +110,13 @@ export const Layout: FC<Props> = ({
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
-      {/* <div style="
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
-  
-  background-image: url('ruta/de/la/imagen.jpg'); background-repeat: no-repeat; background-size: cover; z-index: -1;"></div> */}
-      {/* <div
-      // style={{
-      //   backgroundImage: 'url(/img/app-background.svg)',
-      //   backgroundSize: 'cover',
-      //   backgroundRepeat: 'no-repeat',
-      //   backgroundPosition: 'center'
-      // }}
-      > */}
-      {/* <div className="flex"> */}
-      {/* <nav>
-            <Navbar />
-          </nav> */}
       <div className="grid  w-full grid-cols-12">
-        <SideBarLeft />
+        <SideBarLeft
+          setIsExplore={setIsExplore}
+          isExplore={isExplore}
+          setSkipExplore={setSkipExplore}
+          skipExplore={skipExplore}
+        />
         <main
           className={`col-span-7 overflow-x-clip ${
             sidebarCollapsedStateLeft.collapsed &&
@@ -134,11 +131,6 @@ export const Layout: FC<Props> = ({
         <SideBarRight />
         <Toaster />
       </div>
-      {/* </div> */}
-      {/* </div> */}
-      {/* <main className={`${!screen ? 'h-screen' : 'h-full'} mt-16  `}> */}
-      {/* <main className="mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
-      {/* <main className="z-0 mx-auto h-screen w-3/5 overflow-auto  pt-14"> */}
     </>
   );
 };

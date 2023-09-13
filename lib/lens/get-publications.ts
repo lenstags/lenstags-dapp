@@ -1,11 +1,23 @@
 import {
+  Comment,
+  FeedEventItemType,
+  FeedRequest,
+  PaginatedFeedResult,
+  ProfileFeedDocument,
+  PublicationMetadataFilters,
   PublicationTypes,
   PublicationsDocument,
-  PublicationsQueryRequest
+  PublicationsQueryRequest,
+  TimelineDocument,
+  TimelineQuery,
+  TimelineRequest,
+  TimelineType
 } from '@lib/lens/graphql/generated';
 
 import { APP_NAME } from '@lib/config';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';
+import { followGaslessSignOnly } from './follow-gasless';
+import { followers } from './followers';
 
 const getPublicationsRequest = async (request: PublicationsQueryRequest) => {
   const result = await apolloClient.query({
@@ -92,7 +104,12 @@ export const getComments = async (postId: string) => {
   // );
 
   // console.log('resulttt: ', result, result.items.length);
-  return result.items;
+
+  // FIXME for paginated results
+  const allComments = result.items.filter(
+    (i) => i.__typename === 'Comment'
+  ) as Array<Comment>;
+  return allComments;
 };
 
 export const getPublications = async (
@@ -110,56 +127,48 @@ export const getPublications = async (
   return result;
 };
 
-export const getPostsCommentsxxxx = async (postIds: string[]) => {
-  const result = await getPublicationsRequest({
-    commentsOf: postIds
+const getFeed = async (request: FeedRequest) => {
+  const result = await apolloClient.query({
+    query: ProfileFeedDocument,
+    variables: {
+      request
+    }
   });
-
-  // const p = await getPublication(postId);
-  // console.log(p);
-  // const result = await getPublicationsRequest({
-  //   // profileId: '0x4b87',
-  //   publicationTypes: [PublicationTypes.Comment],
-  //   commentsOf: '0x4b87-0x0130'
-  //   // publicationIds: [postId] // ['0x4b87-0x69'] // FIXME test later if it doesnt work
-  //   // [PublicationTypes.Post, PublicationTypes.Comment, PublicationTypes.Mirror],
-  // });
-
-  console.log('resultazo ', result);
-  console.log(
-    'post comments de ',
-    postIds,
-    ': ',
-    result.items.filter((i) => i.__typename === 'Comment')
-  );
-
-  return result;
+  return result.data.feed;
 };
 
-// export const getPostsComments = async (postIds: string[]) => {
-//   const result = await getPublicationsRequest({
-//     // commentsOf: postIds,
-//     publicationIds: postIds
-//     // publicationTypes: [PublicationTypes.Comment]
-//   });
+export const getPublicationsFollowing = async (
+  // publicationTypes: PublicationTypes[],
+  profileId: string,
+  metadata?: PublicationMetadataFilters | null
+) => {
+  // get my follows
 
-//   // const p = await getPublication(postId);
-//   // console.log(p);
-//   // const result = await getPublicationsRequest({
-//   //   // profileId: '0x4b87',
-//   //   publicationTypes: [PublicationTypes.Comment],
-//   //   commentsOf: '0x4b87-0x0130'
-//   //   // publicationIds: [postId] // ['0x4b87-0x69'] // FIXME test later if it doesnt work
-//   //   // [PublicationTypes.Post, PublicationTypes.Comment, PublicationTypes.Mirror],
-//   // });
+  const req: FeedRequest = {
+    metadata,
+    profileId,
+    sources: [APP_NAME],
+    feedEventItemTypes: [FeedEventItemType.Post]
+  };
+  const res = await getFeed(req);
+  const newRes: PaginatedFeedResult = {
+    items: res.items.map((r: any) => r.root),
+    pageInfo: res.pageInfo,
+    __typename: res.__typename
+  };
 
-//   // console.log('resultazo ', result);
-//   console.log(
-//     'post comments de ',
-//     postIds,
-//     ': ',
-//     result.items.filter((i) => i.__typename === 'Comment')
-//   );
+  return newRes;
 
-//   return result;
-// };
+  // const res = await following(address);
+  // const arrayFollowing = res.items.map((r) => r.profile.id);
+  // console.log('---my following: ', arrayFollowing);
+  // const req: PublicationsQueryRequest = {
+  //   // customFilters
+  //   metadata,
+  //   profileIds: arrayFollowing,
+  //   publicationTypes,
+  //   sources: [APP_NAME]
+  // };
+  // const result = await getPublicationsRequest(req);
+  // return result;
+};

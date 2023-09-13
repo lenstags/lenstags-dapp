@@ -1,3 +1,8 @@
+import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
+import {
+  IbuiltPost,
+  PublicationContentWarning
+} from '@lib/lens/interfaces/publication';
 import React, {
   ChangeEvent,
   useContext,
@@ -8,29 +13,24 @@ import React, {
 import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
 import Avatar from 'boring-avatars';
-import CollapsiblePanels from 'components/Panels';
 import CreatableSelect from 'react-select/creatable';
-import { DEFAULT_METADATA_ATTRIBUTES } from '@lib/lens/post';
 import { DotWave } from '@uiball/loaders';
 import Editor from 'components/Editor';
-import { IbuiltPost } from '@lib/lens/interfaces/publication';
-import Image from 'next/image';
-import { LayoutCreate } from '@components/LayourCreate';
+import { LayoutCreate } from '@components/LayoutCreate';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
 import { NextPage } from 'next';
+import { NotificationTypes } from '@models/notifications.models';
 import { ProfileContext } from 'components';
 import { Spinner } from '@components/Spinner';
 import { TAGS } from '@lib/lens/tags';
 import Toast from '../../components/Toast';
 import TurndownService from 'turndown';
 import _ from 'lodash';
-import { createPostManager } from '@lib/lens/post';
+import { followers } from '@lib/lens/followers';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import { followers } from '@lib/lens/followers';
-import { sendNotification } from '@lib/lens/user-notifications';
-import { NotificationTypes } from '@models/notifications.models';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -91,17 +91,19 @@ const Create: NextPage = () => {
   const [sourceUrl, setSourceUrl] = useState('');
   const [toast, setToast] = useState<ToastContent>({});
   const [isToastVisible, setToastVisible] = useState(false);
+  const [isNSFW, setIsNSFW] = useState(false);
   const [cover, setCover] = useState<File>();
   const [generatedImage, setGeneratedImage] = useState<any>();
   const [generatedImage2, setGeneratedImage2] = useState<any>(); // FIXME use only one
   const [isTagSelected, setIsTagSelected] = useState<boolean>(false);
+  const [isExplore, setIsExplore] = useState(false);
+  const [skipExplore, setSkipExplore] = useState(true);
 
   const [imageURL, setImageURL] = useState('');
   const [imageOrigin, setImageOrigin] = useState<string | null>('panelAI');
 
   const [loading, setLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
-  // const [loadingTLDR, setLoadingTLDR] = useState(false);
   const [loadingIA, setLoadingIA] = useState(false);
   const [loadingLP, setLoadingLP] = useState(false);
   const [selectedOption, setSelectedOption] = useState([]);
@@ -255,9 +257,6 @@ const Create: NextPage = () => {
     if (data) {
       setImageURL(data.image as string);
       setImageOrigin('panelLink');
-
-      console.log('ssss ', data.image);
-
       // setGeneratedImage(data.image as string);
       setIsLoaded(true);
     } else {
@@ -376,7 +375,8 @@ const Create: NextPage = () => {
       locale: 'en',
       image: imageBuffer || null,
       imageMimeType: 'image/jpeg',
-      tags: selectedOption.map((r) => r['value'])
+      tags: selectedOption.map((r) => r['value']),
+      contentWarning: isNSFW ? PublicationContentWarning.NSFW : undefined
       // TODO: GET FILTER ARRAY FROM THE UI
       // title: title,
       // todo: image?: Buffer[]
@@ -398,7 +398,7 @@ const Create: NextPage = () => {
       );
       const { pubId } =
         typeof result !== 'string' && result.pubId ? result : { pubId: '' };
-      const id = lensProfile?.id;
+      const id = `${lensProfile?.id}-${pubId}`;
       const dataSender = {
         title,
         pubId,
@@ -545,6 +545,11 @@ const Create: NextPage = () => {
     <LayoutCreate
       title="Nata Social | Create post"
       pageDescription="Create post"
+      breadcumpTitle="Create post"
+      setIsExplore={setIsExplore}
+      isExplore={isExplore}
+      setSkipExplore={setSkipExplore}
+      skipExplore={skipExplore}
     >
       {hydrationLoading ? (
         <div className="flex w-full justify-center p-10">
@@ -751,29 +756,24 @@ const Create: NextPage = () => {
                     </div>
                   </div>
                 </div>
-                {/* 
-                <div className="mb-4 w-full">
-                  <CollapsiblePanels
-                    panels={panels}
-                    onActivePanelChange={handleActivePanelChange}
-                  />
-                </div> */}
+
+                {/* NSFW switch  */}
+                <div className="mb-4 items-center px-4 py-2">
+                  <div className="mb-1 flex ">
+                    This post contains sensitive content
+                    <input
+                      checked={isNSFW}
+                      onChange={() => setIsNSFW(!isNSFW)}
+                      type="checkbox"
+                      className="form-checkbox ml-2 h-5 w-5"
+                      style={{
+                        backgroundColor: isNSFW ? 'purple' : '',
+                        borderColor: isNSFW ? 'purple' : 'gray'
+                      }}
+                    />
+                  </div>
+                </div>
               </div>
-              {/* abstract */}
-              {/*
-                <button
-                  className="ml-2 flex w-2/12 items-center justify-center whitespace-nowrap rounded-md
-                bg-black p-2 text-center font-serif text-xs text-white"
-                  onClick={handleGenerateTLDR}
-                >
-                  GENERATE TLDR
-                  {loadingTLDR && (
-                    <div className="ml-2">
-                      <DotWave size={22} color="#FFFFFF" />
-                    </div>
-                  )}
-                </button>
-              </div> */}
 
               {/* hidden default image DO NOT REMOVE */}
               <div

@@ -4,19 +4,14 @@ import {
   QueueListIcon,
   RectangleStackIcon
 } from '@heroicons/react/24/outline';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 
 export interface SortingValuesType {
   date: string;
   sort: PublicationSortCriteria;
   by: string;
-}
-
-enum ViewBy {
-  CARD = 'CARD',
-  VIEW = 'VIEW',
-  POST = 'POST'
 }
 
 export enum Filter {
@@ -38,7 +33,7 @@ export const SortFilterControls = ({
 }) => {
   const [showSortingOptions, setShowSortingOptions] = useState(false);
   const [localValues, setLocalValues] = useState(sortingValues);
-  const [viewCard, setViewCard] = useState<ViewBy>(ViewBy.CARD);
+  const { viewCard, setViewCard } = useContext(ViewCardContext);
   const [showViewOptions, setShowViewOptions] = useState(false);
 
   const Pill = () => {
@@ -47,12 +42,16 @@ export const SortFilterControls = ({
         return <Squares2X2Icon className="w-6 h-6" />;
       case ViewBy.POST:
         return <QueueListIcon className="w-6 h-6" />;
-      case ViewBy.VIEW:
+      case ViewBy.LIST:
         return <RectangleStackIcon className="w-6 h-6" />;
+      default:
+        return null;
     }
   };
 
-  const handleViewOptionClick = (view: ViewBy) => {
+  const handleViewOptionClick = (
+    view: (typeof ViewBy)[keyof typeof ViewBy]
+  ) => {
     setViewCard(view);
     setTimeout(() => {
       setShowViewOptions(false);
@@ -159,17 +158,17 @@ export const SortFilterControls = ({
                   <QueueListIcon className="w-6 h-6" />
                 </button>
               )}
-              {viewCard === ViewBy.VIEW ? (
+              {viewCard === ViewBy.LIST ? (
                 <button
                   className="bg-black text-white py-1 px-1.5 rounded-lg"
-                  onClick={() => handleViewOptionClick(ViewBy.VIEW)}
+                  onClick={() => handleViewOptionClick(ViewBy.LIST)}
                 >
                   <RectangleStackIcon className="w-6 h-6" />
                 </button>
               ) : (
                 <button
                   className="bg-white text-black py-1 px-1.5"
-                  onClick={() => handleViewOptionClick(ViewBy.VIEW)}
+                  onClick={() => handleViewOptionClick(ViewBy.LIST)}
                 >
                   <RectangleStackIcon className="w-6 h-6" />
                 </button>

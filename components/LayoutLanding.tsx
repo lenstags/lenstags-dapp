@@ -1,5 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 
+import { DEFAULT_NATA_DOMAIN } from '@lib/config';
 import Head from 'next/head';
 import Link from 'next/link';
 import Script from 'next/script';
@@ -147,13 +148,13 @@ export const LayoutLanding: FC<Props> = ({
           }}
         >
           <a
-            href="https://tally.so/r/mVjz7J"
+            href={DEFAULT_NATA_DOMAIN}
             target="_blank"
             rel="noreferrer"
             className="cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 font-serif
              text-xs font-bold text-white md:text-sm   "
           >
-            JOIN
+            OPEN APP
           </a>
         </div>
       </nav>

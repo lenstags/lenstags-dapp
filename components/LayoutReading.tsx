@@ -2,24 +2,31 @@ import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
 import Script from 'next/script';
-import { Navbar } from 'components';
 import SideBarLeft from './SideBarLeft';
 import Topbar from './Topbar';
+import { useExplore } from '@context/ExploreContext';
 
 interface Props {
   title: string;
   pageDescription: string;
   children: React.ReactNode;
   screen?: boolean;
+  breadcumpTitle: string;
+  metadataName: string;
+  fromList?: boolean;
 }
 
 export const LayoutReading: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen
+  screen,
+  breadcumpTitle,
+  metadataName,
+  fromList
 }) => {
   const [hydrationLoading, setHydrationLoading] = useState(true);
+  const { isExplore, setIsExplore, setSkipExplore, skipExplore } = useExplore();
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
@@ -96,10 +103,18 @@ export const LayoutReading: FC<Props> = ({
       ></Script>
 
       <div className="grid w-full grid-cols-12">
-        <SideBarLeft />
-
+        <SideBarLeft
+          setIsExplore={setIsExplore}
+          isExplore={isExplore}
+          setSkipExplore={setSkipExplore}
+          skipExplore={skipExplore}
+        />
         <div className="col-span-10 col-start-2 overflow-x-clip">
-          <Topbar />
+          <Topbar
+            breadcumpTitle={breadcumpTitle}
+            metadataName={metadataName}
+            fromList={fromList}
+          />
           <main
             // FIXME Remove the absolute and left, when the sidebar
             // has no the fixed anymore!!!

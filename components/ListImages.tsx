@@ -10,6 +10,7 @@ import { useEffect, useState } from 'react';
 
 import { getLastComment } from '@lib/lens/get-publications';
 import { getPublication } from '@lib/lens/get-publication';
+import { cn } from '@lib/utils';
 
 // import { Comment } from '@lib/lens/graphql/generated';
 // import { getIPFSImage } from '@lib/helpers';
@@ -18,15 +19,23 @@ SwiperCore.use([Autoplay]);
 
 interface listImageProps {
   postId: string;
+  square?: boolean;
+  className?: string;
+  h?: string;
 }
 
-const ListImages: React.FC<listImageProps> = (props) => {
+const ListImages: React.FC<listImageProps> = ({
+  postId,
+  className,
+  h = 'h-28',
+  square
+}) => {
   // const [comments, setComments] = useState<any>([]);
   const [URLImages, setURLImages] = useState<any>([]);
 
   useEffect(() => {
     async function fetchComments() {
-      const arrPosts = await getLastComment(props.postId);
+      const arrPosts = await getLastComment(postId);
       // for each comment array, bring each post image
       if (!arrPosts) {
         return;
@@ -50,7 +59,7 @@ const ListImages: React.FC<listImageProps> = (props) => {
     }
 
     fetchComments();
-  }, [props.postId]);
+  }, [postId]);
 
   return (
     <>
@@ -59,10 +68,14 @@ const ListImages: React.FC<listImageProps> = (props) => {
         // className=" flex flex-row overflow-hidden pt-6"
         // >
         <Swiper
-          className="rounded-lg"
+          className={cn(
+            `rounded-lg ${square !== undefined && 'w-12'} h-full`,
+            className
+          )}
           style={{
             // position: 'absolute',
-            zIndex: 0
+            zIndex: 0,
+            marginInline: square ? 'unset' : 'auto'
           }}
           autoplay={{ delay: 0, disableOnInteraction: false }}
           speed={1000}
@@ -87,10 +100,15 @@ const ListImages: React.FC<listImageProps> = (props) => {
           {URLImages.map(
             (urlImage: string = '/img/list.png', index: number) => {
               return (
-                <SwiperSlide key={index}>
+                <SwiperSlide
+                  key={index}
+                  style={{
+                    marginRight: '0px'
+                  }}
+                >
                   <div key={index} className="rounded-lg">
                     <Image
-                      className=" h-28 w-full rounded-lg object-cover"
+                      className={cn('w-full rounded-lg object-cover', h)}
                       src={urlImage}
                       alt=""
                       width={400}
@@ -103,14 +121,15 @@ const ListImages: React.FC<listImageProps> = (props) => {
           )}
         </Swiper>
       ) : (
-        // </div>
-        <Image
-          className=" h-28 w-full rounded-lg object-cover "
-          src={DEFAULT_IMAGE_POST}
-          alt=""
-          width={400}
-          height={200}
-        />
+        <div className={className}>
+          <Image
+            className={cn('w-full rounded-lg object-cover ', h)}
+            src={DEFAULT_IMAGE_POST}
+            alt=""
+            width={400}
+            height={200}
+          />
+        </div>
       )}
     </>
   );

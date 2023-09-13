@@ -1,8 +1,8 @@
 // @ts-ignore
 
+import { DEFAULT_IMAGE_PROFILE, IPFS_PROXY_URL } from '../lib/config';
 import { parse, setOptions } from 'marked';
 
-import { IPFS_PROXY_URL } from '../lib/config';
 import createDOMPurify from 'dompurify';
 import omitDeep from 'omit-deep';
 
@@ -134,5 +134,25 @@ export const markdownToHTML = (innerHtml: string): any => {
 export const validateWhitelist = async (address: string): Promise<boolean> => {
   const response = await fetch(`/api/gate?wallet=${address}`);
   const data = await response.json();
+  console.log('validateWhitelist data: ', data);
   return data.isWhitelisted as boolean;
+};
+
+const getUrl = (media: any, defaultUrl: string) => {
+  if (!media) {
+    return;
+  }
+  return media?.__typename === 'MediaSet'
+    ? media.original.url
+    : media?.__typename === 'NftImage'
+    ? media.uri
+    : defaultUrl;
+};
+
+export const getPictureUrl = (lensProfile: any) => {
+  return getUrl(lensProfile?.picture, DEFAULT_IMAGE_PROFILE);
+};
+
+export const getCoverPictureUrl = (lensProfile: any) => {
+  return getUrl(lensProfile?.coverPicture, DEFAULT_IMAGE_PROFILE);
 };

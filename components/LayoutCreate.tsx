@@ -9,13 +9,23 @@ interface Props {
   pageDescription: string;
   children: React.ReactNode;
   screen?: boolean;
+  breadcumpTitle: string;
+  setIsExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  isExplore: boolean;
+  setSkipExplore: React.Dispatch<React.SetStateAction<boolean>>;
+  skipExplore: boolean;
 }
 
 export const LayoutCreate: FC<Props> = ({
   children,
   title,
   pageDescription,
-  screen
+  screen,
+  breadcumpTitle,
+  setIsExplore,
+  isExplore,
+  setSkipExplore,
+  skipExplore
 }) => {
   return (
     <>
@@ -65,10 +75,14 @@ export const LayoutCreate: FC<Props> = ({
       ></script>
 
       <div className="grid w-full grid-cols-12">
-        <SideBarLeft />
-
+        <SideBarLeft
+          setIsExplore={setIsExplore}
+          isExplore={isExplore}
+          setSkipExplore={setSkipExplore}
+          skipExplore={skipExplore}
+        />
         <div className="col-span-12 col-start-2 overflow-x-clip">
-          <Topbar />
+          <Topbar breadcumpTitle={breadcumpTitle} />
           <main
             // FIXME Remove the absolute and left, when the sidebar
             // has no the fixed anymore!!!

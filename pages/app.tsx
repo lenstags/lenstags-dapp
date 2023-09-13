@@ -1,13 +1,19 @@
+import { APP_NAME, LENSTAGS_SOURCE } from '@lib/config';
+import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import {
-  APP_UI_VERSION,
-  ATTRIBUTES_LIST_KEY,
-  DEFAULT_CHAIN_ID,
-  DEFAULT_NETWORK
-} from '@lib/config';
-import { ProfileContext, TagsFilterContext } from 'components';
-import { enable, queryProfile } from '@lib/lens/enable-dispatcher';
-import { explore, reqQuery } from '@lib/lens/explore-publications';
-import { findKeyAttributeInProfile, validateWhitelist } from 'utils/helpers';
+  CustomFiltersTypes,
+  ExplorePublicationsDocument,
+  ExplorePublicationsQuery,
+  FeedEventItemType,
+  FeedRequest,
+  PaginatedFeedResult,
+  ProfileFeedDocument,
+  PublicationContentWarning,
+  PublicationSortCriteria,
+  PublicationTypes
+} from '@lib/lens/graphql/generated';
+import { ProfileContext, TagsFilter, TagsFilterContext } from 'components';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import {
   useCallback,
   useContext,
@@ -16,32 +22,29 @@ import {
   useRef,
   useState
 } from 'react';
-import { useNetwork, useSwitchNetwork } from 'wagmi';
 
-import {
-  ExplorePublicationsDocument,
-  PublicationSortCriteria
-} from '@lib/lens/graphql/generated';
 import ExplorerCard from 'components/ExplorerCard';
 import Head from 'next/head';
 import ImageProxied from 'components/ImageProxied';
+import CustomHead from '@components/CustomHead';
 import { Layout } from 'components/Layout';
 import type { NextPage } from 'next';
 import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
 import { Spinner } from 'components/Spinner';
-import { TagsFilter } from 'components/TagsFilter';
 import {
   Filter,
   SortFilterControls,
   SortingValuesType
 } from '@components/SortFilterControls';
+import WelcomePanel from '@components/WelcomePanel';
 import WhitelistScreen from '@components/WhitelistScreen';
-import { createDefaultList } from '@lib/lens/load-lists';
-import { deleteLensLocalStorage } from '@lib/lens/localStorage';
-import { useDisconnect } from 'wagmi';
+import { cn } from '@lib/utils';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
+import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
+import { useExplore } from '@context/ExploreContext';
+import { useNetwork } from 'wagmi';
 import { useQuery } from '@apollo/client';
-import { useSnackbar } from 'material-ui-snackbar-provider';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -49,18 +52,13 @@ const App: NextPage = () => {
   useEffect(() => {
     setHydrationLoading(false);
   }, []);
-  const { chain } = useNetwork();
 
+  const { chain } = useNetwork();
   const { tags } = useContext(TagsFilterContext);
-  const [showWelcome, setShowWelcome] = useState(false);
-  const [showReject, setShowReject] = useState(false);
-  const [ready, setReady] = useState(false);
   const [loadingFetchMore, setLoadingFetchMore] = useState(false);
   const [loader, setLoader] = useState(false);
-  const [cursor, setCursor] = useState<string | undefined>(undefined);
-  const [isVisibleWL, setIsVisibleWL] = useState<boolean>(false); //HEREEE
-  const { disconnect } = useDisconnect();
-  const snackbar = useSnackbar();
+  const [finished, setFinished] = useState(false);
+  const [cursor, setCursor] = useState<string | null>(null);
   const { profile: lensProfile } = useContext(ProfileContext);
   const [sortingValues, setSortingValues] = useState<SortingValuesType>({
     date: 'all',
@@ -68,238 +66,328 @@ const App: NextPage = () => {
     by: 'all'
   });
   const [filterValue, setFilterValue] = useState<Filter>(Filter.ALL);
+  const { viewCard } = useContext(ViewCardContext);
+  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
-  const { chains, error, isLoading, pendingChainId, switchNetwork } =
-    useSwitchNetwork({
-      chainId: DEFAULT_CHAIN_ID,
-      onError(error) {
-        console.log('Error', error);
-      },
-      onSuccess(data) {
-        console.log('Success', data);
+  const {
+    checkWhitelist,
+    isVisibleWL,
+    setIsVisibleWL,
+    showWelcome,
+    setShowWelcome,
+    welcomeReady
+  } = useCheckWhitelist(lensProfile);
+
+  /*
+   *  whitelist validation HOOKEABLE
+   */
+  useEffect(() => {
+    if (lensProfile?.id && chain) {
+      checkWhitelist(lensProfile.ownedBy, chain.id);
+    }
+  }, [lensProfile, chain]); // removed checkWhitelist!
+
+  /*
+   * main query definitions
+   */
+  const limitPosts = 30;
+  const resExplore = useQuery(ExplorePublicationsDocument, {
+    variables: {
+      request: {
+        sortCriteria: PublicationSortCriteria.Latest,
+        noRandomize: true,
+        sources: [LENSTAGS_SOURCE],
+        limit: limitPosts,
+        publicationTypes: [PublicationTypes.Post],
+        customFilters: [CustomFiltersTypes.Gardeners],
+        metadata: {
+          locale: 'en',
+          tags: { oneOf: tags }
+          // FIXME this is not working as Lens said...
+          // contentWarning: {
+          //   includeOneOf: [
+          //     PublicationContentWarning.Nsfw
+          //     // PublicationContentWarning.Sensitive
+          //     // PublicationContentWarning.Spoiler
+          //   ]
+          // }
+        }
       }
-    });
+    },
+    skip: skipExplore // when true is skipped
+  });
 
-  // let provider: Web3Provider;
+  const resFollowing = useQuery(ProfileFeedDocument, {
+    variables: {
+      request: {
+        profileId: lensProfile?.id,
+        sources: [APP_NAME],
+        feedEventItemTypes: [FeedEventItemType.Post],
+        metadata: {
+          locale: 'en',
+          tags: { oneOf: tags }
+          // contentWarning: {
+          //   includeOneOf: [
+          //     PublicationContentWarning.Nsfw,
+          //     PublicationContentWarning.Sensitive,
+          //     PublicationContentWarning.Spoiler
+          //   ]
+          // }
+        }
+      }
+    },
+    skip: !skipExplore
+  });
 
-  // const networkMap = {
-  //   POLYGON_MAINNET: {
-  //     chainId: hexValue(137), // '0x89'
-  //     chainName: 'Polygon Mainnet',
-  //     nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
-  //     rpcUrls: ['https://polygon-rpc.com'],
-  //     blockExplorerUrls: ['https://www.polygonscan.com/']
-  //   },
-  //   MUMBAI_TESTNET: {
-  //     chainId: hexValue(80001), // '0x13881'
-  //     chainName: 'Polygon Mumbai Testnet',
-  //     nativeCurrency: { name: 'tMATIC', symbol: 'tMATIC', decimals: 18 },
-  //     rpcUrls: ['https://rpc-mumbai.maticvigil.com'],
-  //     blockExplorerUrls: ['https://mumbai.polygonscan.com/']
-  //   }
-  // };
+  const {
+    fetchMore,
+    data,
+    loading,
+    error: apolloError
+  } = isExplore ? resExplore : resFollowing;
 
-  // const switchChains = async (chainId: number) => {
-  //   const id: string = hexValue(chainId);
-  //   try {
-  //     await provider.send('wallet_switchEthereumChain', [{ chainId: id }]);
-  //     console.log('switched to chain', chainId);
-  //   } catch (error) {
-  //     // @ts-ignore
-  //     if (error.code === 4902) {
-  //       console.log("this network is not in the user's wallet");
-  //       await provider.send('wallet_addEthereumChain', [
-  //         chainId === 80001
-  //           ? networkMap.MUMBAI_TESTNET
-  //           : networkMap.POLYGON_MAINNET
-  //       ]);
+  // Primer useEffect para manejar la actualización de 'publications' y 'cursor'
+  useEffect(() => {
+    setPublications([]); // Limpiar datos
+
+    if (!data) {
+      return;
+    }
+
+    if (isExplore) {
+      // @ts-ignore
+      const { pageInfo, items } = data.explorePublications;
+      setCursor(pageInfo.next);
+      setPublications(items);
+    } else {
+      // @ts-ignore
+      const { items, pageInfo, __typename } = data.feed;
+      const newRes: PaginatedFeedResult = {
+        items: items.map((r: any) => r.root),
+        pageInfo,
+        __typename
+      };
+      setCursor(newRes.pageInfo.next);
+      setPublications(newRes.items);
+    }
+  }, [data, isExplore, tags, lensProfile]);
+
+  // Segundo useEffect para manejar el estado del 'loader'
+  useEffect(() => {
+    setLoader(loading);
+  }, [loading]);
+
+  // Tercer useEffect para manejar errores de Apollo
+  useEffect(() => {
+    if (apolloError) {
+      console.log('⛔️ ⛔️ ⛔️ Error fetching data', apolloError);
+    }
+  }, [apolloError]);
+
+  // use/Effect(() => {
+  //   setPublications([]); // cleans data
+
+  //   if (data) {
+  //     if (typeof data === 'undefined') {
+  //       return;
   //     }
 
-  //     throw error;
+  //     if (isExplore) {
+  //       // @ts-ignore
+  //       const t = data.explorePublications;
+  //       setCursor(t.pageInfo.next);
+  //       setPublications(t.items);
+  //       return;
+  //     }
+
+  //     // @ts-ignore
+  //     const t = data.feed;
+  //     const newRes: PaginatedFeedResult = {
+  //       items: t.items.map((r: any) => r.root),
+  //       pageInfo: t.pageInfo,
+  //       __typename: t.__typename
+  //     };
+  //     setCursor(newRes.pageInfo.next);
+  //     setPublications(newRes.items);
+  //     return;
   //   }
-  // };
+  // }, [data, isExplore, tags]);
 
-  // function normalizeChainId(chainId: string | number | bigint) {
-  //   if (typeof chainId === 'string')
-  //     return Number.parseInt(
-  //       chainId,
-  //       chainId.trim().substring(0, 2) === '0x' ? 16 : 10
-  //     );
-  //   if (typeof chainId === 'bigint') return Number(chainId);
-  //   return chainId;
-  // }
+  // use/Effect(() => {
+  //   setLoader(loading);
+  // }, [loading, resExplore]);
 
-  // const getChainId = async (): Promise<number> => {
-  //   return provider.send('eth_chainId', []).then(normalizeChainId);
-  // };
+  // use/Effect(() => {
+  //   setLoader(loading);
+  // }, [data]);
 
-  // const ensureCorrectChain = async () => {
-  //   const currentChainId = await getChainId();
-  //   if (currentChainId !== DEFAULT_CHAIN_ID) {
-  //     await switchChains(DEFAULT_CHAIN_ID);
+  // use/Effect(() => {
+  //   setLoader(loading);
+  // }, [loading]);
+
+  // use/Effect(() => {
+  //   if (apolloError) {
+  //     console.log('⛔️ ⛔️ ⛔️ Error fetching data', apolloError);
   //   }
-  // };
-
-  const handleSetup = async () => {
-    // await ensureCorrectChain();
-
-    const profileResult = await queryProfile({ profileId: lensProfile!.id });
-    const listAttributeObject = findKeyAttributeInProfile(
-      profileResult,
-      ATTRIBUTES_LIST_KEY
-    );
-    console.log('profileResult ', profileResult);
-
-    const hasLists =
-      listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;
-    console.log('>>> hasLists ', hasLists);
-
-    const dispatcherEnabled = profileResult
-      ? profileResult.dispatcher?.canUseRelay || false
-      : false;
-
-    if (!dispatcherEnabled || !hasLists) {
-      console.log('>>>   enabledRelayer: ', dispatcherEnabled);
-
-      setShowWelcome(true);
-      try {
-        if (profileResult && !dispatcherEnabled) {
-          snackbar.showMessage('🟦 Enabling Tx Dispatcher...');
-          const res = await enable(profileResult.id);
-          console.log('RRR ', res);
-          if (!res) {
-            setShowReject(true);
-            return;
-          }
-          snackbar.showMessage('🟦 Dispatcher enabled successfully.');
-        }
-
-        if (!hasLists) {
-          snackbar.showMessage('🟦 Creating default list...');
-          await createDefaultList(profileResult);
-          snackbar.showMessage('💚 LFGrow ⚜️!');
-        }
-        setReady(true);
-      } catch (err: any) {
-        if (err.code === 'ACTION_REJECTED') {
-          setShowReject(true);
-        } else {
-          console.log('Unknown error!: ', err.code);
-        }
-      }
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async (address: string, chainId: number) => {
-      await validateWhitelist(address).then((isInWL) => {
-        if (isInWL) {
-          setIsVisibleWL(false);
-          if (chainId !== DEFAULT_CHAIN_ID) {
-            // switch
-            switchNetwork?.(DEFAULT_CHAIN_ID);
-          }
-          handleSetup();
-        } else {
-          setIsVisibleWL(true);
-          deleteLensLocalStorage();
-          disconnect();
-          return;
-        }
-      });
-    };
-
-    if (lensProfile?.id && chain) {
-      fetchData(lensProfile.ownedBy, chain.id);
-    }
-  }, [lensProfile, chain]);
+  // }, [apolloError]);
 
   /**
    * Infinite scroll
    */
-  const query = useMemo(() => {
-    if (!tags) return reqQuery;
-    reqQuery.metadata = {
+  const reqQueryFeed: FeedRequest = {
+    profileId: lensProfile?.id,
+    sources: [APP_NAME],
+    feedEventItemTypes: [FeedEventItemType.Post]
+  };
+
+  const query2 = useMemo(() => {
+    const finalReq = isExplore ? reqQuery : reqQueryFeed;
+    if (!tags) {
+      return finalReq;
+    }
+
+    finalReq.metadata = {
       locale: 'en',
       tags: { oneOf: tags }
+      // contentWarning: {
+      //   includeOneOf: [
+      //     PublicationContentWarning.Nsfw,
+      //     PublicationContentWarning.Sensitive,
+      //     PublicationContentWarning.Spoiler
+      //   ]
+      // }
     };
-    return reqQuery;
-  }, [tags]);
 
-  const { fetchMore } = useQuery(ExplorePublicationsDocument, {
-    variables: {
-      request: query
-    },
-    onCompleted: (data) => {
-      if (cursor === undefined)
-        setCursor(data.explorePublications.pageInfo.next);
+    if (!isExplore && lensProfile) {
+      // @ts-ignore
+      finalReq.profileId = lensProfile.id;
     }
-  });
+    return finalReq;
+  }, [tags, isExplore, lensProfile]);
 
   const handleLoadMoreWithoutTags = useCallback(() => {
-    if (!cursor) return console.log('no more results');
+    if (!cursor) {
+      setFinished(true);
+      return console.log('no more results');
+    }
     setLoadingFetchMore(true);
     fetchMore({
       variables: {
         request: {
-          ...query,
+          ...query2,
           cursor
         }
       },
       updateQuery: (prev, { fetchMoreResult }): any => {
-        if (!fetchMoreResult) return 'no more results';
-        return {
+        if (!fetchMoreResult) {
+          setFinished(true);
+          return 'no more results';
+        }
+
+        const feedResult = {
+          explorePublicationsResult: {
+            ...fetchMoreResult.feed
+          }
+        };
+
+        const explorePublicationsResult = {
           explorePublications: {
+            // @ts-ignore
             ...fetchMoreResult.explorePublications
           }
         };
+
+        return isExplore ? explorePublicationsResult : feedResult;
       }
     }).then((res) => {
-      if (res.data.explorePublications.items.length > 0) {
-        setCursor(res.data.explorePublications.pageInfo.next);
-        setPublications((prev) => [
-          ...prev,
-          ...res.data.explorePublications.items
-        ]);
+      const t = res.data;
+      // @ts-ignore
+      if (t.explorePublications?.items.length > 0 || t.feed?.items.length > 0) {
+        if (isExplore) {
+          const newRes = {
+            // @ts-ignore
+            items: t.explorePublications.items,
+            // @ts-ignore
+            pageInfo: t.explorePublications.pageInfo,
+            // @ts-ignore
+            __typename: t.explorePublications.__typename
+          };
+          setCursor(newRes.pageInfo.next);
+          setPublications((prev) => [...prev, ...newRes.items]);
+        } else {
+          const newRes = {
+            items: t.feed.items.map((r: any) => r.root),
+            pageInfo: t.feed.pageInfo,
+            __typename: t.feed.__typename
+          };
+          setCursor(newRes.pageInfo.next);
+          setPublications((prev) => [...prev, ...newRes.items]);
+        }
         setLoadingFetchMore(false);
       } else {
         setLoadingFetchMore(false);
+        setFinished(true);
+
         return console.log('no more results');
       }
     });
-  }, [cursor, fetchMore, query]);
+  }, [cursor, fetchMore, query2, isExplore]);
 
   const handleLoadMoreWithTags = useCallback(() => {
     setLoadingFetchMore(true);
+
     fetchMore({
       variables: {
         request: {
-          ...query,
+          ...query2,
           cursor
         }
       },
       updateQuery: (prev, { fetchMoreResult }): any => {
-        if (!fetchMoreResult) return 'no more results';
-        return {
+        if (!fetchMoreResult) {
+          return 'no more results';
+        }
+
+        const feedResult = {
+          feed: {
+            ...fetchMoreResult.feed
+          }
+        };
+
+        const explorePublicationsResult = {
           explorePublications: {
+            // @ts-ignore
             ...fetchMoreResult.explorePublications
           }
         };
+
+        return isExplore ? explorePublicationsResult : feedResult;
       }
-    }).then((res) => {
-      if (res.data.explorePublications.items.length > 0) {
-        setCursor(res.data.explorePublications.pageInfo.next);
-        setPublications((prev) => [
-          ...prev,
-          ...res.data.explorePublications.items
-        ]);
-        setLoadingFetchMore(false);
-      } else {
-        setLoadingFetchMore(false);
-        return console.log('no more results');
-      }
-    });
-  }, [cursor, fetchMore, query]);
+    })
+      .then((res) => {
+        // @ts-ignore
+        const feedItems = res.data?.explorePublications?.items?.length > 0;
+        const exploreItems = res.data?.feed?.items?.length > 0;
+
+        if (feedItems || exploreItems) {
+          const { next } = res.data?.feed?.pageInfo ?? {};
+          const newItems = res.data?.feed?.items ?? [];
+
+          if (next) {
+            setCursor(next);
+          } else {
+            console.log('no more results 1');
+          }
+          setPublications((prev) => [...prev, ...newItems]);
+        } else {
+          console.log('no more results 2');
+        }
+      })
+      .catch((error) => {
+        console.error('Unknown error reading publications:', error);
+      })
+      .finally(() => setLoadingFetchMore(false));
+  }, [cursor, fetchMore, query2, isExplore]);
 
   const observer = useRef<IntersectionObserver>();
   const lastPublicationRef = useCallback(
@@ -341,117 +429,15 @@ const App: NextPage = () => {
 
   if (hydrationLoading) {
     return (
-      <div className="flex">
-        <div className="my-8 justify-center">
-          <Spinner h="10" w="10" />
-        </div>
+      <div className="my-8 flex justify-center">
+        <Spinner h="10" w="10" />
       </div>
     );
   }
 
-  const handleWelcomeClick = () => {
-    setShowWelcome(false);
-  };
-
-  // content filtering
-  // const fetchMyCollects = async () => {
-  //   if (!lp) {
-  //     return;
-  //   }
-
-  //   const res = await getPublications(
-  //     [PublicationTypes.Post],
-  //     undefined,
-  //     lp?.ownedBy
-  //   );
-  //   console.log('RES ', res);
-  //   // TODO LENS ISSUE: APPID MISMATCHES SOURCES PARAM
-  //   setPublications(res.items.filter((i) => i.appId === APP_NAME)); // TODO PAGINATION CURSOR
-  // };
-
-  // const fetchContentLists = async () => {
-  //   const res = await getPublications(
-  //     [PublicationTypes.Post],
-  //     lensProfile.id
-  //   );
-  //   setPublications(
-  //     res.items.filter(
-  //       (r) =>
-  //         (r.profile.id === lensProfile?.id &&
-  //           r.metadata.attributes[0].value === 'list') ||
-  //         r.metadata.attributes[0].value === 'privateDefaultList' // FIXME internalPublicationType
-  //       //     .attributes?.find((attribute) => attribute.key === 'internalPublicationType')?.value || '',
-  //     )
-  //   ); // TODO PAGINATION CURSOR
-  // };
-
-  // const fetchAll = async () => {
-  //   // my pubs+lists
-  //   const myPublications = await getPublications(
-  //     [PublicationTypes.Post],
-  //     lensProfile.id
-  //   );
-  //   // my collects
-  //   const myCollects = await getPublications(
-  //     [PublicationTypes.Post],
-  //     undefined,
-  //     lp?.ownedBy
-  //   );
-  //   const filteredCollects = myCollects.items.filter(
-  //     (i) => i.appId === APP_NAME
-  //   ); // TODO this is because sources!=appId
-
-  //   const array1 = myPublications.items;
-  //   const array2 = filteredCollects;
-  //   const mergedArray = [...array1, ...array2].reduce(
-  //     (a: any, b: any) => (a.some((o: any) => o.id === b.id) ? a : [...a, b]),
-  //     []
-  //   );
-
-  //   setPublications(mergedArray); // TODO PAGINATION CURSOR
-  // };
-
   return (
     <>
-      <Head>
-        <title>Nata Social</title>
-        <meta property="og:title" content="We are Nata Social" />
-        {/* 
-        <meta
-          property="og:description"
-          content="The first social bookmarking platform, backed by the community`s collective knowledge."
-        />
-        <meta property="og:image" content="banner.png" />
-
-        <meta property="og:url" content="https://www.nata.social" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="Nata Social" />
-        <meta property="og:locale" content="en_US" /> */}
-
-        {/* <link
-          rel="apple-touch-icon"
-          sizes="180x180"
-          href="favicon/apple-touch-icon.png"
-          />
-        <link
-          rel="icon"
-          type="image/png"
-          sizes="32x32"
-          href="favicon/favicon-32x32.png"
-          />
-          <link
-          rel="icon"
-          type="image/png"
-          sizes="16x16"
-          href="favicon/favicon-16x16.png"
-        /> */}
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-        <link rel="icon" type="image/png" href="/favicon.png" />
-        <link rel="manifest" href="/site.webmanifest" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
-        <meta name="msapplication-TileColor" content="#da532c" />
-        <meta name="theme-color" content="#ffffff" />
-      </Head>
+      <CustomHead title="Nata Social" content="" />
       <Script
         async
         defer
@@ -459,132 +445,24 @@ const App: NextPage = () => {
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
-      <Layout title={'Nata Social | Home'} pageDescription={'Home'}>
+      <Layout
+        title={'Nata Social | Home'}
+        pageDescription={'Home'}
+        setIsExplore={setIsExplore}
+        isExplore={isExplore}
+        setSkipExplore={setSkipExplore}
+        skipExplore={skipExplore}
+        // clearFeed={clearFeed}
+      >
         {isVisibleWL ? (
-          <WhitelistScreen />
+          <WhitelistScreen setIsVisibleWL={setIsVisibleWL} />
         ) : showWelcome ? (
-          <div
-            className=" duration-600 fixed 
-          bottom-0 
-          left-0 right-0
-          top-0 z-50 flex h-full w-full flex-col items-center  justify-center bg-stone-900
-          "
-            style={{
-              backgroundImage:
-                'linear-gradient(to bottom, gray, rgb(45 212 191))',
-              backgroundSize: '400% 400%',
-              animation: 'gradient 10s ease infinite'
-            }}
-          >
-            <div className="mt-10 font-mono">
-              {chain && <div>Connected to {chain.name}</div>}
-            </div>
-            <ImageProxied
-              className="mt-20"
-              category="profile"
-              src="/img/landing/nata-logo.svg"
-              alt=""
-              width={200}
-              height={120}
-            />
-            <style jsx>{`
-              @keyframes gradient {
-                0% {
-                  background-position: 0% 0%;
-                }
-                50% {
-                  background-position: 100% 100%;
-                }
-                100% {
-                  background-position: 0% 0%;
-                }
-              }
-            `}</style>
-            <div className="  h-full w-2/3 max-w-xl content-center items-center justify-center py-20 text-center font-mono">
-              <p className=" mb-6 text-center font-sans text-4xl ">Welcome!</p>
-              <p className="py-6 text-justify font-serif text-lg">
-                This platform is an <b>Alpha</b> release
-                <i> (fresh out of the oven)</i>, meaning that some unexpected
-                behaviour may occur. We appreciate your understanding and
-                encourage you to report any issues you encounter.
-              </p>
-
-              <p className="py-4">Yours, The Nata Social team ⚜️</p>
-
-              <p className="pb-4 text-xs">
-                P.S.: Meanwhile, we are performing some setup tasks in
-                background, fasten your seat belts! 🚀
-              </p>
-
-              {ready ? (
-                <div>
-                  <button
-                    className=" bg-black px-4 py-2 font-serif text-white hover:bg-gray-700"
-                    onClick={handleWelcomeClick}
-                  >
-                    Continue
-                  </button>
-                </div>
-              ) : (
-                !showReject && (
-                  <div className="flex justify-center">
-                    <Spinner h="8" w="8" />
-                  </div>
-                )
-              )}
-
-              {showReject && (
-                <div className="mt-6 rounded-lg border border-black px-8 py-4 text-center font-sans  ">
-                  <h1 className="py-2">⛔️ Oops!</h1>
-                  <h2>
-                    Seems that you rejected your wallet signature petitions.
-                  </h2>
-                  <br></br>
-                  <div className=" text-justify">
-                    In order to finish your account setup, we encourage to sign
-                    the following two wallet interactions:
-                    <p>
-                      - The dispatcher signature: sets you free from signing TX!
-                    </p>
-                    <p>
-                      - The default saved items list: the main folder where you
-                      will store your posts.
-                    </p>
-                  </div>
-
-                  <div className="my-4 flex justify-between">
-                    <button
-                      onClick={() => {
-                        setShowReject(false);
-                        handleSetup();
-                      }}
-                      className="rounded-lg bg-black px-6 py-1 text-white"
-                    >
-                      Retry
-                    </button>
-                    <button
-                      onClick={() => {
-                        deleteLensLocalStorage();
-                        disconnect();
-                        setShowReject(false);
-                        setShowWelcome(false);
-                      }}
-                      className="rounded-lg  border border-solid border-black 
-                      bg-transparent px-6 py-1"
-                    >
-                      Cancel, navigate without registering
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="mt-10">
-              <hr />
-              <div className="font-mono text-xs">
-                ui v{APP_UI_VERSION} - {DEFAULT_NETWORK}
-              </div>
-            </div>
-          </div>
+          <WelcomePanel
+            lensProfile={lensProfile}
+            chain={chain}
+            welcomeReady={welcomeReady} // para adentro
+            setShowWelcome={setShowWelcome} // para que desde adentro mande modificacion
+          />
         ) : (
           <>
             {/* top bar container*/}
@@ -603,42 +481,39 @@ const App: NextPage = () => {
             </div>
 
             {/* publications */}
-            <div className="px-4 pb-6">
-              <div className="flex flex-wrap justify-center rounded-b-lg px-3 pb-6">
+            <section className="px-4 pb-6">
+              <ul
+                className={cn(
+                  'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
+                  viewCard !== ViewBy.CARD && 'flex-col gap-3'
+                )}
+              >
                 {publications.length > 0 ? (
                   publications.map((post, index) => {
-                    if (publications.length === index + 1) {
-                      return (
-                        <ExplorerCard
-                          post={post}
-                          key={index}
-                          refProp={lastPublicationRef}
-                        />
-                      );
-                    } else {
-                      return (
-                        <ExplorerCard post={post} key={index} refProp={null} />
-                      );
-                    }
+                    return CardViewsMap[viewCard]({
+                      post,
+                      key: index,
+                      refProp:
+                        publications.length - 15 === index
+                          ? lastPublicationRef
+                          : null
+                    });
                   })
                 ) : loader ? (
-                  <div className="my-8">
+                  <div className="mx-auto my-8">
                     <Spinner h="10" w="10" />
                   </div>
                 ) : (
-                  <div className="my-8">
-                    <span className="text-lg font-medium">
-                      No results found 🤷‍♂️
-                    </span>
-                  </div>
+                  <div className="my-8">No results found 💤</div>
                 )}
-              </div>
+              </ul>
               {loadingFetchMore && (
                 <div className="mx-auto mb-10 flex w-10 items-center justify-center ">
                   <Spinner h="10" w="10" />
                 </div>
               )}
-            </div>
+              {finished && <div className="my-8">No more results 🍃.</div>}
+            </section>
           </>
         )}
       </Layout>

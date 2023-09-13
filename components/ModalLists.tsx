@@ -1,16 +1,15 @@
-import { ATTRIBUTES_LIST_KEY, PRIVATE_LIST_NAME } from '@lib/config';
-import { PostProcessStatus, findKeyAttributeInProfile } from 'utils/helpers';
 import { createUserList, getUserLists, typeList } from '@lib/lens/load-lists';
 import { useContext, useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads';
 import { NotificationTypes } from '@models/index';
+import { PRIVATE_LIST_NAME } from '@lib/config';
+import { PostProcessStatus } from 'utils/helpers';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { addPostIdtoListId } from '@lib/lens/post';
 import { followers } from '@lib/lens/followers';
 import { freeCollect } from '@lib/lens/collect';
-import { queryProfile } from '@lib/lens/dispatcher';
 import { sendNotification } from '@lib/lens/user-notifications';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 

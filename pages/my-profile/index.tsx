@@ -1,27 +1,37 @@
-import { Layout, ProfileContext, TagsFilter } from 'components';
-import { Profile, PublicationTypes } from '@lib/lens/graphql/generated';
-import { useContext, useEffect, useState } from 'react';
+import { LayoutProfile, ProfileContext } from 'components';
+import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
+import { useContext, useEffect, useRef, useState } from 'react';
 
 import { APP_NAME } from '@lib/config';
-import ExplorerCard from 'components/ExplorerCard';
+import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
 import { NextPage } from 'next';
-import { TagsFilterContext } from 'components';
-import { explore } from '@lib/lens/explore-publications';
+import { PublicationTypes } from '@lib/lens/graphql/generated';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { useExplore } from '@context/ExploreContext';
+import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
+import { cn } from '@lib/utils';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import CardListView from '@components/CardListView';
+import CardPostView from '@components/CardPostView';
+import { Spinner } from '@components/Spinner';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [tab, setTab] = useState<any>('all');
   const [lensProfile, setProfile] = useState<any>();
+  const [loader, setLoader] = useState(false);
+  const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
   // const { tags } = useContext(TagsFilterContext);
   const [tags, setTags] = useState<string[]>([]);
 
   // const lp = useContext(ProfileContext);
   const { profile: lp } = useContext(ProfileContext);
+  const { viewCard } = useContext(ViewCardContext);
 
   // set profile
   useEffect(() => {
@@ -30,13 +40,6 @@ const MyProfile: NextPage = () => {
 
       const profileResult = await queryProfile({ profileId: lp.id });
       if (!profileResult) return;
-
-      const pic =
-        profileResult.picture?.__typename === 'MediaSet'
-          ? profileResult.picture?.original.url
-          : profileResult.picture?.__typename === 'NftImage'
-          ? profileResult.picture.uri
-          : '/img/profilePic.png';
 
       // setPictureUrl(pic);
       setProfile(profileResult);
@@ -60,14 +63,14 @@ const MyProfile: NextPage = () => {
     if (!lensProfile) {
       return;
     }
-
     const fetchMyPosts = async () => {
+      setLoader(true);
       const res = await getPublications(
         [PublicationTypes.Post],
         lensProfile.id
       );
 
-      const filteredItems = res.items.filter((item) => {
+      const filteredItems = res.items.filter((item: any) => {
         const id = lensProfile?.id;
         const attributes = item.metadata.attributes;
         return (
@@ -78,16 +81,18 @@ const MyProfile: NextPage = () => {
       });
 
       setPublications(filteredItems);
+      setLoader(false);
       // TODO PAGINATION CURSOR
     };
 
     const fetchMyLists = async () => {
+      setLoader(true);
       const res = await getPublications(
         [PublicationTypes.Post],
         lensProfile.id
       );
 
-      const filteredItems = res.items.filter((item) => {
+      const filteredItems = res.items.filter((item: any) => {
         const id = lensProfile?.id;
         const attributes = item.metadata.attributes;
         return (
@@ -105,7 +110,7 @@ const MyProfile: NextPage = () => {
       if (!lp) {
         return;
       }
-
+      setLoader(true);
       const res = await getPublications(
         [PublicationTypes.Post],
         undefined,
@@ -113,11 +118,13 @@ const MyProfile: NextPage = () => {
       );
       console.log('RES ', res);
       // TODO LENS ISSUE: APPID MISMATCHES SOURCES PARAM
-      setPublications(res.items.filter((i) => i.appId === APP_NAME)); // TODO PAGINATION CURSOR
+      setPublications(res.items.filter((i: any) => i.appId === APP_NAME)); // TODO PAGINATION CURSOR
+      setLoader(false);
     };
 
     const fetchAll = async () => {
       // my pubs+lists
+      setLoader(true);
       const myPublications = await getPublications(
         [PublicationTypes.Post],
         lensProfile.id
@@ -129,7 +136,7 @@ const MyProfile: NextPage = () => {
         lp?.ownedBy
       );
       const filteredCollects = myCollects.items.filter(
-        (i) => i.appId === APP_NAME
+        (i: any) => i.appId === APP_NAME
       ); // TODO this is because sources!=appId
 
       const array1 = myPublications.items;
@@ -140,6 +147,7 @@ const MyProfile: NextPage = () => {
       );
 
       setPublications(mergedArray); // TODO PAGINATION CURSOR
+      setLoader(false);
     };
 
     if (tab === 'myposts') {
@@ -159,56 +167,141 @@ const MyProfile: NextPage = () => {
     }
   }, [tab, lensProfile?.id, tags]);
 
-  const pictureUrl =
-    lensProfile?.picture?.__typename === 'MediaSet'
-      ? lensProfile?.picture.original.url
-      : lensProfile?.picture?.__typename === 'NftImage'
-      ? lensProfile?.picture.uri
-      : '/img/profilePic.png';
+  const location =
+    lensProfile?.attributes.find((item: any) => item.key === 'location')
+      ?.value || '';
+
+  const twitter =
+    lensProfile?.attributes.find((item: any) => item.key === 'twitter')
+      ?.value || '';
+
+  const url =
+    lensProfile?.attributes.find((item: any) => item.key === 'website')
+      ?.value || '';
+
+  let website = '';
+
+  if (url !== '') {
+    try {
+      const parsedURL = new URL(url);
+
+      website = parsedURL.hostname.replace(/^www\./, '');
+    } catch (e) {
+      website = url;
+    }
+  }
 
   return (
-    <Layout
+    <LayoutProfile
       title="Nata Social | Explore"
       pageDescription="My profile"
-      screen={true}
+      setIsExplore={setIsExplore}
+      isExplore={isExplore}
+      setSkipExplore={setSkipExplore}
+      skipExplore={skipExplore}
     >
-      <div className="w-full px-6">
+      <div className="w-full px-8">
         {/* header */}
-        <div
-          style={{
-            backgroundImage: `linear-gradient(to bottom, transparent, white), url('${lensProfile?.coverPicture?.original?.url}')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-          className="pt-40"
-        >
-          <div className="mx-4 flex items-center sm:mx-6 ">
-            <ImageProxied
-              className="h-32 w-32 rounded-full border-2 border-white object-cover"
-              category="profile"
-              height={144}
-              width={144}
-              src={pictureUrl}
-              alt="avatar"
-            />
-            <div className="ml-6">
-              <p className="mb-1 text-2xl font-semibold">{lensProfile?.name}</p>
-              <p className="mb-2 font-light">@{lensProfile?.handle}</p>
-              <div className="flex text-xs">
-                <div className="rounded-lg bg-black px-3 py-1 text-center text-white">
-                  <Link href={'/settings'}>Settings</Link>
-                </div>
-                <div className="ml-2 rounded-lg bg-black px-3 py-1 text-center text-white">
-                  ...
-                </div>
+        <div className="">
+          <div
+            style={{
+              backgroundImage: `url('${getCoverPictureUrl(lensProfile)}')`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+            className="min-h-[25vh] rounded-xl"
+          ></div>
+          <div className="flex items-center justify-between">
+            <div className="mb-4 flex max-w-[50%] flex-col">
+              <ImageProxied
+                className="-mt-16 ml-4 h-32 w-32 rounded-full border-4 border-white object-cover"
+                category="profile"
+                height={144}
+                width={144}
+                src={getPictureUrl(lensProfile)}
+                alt="avatar"
+              />
+              <div className="mt-2 flex items-center">
+                <span className="mb-1 mr-1 text-2xl font-bold">
+                  {lensProfile?.name}
+                </span>
+                <span className="mb-0.5 text-lg font-normal text-gray-600">
+                  @{lensProfile?.handle}
+                </span>
               </div>
+              <p className="mt-1 font-medium">{lensProfile?.bio}</p>
+              <div className="mt-4 flex space-x-3">
+                {location !== '' && (
+                  <div className="flex items-center">
+                    <MapPinIcon className="h-4 w-4" />
+                    <span className="ml-1 text-sm font-medium text-[#4D4D4D]">
+                      {location}
+                    </span>
+                  </div>
+                )}
+                {website !== '' && (
+                  <>
+                    <span>᛫</span>
+                    <div className="flex items-center">
+                      <LinkIcon className="h-4 w-4" />
+                      <Link
+                        href={url}
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
+                      >
+                        {website}
+                      </Link>
+                    </div>
+                  </>
+                )}
+                {twitter !== '' && (
+                  <>
+                    <span>᛫</span>
+                    <div className="flex items-center">
+                      <Image
+                        src="/icons/x-twitter.svg"
+                        alt="Twitter icon"
+                        height={16}
+                        width={16}
+                      />
+                      <Link
+                        href={`https://twitter.com/${twitter}`}
+                        className="ml-1 text-sm font-medium text-[#008BFF]"
+                      >
+                        @{twitter}
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+              <div className="mt-4 flex space-x-4 self-start rounded-lg bg-[#F8F8F8] px-3 py-2">
+                <span className="text-sm">
+                  <span className="text-base font-medium">
+                    {lensProfile?.stats.totalFollowing}
+                  </span>{' '}
+                  Following
+                </span>
+                <span className="text-sm">
+                  <span className="text-base font-medium">
+                    {lensProfile?.stats.totalFollowers}
+                  </span>{' '}
+                  Followers
+                </span>
+                <span className="text-sm">
+                  <span className="text-base font-medium">
+                    {lensProfile?.stats.totalCollects}
+                  </span>{' '}
+                  Collects
+                </span>
+              </div>
+            </div>
+            <div className="mt-6 self-start rounded-lg border-2 border-black px-4 py-1 text-center text-sm font-bold hover:cursor-pointer">
+              <Link href={'/settings'}>Edit Profile</Link>
             </div>
           </div>
         </div>
 
-        <div className=" mx-4  py-6 sm:mx-6 ">
-          <div className="flex space-x-2 text-sm text-black">
-            <button
+        <CardViewButtons />
+        {/* <button
               onClick={() => setTab('all')}
               className="rounded-md border-2 border-solid border-black bg-white  px-2 text-center hover:bg-lensGreen"
             >
@@ -238,22 +331,34 @@ const MyProfile: NextPage = () => {
               <div className="flex">
                 <span className="">My lists</span>
               </div>
-            </button>
-          </div>
-        </div>
+            </button> */}
       </div>
 
       {/* contents */}
-      <div className="  w-full px-6">
-        <div className="  flex flex-wrap  ">
-          {publications
-            ? publications.map((post, index) => (
-                <ExplorerCard post={post} key={index} />
-              ))
-            : null}
-        </div>
+      <div className="  w-full px-8">
+        <ul
+          className={cn(
+            'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
+            viewCard !== ViewBy.CARD && 'flex-col gap-3'
+          )}
+        >
+          {publications.length > 0 ? (
+            publications.map((post, index) => {
+              return CardViewsMap[viewCard]({
+                post,
+                key: index
+              });
+            })
+          ) : loader ? (
+            <div className="mx-auto my-8">
+              <Spinner h="10" w="10" />
+            </div>
+          ) : (
+            <div className="my-8">No results found 💤</div>
+          )}
+        </ul>
       </div>
-    </Layout>
+    </LayoutProfile>
   );
 };
 

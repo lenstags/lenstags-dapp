@@ -2,6 +2,7 @@ import {
   BookOpenIcon,
   BookmarkSquareIcon,
   ChatBubbleOvalLeftEllipsisIcon,
+  PencilSquareIcon,
   UserPlusIcon
 } from '@heroicons/react/24/outline';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from './ui/HoverCard';
@@ -30,6 +31,9 @@ const notifToIconMap: notifToIconMapType = {
   ),
   [NotificationTypes.CollectedList]: (
     <BookOpenIcon className="h-6 w-6 text-lensBlack" />
+  ),
+  [NotificationTypes.CreatedPost]: (
+    <PencilSquareIcon className="h-6 w-6 text-lensBlack" />
   )
 };
 
@@ -65,7 +69,7 @@ const Notifications = ({ notif }: NotificationsProps) => {
       setNotifMessage(notif.message);
     }
   }, [profileId, notif.message]);
-
+  console.log(notifMessage);
   return (
     <div
       className="flex w-full select-none items-center gap-2 px-6 py-2 hover:bg-teal-50"
@@ -86,14 +90,13 @@ const Notifications = ({ notif }: NotificationsProps) => {
             </HoverCardContent>
           )}
         </HoverCard>
-        <span className="font-bold text-black"></span> {notif.notification.body}
+        <span className="font-bold text-black"></span> {notif.notification.body}{' '}
         {notifMessage?.id && (
           <Link
             className="font-extrabold hover:underline"
             href={`${PublicRoutes.POST}/${notifMessage.id}`}
           >
-            {' '}
-            &quot;{notifMessage.name}&quot;
+            &quot;{notifMessage.namePost || notifMessage.title}&quot;
           </Link>
         )}
       </span>
