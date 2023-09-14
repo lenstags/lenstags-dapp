@@ -7,12 +7,14 @@ import {
   BellIcon,
   FolderIcon,
   GlobeAltIcon,
+  HomeIcon,
   PlusSmallIcon
 } from '@heroicons/react/24/outline';
 import {
   BellIcon as BellIconFilled,
   FolderIcon as FolderIconFilled,
-  GlobeAltIcon as GlobeAltIconFilled
+  GlobeAltIcon as GlobeAltIconFilled,
+  HomeIcon as HomeIconFilled
 } from '@heroicons/react/24/solid';
 import { getPopulatedLists, getUserLists } from '@lib/lens/load-lists';
 import {
@@ -61,7 +63,7 @@ interface SidebarProps {
 const SideBarLeft: React.FC<SidebarProps> = () => {
   const { profile: lensProfile } = useContext(ProfileContext);
   const router = useRouter();
-  const { setIsExplore, setSkipExplore } = useExplore();
+  const { setIsExplore, setSkipExplore, isExplore } = useExplore();
 
   const { sidebarCollapsedStateLeft } = useContext(SidebarContext);
   const [publications, setPublications] = useState<any[]>([]);
@@ -219,6 +221,7 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                     }`}
                   >
                     {router.pathname === PublicRoutes.APP &&
+                    isExplore &&
                     !sidebarCollapsedStateLeft.collapsed ? (
                       <GlobeAltIconFilled
                         width={22}
@@ -253,15 +256,25 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                       // isExplore === true && clearFeed();
                       setIsExplore(false);
                       setSkipExplore(true);
-                      router.push(PublicRoutes.APP);
+                      if (router.pathname !== PublicRoutes.APP)
+                        router.push(PublicRoutes.APP);
                     }}
                   >
-                    <Image
-                      src="/icons/home.svg"
-                      alt="Feed"
-                      width={20}
-                      height={20}
-                    />
+                    {router.pathname === PublicRoutes.APP &&
+                    !isExplore &&
+                    !sidebarCollapsedStateLeft.collapsed ? (
+                      <HomeIconFilled
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    ) : (
+                      <HomeIcon
+                        width={22}
+                        height={22}
+                        className="text-lensBlack"
+                      />
+                    )}
                     {!sidebarCollapsedStateLeft.collapsed && (
                       <span className="ml-2">Feed</span>
                     )}
@@ -280,10 +293,12 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                     // isExplore === false && clearFeed();
                     setIsExplore(true);
                     setSkipExplore(false);
-                    router.push(PublicRoutes.APP);
+                    if (router.pathname !== PublicRoutes.APP)
+                      router.push(PublicRoutes.APP);
                   }}
                 >
                   {router.pathname === PublicRoutes.APP &&
+                  isExplore &&
                   !sidebarCollapsedStateLeft.collapsed ? (
                     <GlobeAltIconFilled
                       width={22}

@@ -27,7 +27,6 @@ interface Props {
 }
 
 const ExplorerCard: FC<Props> = (props) => {
-  console.log('props', props);
   const { post } = props;
   const isList =
     post.metadata &&

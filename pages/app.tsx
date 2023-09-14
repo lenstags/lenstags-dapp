@@ -22,10 +22,7 @@ import {
 } from 'react';
 
 import { useQuery } from '@apollo/client';
-import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
-import ExplorerCard from 'components/ExplorerCard';
-import Head from 'next/head';
-import ImageProxied from 'components/ImageProxied';
+import { CardViewsMap } from '@components/CardViewButtons';
 import CustomHead from '@components/CustomHead';
 import { SearchBar } from '@components/SearchBar';
 import {
@@ -502,7 +499,11 @@ const App: NextPage = () => {
                     });
                   })
                 ) : loader ? (
-                  <div className="mx-auto my-8">
+                  <div
+                    className={`mx-auto my-8 flex w-full justify-center ${
+                      viewCard !== ViewBy.CARD ? 'col-span-1' : 'col-span-3'
+                    }`}
+                  >
                     <Spinner h="10" w="10" />
                   </div>
                 ) : (
