@@ -1,8 +1,9 @@
-import { apolloClient } from '@lib/lens/graphql/apollo-client';
 import {
   ProfileQueryRequest,
   ProfilesDocument
 } from '@lib/lens/graphql/generated';
+
+import { apolloClient } from '@lib/lens/graphql/apollo-client';
 
 const getProfilesRequest = async (request: ProfileQueryRequest) => {
   const result = await apolloClient.query({
