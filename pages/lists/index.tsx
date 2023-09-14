@@ -12,6 +12,7 @@ import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 import { TagsFilterContext } from 'components';
 import { explore } from '@lib/lens/explore-publications';
 import { useExplore } from '@context/ExploreContext';
+import { DotWave } from '@uiball/loaders';
 
 const Lists: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -21,16 +22,19 @@ const Lists: NextPage = () => {
     by: 'all'
   });
   const [filterValue, setFilterValue] = useState<Filter>(Filter.ALL);
+  const [loader, setLoader] = useState(false);
 
   const { tags } = useContext(TagsFilterContext);
 
   useEffect(() => {
+    setLoader(true);
     explore({ locale: 'en', sortingValues, filterValue, tags }).then((data) => {
       if (data.__typename === 'ExplorePublicationResult') {
         const filteredItems = data.items.filter(
           (r: any) => r.metadata.attributes[0].value === 'list'
         );
         setPublications(filteredItems);
+        setLoader(false);
       }
     });
   }, [tags, sortingValues, filterValue]);
@@ -56,6 +60,7 @@ const Lists: NextPage = () => {
             setSortingValues={setSortingValues}
             filterValue={filterValue}
             setFilterValue={setFilterValue}
+            isLoading={loader}
           />
         </div>
         <div className="h-auto w-full">{/* <Pagination /> */}</div>
@@ -63,11 +68,15 @@ const Lists: NextPage = () => {
       <div className="text-center text-2xl">My lists</div>
       <div className="container mx-auto">
         <div className="  flex flex-wrap  ">
-          {publications
-            ? publications.map((post, index) => (
-                <ExplorerCard post={post} key={index} />
-              ))
-            : null}
+          {loader ? (
+            <div className="min-w-full flex justify-center pt-10">
+              <DotWave />
+            </div>
+          ) : publications ? (
+            publications.map((post, index) => (
+              <ExplorerCard post={post} key={index} />
+            ))
+          ) : null}
         </div>
       </div>
     </Layout>

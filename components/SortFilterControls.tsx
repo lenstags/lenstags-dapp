@@ -4,7 +4,7 @@ import {
   QueueListIcon,
   RectangleStackIcon
 } from '@heroicons/react/24/outline';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 
@@ -24,12 +24,14 @@ export const SortFilterControls = ({
   sortingValues,
   setSortingValues,
   filterValue,
-  setFilterValue
+  setFilterValue,
+  isLoading
 }: {
   sortingValues: SortingValuesType;
   setSortingValues: (values: SortingValuesType) => void;
   filterValue: Filter;
   setFilterValue: (Filter: Filter) => void;
+  isLoading: boolean;
 }) => {
   const [showSortingOptions, setShowSortingOptions] = useState(false);
   const [localValues, setLocalValues] = useState(sortingValues);
@@ -70,6 +72,12 @@ export const SortFilterControls = ({
     setShowSortingOptions(false);
   };
 
+  useEffect(() => {
+    if (isLoading) {
+      setShowSortingOptions(false);
+    }
+  }, [isLoading]);
+
   return (
     <div className="flex flex-col">
       <div className="mt-2 flex justify-between rounded-t-lg min-h-[3rem]">
@@ -82,7 +90,8 @@ export const SortFilterControls = ({
             filterValue === Filter.ALL
               ? 'bg-black text-white'
               : 'bg-white text-black'
-          }`}
+          } ${isLoading && 'cursor-not-allowed opacity-50'}`}
+            disabled={isLoading}
           >
             All
           </button>
@@ -95,7 +104,8 @@ export const SortFilterControls = ({
             filterValue === Filter.LISTS
               ? 'bg-black text-white'
               : 'bg-white text-black'
-          }`}
+          } ${isLoading && 'cursor-not-allowed opacity-50'}`}
+            disabled={isLoading}
           >
             Lists
           </button>
@@ -108,7 +118,8 @@ export const SortFilterControls = ({
             filterValue === Filter.POSTS
               ? 'bg-black text-white'
               : 'bg-white text-black'
-          }`}
+          } ${isLoading && 'cursor-not-allowed opacity-50'}`}
+            disabled={isLoading}
           >
             Posts
           </button>
@@ -118,7 +129,10 @@ export const SortFilterControls = ({
             onClick={() => setShowSortingOptions(!showSortingOptions)}
             className={`py-1 px-1.5 rounded-lg
           border-black border border-solid 
-          ${showSortingOptions ? 'bg-black' : 'bg-white'}`}
+          ${showSortingOptions ? 'bg-black' : 'bg-white'} ${
+              isLoading && 'cursor-not-allowed opacity-50'
+            }`}
+            disabled={isLoading}
           >
             {showSortingOptions ? (
               <AdjustmentsHorizontalIcon className="text-white w-6 h-6" />
