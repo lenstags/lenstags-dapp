@@ -78,6 +78,7 @@ const CardPostView: FC<Props> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postId, setPostId] = useState('');
   const handleOpenModal = (postId: string) => {
+    if (!postId) return;
     setPostId(postId);
     setIsModalOpen(true);
   };
@@ -115,6 +116,10 @@ const CardPostView: FC<Props> = (props) => {
       setPointerEvents('none');
     });
 
+  const image = URL.createObjectURL(
+    new Blob([post?.image], { type: 'image/png' })
+  );
+
   return (
     <li
       key={post.id}
@@ -140,15 +145,17 @@ const CardPostView: FC<Props> = (props) => {
         <article className="lens-post relative h-52 p-4">
           {/* main tab contents goes here */}
           {/* favllect content goes here */}
-          <ModalLists
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            postId={postId}
-            post={post}
-            processStatus={handleProcessStatus}
-            ownedBy={post.profile.ownedBy}
-            isList={isList}
-          />
+          {post.id && (
+            <ModalLists
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              postId={postId}
+              post={post}
+              processStatus={handleProcessStatus}
+              ownedBy={post.profile.ownedBy}
+              isList={isList}
+            />
+          )}
           {/* card contents */}
           <div className="flex justify-between pb-3 text-sm text-black">
             {/* profile */}
@@ -208,36 +215,38 @@ const CardPostView: FC<Props> = (props) => {
                 />
               </div>
 
-              <div className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2 border-gray-200 bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 ">
-                <p className="">
-                  <span
-                    className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                    // href="#"
-                  >
-                    Share
-                  </span>
-                </p>
-
-                <p className="">
-                  <a
-                    className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
-                    href="#"
-                  >
-                    Report
-                  </a>
-                </p>
-
-                <p className="">
-                  {lensProfile && post.profile.id === lensProfile.id && (
+              {post.id && (
+                <div className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2 border-gray-200 bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 ">
+                  <p className="">
                     <span
-                      className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
-                      onClick={() => handleRemove(post.id)}
+                      className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
+                      // href="#"
                     >
-                      Remove
+                      Share
                     </span>
-                  )}
-                </p>
-              </div>
+                  </p>
+
+                  <p className="">
+                    <a
+                      className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
+                      href="#"
+                    >
+                      Report
+                    </a>
+                  </p>
+
+                  <p className="">
+                    {lensProfile && post.profile.id === lensProfile.id && (
+                      <span
+                        className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
+                        onClick={() => handleRemove(post.id)}
+                      >
+                        Remove
+                      </span>
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -246,7 +255,7 @@ const CardPostView: FC<Props> = (props) => {
             <Link
               rel="noreferrer"
               href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-              className="min-w-fit"
+              className={`${post.id ?? 'pointer-events-none'} min-w-fit`}
             >
               {isList ? (
                 <div className="max-w-56 relative">
@@ -289,7 +298,7 @@ const CardPostView: FC<Props> = (props) => {
                   priority={true}
                   alt=""
                   className="h-30 aspect-video w-56 rounded-lg object-cover duration-1000 animate-in fade-in-50"
-                  src={post.metadata.media[0]?.original.url}
+                  src={post.metadata.media[0]?.original.url || image}
                 />
               )}
             </Link>
@@ -298,7 +307,7 @@ const CardPostView: FC<Props> = (props) => {
               <Link
                 rel="noreferrer"
                 href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-                className="w-full"
+                className={`${post.id ?? 'pointer-events-none'} w-full`}
               >
                 <div className="w-[600px] truncate text-ellipsis font-serif text-xl font-bold">
                   {post.metadata.name === PRIVATE_LIST_NAME ||
@@ -341,9 +350,11 @@ const CardPostView: FC<Props> = (props) => {
                 </div>
               </Link>
               <footer className="flex w-full justify-between">
-                <TagStrip tags={post.metadata.tags} postId={post.id} />
+                {post.metadata.tags && (
+                  <TagStrip tags={post.metadata.tags} postId={post.id} />
+                )}
                 {/* comments and collect indicators */}
-                <div className="flex w-min items-center text-xs">
+                <div className="ml-auto flex w-min items-center text-xs">
                   <PostIndicators
                     collects={post.stats.totalAmountOfCollects}
                     comments={

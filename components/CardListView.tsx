@@ -80,6 +80,7 @@ const CardListView: FC<Props> = (props) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [postId, setPostId] = useState('');
   const handleOpenModal = (postId: string) => {
+    if (!postId) return;
     setPostId(postId);
     setIsModalOpen(true);
   };
@@ -117,6 +118,10 @@ const CardListView: FC<Props> = (props) => {
       setPointerEvents('none');
     });
 
+  const image = URL.createObjectURL(
+    new Blob([post?.image], { type: 'image/png' })
+  );
+
   return (
     <li
       key={post.id}
@@ -136,23 +141,27 @@ const CardListView: FC<Props> = (props) => {
           </button>
         </div>
       ) : (
-        <article className="lens-post relative flex h-24 flex-col px-4 py-3">
+        <section className="lens-post relative flex h-24 flex-col px-4 py-3">
           {/* main tab contents goes here */}
           {/* favllect content goes here */}
-          <ModalLists
-            isOpen={isModalOpen}
-            onClose={handleCloseModal}
-            postId={postId}
-            post={post}
-            processStatus={handleProcessStatus}
-            ownedBy={post.profile.ownedBy}
-            isList={isList}
-          />
+          {postId && (
+            <ModalLists
+              isOpen={isModalOpen}
+              onClose={handleCloseModal}
+              postId={postId}
+              post={post}
+              processStatus={handleProcessStatus}
+              ownedBy={post.profile.ownedBy}
+              isList={isList}
+            />
+          )}
           {/* <Link > */}
           <Link
             rel="noreferrer"
             href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-            className="flex h-12 items-center gap-2"
+            className={`${
+              post.id ?? 'pointer-events-none'
+            } flex h-12 items-center gap-2`}
           >
             {isList ? (
               <ListBulletIcon className="h-5 w-5" />
@@ -164,7 +173,7 @@ const CardListView: FC<Props> = (props) => {
                 priority={true}
                 alt=""
                 className="aspect-square w-10 rounded-lg object-cover duration-1000 animate-in fade-in-50"
-                src={post.metadata.media[0]?.original.url}
+                src={post.metadata.media[0]?.original.url || image}
               />
             )}
 
@@ -192,53 +201,53 @@ const CardListView: FC<Props> = (props) => {
               />
             </div>
 
-            <div
-              className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
+            {postId && (
+              <div
+                className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
                        border-gray-200 
                       bg-gray-50 text-lensBlack shadow-lg shadow-gray-400 "
-            >
-              <p className="">
-                <span
-                  className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
-                  // href="#"
-                >
-                  Share
-                </span>
-              </p>
-
-              <p className="">
-                <a
-                  className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
-                  href="#"
-                >
-                  Report
-                </a>
-              </p>
-
-              <p className="">
-                {lensProfile && post.profile.id === lensProfile.id && (
+              >
+                <p className="">
                   <span
-                    className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
-                    onClick={() => handleRemove(post.id)}
+                    className="whitespace-no-wrap block rounded-t-lg bg-gray-50 px-4 py-2 hover:bg-lensGreen hover:text-black"
+                    // href="#"
                   >
-                    Remove
+                    Share
                   </span>
-                )}
-              </p>
-            </div>
+                </p>
+
+                <p className="">
+                  <a
+                    className="whitespace-no-wrap block rounded-b-lg bg-gray-50 px-4 py-2 hover:bg-yellow-200 hover:text-black"
+                    href="#"
+                  >
+                    Report
+                  </a>
+                </p>
+
+                <p className="">
+                  {lensProfile && post.profile.id === lensProfile.id && (
+                    <span
+                      className="whitespace-no-wrap flex rounded-b-lg bg-gray-50  px-4 py-2 hover:bg-red-300 hover:text-black"
+                      onClick={() => handleRemove(post.id)}
+                    >
+                      Remove
+                    </span>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
           {/* card contents */}
           <footer className="flex h-12 text-sm text-black">
             {/* profile */}
-            <div
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}
-              className="relative flex w-full items-center"
-            >
+            <div className="relative flex w-full items-center">
               <Link
                 rel="noreferrer"
                 href={`${PublicRoutes.PROFILE}/${post.profile.id}`}
                 className="mr-2 flex h-min w-auto gap-2 text-xs"
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
               >
                 <span className="w-max">
                   {(post.profile.name || post.profile.id).trim() || '-'}
@@ -250,7 +259,9 @@ const CardListView: FC<Props> = (props) => {
                   • {moment(post.createdAt).fromNow()} •
                 </span>
               </Link>
-              <TagStrip tags={post.metadata.tags} postId={post.id} />
+              {post.metadata.tags && (
+                <TagStrip tags={post.metadata.tags} postId={post.id} />
+              )}
               {/* comments and collect indicators */}
               <div className="ml-auto flex h-min w-auto items-center justify-between text-xs">
                 <PostIndicators
@@ -286,7 +297,7 @@ const CardListView: FC<Props> = (props) => {
               />
             </div>
           </footer>
-        </article>
+        </section>
       )}
     </li>
   );

@@ -39,7 +39,7 @@ const CollectButton = ({
             onClick={() => {
               openModalHandler(postId, post);
             }}
-            className="rounded-lg bg-black "
+            className={`rounded-lg bg-black ${postId ?? 'pointer-events-none'}`}
           >
             <div className="flex items-center px-2 py-1 text-xs font-bold">
               <BookmarkIcon color="white" height={14} width={14} />

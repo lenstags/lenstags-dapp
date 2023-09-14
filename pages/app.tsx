@@ -1,5 +1,4 @@
 import { APP_NAME, LENSTAGS_SOURCE } from '@lib/config';
-import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
 import {
   CustomFiltersTypes,
   ExplorePublicationsDocument,
@@ -13,7 +12,6 @@ import {
   PublicationTypes
 } from '@lib/lens/graphql/generated';
 import { ProfileContext, TagsFilter, TagsFilterContext } from 'components';
-import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import {
   useCallback,
   useContext,
@@ -23,15 +21,10 @@ import {
   useState
 } from 'react';
 
-import ExplorerCard from 'components/ExplorerCard';
-import Head from 'next/head';
-import ImageProxied from 'components/ImageProxied';
+import { useQuery } from '@apollo/client';
+import { CardViewsMap } from '@components/CardViewButtons';
 import CustomHead from '@components/CustomHead';
-import { Layout } from 'components/Layout';
-import type { NextPage } from 'next';
-import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
-import { Spinner } from 'components/Spinner';
 import {
   Filter,
   SortFilterControls,
@@ -39,12 +32,16 @@ import {
 } from '@components/SortFilterControls';
 import WelcomePanel from '@components/WelcomePanel';
 import WhitelistScreen from '@components/WhitelistScreen';
-import { cn } from '@lib/utils';
 import { explore, reqQuery } from '@lib/lens/explore-publications';
-import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
 import { useExplore } from '@context/ExploreContext';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
+import { cn } from '@lib/utils';
+import { Layout } from 'components/Layout';
+import { Spinner } from 'components/Spinner';
+import type { NextPage } from 'next';
+import Script from 'next/script';
 import { useNetwork } from 'wagmi';
-import { useQuery } from '@apollo/client';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -484,8 +481,10 @@ const App: NextPage = () => {
             <section className="px-4 pb-6">
               <ul
                 className={cn(
-                  'flex flex-wrap justify-center rounded-b-lg px-3 pb-6',
-                  viewCard !== ViewBy.CARD && 'flex-col gap-3'
+                  'w-full rounded-b-lg pb-6',
+                  viewCard !== ViewBy.CARD
+                    ? 'flex flex-col gap-3'
+                    : 'grid grid-cols-3 gap-5'
                 )}
               >
                 {publications.length > 0 ? (
@@ -500,7 +499,11 @@ const App: NextPage = () => {
                     });
                   })
                 ) : loader ? (
-                  <div className="mx-auto my-8">
+                  <div
+                    className={`mx-auto my-8 flex w-full justify-center ${
+                      viewCard !== ViewBy.CARD ? 'col-span-1' : 'col-span-3'
+                    }`}
+                  >
                     <Spinner h="10" w="10" />
                   </div>
                 ) : (

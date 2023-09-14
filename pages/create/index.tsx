@@ -1,4 +1,3 @@
-import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
 import {
   IbuiltPost,
   PublicationContentWarning
@@ -12,25 +11,38 @@ import React, {
 } from 'react';
 import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
-import Avatar from 'boring-avatars';
-import CreatableSelect from 'react-select/creatable';
-import { DotWave } from '@uiball/loaders';
-import Editor from 'components/Editor';
 import { LayoutCreate } from '@components/LayoutCreate';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
-import { NextPage } from 'next';
-import { NotificationTypes } from '@models/notifications.models';
-import { ProfileContext } from 'components';
 import { Spinner } from '@components/Spinner';
-import { TAGS } from '@lib/lens/tags';
-import Toast from '../../components/Toast';
-import TurndownService from 'turndown';
-import _ from 'lodash';
-import { followers } from '@lib/lens/followers';
 import { queryProfile } from '@lib/lens/dispatcher';
+import { followers } from '@lib/lens/followers';
+import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
+import { TAGS } from '@lib/lens/tags';
 import { sendNotification } from '@lib/lens/user-notifications';
-import { useRouter } from 'next/router';
+import { NotificationTypes } from '@models/notifications.models';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
+import { DotWave } from '@uiball/loaders';
+import Avatar from 'boring-avatars';
+import { ProfileContext } from 'components';
+import Editor from 'components/Editor';
+import _ from 'lodash';
 import { useSnackbar } from 'material-ui-snackbar-provider';
+import { NextPage } from 'next';
+import { useRouter } from 'next/router';
+import CreatableSelect from 'react-select/creatable';
+import TurndownService from 'turndown';
+import Toast from '../../components/Toast';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@components/ui/Dialog';
+import ExplorerCard from '@components/ExplorerCard';
+import PillTab from '@components/PillTab';
+import { ViewBy } from '@context/ViewCardContext';
+import { CardViewsMap } from '@components/CardViewButtons';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -98,6 +110,11 @@ const Create: NextPage = () => {
   const [isTagSelected, setIsTagSelected] = useState<boolean>(false);
   const [isExplore, setIsExplore] = useState(false);
   const [skipExplore, setSkipExplore] = useState(true);
+  const [post, setPost] = useState<any>();
+  const [viewCard, setViewCard] = useState<
+    typeof ViewBy.CARD | typeof ViewBy.POST | typeof ViewBy.LIST
+  >(ViewBy.CARD);
+  const [openPreview, setOpenPreview] = useState(false);
 
   const [imageURL, setImageURL] = useState('');
   const [imageOrigin, setImageOrigin] = useState<string | null>('panelAI');
@@ -134,12 +151,29 @@ const Create: NextPage = () => {
       div.innerHTML = html;
       const text = div.textContent;
       setPlainText(text || '');
+      setPost({
+        ...post,
+        content: text || '',
+        metadata: {
+          ...post?.metadata,
+          content: text || ''
+        }
+      });
     }
   }, [editorContents]);
 
   const handleTagsChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
+    setPost({
+      ...post,
+      metadata: {
+        ...post?.metadata,
+        tags: selectedOptions.map((r: any) => r['value'])
+      }
+    });
   };
+
+  console.log('post: ', post);
 
   // const handleActivePanelChange = (selectedPanel: string | null) => {
   //   setActualPanel(selectedPanel);
@@ -224,13 +258,42 @@ const Create: NextPage = () => {
 
         const imgTarget = data.image ? data.image : 'public/img/post.png';
         const imageBuffer = await getBufferFromElement(imgTarget);
-        console.log('i1: ', imageBuffer);
         console.log('i1: ', imageBuffer.toString('base64'));
 
         setGeneratedImage(
           `data:image/png;base64,${imageBuffer.toString('base64')}`
         );
         setEditorContents(data.description as string);
+        setPost({
+          attributes: DEFAULT_METADATA_ATTRIBUTES,
+          name: data.title as string,
+          abstract: '',
+          content: data.description as string,
+          link: event.target.value,
+          locale: 'en',
+          image: imageBuffer,
+          imageMimeType: 'image/jpeg',
+          tags: [],
+          profile: lensProfile,
+          metadata: {
+            ...post?.metadata,
+            attributes: DEFAULT_METADATA_ATTRIBUTES,
+            name: data.title as string,
+            content: data.description as string,
+            image: data.image as string,
+            media: [
+              {
+                original: {
+                  url: data.image as string
+                }
+              }
+            ]
+          },
+          stats: {
+            totalAmountOfCollects: 0,
+            totalAmountOfComments: 0
+          }
+        });
       } else {
         console.log('No link preview');
       }
@@ -258,11 +321,142 @@ const Create: NextPage = () => {
       setImageURL(data.image as string);
       setImageOrigin('panelLink');
       // setGeneratedImage(data.image as string);
+      setPost({
+        attributes: DEFAULT_METADATA_ATTRIBUTES,
+        name: data.title as string,
+        abstract: '',
+        content: data.description as string,
+        link: sourceUrl,
+        locale: 'en',
+        image: data.image as string,
+        imageMimeType: 'image/jpeg',
+        tags: [],
+        profile: lensProfile,
+        metadata: {
+          ...post?.metadata,
+          attributes: DEFAULT_METADATA_ATTRIBUTES,
+          name: data.title as string,
+          content: data.description as string,
+          image: data.image as string,
+          media: [
+            {
+              original: {
+                url: data.image as string
+              }
+            }
+          ]
+        },
+        stats: {
+          totalAmountOfCollects: 0,
+          totalAmountOfComments: 0
+        }
+      });
       setIsLoaded(true);
     } else {
       snackbar.showMessage('⚠️ Link does not contain image preview');
       setIsLoaded(false);
     }
+  };
+
+  const BuildPostPreview = async () => {
+    let imageBuffer: Buffer | null = null;
+
+    imageBuffer = await getBufferFromElement(
+      imageURL
+      // imageURL ? imageURL : 'public/img/post.png'
+    );
+
+    if (imageOrigin === 'panelUpload') {
+      console.log('aca ', cover);
+      if (cover) {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(cover);
+        await new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+            if (reader.result instanceof ArrayBuffer) {
+              imageBuffer = Buffer.from(reader.result);
+            } else if (reader.result !== null) {
+              imageBuffer = Buffer.from(reader.result.toString());
+            } else {
+              // TODO: handle the case where reader.result is null
+            }
+            resolve(imageBuffer);
+          };
+          reader.onerror = () => {
+            return snackbar.showMessage('❌ Upload failed! Please try again.');
+          };
+        });
+      }
+    }
+
+    if (imageOrigin === 'panelLink') {
+      const imgTarget = imageURL ? imageURL : 'public/img/post.png';
+      imageBuffer = await getBufferFromElement(imgTarget);
+    }
+
+    if (imageOrigin === 'panelAI') {
+      imageBuffer = generatedImage2
+        ? Buffer.from(generatedImage2, 'base64')
+        : null;
+    }
+
+    if (!imageBuffer) {
+      const parentNode = document.getElementById('defaultImage');
+
+      if (parentNode) {
+        const svgNode = parentNode.firstElementChild;
+        if (svgNode) {
+          const { toPng } = await import('html-to-image');
+          try {
+            const dataUrl = await toPng(svgNode as HTMLElement);
+            const base64Image = dataUrl.split(';base64,').pop();
+            imageBuffer = base64Image
+              ? Buffer.from(base64Image, 'base64')
+              : null;
+          } catch (error) {
+            console.error('Could not create image from SVG:', error);
+          }
+        }
+      }
+    }
+
+    setPost({
+      ...post,
+      attributes: DEFAULT_METADATA_ATTRIBUTES,
+      name: title || ' ',
+      abstract: '',
+      content: editorContents || '',
+      link: sourceUrl,
+      locale: 'en',
+      image: imageBuffer || null,
+      imageMimeType: 'image/jpeg',
+      profile: lensProfile,
+      metadata: {
+        ...post?.metadata,
+        attributes: DEFAULT_METADATA_ATTRIBUTES,
+        name: title || ' ',
+        content: editorContents || '',
+        image: imageBuffer || null,
+        media: [
+          {
+            original: {
+              url: imageURL
+            }
+          }
+        ],
+        tags: selectedOption.map((r) => r['value'])
+      },
+      stats: {
+        totalAmountOfCollects: 0,
+        totalAmountOfComments: 0
+      }
+    });
+  };
+
+  const handlePreview = async () => {
+    await BuildPostPreview().then(() => {
+      setOpenPreview(true);
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -277,7 +471,6 @@ const Create: NextPage = () => {
           setCover(e.target.files[0]);
         }
       };
-
       reader.readAsDataURL(e.target.files[0]);
     }
   };
@@ -690,6 +883,14 @@ const Create: NextPage = () => {
                 value={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
+                  setPost({
+                    ...post,
+                    name: e.target.value,
+                    metadata: {
+                      ...post?.metadata,
+                      name: e.target.value
+                    }
+                  });
                 }}
               />
               <Editor
@@ -730,33 +931,30 @@ const Create: NextPage = () => {
 
                 {/* tags  */}
                 <div className="mb-4 items-center px-4 py-2">
-                  <div className="mb-1">Select your tags</div>
-                  <div className="w-full">
-                    <div className="w-full rounded-lg border bg-stone-50 ">
-                      {typeof window !== 'undefined' && (
-                        <CreatableSelect
-                          styles={{
-                            control: (baseStyles, state) => ({
-                              ...baseStyles,
-                              boxShadow: 'none',
-                              margin: '2px',
-                              borderColor: 'transparent',
-                              '&:hover': {
-                                borderColor: 'transparent'
-                              }
-                            })
-                          }}
-                          placeholder="Choose 1 tag minimum"
-                          menuPortalTarget={document.querySelector('body')}
-                          isMulti
-                          onChange={handleTagsChange}
-                          options={TAGS}
-                        />
-                      )}
-                    </div>
+                  <label className="mb-1">Select your tags</label>
+                  <div className="w-full rounded-lg border bg-stone-50 ">
+                    {typeof window !== 'undefined' && (
+                      <CreatableSelect
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            boxShadow: 'none',
+                            margin: '2px',
+                            borderColor: 'transparent',
+                            '&:hover': {
+                              borderColor: 'transparent'
+                            }
+                          })
+                        }}
+                        placeholder="Choose 1 tag minimum"
+                        menuPortalTarget={document.querySelector('body')}
+                        isMulti
+                        onChange={handleTagsChange}
+                        options={TAGS}
+                      />
+                    )}
                   </div>
                 </div>
-
                 {/* NSFW switch  */}
                 <div className="mb-4 items-center px-4 py-2">
                   <div className="mb-1 flex ">
@@ -773,6 +971,42 @@ const Create: NextPage = () => {
                     />
                   </div>
                 </div>
+                {/* preview */}
+                <Dialog
+                  open={openPreview}
+                  onOpenChange={(isOpen) => {
+                    if (!openPreview) return;
+                    setOpenPreview(isOpen);
+                  }}
+                >
+                  <DialogTrigger
+                    className="mb-4 ml-4 items-center px-8 py-1 disabled:border-0 disabled:bg-gray-200 disabled:text-gray-600 disabled:opacity-50 disabled:hover:bg-gray-200"
+                    style={{ border: '2px solid #000' }}
+                    disabled={!post?.metadata.name || !post?.metadata.content}
+                    onClick={handlePreview}
+                  >
+                    Preview
+                  </DialogTrigger>
+                  <DialogContent className="z-50 flex min-w-[1000px] flex-col items-center gap-8">
+                    <DialogHeader className="w-full">
+                      <DialogTitle className="text-xl">
+                        Preview mode
+                      </DialogTitle>
+                    </DialogHeader>
+                    <article
+                      className={`prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto flex min-h-[310px] list-none items-center justify-center ${
+                        viewCard === ViewBy.CARD ? 'w-96' : 'w-full'
+                      }`}
+                    >
+                      {post.metadata.attributes &&
+                        CardViewsMap[viewCard]({
+                          post: post,
+                          refProp: null
+                        })}
+                    </article>
+                    <PillTab viewCard={viewCard} setViewCard={setViewCard} />
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {/* hidden default image DO NOT REMOVE */}

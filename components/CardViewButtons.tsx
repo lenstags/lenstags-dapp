@@ -32,7 +32,7 @@ export const CardViewsMap: CardViewTypeProps = {
 const CardViewButtons = () => {
   const { viewCard, setViewCard } = useContext(ViewCardContext);
   return (
-    <div className="my-4 flex items-center gap-2 px-4">
+    <div className="flex items-center gap-2">
       {buttons.map((button) => (
         <button
           key={button.name}

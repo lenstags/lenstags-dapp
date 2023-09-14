@@ -3,11 +3,16 @@ import { TAGS } from '../lib/lens/tags';
 import { TagsFilterContext } from './TagsFilterProvider';
 import { useContext } from 'react';
 import { useState } from 'react';
+import { cn } from '@lib/utils';
 
 const selectedStyle = 'bg-lensGreen text-black border-black shadow';
 
+interface TagProps {
+  className?: string;
+}
+
 // TODO Improve UI when there are too many tags for two lines
-export const TagsFilter = () => {
+export const TagsFilter: React.FC<TagProps> = ({ className = 'mt-4' }) => {
   const { setTags } = useContext(TagsFilterContext);
 
   const [selectedOption, setSelectedOption] = useState([]);
@@ -18,7 +23,12 @@ export const TagsFilter = () => {
   };
 
   return (
-    <div className="mt-4 flex w-full items-baseline rounded-lg bg-stone-100 pt-1">
+    <div
+      className={cn(
+        'flex w-full items-baseline rounded-lg bg-stone-100',
+        className
+      )}
+    >
       <span className="ml-4 font-serif">Tags</span>
       <div className="w-full  border-0 pl-4 ">
         <CreatableSelect

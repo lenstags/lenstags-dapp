@@ -69,7 +69,7 @@ const Notifications = ({ notif }: NotificationsProps) => {
       setNotifMessage(notif.message);
     }
   }, [profileId, notif.message]);
-  console.log(notifMessage);
+
   return (
     <div
       className="flex w-full select-none items-center gap-2 px-6 py-2 hover:bg-teal-50"

@@ -30,6 +30,7 @@ import { Spinner } from './Spinner';
 import { Tooltip } from './ui/Tooltip';
 import { useListSorts } from '@lib/hooks/use-sort';
 import { useRouter } from 'next/router';
+import { ENABLE_NOTIFICATIONS } from '@lib/config';
 
 interface SidePanelProps {
   fetchMyLists: () => void;
@@ -163,8 +164,12 @@ const SidePanelMyInventory = forwardRef(function (
             : 'w-80 animate-fadeLeft'
         }
         onInteractOutside={(e) => {
-          // @ts-ignore
-          if (notificationRef.current.id === e.target?.id) return;
+          if (
+            ENABLE_NOTIFICATIONS &&
+            // @ts-ignore
+            notificationRef.current.id === e.target?.id
+          )
+            return;
           // @ts-ignore
           if (e.target?.id === 'radix-:r0:' || e.target?.id.includes('radix'))
             return;
