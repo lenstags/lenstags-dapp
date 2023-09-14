@@ -16,6 +16,8 @@ import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
 import { useRouter } from 'next/router';
+import { Filter, SortingValuesType } from '@components/SortFilterControls';
+import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 
 const OtherProfile: NextPage = () => {
   const router = useRouter();
@@ -23,6 +25,12 @@ const OtherProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
   const [contentType, setContentType] = useState<any>('all');
   const [lensProfile, setProfile] = useState<any>();
+  const [sortingValues, setSortingValues] = useState<SortingValuesType>({
+    date: 'all',
+    sort: PublicationSortCriteria.Latest,
+    by: 'all'
+  });
+  const [filterValue, setFilterValue] = useState<Filter>(Filter.ALL);
   const [isFollowing, setIsFollowing] = useState(lensProfile?.isFollowedByMe);
   const [showUnfollow, setShowUnfollow] = useState('Following');
   const [isDotFollowing, setIsDotFollowing] = useState(false);
@@ -60,7 +68,7 @@ const OtherProfile: NextPage = () => {
 
   // TODO USE NSFW FILTERS!
   useEffect(() => {
-    explore({ locale: 'en', tags }).then((data) => {
+    explore({ locale: 'en', sortingValues, filterValue, tags }).then((data) => {
       //   if (contentType === 'collected') {
       //     setPublications(
       //       data.items.filter((r) => r.profile.id !== lensProfile?.id)
@@ -77,7 +85,7 @@ const OtherProfile: NextPage = () => {
       return;
       //   }
     });
-  }, [lensProfile?.id, tags]);
+  }, [lensProfile?.id, tags, sortingValues]);
 
   const location =
     lensProfile?.attributes.find((item: any) => item.key === 'location')
@@ -103,7 +111,7 @@ const OtherProfile: NextPage = () => {
     }
   }
 
-  explore({ locale: 'en', tags });
+  //explore({ locale: 'en', tags });
   return (
     <LayoutProfile
       title="Nata Social | Explore"

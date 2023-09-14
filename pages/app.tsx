@@ -23,14 +23,22 @@ import {
 
 import { useQuery } from '@apollo/client';
 import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
+import ExplorerCard from 'components/ExplorerCard';
+import Head from 'next/head';
+import ImageProxied from 'components/ImageProxied';
 import CustomHead from '@components/CustomHead';
 import { SearchBar } from '@components/SearchBar';
+import {
+  Filter,
+  SortFilterControls,
+  SortingValuesType
+} from '@components/SortFilterControls';
 import WelcomePanel from '@components/WelcomePanel';
 import WhitelistScreen from '@components/WhitelistScreen';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
 import { useExplore } from '@context/ExploreContext';
 import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
-import { reqQuery } from '@lib/lens/explore-publications';
 import { cn } from '@lib/utils';
 import { Layout } from 'components/Layout';
 import { Spinner } from 'components/Spinner';
@@ -52,6 +60,12 @@ const App: NextPage = () => {
   const [finished, setFinished] = useState(false);
   const [cursor, setCursor] = useState<string | null>(null);
   const { profile: lensProfile } = useContext(ProfileContext);
+  const [sortingValues, setSortingValues] = useState<SortingValuesType>({
+    date: 'all',
+    sort: PublicationSortCriteria.Latest,
+    by: 'all'
+  });
+  const [filterValue, setFilterValue] = useState<Filter>(Filter.ALL);
   const { viewCard } = useContext(ViewCardContext);
   const { isExplore, setIsExplore, skipExplore, setSkipExplore } = useExplore();
 
@@ -398,6 +412,21 @@ const App: NextPage = () => {
     ]
   );
 
+  useEffect(() => {
+    setLoader(true);
+    explore({ locale: 'en', sortingValues, filterValue, tags })
+      .then((data) => {
+        setLoader(false);
+        if (!data) return setPublications([]);
+        setCursor(data.pageInfo.next);
+        return setPublications(data.items);
+      })
+      .catch((err) => {
+        console.log('ERROR ', err);
+        setLoader(false);
+      });
+  }, [tags, sortingValues, filterValue]);
+
   if (hydrationLoading) {
     return (
       <div className="my-8 flex justify-center">
@@ -441,11 +470,18 @@ const App: NextPage = () => {
               {/* search bar */}
               <SearchBar />
               <TagsFilter />
+
+              {/* view options */}
+              <SortFilterControls
+                sortingValues={sortingValues}
+                setSortingValues={setSortingValues}
+                filterValue={filterValue}
+                setFilterValue={setFilterValue}
+              />
             </div>
 
             {/* publications */}
-            <section className="flex flex-col gap-2 px-8 pb-6">
-              <CardViewButtons />
+            <section className="px-4 pb-6">
               <ul
                 className={cn(
                   'w-full rounded-b-lg pb-6',
