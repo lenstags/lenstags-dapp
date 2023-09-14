@@ -70,6 +70,10 @@ const ExplorerCard: FC<Props> = (props) => {
     }
   });
 
+  const image = URL.createObjectURL(
+    new Blob([post?.image], { type: 'image/png' })
+  );
+
   fromHtml.addRule('lineElementsToPlain', {
     filter: ['div', 'p'],
     replacement: (content) => {
@@ -352,7 +356,7 @@ const ExplorerCard: FC<Props> = (props) => {
                   priority={true}
                   alt=""
                   className={`h-28 w-full rounded-lg object-cover duration-1000 animate-in fade-in-50`}
-                  src={post.metadata.media[0]?.original.url}
+                  src={post.metadata.media[0]?.original.url || image}
                 />
               )}
 

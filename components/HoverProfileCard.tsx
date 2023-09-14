@@ -43,6 +43,7 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
   const [showUnfollow, setShowUnfollow] = useState('Following');
 
   const handleFollow = async (profileId: string) => {
+    if (lensProfile?.id === id) return;
     setIsDotFollowing(true);
     if (showUnfollow === 'Unfollow') {
       return freeUnfollow(profileId).then((r) => {
@@ -85,7 +86,7 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
                   src={picture?.original.url || profilePicture}
                 />
               </Link>
-              {isFollowing && lensProfile ? (
+              {isFollowing && lensProfile && lensProfile.id !== id ? (
                 <button
                   onMouseEnter={() => setShowUnfollow('Unfollow')}
                   onMouseLeave={() => setShowUnfollow('Following')}
@@ -104,7 +105,7 @@ const HoverProfileCard: React.FC<HoverProfileCardProps> = ({
                 ''
               )}
 
-              {!isFollowing && lensProfile ? (
+              {!isFollowing && lensProfile && lensProfile.id !== id ? (
                 <button
                   onClick={() => handleFollow(id)}
                   className=" m-2 flex items-center rounded-lg border border-solid border-black bg-transparent px-2 py-1 font-bold"

@@ -40,6 +40,9 @@ import {
   DialogTrigger
 } from '@components/ui/Dialog';
 import ExplorerCard from '@components/ExplorerCard';
+import PillTab from '@components/PillTab';
+import { ViewBy } from '@context/ViewCardContext';
+import { CardViewsMap } from '@components/CardViewButtons';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -108,6 +111,10 @@ const Create: NextPage = () => {
   const [isExplore, setIsExplore] = useState(false);
   const [skipExplore, setSkipExplore] = useState(true);
   const [post, setPost] = useState<any>();
+  const [viewCard, setViewCard] = useState<
+    typeof ViewBy.CARD | typeof ViewBy.POST | typeof ViewBy.LIST
+  >(ViewBy.CARD);
+  const [openPreview, setOpenPreview] = useState(false);
 
   const [imageURL, setImageURL] = useState('');
   const [imageOrigin, setImageOrigin] = useState<string | null>('panelAI');
@@ -144,12 +151,29 @@ const Create: NextPage = () => {
       div.innerHTML = html;
       const text = div.textContent;
       setPlainText(text || '');
+      setPost({
+        ...post,
+        content: text || '',
+        metadata: {
+          ...post?.metadata,
+          content: text || ''
+        }
+      });
     }
   }, [editorContents]);
 
   const handleTagsChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
+    setPost({
+      ...post,
+      metadata: {
+        ...post?.metadata,
+        tags: selectedOptions.map((r: any) => r['value'])
+      }
+    });
   };
+
+  console.log('post: ', post);
 
   // const handleActivePanelChange = (selectedPanel: string | null) => {
   //   setActualPanel(selectedPanel);
@@ -234,14 +258,12 @@ const Create: NextPage = () => {
 
         const imgTarget = data.image ? data.image : 'public/img/post.png';
         const imageBuffer = await getBufferFromElement(imgTarget);
-        console.log('i1: ', imageBuffer);
         console.log('i1: ', imageBuffer.toString('base64'));
 
         setGeneratedImage(
           `data:image/png;base64,${imageBuffer.toString('base64')}`
         );
         setEditorContents(data.description as string);
-        console.log('i2: ', imageBuffer);
         setPost({
           attributes: DEFAULT_METADATA_ATTRIBUTES,
           name: data.title as string,
@@ -254,6 +276,7 @@ const Create: NextPage = () => {
           tags: [],
           profile: lensProfile,
           metadata: {
+            ...post?.metadata,
             attributes: DEFAULT_METADATA_ATTRIBUTES,
             name: data.title as string,
             content: data.description as string,
@@ -298,11 +321,142 @@ const Create: NextPage = () => {
       setImageURL(data.image as string);
       setImageOrigin('panelLink');
       // setGeneratedImage(data.image as string);
+      setPost({
+        attributes: DEFAULT_METADATA_ATTRIBUTES,
+        name: data.title as string,
+        abstract: '',
+        content: data.description as string,
+        link: sourceUrl,
+        locale: 'en',
+        image: data.image as string,
+        imageMimeType: 'image/jpeg',
+        tags: [],
+        profile: lensProfile,
+        metadata: {
+          ...post?.metadata,
+          attributes: DEFAULT_METADATA_ATTRIBUTES,
+          name: data.title as string,
+          content: data.description as string,
+          image: data.image as string,
+          media: [
+            {
+              original: {
+                url: data.image as string
+              }
+            }
+          ]
+        },
+        stats: {
+          totalAmountOfCollects: 0,
+          totalAmountOfComments: 0
+        }
+      });
       setIsLoaded(true);
     } else {
       snackbar.showMessage('⚠️ Link does not contain image preview');
       setIsLoaded(false);
     }
+  };
+
+  const BuildPostPreview = async () => {
+    let imageBuffer: Buffer | null = null;
+
+    imageBuffer = await getBufferFromElement(
+      imageURL
+      // imageURL ? imageURL : 'public/img/post.png'
+    );
+
+    if (imageOrigin === 'panelUpload') {
+      console.log('aca ', cover);
+      if (cover) {
+        const reader = new FileReader();
+        reader.readAsArrayBuffer(cover);
+        await new Promise((resolve, reject) => {
+          reader.onloadend = () => {
+            if (reader.result instanceof ArrayBuffer) {
+              imageBuffer = Buffer.from(reader.result);
+            } else if (reader.result !== null) {
+              imageBuffer = Buffer.from(reader.result.toString());
+            } else {
+              // TODO: handle the case where reader.result is null
+            }
+            resolve(imageBuffer);
+          };
+          reader.onerror = () => {
+            return snackbar.showMessage('❌ Upload failed! Please try again.');
+          };
+        });
+      }
+    }
+
+    if (imageOrigin === 'panelLink') {
+      const imgTarget = imageURL ? imageURL : 'public/img/post.png';
+      imageBuffer = await getBufferFromElement(imgTarget);
+    }
+
+    if (imageOrigin === 'panelAI') {
+      imageBuffer = generatedImage2
+        ? Buffer.from(generatedImage2, 'base64')
+        : null;
+    }
+
+    if (!imageBuffer) {
+      const parentNode = document.getElementById('defaultImage');
+
+      if (parentNode) {
+        const svgNode = parentNode.firstElementChild;
+        if (svgNode) {
+          const { toPng } = await import('html-to-image');
+          try {
+            const dataUrl = await toPng(svgNode as HTMLElement);
+            const base64Image = dataUrl.split(';base64,').pop();
+            imageBuffer = base64Image
+              ? Buffer.from(base64Image, 'base64')
+              : null;
+          } catch (error) {
+            console.error('Could not create image from SVG:', error);
+          }
+        }
+      }
+    }
+
+    setPost({
+      ...post,
+      attributes: DEFAULT_METADATA_ATTRIBUTES,
+      name: title || ' ',
+      abstract: '',
+      content: editorContents || '',
+      link: sourceUrl,
+      locale: 'en',
+      image: imageBuffer || null,
+      imageMimeType: 'image/jpeg',
+      profile: lensProfile,
+      metadata: {
+        ...post?.metadata,
+        attributes: DEFAULT_METADATA_ATTRIBUTES,
+        name: title || ' ',
+        content: editorContents || '',
+        image: imageBuffer || null,
+        media: [
+          {
+            original: {
+              url: imageURL
+            }
+          }
+        ],
+        tags: selectedOption.map((r) => r['value'])
+      },
+      stats: {
+        totalAmountOfCollects: 0,
+        totalAmountOfComments: 0
+      }
+    });
+  };
+
+  const handlePreview = async () => {
+    await BuildPostPreview().then(() => {
+      setOpenPreview(true);
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -317,7 +471,6 @@ const Create: NextPage = () => {
           setCover(e.target.files[0]);
         }
       };
-
       reader.readAsDataURL(e.target.files[0]);
     }
   };
@@ -581,8 +734,6 @@ const Create: NextPage = () => {
     }
   ];
 
-  console.log(post);
-
   return (
     <LayoutCreate
       title="Nata Social | Create post"
@@ -732,6 +883,14 @@ const Create: NextPage = () => {
                 value={title}
                 onChange={(e) => {
                   setTitle(e.target.value);
+                  setPost({
+                    ...post,
+                    name: e.target.value,
+                    metadata: {
+                      ...post?.metadata,
+                      name: e.target.value
+                    }
+                  });
                 }}
               />
               <Editor
@@ -813,20 +972,39 @@ const Create: NextPage = () => {
                   </div>
                 </div>
                 {/* preview */}
-                <Dialog>
+                <Dialog
+                  open={openPreview}
+                  onOpenChange={(isOpen) => {
+                    if (!openPreview) return;
+                    setOpenPreview(isOpen);
+                  }}
+                >
                   <DialogTrigger
-                    className="mb-4 ml-4 items-center px-8 py-1"
+                    className="mb-4 ml-4 items-center px-8 py-1 disabled:border-0 disabled:bg-gray-200 disabled:text-gray-600 disabled:opacity-50 disabled:hover:bg-gray-200"
                     style={{ border: '2px solid #000' }}
+                    disabled={!post?.metadata.name || !post?.metadata.content}
+                    onClick={handlePreview}
                   >
                     Preview
                   </DialogTrigger>
-                  <DialogContent className="z-50 flex min-w-[1000px] flex-col gap-8">
-                    <DialogHeader>
-                      <DialogTitle>Preview mode</DialogTitle>
+                  <DialogContent className="z-50 flex min-w-[1000px] flex-col items-center gap-8">
+                    <DialogHeader className="w-full">
+                      <DialogTitle className="text-xl">
+                        Preview mode
+                      </DialogTitle>
                     </DialogHeader>
-                    <article className="prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto w-96">
-                      <ExplorerCard post={post} refProp={null} />
+                    <article
+                      className={`prose prose-sm sm:prose lg:prose-lg xl:prose-xl mx-auto flex min-h-[310px] list-none items-center justify-center ${
+                        viewCard === ViewBy.CARD ? 'w-96' : 'w-full'
+                      }`}
+                    >
+                      {post.metadata.attributes &&
+                        CardViewsMap[viewCard]({
+                          post: post,
+                          refProp: null
+                        })}
                     </article>
+                    <PillTab viewCard={viewCard} setViewCard={setViewCard} />
                   </DialogContent>
                 </Dialog>
               </div>
