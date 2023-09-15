@@ -8,6 +8,7 @@ import React, { FC, useContext, useRef, useState } from 'react';
 import CollectButton from './CollectButton';
 import HoverProfileCard from './HoverProfileCard';
 import ImageProxied from './ImageProxied';
+import Link from 'next/link';
 import ListImages from './ListImages';
 import ModalLists from './ModalLists';
 import { PRIVATE_LIST_NAME } from '@lib/config';
@@ -19,7 +20,6 @@ import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import useDisconnector from '@lib/hooks/useDisconnector';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import Link from 'next/link';
 
 interface Props {
   post: any;
