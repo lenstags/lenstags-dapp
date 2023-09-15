@@ -68,7 +68,7 @@ export const LayoutLanding: FC<Props> = ({
       <Script
         async
         defer
-        src="https://analytics.umami.is/script.js"
+        src="/analytics/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
       <nav
