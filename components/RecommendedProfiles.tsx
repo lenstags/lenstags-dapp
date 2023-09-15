@@ -105,6 +105,8 @@ const RecommendedProfiles: FC = () => {
                       @{profile.handle}
                     </p>
                   </Link>
+
+                  <div className="FOLLOW-BUTTON"></div>
                 </div>
               </div>
             );
