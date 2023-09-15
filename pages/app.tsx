@@ -11,7 +11,14 @@ import {
   PublicationSortCriteria,
   PublicationTypes
 } from '@lib/lens/graphql/generated';
+import {
+  Filter,
+  SortFilterControls,
+  SortingValuesType
+} from '@components/SortFilterControls';
 import { ProfileContext, TagsFilter, TagsFilterContext } from 'components';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
   useContext,
@@ -21,28 +28,21 @@ import {
   useState
 } from 'react';
 
-import { useQuery } from '@apollo/client';
 import { CardViewsMap } from '@components/CardViewButtons';
 import CustomHead from '@components/CustomHead';
-import { SearchBar } from '@components/SearchBar';
-import {
-  Filter,
-  SortFilterControls,
-  SortingValuesType
-} from '@components/SortFilterControls';
-import WelcomePanel from '@components/WelcomePanel';
-import WhitelistScreen from '@components/WhitelistScreen';
-import { explore, reqQuery } from '@lib/lens/explore-publications';
-import { useExplore } from '@context/ExploreContext';
-import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
-import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
-import { cn } from '@lib/utils';
+import { DotWave } from '@uiball/loaders';
 import { Layout } from 'components/Layout';
-import { Spinner } from 'components/Spinner';
 import type { NextPage } from 'next';
 import Script from 'next/script';
+import { SearchBar } from '@components/SearchBar';
+import { Spinner } from 'components/Spinner';
+import WelcomePanel from '@components/WelcomePanel';
+import WhitelistScreen from '@components/WhitelistScreen';
+import { cn } from '@lib/utils';
+import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
+import { useExplore } from '@context/ExploreContext';
 import { useNetwork } from 'wagmi';
-import { DotWave } from '@uiball/loaders';
+import { useQuery } from '@apollo/client';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -439,7 +439,7 @@ const App: NextPage = () => {
       <Script
         async
         defer
-        src="https://analytics.umami.is/script.js"
+        src="/analytics/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
       ></Script>
 
@@ -482,7 +482,7 @@ const App: NextPage = () => {
             {/* publications */}
             <section className="px-4 pb-6">
               {loader ? (
-                <div className="min-w-full flex justify-center pt-10">
+                <div className="flex min-w-full justify-center pt-10">
                   <DotWave />
                 </div>
               ) : (
