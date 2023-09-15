@@ -436,12 +436,27 @@ const App: NextPage = () => {
   return (
     <>
       <CustomHead title="Nata Social" content="" />
-      <Script
+
+      {/* <Script
         async
         defer
-        src="/analytics/script.js"
+        data-do-not-track="true"
+        src="https://analytics.umami.is/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
+      ></Script> */}
+
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-XQNNYXZS5D"
       ></Script>
+      <Script id="ss" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XQNNYXZS5D');
+        `}
+      </Script>
 
       <Layout
         title={'Nata Social | Home'}
@@ -483,7 +498,7 @@ const App: NextPage = () => {
             <section className="px-4 pb-6">
               {loader ? (
                 <div className="flex min-w-full justify-center pt-10">
-                  <DotWave />
+                  <DotWave size={22} />
                 </div>
               ) : (
                 <ul
