@@ -1,15 +1,16 @@
+import { useContext, useEffect, useState } from 'react';
+
+import { DotWave } from '@uiball/loaders';
 import ImageProxied from '@components/ImageProxied';
-import { doesFollow } from '@lib/lens/does-follow';
-import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
-import { freeUnfollow } from '@lib/lens/free-unfollow';
+import Link from 'next/link';
+import { ProfileContext } from './LensAuthenticationProvider';
+import { ProfileProps } from './ProfileCard';
 import { ProfileQuery } from '@lib/lens/graphql/generated';
 import { PublicRoutes } from '@models/routes.model';
-import { DotWave } from '@uiball/loaders';
-import { useContext, useEffect, useState } from 'react';
-import { ProfileProps } from './ProfileCard';
 import { PublicationSearchType } from './SearchBar';
-import { ProfileContext } from './LensAuthenticationProvider';
-import Link from 'next/link';
+import { doesFollow } from '@lib/lens/does-follow';
+import { freeUnfollow } from '@lib/lens/free-unfollow';
+import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 
 interface HoverProfileCardProps {
   profile: ProfileQuery['profile'] | null;
