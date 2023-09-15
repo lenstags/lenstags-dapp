@@ -43,6 +43,7 @@ export const explore = async (
 ) => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  today.setDate(today.getDate() - 1);
   const lastWeek = new Date(today);
   lastWeek.setDate(today.getDate() - 7);
   const lastMonth = new Date(today);
