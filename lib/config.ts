@@ -3,7 +3,7 @@ export enum NETWORKS {
   MAINNET = 'mainnet'
 }
 
-export const DEFAULT_NETWORK = NETWORKS.MAINNET; // the one and only switcher
+export const DEFAULT_NETWORK = NETWORKS.MAINNET; // the one and only switcher for all
 
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
 export const DEFAULT_NATA_DOMAIN = 'https://dev.nata.social/app';
