@@ -1,18 +1,22 @@
+import {
+  Profile,
+  RecommendedProfilesDocument
+} from '@lib/lens/graphql/generated';
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 
 import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
-import { Profile } from '@lib/lens/graphql/generated';
 import { ProfileContext } from './LensAuthenticationProvider';
 import { getPictureUrl } from 'utils/helpers';
 import { recommendedProfiles } from '@lib/lens/recommended-profiles';
+import { useQuery } from '@apollo/client';
+import { useRecommendedProfilesQuery } from '@lib/lens/graphql/generated';
 
 const RecommendedProfiles: FC = () => {
-  const { profile: lensProfile } = useContext(ProfileContext);
   const [profiles, setProfiles] = useState<any>([]);
   const [showCard, setShowCard] = useState(false);
-  const timeoutId = useRef<NodeJS.Timeout | null>(null);
+  //   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showUnfollow, setShowUnfollow] = useState('Following');
 
@@ -43,26 +47,39 @@ const RecommendedProfiles: FC = () => {
   //     setShowCard(false);
   //   };
 
-  const fetchData = async () => {
-    // if (!lensProfile) return;
-    const res = await recommendedProfiles();
-    setProfiles(res);
-    console.log('fetchData qqq ', res);
-  };
+  //   const resRecommendedProfiles = useQuery(RecommendedProfilesDocument, {
+  //     variables: {
+  //       options: {
+  //         // disableML: true,
+  //         shuffle: true // this does not work!
+  //       }
+  //     }
+  //   });
+
+  const { data, loading, error } = useRecommendedProfilesQuery({
+    variables: {
+      options: {
+        profileId: null
+      }
+    }
+  });
+
+  //   const { data, loading, error: apolloError } = resRecommendedProfiles;
+
+  //   const fetchData = async () => {
+  //     // if (!lensProfile) return;
+  //     const res = await recommendedProfiles();
+  //     setProfiles(res);
+  //     console.log('fetchData qqq ', res);
+  //   };
 
   useEffect(() => {
-    // lensProfile &&
-    //   getSubscriptions(lensProfile?.ownedBy).then((res: any) => {
-    //     const channelNataSocial =
-    //       res &&
-    //       !!res.find(
-    //         (item: { channel: string }) =>
-    //           item.channel === '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
-    //       );
-    //     setSubscribed(channelNataSocial);
-    //   });
-    fetchData();
-  }, []);
+    if (!data) {
+      return;
+    }
+    console.log('sasasa ', data);
+    setProfiles(data.recommendedProfiles);
+  }, [data]);
 
   return (
     <>
