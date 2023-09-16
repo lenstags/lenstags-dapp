@@ -357,7 +357,7 @@ export default function PostDetails() {
                   collects={post.stats.totalAmountOfCollects}
                   comments={post.stats.totalAmountOfComments || 0}
                 />
-                {(isFinished || (lensProfile && post.hasCollectedByMe)) && (
+                {(isFinished || (loggedProfile && post.hasCollectedByMe)) && (
                   // && post.metadata.attributes[0].value === 'post'
                   <div
                     title="You do own this item!"
@@ -367,9 +367,9 @@ export default function PostDetails() {
                   </div>
                 )}
 
-                {!isFinished &&
+                {loggedProfile &&
+                  !isFinished &&
                   !isPosting &&
-                  lensProfile &&
                   !post.hasCollectedByMe && (
                     <button
                       onClick={() => {
@@ -455,52 +455,54 @@ export default function PostDetails() {
               <p>Comments</p>
 
               <div className="">
-                <div className=" flex bg-white py-4 ">
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    className="w-full rounded-lg border border-stone-300 
+                {loggedProfile && (
+                  <div className=" flex bg-white py-4 ">
+                    <input
+                      type="text"
+                      autoComplete="off"
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="w-full rounded-lg border border-stone-300 
                    bg-stone-100  px-3 py-1 
                       leading-none  outline-none"
-                    name="tag-search-input"
-                    id="tag-search-input"
-                    placeholder="Add your comment..."
-                  />
+                      name="tag-search-input"
+                      id="tag-search-input"
+                      placeholder="Add your comment..."
+                    />
 
-                  {isSpinnerVisible ? (
-                    <button className="ml-3 rounded-lg  bg-stone-400 px-3 py-2 text-white">
-                      <div className="flex items-center">
-                        <span className="mr-1">Sending</span>
-                        <DotWave size={22} color="#FFFFFF" />
-                      </div>
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => handleComment(comment)}
-                      className="ml-3 rounded-lg  bg-black px-3 py-2 text-white"
-                    >
-                      <div className="flex items-center">
-                        <span className="mr-1">Send</span>
-                        <svg
-                          width="12"
-                          height="12"
-                          viewBox="0 0 18 18"
-                          fill="none"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            d="M5.00038 9.00013H9.00038M4.73057 8.51449L1.57019 2.82579C1.09271 1.96633 2.01216 1.00602 2.89156 1.44572L16.2115 8.1057C16.9486 8.47423 16.9486 9.52603 16.2115 9.89456L2.89156 16.5545C2.01216 16.9942 1.09271 16.0339 1.57019 15.1745L4.73057 9.48577C4.89836 9.18375 4.89836 8.81651 4.73057 8.51449Z"
-                            stroke="white"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                      </div>
-                    </button>
-                  )}
-                </div>
+                    {isSpinnerVisible && loggedProfile ? (
+                      <button className="ml-3 rounded-lg  bg-stone-400 px-3 py-2 text-white">
+                        <div className="flex items-center">
+                          <span className="mr-1">Sending</span>
+                          <DotWave size={22} color="#FFFFFF" />
+                        </div>
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleComment(comment)}
+                        className="ml-3 rounded-lg  bg-black px-3 py-2 text-white"
+                      >
+                        <div className="flex items-center">
+                          <span className="mr-1">Send</span>
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 18 18"
+                            fill="none"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              d="M5.00038 9.00013H9.00038M4.73057 8.51449L1.57019 2.82579C1.09271 1.96633 2.01216 1.00602 2.89156 1.44572L16.2115 8.1057C16.9486 8.47423 16.9486 9.52603 16.2115 9.89456L2.89156 16.5545C2.01216 16.9942 1.09271 16.0339 1.57019 15.1745L4.73057 9.48577C4.89836 9.18375 4.89836 8.81651 4.73057 8.51449Z"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                        </div>
+                      </button>
+                    )}
+                  </div>
+                )}
                 {/* other comments */}
                 {allComments &&
                   allComments.map((singleComment: Comment) => {
