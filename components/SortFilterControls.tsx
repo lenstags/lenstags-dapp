@@ -1,12 +1,13 @@
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
 import {
-  Squares2X2Icon,
   QueueListIcon,
-  RectangleStackIcon
+  RectangleStackIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline';
-import { useContext, useEffect, useState } from 'react';
-import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import { useContext, useEffect, useState } from 'react';
+
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
+import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 
 export interface SortingValuesType {
   date: string;
@@ -41,11 +42,11 @@ export const SortFilterControls = ({
   const Pill = () => {
     switch (viewCard) {
       case ViewBy.CARD:
-        return <Squares2X2Icon className="w-6 h-6" />;
+        return <Squares2X2Icon className="h-6 w-6" />;
       case ViewBy.POST:
-        return <QueueListIcon className="w-6 h-6" />;
+        return <QueueListIcon className="h-6 w-6" />;
       case ViewBy.LIST:
-        return <RectangleStackIcon className="w-6 h-6" />;
+        return <RectangleStackIcon className="h-6 w-6" />;
       default:
         return null;
     }
@@ -80,8 +81,8 @@ export const SortFilterControls = ({
 
   return (
     <div className="flex flex-col">
-      <div className="mt-2 flex justify-between rounded-t-lg min-h-[3rem]">
-        <div className="flex gap-1 font-sans font-medium tracking-wide items-center">
+      <div className="mt-2 flex min-h-[3rem] justify-between rounded-t-lg">
+        <div className="flex items-center gap-1 font-sans font-medium tracking-wide">
           <button
             onClick={() => setFilterValue(Filter.ALL)}
             className={`rounded-lg border
@@ -124,76 +125,77 @@ export const SortFilterControls = ({
             Posts
           </button>
         </div>
-        <div className="flex gap-1 items-center font-sans font-medium tracking-wide">
+        <div className="flex items-center gap-1 font-sans font-medium tracking-wide">
           <button
             onClick={() => setShowSortingOptions(!showSortingOptions)}
-            className={`py-1 px-1.5 rounded-lg
-          border-black border border-solid 
+            className={`rounded-lg border border-solid
+          border-black px-1.5 py-1 
           ${showSortingOptions ? 'bg-black' : 'bg-white'} ${
               isLoading && 'cursor-not-allowed opacity-50'
             }`}
             disabled={isLoading}
           >
             {showSortingOptions ? (
-              <AdjustmentsHorizontalIcon className="text-white w-6 h-6" />
+              <AdjustmentsHorizontalIcon className="h-6 w-6 text-white" />
             ) : (
-              <AdjustmentsHorizontalIcon className="text-black w-6 h-6" />
+              <AdjustmentsHorizontalIcon className="h-6 w-6 text-black" />
             )}
           </button>
           {showViewOptions ? (
-            <div className="flex space-x-2 py-1 px-1.5 shadow rounded-lg">
+            <div className="flex space-x-2 rounded-lg px-1.5 py-1 shadow">
               {viewCard === ViewBy.CARD ? (
                 <button
-                  className="bg-black text-white py-1 px-1.5 rounded-lg"
+                  className="rounded-lg bg-black px-1.5 py-1 text-white"
                   onClick={() => handleViewOptionClick(ViewBy.CARD)}
                 >
-                  <Squares2X2Icon className="w-6 h-6" />
+                  <Squares2X2Icon className="h-6 w-6" />
                 </button>
               ) : (
                 <button
-                  className="bg-white text-black py-1 px-1.5"
+                  className="bg-white px-1.5 py-1 text-black"
                   onClick={() => handleViewOptionClick(ViewBy.CARD)}
                 >
-                  <Squares2X2Icon className="w-6 h-6" />
+                  <Squares2X2Icon className="h-6 w-6" />
                 </button>
               )}
               {viewCard === ViewBy.POST ? (
                 <button
-                  className="bg-black text-white py-1 px-1.5 rounded-lg"
+                  title="View by list"
+                  className="rounded-lg bg-black px-1.5 py-1 text-white"
                   onClick={() => handleViewOptionClick(ViewBy.POST)}
                 >
-                  <QueueListIcon className="w-6 h-6" />
+                  <QueueListIcon className="h-6 w-6" />
                 </button>
               ) : (
                 <button
-                  className="bg-white text-black py-1 px-1.5"
+                  className="bg-white px-1.5 py-1 text-black"
                   onClick={() => handleViewOptionClick(ViewBy.POST)}
                 >
-                  <QueueListIcon className="w-6 h-6" />
+                  <QueueListIcon className="h-6 w-6" />
                 </button>
               )}
               {viewCard === ViewBy.LIST ? (
                 <button
-                  className="bg-black text-white py-1 px-1.5 rounded-lg"
+                  className="rounded-lg bg-black px-1.5 py-1 text-white"
                   onClick={() => handleViewOptionClick(ViewBy.LIST)}
                 >
-                  <RectangleStackIcon className="w-6 h-6" />
+                  <RectangleStackIcon className="h-6 w-6" />
                 </button>
               ) : (
                 <button
-                  className="bg-white text-black py-1 px-1.5"
+                  className="bg-white px-1.5 py-1 text-black"
                   onClick={() => handleViewOptionClick(ViewBy.LIST)}
                 >
-                  <RectangleStackIcon className="w-6 h-6" />
+                  <RectangleStackIcon className="h-6 w-6" />
                 </button>
               )}
             </div>
           ) : (
             <button
               onClick={() => setShowViewOptions(true)}
-              className="py-1 px-1.5 rounded-lg
-          border-black border border-solid 
-          bg-white"
+              className="rounded-lg border border-solid
+          border-black bg-white px-1.5 
+          py-1"
             >
               <Pill />
             </button>
@@ -201,10 +203,10 @@ export const SortFilterControls = ({
         </div>
       </div>
       {showSortingOptions && (
-        <div className="flex flex-col bg-[#F8F8F8] rounded-lg border border-black py-4 px-6 my-2">
+        <div className="my-2 flex flex-col rounded-lg border border-black bg-[#F8F8F8] px-6 py-4">
           <div className="flex space-x-40">
             <div className="flex flex-col space-y-1">
-              <span className="font-serif font-bold text-sm mb-1.5">
+              <span className="mb-1.5 font-serif text-sm font-bold">
                 Upload date
               </span>
               <div className="flex items-center">
@@ -218,7 +220,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() => handleSortingOptionClick('date', 'today')}
                 ></div>
                 <label htmlFor="dateToday" className="ml-1.5 text-xs">
@@ -236,7 +238,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() => handleSortingOptionClick('date', 'lastWeek')}
                 ></div>
                 <label htmlFor="dateWeek" className="ml-1.5 text-xs">
@@ -254,7 +256,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() => handleSortingOptionClick('date', 'lastMonth')}
                 ></div>
                 <label htmlFor="dateLastMonth" className="ml-1.5 text-xs">
@@ -272,7 +274,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() => handleSortingOptionClick('date', 'all')}
                 ></div>
                 <label htmlFor="dateAll" className="ml-1.5 text-xs">
@@ -281,7 +283,7 @@ export const SortFilterControls = ({
               </div>
             </div>
             <div className="flex flex-col space-y-1">
-              <span className="font-serif font-bold text-sm mb-1.5">
+              <span className="mb-1.5 font-serif text-sm font-bold">
                 Sort by
               </span>
               <div className="flex items-center">
@@ -300,7 +302,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() =>
                     handleSortingOptionClick(
                       'sort',
@@ -330,7 +332,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() =>
                     handleSortingOptionClick(
                       'sort',
@@ -360,7 +362,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() =>
                     handleSortingOptionClick(
                       'sort',
@@ -373,8 +375,8 @@ export const SortFilterControls = ({
                 </label>
               </div>
             </div>
-            <div className="flex-col space-y-1 hidden">
-              <span className="font-serif font-bold text-sm mb-1.5">By</span>
+            <div className="hidden flex-col space-y-1">
+              <span className="mb-1.5 font-serif text-sm font-bold">By</span>
               <div className="flex items-center">
                 <input
                   type="radio"
@@ -386,7 +388,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() => handleSortingOptionClick('by', 'all')}
                 ></div>
                 <label htmlFor="byAll" className="ml-1.5 text-xs">
@@ -404,7 +406,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() => handleSortingOptionClick('by', 'curators')}
                 ></div>
                 <label htmlFor="byCurators" className="ml-1.5 text-xs">
@@ -422,7 +424,7 @@ export const SortFilterControls = ({
                   className="peer sr-only"
                 />
                 <div
-                  className="w-3 h-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:ring-black peer-checked:bg-black peer-checked:border-white"
+                  className="h-3 w-3 rounded-full border-2 border-gray-500 ring-1 ring-transparent hover:border-black peer-checked:border-white peer-checked:bg-black peer-checked:ring-black"
                   onClick={() => handleSortingOptionClick('by', 'projects')}
                 ></div>
                 <label htmlFor="byProjects" className="ml-1.5 text-xs">
@@ -432,7 +434,7 @@ export const SortFilterControls = ({
             </div>
           </div>
           <button
-            className="self-end text-white px-3 py-1 font-semibold text-xs mt-1.5"
+            className="mt-1.5 self-end px-3 py-1 text-xs font-semibold text-white"
             onClick={handleApplyClick}
           >
             Apply

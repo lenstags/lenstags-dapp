@@ -4,23 +4,23 @@ import React, { FC, useContext, useRef, useState } from 'react';
 import CollectButton from './CollectButton';
 import HoverProfileCard from './HoverProfileCard';
 import ImageProxied from './ImageProxied';
+import Link from 'next/link';
+import { ListBulletIcon } from '@heroicons/react/24/outline';
 import ListImages from './ListImages';
 import ModalLists from './ModalLists';
 import { PRIVATE_LIST_NAME } from '@lib/config';
 import PostIndicators from '@components/PostIndicators';
 // import ProfileCard from './ProfileCard';
 import { ProfileContext } from './LensAuthenticationProvider';
+import { PublicRoutes } from '@models/routes.model';
+import TagStrip from './TagStrip';
 import TurndownService from 'turndown';
+import { cn } from '@lib/utils';
 import { deleteLensLocalStorage } from '@lib/lens/localStorage';
 import { hidePublication } from '@lib/lens/hide-publication';
 import moment from 'moment';
 import { useDisconnect } from 'wagmi';
 import { useSnackbar } from 'material-ui-snackbar-provider';
-import { cn } from '@lib/utils';
-import Link from 'next/link';
-import { PublicRoutes } from '@models/routes.model';
-import { ListBulletIcon } from '@heroicons/react/24/outline';
-import TagStrip from './TagStrip';
 
 interface Props {
   post: any;
