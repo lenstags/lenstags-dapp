@@ -26,10 +26,17 @@ const exploreProfiles = async (request: ExploreProfilesRequest) => {
 // MostPosts = 'MOST_POSTS',
 // MostPublication = 'MOST_PUBLICATION'
 
-export const getExploreProfiles = async () => {
+export const getExploreProfiles = async (myProfileId?: string) => {
   const result = await exploreProfiles({
     sortCriteria: ProfileSortCriteria.MostFollowers
   });
+  console.log('rrrr ', result);
+  let filteredResult;
+  if (myProfileId) {
+    filteredResult = result.items.filter((p) => p.isFollowedByMe === false);
+  } else {
+    filteredResult = result.items;
+  }
 
-  return result;
+  return filteredResult;
 };
