@@ -30,7 +30,6 @@ export const getExploreProfiles = async (myProfileId?: string) => {
   const result = await exploreProfiles({
     sortCriteria: ProfileSortCriteria.MostFollowers
   });
-  console.log('rrrr ', result);
   let filteredResult;
   if (myProfileId) {
     filteredResult = result.items.filter((p) => p.isFollowedByMe === false);
