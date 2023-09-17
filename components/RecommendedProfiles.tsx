@@ -13,6 +13,7 @@ import { recommendedProfiles } from '@lib/lens/recommended-profiles';
 import { useQuery } from '@apollo/client';
 import { useRecommendedProfilesQuery } from '@lib/lens/graphql/generated';
 import { getExploreProfiles } from '@lib/lens/explore-profiles';
+import FollowButton from './FollowButton';
 
 const RecommendedProfiles: FC = () => {
   const [profiles, setProfiles] = useState<any>([]);
@@ -76,19 +77,19 @@ const RecommendedProfiles: FC = () => {
   //     console.log('fetchData qqq ', res);
   //   };
 
-  const fetchData = async () => {
-    const res = await getExploreProfiles();
+  const fetchData = async (myProfileId?: string) => {
+    const res = await getExploreProfiles(myProfileId);
     if (!res) {
       return;
     }
-    const randomizedArray = shuffleArray(res.items);
+    const randomizedArray = shuffleArray(res);
     const firstFiveElements = randomizedArray.slice(0, 5);
     setProfiles(firstFiveElements);
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(loggedProfile?.id);
+  }, [loggedProfile]);
 
   return (
     <>
@@ -132,21 +133,10 @@ const RecommendedProfiles: FC = () => {
                     </p>
                   </Link>
 
-                  {loggedProfile && (
-                    <button
-                      //   onClick={() => handleFollow(id)}
-                      className="inline-flex h-7 w-[60px] items-center justify-center 
-                    rounded-lg border border-solid
-                   border-neutral-900 bg-white px-2 py-1"
-                    >
-                      <div
-                        className="text-center font-['Inter'] text-xs font-bold 
-                      leading-normal text-neutral-900"
-                      >
-                        Follow
-                      </div>
-                    </button>
-                  )}
+                  <FollowButton
+                    myProfileId={loggedProfile?.id}
+                    profileId={profile.id}
+                  />
                 </div>
               </div>
             );
