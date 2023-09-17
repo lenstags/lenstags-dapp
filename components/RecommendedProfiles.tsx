@@ -8,14 +8,17 @@ import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { getPictureUrl } from 'utils/helpers';
+import { getPictureUrl, shuffleArray } from 'utils/helpers';
 import { recommendedProfiles } from '@lib/lens/recommended-profiles';
 import { useQuery } from '@apollo/client';
 import { useRecommendedProfilesQuery } from '@lib/lens/graphql/generated';
+import { getExploreProfiles } from '@lib/lens/explore-profiles';
 
 const RecommendedProfiles: FC = () => {
   const [profiles, setProfiles] = useState<any>([]);
   const [showCard, setShowCard] = useState(false);
+  const { profile: loggedProfile } = useContext(ProfileContext);
+
   //   const timeoutId = useRef<NodeJS.Timeout | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showUnfollow, setShowUnfollow] = useState('Following');
@@ -56,13 +59,13 @@ const RecommendedProfiles: FC = () => {
   //     }
   //   });
 
-  const { data, loading, error } = useRecommendedProfilesQuery({
-    variables: {
-      options: {
-        profileId: null
-      }
-    }
-  });
+  //   const { data, loading, error } = useRecommendedProfilesQuery({
+  //     variables: {
+  //       options: {
+  //         profileId: null
+  //       }
+  //     }
+  //   });
 
   //   const { data, loading, error: apolloError } = resRecommendedProfiles;
 
@@ -73,17 +76,23 @@ const RecommendedProfiles: FC = () => {
   //     console.log('fetchData qqq ', res);
   //   };
 
-  useEffect(() => {
-    if (!data) {
+  const fetchData = async () => {
+    const res = await getExploreProfiles();
+    if (!res) {
       return;
     }
-    console.log('sasasa ', data);
-    setProfiles(data.recommendedProfiles);
-  }, [data]);
+    const randomizedArray = shuffleArray(res.items);
+    const firstFiveElements = randomizedArray.slice(0, 5);
+    setProfiles(firstFiveElements);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <>
-      <div className="mt-4 rounded-t-lg bg-stone-100 py-2 pr-4">
+      <div className="mt-4 rounded-t-xl bg-stone-100 py-2 pr-4">
         <div className=" rounded-lg pl-4">
           <div className=" flex items-baseline justify-between">
             <p className="font-serif text-sm font-bold">Recommended creators</p>
@@ -91,11 +100,11 @@ const RecommendedProfiles: FC = () => {
           </div>
         </div>
       </div>
-      <div className="mb-6 w-full rounded-b-lg border-2 border-solid border-stone-100 bg-white px-4 pb-4">
+      <div className="mb-6 w-full rounded-b-xl border-2 border-solid border-stone-100 bg-white px-4 pb-4">
         {profiles &&
           profiles.map((profile: Profile) => {
             return (
-              <div key={profile.id} className=" relative flex pt-3">
+              <div key={profile.id} className="relative flex pt-3">
                 {/* profile header */}
                 <div className="inline-block cursor-pointer items-center rounded font-semibold text-gray-700">
                   <ImageProxied
@@ -104,12 +113,12 @@ const RecommendedProfiles: FC = () => {
                     alt={`Pic from ${profile.picture?.original?.url}`}
                     height={40}
                     width={40}
-                    className="h-9 w-9 cursor-pointer rounded-full object-cover"
+                    className="h-9 w-10 cursor-pointer rounded-full object-cover"
                     // @ts-ignore
                     src={profile.picture?.original?.url}
                   />
                 </div>
-                <div className="flex">
+                <div className="flex w-full items-center justify-between">
                   <Link
                     rel="noreferrer"
                     href={`/profile/${profile.id}`}
@@ -122,6 +131,22 @@ const RecommendedProfiles: FC = () => {
                       @{profile.handle}
                     </p>
                   </Link>
+
+                  {loggedProfile && (
+                    <button
+                      //   onClick={() => handleFollow(id)}
+                      className="inline-flex h-7 w-[60px] items-center justify-center 
+                    rounded-lg border border-solid
+                   border-neutral-900 bg-white px-2 py-1"
+                    >
+                      <div
+                        className="text-center font-['Inter'] text-xs font-bold 
+                      leading-normal text-neutral-900"
+                      >
+                        Follow
+                      </div>
+                    </button>
+                  )}
                 </div>
               </div>
             );
