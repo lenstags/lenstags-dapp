@@ -1,18 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
-
-import { ProfileContext } from './LensAuthenticationProvider';
-import { ProfileQuery } from '@lib/lens/graphql/generated';
-import { PublicationSearchType } from './SearchBar';
-import { doesFollow } from '@lib/lens/does-follow';
-import { freeUnfollow } from '@lib/lens/free-unfollow';
+import { useState } from 'react';
 import { proxyActionFreeFollow } from '@lib/lens/follow-gasless';
 import { DotWave } from '@uiball/loaders';
 
 interface Props {
   myProfileId: string;
   profileId: string;
-  //   showCardStatus: boolean;
-  //   postProfile: Partial<PublicationSearchType & ProfileProps>;
 }
 
 const FollowButton: React.FC<Props> = ({ myProfileId, profileId }) => {
@@ -23,9 +15,7 @@ const FollowButton: React.FC<Props> = ({ myProfileId, profileId }) => {
     if (myProfileId === profileId) {
       return;
     }
-
     setIsDotFollowing(true);
-
     return proxyActionFreeFollow(profileId).then(() => {
       setFollowText('Following');
       setIsDotFollowing(false);
@@ -39,7 +29,8 @@ const FollowButton: React.FC<Props> = ({ myProfileId, profileId }) => {
           onClick={() =>
             followText === 'Following' ? null : handleFollow(profileId)
           }
-          className=" m-2 flex items-center rounded-lg border border-solid border-black bg-transparent px-2 py-1 font-bold"
+          className=" m-2 flex items-center rounded-lg border border-solid
+           border-black bg-transparent px-2 py-1 font-bold"
         >
           {isDotFollowing ? (
             <div className="mx-2 my-1">

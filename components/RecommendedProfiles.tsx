@@ -1,81 +1,16 @@
-import {
-  Profile,
-  RecommendedProfilesDocument
-} from '@lib/lens/graphql/generated';
+import { Profile } from '@lib/lens/graphql/generated';
 import React, { FC, useContext, useEffect, useRef, useState } from 'react';
 
-import { DotWave } from '@uiball/loaders';
 import ImageProxied from './ImageProxied';
 import Link from 'next/link';
 import { ProfileContext } from './LensAuthenticationProvider';
-import { getPictureUrl, shuffleArray } from 'utils/helpers';
-import { recommendedProfiles } from '@lib/lens/recommended-profiles';
-import { useQuery } from '@apollo/client';
-import { useRecommendedProfilesQuery } from '@lib/lens/graphql/generated';
 import { getExploreProfiles } from '@lib/lens/explore-profiles';
 import FollowButton from './FollowButton';
+import { shuffleArray } from 'utils/helpers';
 
 const RecommendedProfiles: FC = () => {
   const [profiles, setProfiles] = useState<any>([]);
-  const [showCard, setShowCard] = useState(false);
   const { profile: loggedProfile } = useContext(ProfileContext);
-
-  //   const timeoutId = useRef<NodeJS.Timeout | null>(null);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [showUnfollow, setShowUnfollow] = useState('Following');
-
-  //   useEffect(() => {
-  //     if (profile.isFollowedByMe) {
-  //       setIsFollowing(true);
-  //     }
-  //     const fetchProfileFollow = () =>
-  //       doesFollow(profile.id, lensProfile?.ownedBy);
-
-  //     if (showCard && lensProfile?.ownedBy) {
-  //       fetchProfileFollow().then((r) => {
-  //         setIsFollowing(r.follows);
-  //       });
-  //     }
-  //   }, [showCard, lensProfile?.ownedBy, profile.id, profile.isFollowedByMe]);
-
-  //   const handleMouseEnter = () => {
-  //     timeoutId.current = setTimeout(() => {
-  //       setShowCard(true);
-  //     }, 600);
-  //   };
-
-  //   const handleMouseLeave = () => {
-  //     if (timeoutId.current) {
-  //       clearTimeout(timeoutId.current);
-  //     }
-  //     setShowCard(false);
-  //   };
-
-  //   const resRecommendedProfiles = useQuery(RecommendedProfilesDocument, {
-  //     variables: {
-  //       options: {
-  //         // disableML: true,
-  //         shuffle: true // this does not work!
-  //       }
-  //     }
-  //   });
-
-  //   const { data, loading, error } = useRecommendedProfilesQuery({
-  //     variables: {
-  //       options: {
-  //         profileId: null
-  //       }
-  //     }
-  //   });
-
-  //   const { data, loading, error: apolloError } = resRecommendedProfiles;
-
-  //   const fetchData = async () => {
-  //     // if (!lensProfile) return;
-  //     const res = await recommendedProfiles();
-  //     setProfiles(res);
-  //     console.log('fetchData qqq ', res);
-  //   };
 
   const fetchData = async (myProfileId?: string) => {
     const res = await getExploreProfiles(myProfileId);
