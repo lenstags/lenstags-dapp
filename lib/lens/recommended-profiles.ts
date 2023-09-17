@@ -17,8 +17,6 @@ const getRecommendedProfilesRequest = async () => {
 };
 
 export const recommendedProfiles = async () => {
-  // const address = getAddressFromSigner();
-
   // only showing one example to query but you can see from request
   // above you can query many
   const result = await getRecommendedProfilesRequest();
