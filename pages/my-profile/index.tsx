@@ -225,7 +225,7 @@ const MyProfile: NextPage = () => {
       setSkipExplore={setSkipExplore}
       skipExplore={skipExplore}
     >
-      <div className="mb-4 flex w-full flex-col gap-4 px-8">
+      <div className="mb-4 flex w-full flex-col px-8">
         {/* header */}
         <div className="">
           <div

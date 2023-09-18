@@ -144,10 +144,12 @@ export const LayoutProfile: FC<Props> = ({
               : 'col-start-3'
           }`}
         >
-          <div className="my-4 flex items-center justify-between px-8">
+          <div className="my-4 flex items-center justify-between mx-8">
             <SearchBar />
             {router.pathname.includes(PublicRoutes.MYPROFILE) && (
-              <ProfileButton />
+              <div className="sticky top-0">
+                <ProfileButton />
+              </div>
             )}
           </div>
           {children}
