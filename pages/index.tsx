@@ -731,14 +731,17 @@ const Home: NextPage = () => {
               backgroundRepeat: 'no-repeat'
             }}
           >
-            <div className="mx-4 items-center sm:mx-16 sm:flex sm:flex-row sm:justify-between md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
-              <div className="mr-2 ">
+            <div
+              className="mx-4 flex flex-col items-center sm:mx-16 sm:justify-between md:mx-32
+             md:flex-row lg:mx-48 xl:mx-64 2xl:mx-72"
+            >
+              <div className="md:mr-20 ">
                 <p className="whitespace-nowrap py-6 font-serif text-xl font-bold">
                   Supported by
                 </p>
               </div>
 
-              <div className=" flex   items-center justify-center md:flex md:flex-row ">
+              <div className=" flex flex-col items-center  justify-center sm:flex-row md:flex md:flex-row ">
                 <Image
                   width={140}
                   height={50}
