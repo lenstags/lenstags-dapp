@@ -698,27 +698,29 @@ const Home: NextPage = () => {
                 alt=""
               />
 
-              <div className="ml-10">
+              <div className=" ">
                 <p className="z-1 mb-6 text-3xl font-bold">
                   Save content on the fly.
                 </p>
                 <p>
                   Collect articles and links easily on your favorite browser.
                 </p>
-
-                <a
-                  href="https://chrome.google.com/webstore/detail/bfapefejfnlaieleojmkclbmibpckmmb/preview?hl=es&authuser=3"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <button
-                    className="mt-8 rounded-full border border-solid border-black bg-black
-                 px-6 py-3 font-serif text-white"
-                  >
-                    GET THE EXTENSION
-                  </button>
-                </a>
               </div>
+            </div>
+            <div className="flex flex-row justify-center">
+              <a
+                href="https://chrome.google.com/webstore/detail/bfapefejfnlaieleojmkclbmibpckmmb/preview?hl=es&authuser=3"
+                target="_blank"
+                rel="noreferrer"
+                className=" self-center md:self-start"
+              >
+                <button
+                  className="mt-8 rounded-full border border-solid border-black bg-black
+                 px-6 py-3 font-serif text-white"
+                >
+                  GET THE EXTENSION
+                </button>
+              </a>
             </div>
           </div>
 
@@ -774,7 +776,8 @@ const Home: NextPage = () => {
             </div>
           </div>
 
-          <div className="my-10 py-10 text-center">
+          {/* join button  */}
+          <div className="py-20 text-center">
             <a
               href="https://discord.gg/6wunUd6Ws4"
               target="_blank"
@@ -814,7 +817,8 @@ const Home: NextPage = () => {
             </a>
           </div>
 
-          <div className="my-10 bg-black py-10 text-center text-white">
+          {/* footer  */}
+          <div className="bg-black py-10 text-center text-white">
             <div className=" mx-6 mt-4 font-serif sm:mx-16 md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
               <div
                 style={{
