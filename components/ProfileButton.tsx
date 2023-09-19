@@ -46,27 +46,27 @@ const ProfileButton = ({ className }: { className?: string }) => {
           <button
             ref={buttonRef}
             onClick={() => setProfileView(!profileView)}
-            className="rounded-lg
-                   border border-solid bg-transparent align-middle group"
+            className="group
+                   rounded-lg border border-solid bg-transparent align-middle"
           >
             <div className="flex items-center">
               <ImageProxied
                 category="profile"
-                className="w-10 h-10 rounded-lg"
+                className="h-10 w-10 rounded-lg object-cover"
                 src={getPictureUrl(lensProfile)}
                 alt="avatar"
                 width={100}
                 height={100}
               />
               <div
-                className={`font-medium font-serif text-[#121212] max-w-0 opacity-0 overflow-hidden transition-opacity transition-max-width duration-500 ease-in-out group-hover:max-w-full group-hover:opacity-100 group-hover:mx-3 ${
-                  profileView && 'max-w-full opacity-100 mx-3 hidden'
+                className={`transition-max-width max-w-0 overflow-hidden font-serif font-medium text-[#121212] opacity-0 transition-opacity duration-500 ease-in-out group-hover:mx-3 group-hover:max-w-full group-hover:opacity-100 ${
+                  profileView && 'mx-3 hidden max-w-full opacity-100'
                 }`}
               >
                 @{lensProfile?.handle}
               </div>
               {profileView && (
-                <p className="font-medium font-serif text-[#121212] mx-3">
+                <p className="mx-3 font-serif font-medium text-[#121212]">
                   @{lensProfile?.handle}
                 </p>
               )}
@@ -76,7 +76,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
           {/* profile menu */}
           {profileView && (
             <div ref={menuRef} className="absolute right-0 z-20 mt-2 w-[14rem]">
-              <div className="justify-end rounded-md border border-black bg-white px-4 pt-1 pb-2">
+              <div className="justify-end rounded-md border border-black bg-white px-4 pb-2 pt-1">
                 <div className="my-3 flex items-center">
                   <ImageProxied
                     category="profile"
@@ -87,7 +87,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
                     height={40}
                   />
                   <div className="pl-2">
-                    <p className="w-40 font-serif font-bold text-left text-base">
+                    <p className="w-40 text-left font-serif text-base font-bold">
                       {`${lensProfile?.ownedBy.slice(
                         0,
                         6
