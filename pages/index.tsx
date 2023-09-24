@@ -363,7 +363,7 @@ const Home: NextPage = () => {
               </a>
 
               <a
-                href="https://tally.so/r/mVjz7J"
+                href="https://chrome.google.com/webstore/detail/natasocial-browser-extens/bfapefejfnlaieleojmkclbmibpckmmb"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -709,7 +709,7 @@ const Home: NextPage = () => {
             </div>
             <div className="flex flex-row justify-center">
               <a
-                href="https://chrome.google.com/webstore/detail/bfapefejfnlaieleojmkclbmibpckmmb/preview?hl=es&authuser=3"
+                href="https://chrome.google.com/webstore/detail/natasocial-browser-extens/bfapefejfnlaieleojmkclbmibpckmmb"
                 target="_blank"
                 rel="noreferrer"
                 className=" self-center md:self-start"
