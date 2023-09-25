@@ -13,7 +13,10 @@ import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import Link from 'next/link';
 import { NextPage } from 'next';
-import { PublicationTypes } from '@lib/lens/graphql/generated';
+import {
+  PublicationSortCriteria,
+  PublicationTypes
+} from '@lib/lens/graphql/generated';
 import { getPublications } from '@lib/lens/get-publications';
 import { queryProfile } from '@lib/lens/dispatcher';
 import { useExplore } from '@context/ExploreContext';
@@ -23,6 +26,11 @@ import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import CardListView from '@components/CardListView';
 import CardPostView from '@components/CardPostView';
 import { Spinner } from '@components/Spinner';
+import {
+  Filter,
+  SortFilterControls,
+  SortingValuesType
+} from '@components/SortFilterControls';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -36,6 +44,12 @@ const MyProfile: NextPage = () => {
   // const lp = useContext(ProfileContext);
   const { profile: lp } = useContext(ProfileContext);
   const { viewCard } = useContext(ViewCardContext);
+  const [sortingValues, setSortingValues] = useState<SortingValuesType>({
+    date: 'all',
+    sort: PublicationSortCriteria.Latest,
+    by: 'all'
+  });
+  const [filterValue, setFilterValue] = useState<Filter>(Filter.ALL);
 
   // set profile
   useEffect(() => {
@@ -175,22 +189,18 @@ const MyProfile: NextPage = () => {
       }
     };
 
-    if (tab === 'myposts') {
+    if (filterValue === Filter.POSTS) {
       fetchMyPosts();
     }
 
-    if (tab === 'mycollects') {
-      fetchMyCollects();
-    }
-
-    if (tab === 'mylists') {
+    if (filterValue === Filter.LISTS) {
       fetchMyLists();
     }
 
-    if (tab === 'all') {
+    if (filterValue === Filter.ALL) {
       fetchAll();
     }
-  }, [tab, lensProfile?.id, tags]);
+  }, [lensProfile?.id, tags, filterValue]);
 
   const location =
     lensProfile?.attributes.find((item: any) => item.key === 'location')
@@ -325,7 +335,13 @@ const MyProfile: NextPage = () => {
           </div>
         </div>
         <TagsFilter className="mt-0" />
-        <CardViewButtons />
+        <SortFilterControls
+          sortingValues={sortingValues}
+          setSortingValues={setSortingValues}
+          sorting={false}
+          filterValue={filterValue}
+          setFilterValue={setFilterValue}
+        />
       </div>
 
       {/* contents */}
