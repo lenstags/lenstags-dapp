@@ -1,12 +1,13 @@
-import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
 import {
-  Squares2X2Icon,
   QueueListIcon,
-  RectangleStackIcon
+  RectangleStackIcon,
+  Squares2X2Icon
 } from '@heroicons/react/24/outline';
-import { useContext, useState } from 'react';
-import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import { useContext, useEffect, useState } from 'react';
+
+import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/solid';
+import { PublicationSortCriteria } from '@lib/lens/graphql/generated';
 
 export interface SortingValuesType {
   date: string;
@@ -25,13 +26,15 @@ export const SortFilterControls = ({
   setSortingValues,
   filterValue,
   setFilterValue,
-  sorting = true
+  sorting = true,
+  isLoading
 }: {
   sortingValues: SortingValuesType;
   setSortingValues: (values: SortingValuesType) => void;
   filterValue: Filter;
   setFilterValue: (Filter: Filter) => void;
   sorting?: boolean;
+  isLoading: boolean;
 }) => {
   const [showSortingOptions, setShowSortingOptions] = useState(false);
   const [localValues, setLocalValues] = useState(sortingValues);
@@ -72,6 +75,12 @@ export const SortFilterControls = ({
     setShowSortingOptions(false);
   };
 
+  useEffect(() => {
+    if (isLoading) {
+      setShowSortingOptions(false);
+    }
+  }, [isLoading]);
+
   return (
     <div className="flex flex-col">
       <div className="mt-2 flex min-h-[3rem] justify-between rounded-t-lg">
@@ -84,7 +93,8 @@ export const SortFilterControls = ({
             filterValue === Filter.ALL
               ? 'bg-black text-white'
               : 'bg-white text-black'
-          }`}
+          } ${isLoading && 'cursor-not-allowed opacity-50'}`}
+            disabled={isLoading}
           >
             All
           </button>
@@ -97,7 +107,8 @@ export const SortFilterControls = ({
             filterValue === Filter.LISTS
               ? 'bg-black text-white'
               : 'bg-white text-black'
-          }`}
+          } ${isLoading && 'cursor-not-allowed opacity-50'}`}
+            disabled={isLoading}
           >
             Lists
           </button>
@@ -110,27 +121,28 @@ export const SortFilterControls = ({
             filterValue === Filter.POSTS
               ? 'bg-black text-white'
               : 'bg-white text-black'
-          }`}
+          } ${isLoading && 'cursor-not-allowed opacity-50'}`}
+            disabled={isLoading}
           >
             Posts
           </button>
         </div>
-
         <div className="flex items-center gap-1 font-sans font-medium tracking-wide">
-          {sorting && (
-            <button
-              onClick={() => setShowSortingOptions(!showSortingOptions)}
-              className={`rounded-lg border border-solid
+          <button
+            onClick={() => setShowSortingOptions(!showSortingOptions)}
+            className={`rounded-lg border border-solid
           border-black px-1.5 py-1 
-          ${showSortingOptions ? 'bg-black' : 'bg-white'}`}
-            >
-              {showSortingOptions ? (
-                <AdjustmentsHorizontalIcon className="h-6 w-6 text-white" />
-              ) : (
-                <AdjustmentsHorizontalIcon className="h-6 w-6 text-black" />
-              )}
-            </button>
-          )}
+          ${showSortingOptions ? 'bg-black' : 'bg-white'} ${
+              isLoading && 'cursor-not-allowed opacity-50'
+            }`}
+            disabled={isLoading}
+          >
+            {showSortingOptions ? (
+              <AdjustmentsHorizontalIcon className="h-6 w-6 text-white" />
+            ) : (
+              <AdjustmentsHorizontalIcon className="h-6 w-6 text-black" />
+            )}
+          </button>
           {showViewOptions ? (
             <div className="flex space-x-2 rounded-lg px-1.5 py-1 shadow">
               {viewCard === ViewBy.CARD ? (

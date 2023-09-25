@@ -103,12 +103,26 @@ export const LayoutProfile: FC<Props> = ({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <Script
+
+      {/* <Script
         async
         defer
-        src="https://analytics.umami.is/script.js"
+        src="/analytics/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
+      ></Script> */}
+
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-XQNNYXZS5D"
       ></Script>
+      <Script id="ss" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XQNNYXZS5D');
+        `}
+      </Script>
 
       <div className="grid w-full grid-cols-12">
         <SideBarLeft
@@ -130,10 +144,12 @@ export const LayoutProfile: FC<Props> = ({
               : 'col-start-3'
           }`}
         >
-          <div className="my-4 flex items-center justify-between px-8">
+          <div className="my-4 flex items-center justify-between mx-8">
             <SearchBar />
             {router.pathname.includes(PublicRoutes.MYPROFILE) && (
-              <ProfileButton />
+              <div className="sticky top-0">
+                <ProfileButton />
+              </div>
             )}
           </div>
           {children}

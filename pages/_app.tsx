@@ -15,6 +15,7 @@ import type { AppProps } from 'next/app';
 import { AppProvider } from 'context/AppContext';
 import { ExploreProvider } from 'context/ExploreContext';
 import LensAuthenticationProvider from 'components/LensAuthenticationProvider';
+import Script from 'next/script';
 import { SnackbarProvider } from 'material-ui-snackbar-provider';
 import TagsFilterProvider from 'components/TagsFilterProvider';
 import { apolloClient } from '@lib/lens/graphql/apollo-client';

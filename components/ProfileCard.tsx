@@ -27,6 +27,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile, showCard }) => {
   const [isDotFollowing, setIsDotFollowing] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
   const [showUnfollow, setShowUnfollow] = useState('Following');
+
   useEffect(() => {
     if (profile.isFollowedByMe) {
       setIsFollowing(true);
@@ -40,6 +41,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile, showCard }) => {
       });
     }
   }, [showCard, lensProfile?.ownedBy, profile.id, profile.isFollowedByMe]);
+
   const handleFollow = async () => {
     setIsDotFollowing(true);
     if (showUnfollow === 'Unfollow') {
@@ -88,6 +90,7 @@ const ProfileCard: FC<ProfileCardProps> = ({ profile, showCard }) => {
       });
     }
   };
+
   return (
     <div className="lens-post absolute z-[200] w-64 shadow-xl duration-500 animate-in fade-in-50">
       <div className="items-center rounded p-4 font-semibold text-gray-700">

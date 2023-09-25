@@ -14,6 +14,7 @@ import { disable, enable, queryProfile } from '@lib/lens/dispatcher';
 import { getIPFSImage, imageToBase64, pickPicture } from 'utils/helpers';
 
 import FileInput from 'components/FileInput';
+import Image from 'next/image';
 import ImageProxied from 'components/ImageProxied';
 import { LayoutCreate } from '@components/LayoutCreate';
 import { MetadataDisplayType } from '@lib/lens/interfaces/generic';
@@ -26,7 +27,6 @@ import { uploadImageIpfs } from '@lib/lens/ipfs';
 import { useExplore } from '@context/ExploreContext';
 import { useSnackbar } from 'material-ui-snackbar-provider';
 import { v4 as uuidv4 } from 'uuid';
-import Image from 'next/image';
 
 export const updateLocalStorageProfile = (profileId: string) =>
   queryProfile({ profileId })
@@ -412,7 +412,10 @@ const Settings: NextPage = () => {
               )}
             </div>
           </section>
-          <aside className="flex h-max w-2/12 flex-col rounded-lg border font-sans text-sm">
+
+          {/* We only used dispatcher-only code, so disabling it will have terrible side effects */}
+
+          {/* <aside className="flex h-max w-2/12 flex-col rounded-lg border font-sans text-sm">
             <h2 className="bg-gray-200 px-4 py-2 font-serif font-bold">
               Dispatcher
             </h2>
@@ -435,7 +438,7 @@ const Settings: NextPage = () => {
                 'Enable'
               )}
             </button>
-          </aside>
+          </aside> */}
         </article>
       )}
     </LayoutCreate>

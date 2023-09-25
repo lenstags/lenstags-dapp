@@ -29,7 +29,6 @@ const useHandleSetup = (
       profileResult,
       ATTRIBUTES_LIST_KEY
     );
-    console.log('aca profileResult ', profileResult);
 
     const hasLists =
       listAttributeObject && JSON.parse(listAttributeObject.value).length > 0;

@@ -1,36 +1,34 @@
+import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import {
   LayoutProfile,
   ProfileContext,
   TagsFilter,
   TagsFilterContext
 } from 'components';
-import { LinkIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { useContext, useEffect, useState } from 'react';
 import { getCoverPictureUrl, getPictureUrl } from 'utils/helpers';
-import { useContext, useEffect, useRef, useState } from 'react';
 
-import { APP_NAME } from '@lib/config';
-import Image from 'next/image';
-import ImageProxied from 'components/ImageProxied';
-import Link from 'next/link';
-import { NextPage } from 'next';
-import {
-  PublicationSortCriteria,
-  PublicationTypes
-} from '@lib/lens/graphql/generated';
-import { getPublications } from '@lib/lens/get-publications';
-import { queryProfile } from '@lib/lens/dispatcher';
-import { useExplore } from '@context/ExploreContext';
-import CardViewButtons, { CardViewsMap } from '@components/CardViewButtons';
-import { cn } from '@lib/utils';
-import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
-import CardListView from '@components/CardListView';
-import CardPostView from '@components/CardPostView';
-import { Spinner } from '@components/Spinner';
+import { CardViewsMap } from '@components/CardViewButtons';
 import {
   Filter,
   SortFilterControls,
   SortingValuesType
 } from '@components/SortFilterControls';
+import { Spinner } from '@components/Spinner';
+import { useExplore } from '@context/ExploreContext';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import { APP_NAME } from '@lib/config';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { getPublications } from '@lib/lens/get-publications';
+import {
+  PublicationSortCriteria,
+  PublicationTypes
+} from '@lib/lens/graphql/generated';
+import { cn } from '@lib/utils';
+import ImageProxied from 'components/ImageProxied';
+import { NextPage } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const MyProfile: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -341,6 +339,7 @@ const MyProfile: NextPage = () => {
           sorting={false}
           filterValue={filterValue}
           setFilterValue={setFilterValue}
+          isLoading={false}
         />
       </div>
 

@@ -22,17 +22,18 @@ import {
 } from 'react';
 
 import { useQuery } from '@apollo/client';
-import { CardViewsMap } from '@components/CardViewButtons';
-import CustomHead from '@components/CustomHead';
-import { SearchBar } from '@components/SearchBar';
 import {
   Filter,
   SortFilterControls,
   SortingValuesType
 } from '@components/SortFilterControls';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
+import { CardViewsMap } from '@components/CardViewButtons';
+import CustomHead from '@components/CustomHead';
+import { DotWave } from '@uiball/loaders';
+import { SearchBar } from '@components/SearchBar';
 import WelcomePanel from '@components/WelcomePanel';
 import WhitelistScreen from '@components/WhitelistScreen';
-import { explore, reqQuery } from '@lib/lens/explore-publications';
 import { useExplore } from '@context/ExploreContext';
 import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
 import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
@@ -435,12 +436,27 @@ const App: NextPage = () => {
   return (
     <>
       <CustomHead title="Nata Social" content="" />
-      <Script
+
+      {/* <Script
         async
         defer
+        data-do-not-track="true"
         src="https://analytics.umami.is/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
+      ></Script> */}
+
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-XQNNYXZS5D"
       ></Script>
+      <Script id="ss" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XQNNYXZS5D');
+        `}
+      </Script>
 
       <Layout
         title={'Nata Social | Home'}
@@ -474,6 +490,7 @@ const App: NextPage = () => {
                 setSortingValues={setSortingValues}
                 filterValue={filterValue}
                 setFilterValue={setFilterValue}
+                isLoading={loader}
               />
             </div>
 

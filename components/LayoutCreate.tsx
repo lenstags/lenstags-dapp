@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 
 import Head from 'next/head';
+import Script from 'next/script';
 import SideBarLeft from './SideBarLeft';
 import Topbar from './Topbar';
 
@@ -67,12 +68,25 @@ export const LayoutCreate: FC<Props> = ({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="icon" type="image/png" href="/favicon.png" />
       </Head>
-      <script
+      {/* <Script
         async
         defer
         src="https://analytics.umami.is/script.js"
         data-website-id="4b989056-b471-4b8f-a39f-d2621ddb83c2"
-      ></script>
+      ></Script> */}
+
+      <Script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-XQNNYXZS5D"
+      ></Script>
+      <Script id="ss" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-XQNNYXZS5D');
+        `}
+      </Script>
 
       <div className="grid w-full grid-cols-12">
         <SideBarLeft

@@ -1,6 +1,5 @@
+import { DEFAULT_NETWORK, NETWORKS } from '@lib/config';
 import type { NextApiRequest, NextApiResponse } from 'next';
-
-import { NETWORKS } from '@lib/config';
 
 const WHITELISTED_WALLETS = [
   '0x014FFCF34D8515535b99d6AEF654258c237168B6',
@@ -27,7 +26,10 @@ const WHITELISTED_WALLETS = [
   '0x36ACC9E5248f33B030d3eA3465AC1f99E55868Ec',
   '0x362fd4d772c1F4Ef764AC4f107243014EEDab75D',
   '0xeB53C577B5bC45F9f7A08aae188bCE6fc38f02f0',
-  '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3'
+  '0xd6dd6C7e69D5Fa4178923dAc6A239F336e3c40e3',
+  '0x97f9a889888951667f7e48cd2c52be0df4f1162a',
+  '0x99D86038f4a33b2bb9408A98e1aCE524366bEed0',
+  '0xA58Bea78CFbD31566CCF7d70E764695A504b92D2'
 ];
 
 type ResponseData = {
@@ -42,9 +44,11 @@ const handler = (req: NextApiRequest, res: NextApiResponse<ResponseData>) => {
     return;
   }
 
-  const isWhitelisted: boolean = NETWORKS.TESTNET
-    ? true //  WHITELISTED_WALLETS.includes(wallet) //
-    : WHITELISTED_WALLETS.includes(wallet);
+  const isWhitelisted: boolean =
+    // @ts-ignore
+    DEFAULT_NETWORK === NETWORKS.TESTNET
+      ? true
+      : WHITELISTED_WALLETS.includes(wallet);
   res.status(200).json({ isWhitelisted });
 };
 
