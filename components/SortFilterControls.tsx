@@ -128,21 +128,6 @@ export const SortFilterControls = ({
           </button>
         </div>
         <div className="flex items-center gap-1 font-sans font-medium tracking-wide">
-          <button
-            onClick={() => setShowSortingOptions(!showSortingOptions)}
-            className={`rounded-lg border border-solid
-          border-black px-1.5 py-1 
-          ${showSortingOptions ? 'bg-black' : 'bg-white'} ${
-              isLoading && 'cursor-not-allowed opacity-50'
-            }`}
-            disabled={isLoading}
-          >
-            {showSortingOptions ? (
-              <AdjustmentsHorizontalIcon className="h-6 w-6 text-white" />
-            ) : (
-              <AdjustmentsHorizontalIcon className="h-6 w-6 text-black" />
-            )}
-          </button>
           {showViewOptions ? (
             <div className="flex space-x-2 rounded-lg px-1.5 py-1 shadow">
               {viewCard === ViewBy.CARD ? (
@@ -201,6 +186,21 @@ export const SortFilterControls = ({
               <Pill />
             </button>
           )}
+          <button
+            onClick={() => setShowSortingOptions(!showSortingOptions)}
+            className={`rounded-lg border border-solid
+          border-black px-1.5 py-1 
+          ${showSortingOptions ? 'bg-black' : 'bg-white'} ${
+              isLoading && 'cursor-not-allowed opacity-50'
+            }`}
+            disabled={isLoading}
+          >
+            {showSortingOptions ? (
+              <AdjustmentsHorizontalIcon className="h-6 w-6 text-white" />
+            ) : (
+              <AdjustmentsHorizontalIcon className="h-6 w-6 text-black" />
+            )}
+          </button>
         </div>
       </div>
       {showSortingOptions && (
