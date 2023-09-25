@@ -121,7 +121,7 @@ const Home: NextPage = () => {
     canvas.style.position = 'absolute';
     canvas.style.top = '0';
     canvas.style.left = '0';
-    canvas.style.width = '100%';
+    canvas.style.width = '100vw';
     canvas.style.height = '1000%';
     canvas.style.zIndex = '-10';
     canvasRef.current.appendChild(canvas);
@@ -743,7 +743,7 @@ const Home: NextPage = () => {
                 </p>
               </div>
 
-              <div className=" flex flex-col items-center  justify-center sm:flex-row md:flex md:flex-row ">
+              <div className="flex flex-col items-center justify-center md:flex md:flex-row ">
                 <Image
                   width={140}
                   height={50}
@@ -777,17 +777,17 @@ const Home: NextPage = () => {
           </div>
 
           {/* join button  */}
-          <div className="py-20 text-center">
+          <div className="flex justify-center py-20 px-10">
             <a
               href="https://discord.gg/6wunUd6Ws4"
               target="_blank"
               rel="noreferrer"
             >
               <button
-                className="mx-10 rounded-full border-2 border-solid border-black
+                className="w-full rounded-full border-2 border-solid border-black
              bg-transparent px-10 py-4 font-serif text-xl font-bold md:mx-2 md:text-3xl"
               >
-                <div className="flex items-center gap-12 px-2 py-1">
+                <div className="flex items-center justify-between gap-6 md:gap-12 px-2 py-1">
                   Join our community
                   <svg
                     width="50"
