@@ -129,7 +129,10 @@ export const SortFilterControls = ({
         </div>
         <div className="flex items-center gap-1 font-sans font-medium tracking-wide">
           {showViewOptions ? (
-            <div className="flex space-x-2 rounded-lg px-1.5 py-1 shadow">
+            <div
+              className="flex animate-fadeLeft space-x-2 rounded-lg px-1.5 py-1 shadow transition-all duration-500 data-[state=close]:animate-fadeRight [&[data-state=close]>button]:animate-fadeLeft"
+              data-state={showViewOptions ? 'open' : 'closed'}
+            >
               {viewCard === ViewBy.CARD ? (
                 <button
                   className="rounded-lg bg-black px-1.5 py-1 text-white"
@@ -179,9 +182,8 @@ export const SortFilterControls = ({
           ) : (
             <button
               onClick={() => setShowViewOptions(true)}
-              className="rounded-lg border border-solid
-          border-black bg-white px-1.5 
-          py-1"
+              className="animate-fadeLeft rounded-lg border border-solid border-black bg-white px-1.5 py-1 transition-all duration-300"
+              data-state={showViewOptions ? 'open' : 'closed'}
             >
               <Pill />
             </button>
