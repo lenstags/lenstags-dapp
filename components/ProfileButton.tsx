@@ -76,8 +76,8 @@ const ProfileButton = ({ className }: { className?: string }) => {
           {/* profile menu */}
           {profileView && (
             <div ref={menuRef} className="absolute right-0 z-20 mt-2 w-[14rem]">
-              <div className="justify-end rounded-md border border-black bg-white px-4 pb-2 pt-1">
-                <div className="my-3 flex items-center">
+              <div className="justify-end rounded-md border border-black bg-white pb-2 pt-1">
+                <div className="my-3 flex items-center px-4">
                   <ImageProxied
                     category="profile"
                     className="mx-1 h-6 w-6 rounded-full object-cover"
@@ -96,7 +96,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center py-2 pl-2 hover:bg-teal-100">
+                <div className="flex items-center justify-start px-6 py-2   hover:bg-teal-100">
                   <Image
                     src="/icons/my-profile.svg"
                     alt="My profile"
@@ -108,7 +108,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center py-2 pl-2 hover:bg-teal-100">
+                <div className="flex items-center justify-start  px-6 py-2  hover:bg-teal-100">
                   <Image
                     src="/icons/settings.svg"
                     alt="Settings"
@@ -123,7 +123,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
                   </div>
                 </div>
 
-                <div className=" flex items-center py-2 pl-2 hover:bg-teal-100">
+                <div className=" flex items-center justify-start  px-6 py-2  hover:bg-teal-100">
                   <Image
                     src="/icons/help.svg"
                     alt="Help"
@@ -133,7 +133,7 @@ const ProfileButton = ({ className }: { className?: string }) => {
                   <div className="cursor-pointer pl-3">Help</div>
                 </div>
 
-                <div className=" flex items-center py-2 pl-2 hover:bg-teal-100">
+                <div className=" flex items-center justify-start  px-6 py-2  hover:bg-teal-100">
                   <Image
                     src="/icons/logout.svg"
                     alt="Logout"
