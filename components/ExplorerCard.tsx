@@ -417,9 +417,9 @@ const ExplorerCard: FC<Props> = (props) => {
               <PostIndicators
                 collects={post.stats.totalAmountOfCollects}
                 comments={
-                  !isList
-                    ? post.stats.totalAmountOfComments || 0
-                    : parseInt(post.stats.totalAmountOfComments) - 1
+                  isList && parseInt(post.stats.totalAmountOfComments) > 0
+                    ? (post.stats.totalAmountOfComments - 1).toString() || 0
+                    : post.stats.totalAmountOfComments || 0
                 }
               />
               <CollectButton

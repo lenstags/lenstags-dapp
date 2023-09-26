@@ -142,7 +142,7 @@ const CardPostView: FC<Props> = (props) => {
           </button>
         </div>
       ) : (
-        <article className="lens-post relative h-52 p-4">
+        <article className="lens-post relative flex h-52 w-full flex-col p-4">
           {/* main tab contents goes here */}
           {/* favllect content goes here */}
           {post.id && (
@@ -251,11 +251,11 @@ const CardPostView: FC<Props> = (props) => {
           </div>
 
           {/* <Link > */}
-          <figure className="flex w-full gap-4">
+          <figure className="flex gap-4">
             <Link
               rel="noreferrer"
               href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-              className={`${post.id ?? 'pointer-events-none'} min-w-fit`}
+              className={`${post.id && 'pointer-events-none'} min-w-fit`}
             >
               {isList ? (
                 <div className="max-w-56 relative">
@@ -307,9 +307,9 @@ const CardPostView: FC<Props> = (props) => {
               <Link
                 rel="noreferrer"
                 href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-                className={`${post.id ?? 'pointer-events-none'} w-full`}
+                className={`${post.id && 'pointer-events-none'}`}
               >
-                <div className="w-[600px] truncate text-ellipsis font-serif text-xl font-bold">
+                <div className="max-w-lg truncate text-ellipsis font-serif text-xl font-bold">
                   {post.metadata.name === PRIVATE_LIST_NAME ||
                   post.metadata.name === 'My private list'
                     ? '🔒 '
@@ -317,7 +317,7 @@ const CardPostView: FC<Props> = (props) => {
                   {post.metadata.name || 'untitled'}
                 </div>
                 <div
-                  className="mt-1 w-full font-sans font-thin text-gray-700"
+                  className="mt-1  font-sans font-thin text-gray-700"
                   style={{
                     fontSize: '10px'
                   }}
@@ -358,7 +358,7 @@ const CardPostView: FC<Props> = (props) => {
                   <PostIndicators
                     collects={post.stats.totalAmountOfCollects}
                     comments={
-                      isList
+                      isList && parseInt(post.stats.totalAmountOfComments) > 0
                         ? (post.stats.totalAmountOfComments - 1).toString() || 0
                         : post.stats.totalAmountOfComments || 0
                     }
