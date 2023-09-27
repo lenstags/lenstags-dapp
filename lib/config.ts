@@ -3,10 +3,10 @@ export enum NETWORKS {
   MAINNET = 'mainnet'
 }
 
-export const DEFAULT_NETWORK = NETWORKS.TESTNET; // the one and only switcher
+export const DEFAULT_NETWORK = NETWORKS.MAINNET; // the one and only switcher
 
 export const APP_NAME = 'lenstags_alpha_0.0.2.7';
-export const DEFAULT_APP_DOMAIN = 'https://www.nata.social/app';
+export const DEFAULT_APP_DOMAIN = 'https://beta.nata.social/app';
 export const APP_UI_VERSION = '0.0.25';
 export const LENSTAGS_SOURCE = APP_NAME.toLowerCase();
 export const DEFAULT_IMAGE_PROFILE = '/img/profilePic.png';
