@@ -393,41 +393,43 @@ const SideBarLeft: React.FC<SidebarProps> = () => {
                       />
                     </AccordionContent>
                   </AccordionItem>
-                  <AccordionItem
-                    value="notifications"
-                    className="border-0 py-0"
-                  >
-                    <AccordionTrigger
-                      onClick={handleOpenNotifications}
-                      className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
-                      hiddenArrow
+                  {ENABLE_NOTIFICATIONS && (
+                    <AccordionItem
+                      value="notifications"
+                      className="border-0 py-0"
                     >
-                      {openTo === 'notifications' ? (
-                        <BellIconFilled
-                          width={22}
-                          height={22}
-                          className="text-lensBlack"
-                        />
-                      ) : (
-                        <BellIcon
-                          width={22}
-                          height={22}
-                          className="text-lensBlack"
-                        />
-                      )}
-                      {!sidebarCollapsedStateLeft.collapsed && (
-                        <span className="ml-2 text-base font-normal">
-                          Notifications
-                        </span>
-                      )}
-                    </AccordionTrigger>
-                    <AccordionContent className="flex max-h-[550px] flex-col border-0 outline-none">
-                      {notifications?.length > 0 &&
-                        notifications.map((notif, index: number) => {
-                          return <Notifications notif={notif} key={index} />;
-                        })}
-                    </AccordionContent>
-                  </AccordionItem>
+                      <AccordionTrigger
+                        onClick={handleOpenNotifications}
+                        className="h-12 gap-1 border-l-4  border-l-transparent px-6 hover:border-l-teal-100 hover:bg-teal-50"
+                        hiddenArrow
+                      >
+                        {openTo === 'notifications' ? (
+                          <BellIconFilled
+                            width={22}
+                            height={22}
+                            className="text-lensBlack"
+                          />
+                        ) : (
+                          <BellIcon
+                            width={22}
+                            height={22}
+                            className="text-lensBlack"
+                          />
+                        )}
+                        {!sidebarCollapsedStateLeft.collapsed && (
+                          <span className="ml-2 text-base font-normal">
+                            Notifications
+                          </span>
+                        )}
+                      </AccordionTrigger>
+                      <AccordionContent className="flex max-h-[550px] flex-col border-0 outline-none">
+                        {notifications?.length > 0 &&
+                          notifications.map((notif, index: number) => {
+                            return <Notifications notif={notif} key={index} />;
+                          })}
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
                 </Accordion>
               </div>
             )

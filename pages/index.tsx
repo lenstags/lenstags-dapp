@@ -13,15 +13,16 @@ import {
   Vec2,
   Vec4
 } from 'ogl-typescript';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Autoplay } from 'swiper';
 
-import { DEFAULT_NATA_DOMAIN } from '@lib/config';
+import { DEFAULT_APP_DOMAIN } from '@lib/config';
 import Head from 'next/head';
 import Image from 'next/image';
 import { LayoutLanding } from 'components/LayoutLanding';
 import type { NextPage } from 'next';
+import { getEnvironmentFromDomain } from 'utils/helpers';
 
 SwiperCore.use([Autoplay]);
 
@@ -121,7 +122,7 @@ const Home: NextPage = () => {
     canvas.style.position = 'absolute';
     canvas.style.top = '0';
     canvas.style.left = '0';
-    canvas.style.width = '100%';
+    canvas.style.width = '100vw';
     canvas.style.height = '1000%';
     canvas.style.zIndex = '-10';
     canvasRef.current.appendChild(canvas);
@@ -283,6 +284,12 @@ const Home: NextPage = () => {
     };
   }, [imgSize]);
 
+  const [appUrl, setAppUrl] = useState(DEFAULT_APP_DOMAIN);
+
+  useEffect(() => {
+    setAppUrl(getEnvironmentFromDomain());
+  }, []);
+
   return (
     <div className="">
       <Head>
@@ -356,14 +363,14 @@ const Home: NextPage = () => {
               <p className="mt-8 font-serif md:text-xl">
                 Discover and manage the best resources.
               </p>
-              <a href={DEFAULT_NATA_DOMAIN} target="_blank" rel="noreferrer">
+              <a href={appUrl} target="_blank" rel="noreferrer">
                 <button className=" mt-8 rounded-full border border-solid border-black  bg-black px-6 py-3 font-serif text-white">
                   EXPLORE
                 </button>
               </a>
 
               <a
-                href="https://tally.so/r/mVjz7J"
+                href="https://chrome.google.com/webstore/detail/natasocial-browser-extens/bfapefejfnlaieleojmkclbmibpckmmb"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -698,27 +705,29 @@ const Home: NextPage = () => {
                 alt=""
               />
 
-              <div className="ml-10">
+              <div className=" ">
                 <p className="z-1 mb-6 text-3xl font-bold">
                   Save content on the fly.
                 </p>
                 <p>
                   Collect articles and links easily on your favorite browser.
                 </p>
-
-                <a
-                  href="https://chrome.google.com/webstore/detail/bfapefejfnlaieleojmkclbmibpckmmb/preview?hl=es&authuser=3"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <button
-                    className="mt-8 rounded-full border border-solid border-black bg-black
-                 px-6 py-3 font-serif text-white"
-                  >
-                    GET THE EXTENSION
-                  </button>
-                </a>
               </div>
+            </div>
+            <div className="flex flex-row justify-center">
+              <a
+                href="https://chrome.google.com/webstore/detail/natasocial-browser-extens/bfapefejfnlaieleojmkclbmibpckmmb"
+                target="_blank"
+                rel="noreferrer"
+                className=" self-center md:self-start"
+              >
+                <button
+                  className="mt-8 rounded-full border border-solid border-black bg-black
+                 px-6 py-3 font-serif text-white"
+                >
+                  GET THE EXTENSION
+                </button>
+              </a>
             </div>
           </div>
 
@@ -731,14 +740,17 @@ const Home: NextPage = () => {
               backgroundRepeat: 'no-repeat'
             }}
           >
-            <div className="mx-4 items-center sm:mx-16 sm:flex sm:flex-row sm:justify-between md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
-              <div className="mr-2 ">
+            <div
+              className="mx-4 flex flex-col items-center sm:mx-16 sm:justify-between md:mx-32
+             md:flex-row lg:mx-48 xl:mx-64 2xl:mx-72"
+            >
+              <div className="md:mr-20 ">
                 <p className="whitespace-nowrap py-6 font-serif text-xl font-bold">
                   Supported by
                 </p>
               </div>
 
-              <div className=" flex   items-center justify-center md:flex md:flex-row ">
+              <div className="flex flex-col items-center justify-center md:flex md:flex-row ">
                 <Image
                   width={140}
                   height={50}
@@ -771,17 +783,18 @@ const Home: NextPage = () => {
             </div>
           </div>
 
-          <div className="my-10 py-10 text-center">
+          {/* join button  */}
+          <div className="flex justify-center px-10 py-20">
             <a
               href="https://discord.gg/6wunUd6Ws4"
               target="_blank"
               rel="noreferrer"
             >
               <button
-                className="mx-10 rounded-full border-2 border-solid border-black
+                className="w-full rounded-full border-2 border-solid border-black
              bg-transparent px-10 py-4 font-serif text-xl font-bold md:mx-2 md:text-3xl"
               >
-                <div className="flex items-center gap-12 px-2 py-1">
+                <div className="flex items-center justify-between gap-6 px-2 py-1 md:gap-12">
                   Join our community
                   <svg
                     width="50"
@@ -811,7 +824,8 @@ const Home: NextPage = () => {
             </a>
           </div>
 
-          <div className="my-10 bg-black py-10 text-center text-white">
+          {/* footer  */}
+          <div className="bg-black py-10 text-center text-white">
             <div className=" mx-6 mt-4 font-serif sm:mx-16 md:mx-32 lg:mx-48 xl:mx-64 2xl:mx-72">
               <div
                 style={{

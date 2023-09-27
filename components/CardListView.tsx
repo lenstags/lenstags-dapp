@@ -178,7 +178,7 @@ const CardListView: FC<Props> = (props) => {
             )}
 
             {/* titles  */}
-            <span className="truncate text-ellipsis font-serif text-xl font-bold">
+            <span className="max-w-4xl truncate text-ellipsis font-serif text-xl font-bold">
               {post.metadata.name === PRIVATE_LIST_NAME ||
               post.metadata.name === 'My private list'
                 ? '🔒 '
@@ -201,7 +201,7 @@ const CardListView: FC<Props> = (props) => {
               />
             </div>
 
-            {postId && (
+            {post.id && (
               <div
                 className="dropdown-menu absolute right-1 top-6 z-10 hidden rounded-lg border-2
                        border-gray-200 
@@ -267,7 +267,7 @@ const CardListView: FC<Props> = (props) => {
                 <PostIndicators
                   collects={post.stats.totalAmountOfCollects}
                   comments={
-                    isList
+                    isList && parseInt(post.stats.totalAmountOfComments) > 0
                       ? (
                           parseInt(post.stats.totalAmountOfComments) - 1
                         ).toString()

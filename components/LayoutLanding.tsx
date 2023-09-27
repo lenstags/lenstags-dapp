@@ -1,11 +1,10 @@
 import React, { FC, useEffect, useState } from 'react';
 
-import { DEFAULT_NATA_DOMAIN } from '@lib/config';
+import { DEFAULT_APP_DOMAIN } from '@lib/config';
 import Head from 'next/head';
 import Link from 'next/link';
 import Script from 'next/script';
-
-// import ImageProxied from 'components/ImageProxied';
+import { getEnvironmentFromDomain } from 'utils/helpers';
 
 interface Props {
   title: string;
@@ -20,6 +19,12 @@ export const LayoutLanding: FC<Props> = ({
   pageDescription,
   screen
 }) => {
+  const [appUrl, setAppUrl] = useState(DEFAULT_APP_DOMAIN);
+
+  useEffect(() => {
+    setAppUrl(getEnvironmentFromDomain());
+  }, []);
+
   return (
     <>
       <Head>
@@ -95,7 +100,7 @@ export const LayoutLanding: FC<Props> = ({
         className="fixed top-0 z-50 flex w-full justify-between px-6 py-3 sm:px-16 md:px-32 lg:px-48 xl:px-64 2xl:px-72"
       >
         <div className="hidden sm:contents">
-          <Link href={'/'}>
+          <Link href={'/'} className="mb-1 flex">
             <img
               src="/img/landing/nata-logo.svg"
               alt=""
@@ -104,20 +109,13 @@ export const LayoutLanding: FC<Props> = ({
             />
           </Link>
         </div>
-        <div
-          style={{
-            width: '120px',
-            height: '32px',
-            textAlign: 'left'
-          }}
-          className="self-center sm:hidden"
-        >
+        <div className="mr-2 self-center sm:hidden">
           <Link href={'/'}>
             <img
               src="/img/landing/isologo.svg"
               alt=""
-              width={32}
-              height={32}
+              width={36}
+              height={36}
               // style={{
               //   width: '120px',
               //   height: '80px',
@@ -135,11 +133,11 @@ export const LayoutLanding: FC<Props> = ({
             <Link href={'#welcome'}>ABOUT</Link>
           </div> */}
 
-          <div className="mx-2 p-2 ">
+          <div className="p-2 md:mx-2 ">
             <Link href={'#features'}>PRODUCTS</Link>
           </div>
 
-          <div className="mx-2 p-2 ">
+          <div className="p-2 md:mx-2 ">
             <a
               href="https://natasocial.gitbook.io"
               target="_blank"
@@ -149,21 +147,14 @@ export const LayoutLanding: FC<Props> = ({
             </a>
           </div>
 
-          <div className="mx-2 p-2 ">
+          <div className="p-2 md:mx-2 ">
             <Link href={'#contact'}>CONTACT</Link>
           </div>
         </div>
 
-        <div
-          className="my-2 "
-          style={{
-            width: '120px',
-            textAlign: 'right',
-            alignSelf: 'self-end'
-          }}
-        >
+        <div className="my-2 md:ml-5">
           <a
-            href={DEFAULT_NATA_DOMAIN}
+            href={appUrl}
             target="_blank"
             rel="noreferrer"
             className="cursor-pointer whitespace-nowrap rounded-full bg-black px-4 py-2 font-serif
