@@ -13,15 +13,16 @@ import {
   Vec2,
   Vec4
 } from 'ogl-typescript';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import SwiperCore, { Autoplay } from 'swiper';
 
-import { DEFAULT_NATA_DOMAIN } from '@lib/config';
+import { DEFAULT_APP_DOMAIN } from '@lib/config';
 import Head from 'next/head';
 import Image from 'next/image';
 import { LayoutLanding } from 'components/LayoutLanding';
 import type { NextPage } from 'next';
+import { getEnvironmentFromDomain } from 'utils/helpers';
 
 SwiperCore.use([Autoplay]);
 
@@ -283,6 +284,12 @@ const Home: NextPage = () => {
     };
   }, [imgSize]);
 
+  const [appUrl, setAppUrl] = useState(DEFAULT_APP_DOMAIN);
+
+  useEffect(() => {
+    setAppUrl(getEnvironmentFromDomain());
+  }, []);
+
   return (
     <div className="">
       <Head>
@@ -356,7 +363,7 @@ const Home: NextPage = () => {
               <p className="mt-8 font-serif md:text-xl">
                 Discover and manage the best resources.
               </p>
-              <a href={DEFAULT_NATA_DOMAIN} target="_blank" rel="noreferrer">
+              <a href={appUrl} target="_blank" rel="noreferrer">
                 <button className=" mt-8 rounded-full border border-solid border-black  bg-black px-6 py-3 font-serif text-white">
                   EXPLORE
                 </button>
@@ -777,7 +784,7 @@ const Home: NextPage = () => {
           </div>
 
           {/* join button  */}
-          <div className="flex justify-center py-20 px-10">
+          <div className="flex justify-center px-10 py-20">
             <a
               href="https://discord.gg/6wunUd6Ws4"
               target="_blank"
@@ -787,7 +794,7 @@ const Home: NextPage = () => {
                 className="w-full rounded-full border-2 border-solid border-black
              bg-transparent px-10 py-4 font-serif text-xl font-bold md:mx-2 md:text-3xl"
               >
-                <div className="flex items-center justify-between gap-6 md:gap-12 px-2 py-1">
+                <div className="flex items-center justify-between gap-6 px-2 py-1 md:gap-12">
                   Join our community
                   <svg
                     width="50"
