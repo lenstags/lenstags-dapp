@@ -255,7 +255,7 @@ const CardPostView: FC<Props> = (props) => {
             <Link
               rel="noreferrer"
               href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-              className={`${post.id && 'pointer-events-none'} min-w-fit`}
+              className={`${post.id ? '' : 'pointer-events-none'} min-w-fit`}
             >
               {isList ? (
                 <div className="max-w-56 relative">
@@ -307,7 +307,7 @@ const CardPostView: FC<Props> = (props) => {
               <Link
                 rel="noreferrer"
                 href={isList ? `/list/${post.id}` : `/post/${post.id}`}
-                className={`${post.id && 'pointer-events-none'}`}
+                className={`${post.id ? '' : 'pointer-events-none'}`}
               >
                 <div className="max-w-lg truncate text-ellipsis font-serif text-xl font-bold">
                   {post.metadata.name === PRIVATE_LIST_NAME ||

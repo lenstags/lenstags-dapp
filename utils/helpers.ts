@@ -1,6 +1,10 @@
 // @ts-ignore
 
-import { DEFAULT_IMAGE_PROFILE, IPFS_PROXY_URL } from '../lib/config';
+import {
+  DEFAULT_APP_DOMAIN,
+  DEFAULT_IMAGE_PROFILE,
+  IPFS_PROXY_URL
+} from '../lib/config';
 import { parse, setOptions } from 'marked';
 
 import createDOMPurify from 'dompurify';
@@ -164,3 +168,11 @@ export function shuffleArray<T>(array: T[]): T[] {
   }
   return array;
 }
+
+export const getEnvironmentFromDomain = (): string => {
+  if (typeof window === 'undefined') {
+    return DEFAULT_APP_DOMAIN;
+  }
+  const domain = window.location.origin;
+  return `${domain}/app`;
+};
