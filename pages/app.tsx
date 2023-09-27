@@ -11,14 +11,7 @@ import {
   PublicationSortCriteria,
   PublicationTypes
 } from '@lib/lens/graphql/generated';
-import {
-  Filter,
-  SortFilterControls,
-  SortingValuesType
-} from '@components/SortFilterControls';
 import { ProfileContext, TagsFilter, TagsFilterContext } from 'components';
-import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
-import { explore, reqQuery } from '@lib/lens/explore-publications';
 import {
   useCallback,
   useContext,
@@ -28,21 +21,28 @@ import {
   useState
 } from 'react';
 
+import { useQuery } from '@apollo/client';
+import {
+  Filter,
+  SortFilterControls,
+  SortingValuesType
+} from '@components/SortFilterControls';
+import { explore, reqQuery } from '@lib/lens/explore-publications';
 import { CardViewsMap } from '@components/CardViewButtons';
 import CustomHead from '@components/CustomHead';
 import { DotWave } from '@uiball/loaders';
-import { Layout } from 'components/Layout';
-import type { NextPage } from 'next';
-import Script from 'next/script';
 import { SearchBar } from '@components/SearchBar';
-import { Spinner } from 'components/Spinner';
 import WelcomePanel from '@components/WelcomePanel';
 import WhitelistScreen from '@components/WhitelistScreen';
-import { cn } from '@lib/utils';
-import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
 import { useExplore } from '@context/ExploreContext';
+import { ViewBy, ViewCardContext } from '@context/ViewCardContext';
+import useCheckWhitelist from '@lib/hooks/useCheckWhitelist';
+import { cn } from '@lib/utils';
+import { Layout } from 'components/Layout';
+import { Spinner } from 'components/Spinner';
+import type { NextPage } from 'next';
+import Script from 'next/script';
 import { useNetwork } from 'wagmi';
-import { useQuery } from '@apollo/client';
 
 const App: NextPage = () => {
   const [publications, setPublications] = useState<any[]>([]);
@@ -496,43 +496,37 @@ const App: NextPage = () => {
 
             {/* publications */}
             <section className="px-4 pb-6">
-              {loader ? (
-                <div className="flex min-w-full justify-center pt-10">
-                  <DotWave size={22} />
-                </div>
-              ) : (
-                <ul
-                  className={cn(
-                    'w-full rounded-b-lg pb-6',
-                    viewCard !== ViewBy.CARD
-                      ? 'flex flex-col gap-3'
-                      : 'grid grid-cols-3 gap-5'
-                  )}
-                >
-                  {publications.length > 0 ? (
-                    publications.map((post, index) => {
-                      return CardViewsMap[viewCard]({
-                        post,
-                        key: index,
-                        refProp:
-                          publications.length - 15 === index
-                            ? lastPublicationRef
-                            : null
-                      });
-                    })
-                  ) : loader ? (
-                    <div
-                      className={`mx-auto my-8 flex w-full justify-center ${
-                        viewCard !== ViewBy.CARD ? 'col-span-1' : 'col-span-3'
-                      }`}
-                    >
-                      <Spinner h="10" w="10" />
-                    </div>
-                  ) : (
-                    <div className="my-8">No results found 💤</div>
-                  )}
-                </ul>
-              )}
+              <ul
+                className={cn(
+                  'w-full rounded-b-lg pb-6',
+                  viewCard !== ViewBy.CARD
+                    ? 'flex flex-col gap-3'
+                    : 'grid grid-cols-3 gap-5'
+                )}
+              >
+                {publications.length > 0 ? (
+                  publications.map((post, index) => {
+                    return CardViewsMap[viewCard]({
+                      post,
+                      key: index,
+                      refProp:
+                        publications.length - 15 === index
+                          ? lastPublicationRef
+                          : null
+                    });
+                  })
+                ) : loader ? (
+                  <div
+                    className={`mx-auto my-8 flex w-full justify-center ${
+                      viewCard !== ViewBy.CARD ? 'col-span-1' : 'col-span-3'
+                    }`}
+                  >
+                    <Spinner h="10" w="10" />
+                  </div>
+                ) : (
+                  <div className="my-8">No results found 💤</div>
+                )}
+              </ul>
               {loadingFetchMore && (
                 <div className="mx-auto mb-10 flex w-10 items-center justify-center ">
                   <Spinner h="10" w="10" />

@@ -95,7 +95,7 @@ export const LayoutLanding: FC<Props> = ({
         className="fixed top-0 z-50 flex w-full justify-between px-6 py-3 sm:px-16 md:px-32 lg:px-48 xl:px-64 2xl:px-72"
       >
         <div className="hidden sm:contents">
-          <Link href={'/'}>
+          <Link href={'/'} className="flex mb-1">
             <img
               src="/img/landing/nata-logo.svg"
               alt=""
@@ -104,20 +104,13 @@ export const LayoutLanding: FC<Props> = ({
             />
           </Link>
         </div>
-        <div
-          style={{
-            width: '120px',
-            height: '32px',
-            textAlign: 'left'
-          }}
-          className="self-center sm:hidden"
-        >
+        <div className="self-center mr-2 sm:hidden">
           <Link href={'/'}>
             <img
               src="/img/landing/isologo.svg"
               alt=""
-              width={32}
-              height={32}
+              width={36}
+              height={36}
               // style={{
               //   width: '120px',
               //   height: '80px',
@@ -135,11 +128,11 @@ export const LayoutLanding: FC<Props> = ({
             <Link href={'#welcome'}>ABOUT</Link>
           </div> */}
 
-          <div className="mx-2 p-2 ">
+          <div className="md:mx-2 p-2 ">
             <Link href={'#features'}>PRODUCTS</Link>
           </div>
 
-          <div className="mx-2 p-2 ">
+          <div className="md:mx-2 p-2 ">
             <a
               href="https://natasocial.gitbook.io"
               target="_blank"
@@ -149,19 +142,12 @@ export const LayoutLanding: FC<Props> = ({
             </a>
           </div>
 
-          <div className="mx-2 p-2 ">
+          <div className="md:mx-2 p-2 ">
             <Link href={'#contact'}>CONTACT</Link>
           </div>
         </div>
 
-        <div
-          className="my-2 "
-          style={{
-            width: '120px',
-            textAlign: 'right',
-            alignSelf: 'self-end'
-          }}
-        >
+        <div className="my-2 md:ml-5">
           <a
             href={DEFAULT_NATA_DOMAIN}
             target="_blank"
