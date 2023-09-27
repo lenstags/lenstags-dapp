@@ -46,6 +46,7 @@
     "moment": "^2.29.4",
     "multiselect-react-dropdown": "^2.0.25",
     "next": "^13.4.4",
+    "nsfwjs": "^2.4.2",
     "ogl-typescript": "^0.1.40",
     "omit-deep": "^0.3.0",
     "openai": "^3.2.1",
