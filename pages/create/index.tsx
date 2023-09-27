@@ -1,3 +1,14 @@
+import * as nsfwjs from 'nsfwjs';
+
+import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger
+} from '@components/ui/Dialog';
 import {
   IbuiltPost,
   PublicationContentWarning
@@ -11,38 +22,28 @@ import React, {
 } from 'react';
 import { checkIfUrl, genericFetch, sleep } from 'utils/helpers';
 
-import { LayoutCreate } from '@components/LayoutCreate';
-import { Spinner } from '@components/Spinner';
-import { queryProfile } from '@lib/lens/dispatcher';
-import { followers } from '@lib/lens/followers';
-import { DEFAULT_METADATA_ATTRIBUTES, createPostManager } from '@lib/lens/post';
-import { TAGS } from '@lib/lens/tags';
-import { sendNotification } from '@lib/lens/user-notifications';
-import { NotificationTypes } from '@models/notifications.models';
-import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
-import { DotWave } from '@uiball/loaders';
 import Avatar from 'boring-avatars';
-import { ProfileContext } from 'components';
-import Editor from 'components/Editor';
-import _ from 'lodash';
-import { useSnackbar } from 'material-ui-snackbar-provider';
-import { NextPage } from 'next';
-import { useRouter } from 'next/router';
-import CreatableSelect from 'react-select/creatable';
-import TurndownService from 'turndown';
-import Toast from '../../components/Toast';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@components/ui/Dialog';
-import ExplorerCard from '@components/ExplorerCard';
-import PillTab from '@components/PillTab';
-import { ViewBy } from '@context/ViewCardContext';
 import { CardViewsMap } from '@components/CardViewButtons';
+import CreatableSelect from 'react-select/creatable';
+import { DotWave } from '@uiball/loaders';
+import Editor from 'components/Editor';
+import { LayoutCreate } from '@components/LayoutCreate';
+import { NOTIFICATION_TYPE } from '@pushprotocol/restapi/src/lib/payloads/constants';
+import { NextPage } from 'next';
+import { NotificationTypes } from '@models/notifications.models';
+import PillTab from '@components/PillTab';
+import { ProfileContext } from 'components';
+import { Spinner } from '@components/Spinner';
+import { TAGS } from '@lib/lens/tags';
+import Toast from '../../components/Toast';
+import TurndownService from 'turndown';
+import { ViewBy } from '@context/ViewCardContext';
+import _ from 'lodash';
+import { followers } from '@lib/lens/followers';
+import { queryProfile } from '@lib/lens/dispatcher';
+import { sendNotification } from '@lib/lens/user-notifications';
+import { useRouter } from 'next/router';
+import { useSnackbar } from 'material-ui-snackbar-provider';
 
 async function getBufferFromElement(url: string) {
   const response = await fetch(`/api/proxy?imageUrl=${url}`);
@@ -98,6 +99,8 @@ const Create: NextPage = () => {
   const [title, setTitle] = useState('');
   const snackbar = useSnackbar();
   const router = useRouter();
+  const [model, setModel] = useState<NSFWJS | null>(null);
+
   // const [abstract, setAbstract] = useState<string | undefined>('');
   const [editorContents, setEditorContents] = useState('');
   const [sourceUrl, setSourceUrl] = useState('');
@@ -161,6 +164,10 @@ const Create: NextPage = () => {
       });
     }
   }, [editorContents]);
+
+  useEffect(() => {
+    nsfwjs.load().then(setModel);
+  }, []);
 
   const handleTagsChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
