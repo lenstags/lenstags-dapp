@@ -476,14 +476,15 @@ const Create: NextPage = () => {
                 (prediction.className === 'Porn' ||
                   prediction.className === 'Sexy' ||
                   prediction.className === 'Hentai') &&
-                prediction.probability > 0.7 // We could adjust the threshold
+                prediction.probability > 0.55 // We could adjust the threshold
             );
 
-            if (isNSFW) {
-              console.warn('La imagen es NSFW.');
-            } else {
-              console.log('La imagen es segura.');
-            }
+            setIsNSFW(isNSFW);
+            // if (isNSFW) {
+            //   console.warn('La imagen es NSFW.');
+            // } else {
+            //   console.log('La imagen es segura.');
+            // }
           };
 
           const file = e.target.files[0];
@@ -980,10 +981,12 @@ const Create: NextPage = () => {
                   </div>
                 </div>
                 {/* NSFW switch  */}
-                <div className="mb-4 items-center px-4 py-2">
-                  <div className="mb-1 flex ">
-                    This post contains sensitive content
-                    <input
+                {isNSFW && (
+                  <div className="mb-4 items-center px-4 py-2">
+                    <div className="mb-1 flex text-xs text-red-600">
+                      ⚠️ This post contains sensitive content
+                      {/* <input
+                    
                       checked={isNSFW}
                       onChange={() => setIsNSFW(!isNSFW)}
                       type="checkbox"
@@ -992,9 +995,10 @@ const Create: NextPage = () => {
                         backgroundColor: isNSFW ? 'purple' : '',
                         borderColor: isNSFW ? 'purple' : 'gray'
                       }}
-                    />
+                    /> */}
+                    </div>
                   </div>
-                </div>
+                )}
                 {/* preview */}
                 <Dialog
                   open={openPreview}
