@@ -99,7 +99,7 @@ const Create: NextPage = () => {
   const [title, setTitle] = useState('');
   const snackbar = useSnackbar();
   const router = useRouter();
-  const [model, setModel] = useState<NSFWJS | null>(null);
+  const [model, setModel] = useState(null);
 
   // const [abstract, setAbstract] = useState<string | undefined>('');
   const [editorContents, setEditorContents] = useState('');
@@ -165,10 +165,6 @@ const Create: NextPage = () => {
     }
   }, [editorContents]);
 
-  useEffect(() => {
-    nsfwjs.load().then(setModel);
-  }, []);
-
   const handleTagsChange = (selectedOptions: any) => {
     setSelectedOption(selectedOptions);
     setPost({
@@ -179,12 +175,6 @@ const Create: NextPage = () => {
       }
     });
   };
-
-  console.log('post: ', post);
-
-  // const handleActivePanelChange = (selectedPanel: string | null) => {
-  //   setActualPanel(selectedPanel);
-  // };
 
   const fetchLinkPreview = async (url: string) => {
     setLoadingLP(true);
@@ -473,9 +463,37 @@ const Create: NextPage = () => {
       reader.onloadend = () => {
         const result = reader.result;
         setGeneratedImage(result as string);
+
         setIsLoaded(true);
         if (e.target?.files![0]) {
           setCover(e.target.files[0]);
+
+          const classifyImage = async (imageElement: any) => {
+            const model = await nsfwjs.load(); // Lazy loaded
+            const predictions = await model.classify(imageElement);
+            const isNSFW = predictions.some(
+              (prediction) =>
+                (prediction.className === 'Porn' ||
+                  prediction.className === 'Sexy' ||
+                  prediction.className === 'Hentai') &&
+                prediction.probability > 0.55 // We could adjust the threshold
+            );
+
+            setIsNSFW(isNSFW);
+            // if (isNSFW) {
+            //   console.warn('La imagen es NSFW.');
+            // } else {
+            //   console.log('La imagen es segura.');
+            // }
+          };
+
+          const file = e.target.files[0];
+          const objectURL = URL.createObjectURL(file);
+
+          const image = new Image();
+          image.src = objectURL;
+
+          classifyImage(image);
         }
       };
       reader.readAsDataURL(e.target.files[0]);
@@ -963,10 +981,12 @@ const Create: NextPage = () => {
                   </div>
                 </div>
                 {/* NSFW switch  */}
-                <div className="mb-4 items-center px-4 py-2">
-                  <div className="mb-1 flex ">
-                    This post contains sensitive content
-                    <input
+                {isNSFW && (
+                  <div className="mb-4 items-center px-4 py-2">
+                    <div className="mb-1 flex text-xs text-red-600">
+                      ⚠️ This post contains sensitive content
+                      {/* <input
+                    
                       checked={isNSFW}
                       onChange={() => setIsNSFW(!isNSFW)}
                       type="checkbox"
@@ -975,9 +995,10 @@ const Create: NextPage = () => {
                         backgroundColor: isNSFW ? 'purple' : '',
                         borderColor: isNSFW ? 'purple' : 'gray'
                       }}
-                    />
+                    /> */}
+                    </div>
                   </div>
-                </div>
+                )}
                 {/* preview */}
                 <Dialog
                   open={openPreview}
