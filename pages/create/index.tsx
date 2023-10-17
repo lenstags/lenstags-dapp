@@ -505,6 +505,12 @@ const Create: NextPage = () => {
             );
 
             setIsNSFW(isNSFW);
+
+            // if (isNSFW) {
+            //   console.warn('La imagen es NSFW.');
+            // } else {
+            //   console.log('La imagen es segura.');
+            // }
           };
 
           const file = e.target.files[0];
