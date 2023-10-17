@@ -253,6 +253,31 @@ const Create: NextPage = () => {
         setTitle(data.title as string);
         setImageURL(data.image as string);
 
+        // FIXME THIS
+        const classifyImage = async (imageElement: any) => {
+          const model = await nsfwjs.load(); // Lazy loaded
+          const predictions = await model.classify(imageElement);
+          const isNSFW = predictions.some(
+            (prediction) =>
+              (prediction.className === 'Porn' ||
+                prediction.className === 'Sexy' ||
+                prediction.className === 'Hentai') &&
+              prediction.probability > 0.55 // We could adjust the threshold
+          );
+
+          setIsNSFW(isNSFW);
+          console.log('es NSFW!!!');
+        };
+
+        console.log('dadadadad ', data.image as string);
+
+        const objectURL = data.image; // URL.createObjectURL(file);
+
+        const image = new Image();
+        image.src = objectURL;
+
+        await classifyImage(image);
+
         const imgTarget = data.image ? data.image : 'public/img/post.png';
         const imageBuffer = await getBufferFromElement(imgTarget);
         console.log('i1: ', imageBuffer.toString('base64'));
@@ -480,6 +505,7 @@ const Create: NextPage = () => {
             );
 
             setIsNSFW(isNSFW);
+
             // if (isNSFW) {
             //   console.warn('La imagen es NSFW.');
             // } else {

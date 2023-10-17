@@ -35,6 +35,7 @@
     "dompurify": "^3.0.5",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2",
+    "firebase": "^10.5.0",
     "graphql": "^16.6.0",
     "html-to-image": "^1.11.11",
     "ipfs-http-client": "^59.0.0",
