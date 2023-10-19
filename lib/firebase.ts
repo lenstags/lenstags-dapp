@@ -1,13 +1,12 @@
 import { getFirestore } from 'firebase/firestore';
 import { initializeApp } from 'firebase/app';
 
-// Tus configuraciones de Firebase aquí. Estos son ejemplos y deben ser reemplazados por tus configuraciones reales.
 const firebaseConfig = {
-  apiKey: 'AIzaSyBVbg1qaOkFgu3pySF8RbkAmNtyYzMWKo4',
-  authDomain: 'nata-gram.firebaseapp.com',
-  projectId: 'nata-gram',
-  storageBucket: 'nata-gram.appspot.com',
-  messagingSenderId: '627336891178'
+  apiKey: process.env.FB_APIKEY,
+  authDomain: process.env.FB_AUTHDOMAIN,
+  projectId: process.env.FB_PROJECTID,
+  storageBucket: process.env.FB_STORAGEBUCKET,
+  messagingSenderId: process.env.FB_MESSAGINGSENDERID
 };
 
 const app = initializeApp(firebaseConfig);
